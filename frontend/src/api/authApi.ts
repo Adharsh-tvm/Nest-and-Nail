@@ -1,4 +1,3 @@
-// api/authApi.ts
 import axiosInstance from "@/lib/axiosInstance";
 
 interface LoginCredentials {
