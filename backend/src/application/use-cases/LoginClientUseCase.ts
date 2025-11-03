@@ -18,10 +18,10 @@ export class LoginClientUseCase implements ILoginClientUseCase {
     }> {
         const { email_address, password } = userLoginData;
 
-        console.log(`[LoginUseCase] Executing with email: ${email_address}`);
+        // console.log(`[LoginUseCase] Executing with email: ${email_address}`);
 
         const user = await this._clientRepository.findByEmail(email_address);
-        console.log(user)
+        // console.log(user)
 
         if (!user) {
             console.error("[LoginUseCase] ERROR: User not found in database.");

@@ -31,7 +31,7 @@ const LoginPage = () => {
     e.preventDefault();
     try {
       const response = await authApi.login({ email_address, password });
-      console.log(response.data);
+      // console.log(response.data);
       if (response.data.user.user_role == "CLIENT") {
         router.push("/client/home");
       }

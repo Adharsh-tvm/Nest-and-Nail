@@ -66,3 +66,34 @@
 [2025-11-03 15:21:43] [32mhttp[39m: GET /api/client/me
 [2025-11-03 15:21:43] [32mhttp[39m: GET /api/client/me
 [2025-11-03 15:22:01] [32mhttp[39m: POST /api/client/logout
+[2025-11-03 16:45:12] [32mhttp[39m: POST /api/client/login
+[2025-11-03 16:45:12] [32minfo[39m: Login attempt from undefined
+[2025-11-03 16:45:24] [32mhttp[39m: POST /api/client/login
+[2025-11-03 16:45:24] [32minfo[39m: Login attempt from undefined
+[2025-11-03 16:45:25] [32mhttp[39m: POST /api/client/login
+[2025-11-03 16:45:25] [32minfo[39m: Login attempt from undefined
+[2025-11-03 16:45:42] [32minfo[39m: Server running on http://localhost:4000
+[2025-11-03 16:45:52] [32mhttp[39m: POST /api/client/login
+[2025-11-03 16:45:52] [32minfo[39m: Login attempt from undefined
+[2025-11-03 16:45:52] [32mhttp[39m: GET /api/client/me
+[2025-11-03 16:45:52] [32mhttp[39m: GET /api/client/me
+[2025-11-03 16:45:52] [32mhttp[39m: GET /api/client/me
+[2025-11-03 16:45:52] [32mhttp[39m: GET /api/client/me
+[2025-11-03 16:46:07] [32minfo[39m: Server running on http://localhost:4000
+[2025-11-03 16:48:05] [32mhttp[39m: GET /api/client/me
+[2025-11-03 16:48:10] [32mhttp[39m: GET /api/client/me
+[2025-11-03 16:48:12] [32mhttp[39m: GET /api/client/me
+[2025-11-03 16:48:15] [32mhttp[39m: POST /api/client/logout
+[2025-11-03 16:48:18] [32mhttp[39m: GET /api/client/me
+[2025-11-03 16:48:21] [32mhttp[39m: GET /api/client/me
+[2025-11-03 16:51:45] [32minfo[39m: Server running on http://localhost:4000
+[2025-11-03 16:56:55] [32mhttp[39m: POST /api/client/login
+[2025-11-03 16:56:55] [32minfo[39m: Login attempt from undefined
+[2025-11-03 17:02:41] [32minfo[39m: Server running on http://localhost:4000
+[2025-11-03 17:02:50] [32mhttp[39m: POST /api/client/login
+[2025-11-03 17:02:50] [32minfo[39m: Login attempt from user1@gmail.com
+[2025-11-03 17:02:53] [32mhttp[39m: GET /api/client/me
+[2025-11-03 17:02:53] [32mhttp[39m: GET /api/client/me
+[2025-11-03 17:02:53] [32mhttp[39m: GET /api/client/me
+[2025-11-03 17:02:53] [32mhttp[39m: GET /api/client/me
+[2025-11-03 17:03:39] [32minfo[39m: Server running on http://localhost:4000

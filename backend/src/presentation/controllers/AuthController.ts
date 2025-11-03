@@ -25,7 +25,7 @@ export class AuthController {
   //  LOGIN — sets HttpOnly cookies
   async login(req: Request, res: Response) {
     try {
-      loggerInstance.info(`Login attempt from ${req.body.email}`);
+      loggerInstance.info(`Login attempt from ${req.body.email_address}`);
       const result = await this._loginClient.execute(req.body);
       const { accessToken, refreshToken, user } = result;
 
