@@ -3,7 +3,7 @@ import { HttpStatusCode } from "../enums/httpCodes";
 import { IRegisterClientUseCase } from "../../application/interfaces/IRegisterClientUseCase";
 import { ILoginClientUseCase } from "../../application/interfaces/ILoginClientUseCase";
 import { IGetCurrentUserUseCase } from "../../application/interfaces/IGetCurrentUserUseCase";
-import { ITokenService } from "../../application/services/ITokenService";
+import { loggerInstance } from "../../infrastructure/logger/Logger";
 
 export class AuthController {
   constructor(
@@ -25,6 +25,7 @@ export class AuthController {
   //  LOGIN — sets HttpOnly cookies
   async login(req: Request, res: Response) {
     try {
+      loggerInstance.info(`Login attempt from ${req.body.email}`);
       const result = await this._loginClient.execute(req.body);
       const { accessToken, refreshToken, user } = result;
 

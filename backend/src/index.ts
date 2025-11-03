@@ -18,6 +18,8 @@ import { AuthMiddleware } from "./presentation/middlewares/AuthMiddleware";
 import cookieParser from "cookie-parser";
 import { ILoginClientUseCase } from "./application/interfaces/ILoginClientUseCase";
 import { IGetCurrentUserUseCase } from "./application/interfaces/IGetCurrentUserUseCase";
+import { loggerInstance } from "./infrastructure/logger/Logger";
+import { RequestLogger } from "./presentation/middlewares/RequestLogger";
 
 dotenv.config();
 
@@ -36,6 +38,8 @@ async function bootstrap() {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
   app.use(cookieParser());
+
+  app.use(RequestLogger)
 
 
   // Connect to MongoDB
@@ -71,7 +75,7 @@ async function bootstrap() {
   // Start server
   const PORT = process.env.PORT ?? 3000;
   app.listen(PORT, () => {
-    return console.log(`Server running on http://localhost:${PORT}`)
+    loggerInstance.info(`Server running on http://localhost:${PORT}`)
   });
 }
 
