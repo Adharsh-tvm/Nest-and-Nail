@@ -59,7 +59,7 @@ async function bootstrap() {
 
   // Application
   const registerUseCase: IRegisterClientUseCase = new RegisterClientUseCase(repo, passwordHasher, idGenerator, tokenService);
-  const loginUseCase: ILoginClientUseCase = new LoginClientUseCase(repo, passwordHasher, tokenService);
+  const loginUseCase: ILoginClientUseCase = new LoginClientUseCase(repo, passwordHasher, tokenService , loggerInstance);
   const getCurrentUserUseCase: IGetCurrentUserUseCase = new GetCurrentUserUseCase(repo);
 
   // Presentation

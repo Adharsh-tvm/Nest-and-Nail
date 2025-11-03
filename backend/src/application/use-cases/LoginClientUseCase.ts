@@ -1,6 +1,7 @@
 import { InvalidCredentialsError, UserBlockedError } from "../../domain/errors/DomainError";
 import { IClientRepository } from "../../domain/repositories/ICustomerRepository";
 import { LoginUserDTO, UserResponseDTO } from "../dtos/UserDTO";
+import { ILogger } from "../interfaces/ILogger";
 import { ILoginClientUseCase } from "../interfaces/ILoginClientUseCase";
 import { UserMapper } from "../mappers/UserMapper";
 import { IPasswordHasher } from "../services/IPasswordHasher";
@@ -10,7 +11,8 @@ export class LoginClientUseCase implements ILoginClientUseCase {
     constructor(
         private readonly _clientRepository: IClientRepository,
         private readonly _passwordHasher: IPasswordHasher,
-        private readonly _tokenService: ITokenService
+        private readonly _tokenService: ITokenService,
+        private readonly _logger: ILogger
     ) { }
 
     async execute(userLoginData: LoginUserDTO): Promise<{
@@ -24,7 +26,8 @@ export class LoginClientUseCase implements ILoginClientUseCase {
         // console.log(user)
 
         if (!user) {
-            console.error("[LoginUseCase] ERROR: User not found in database.");
+            const errorMessage = `[LoginUseCase] ERROR: User not found for email: ${email_address}`;
+            this._logger.error(errorMessage);
             throw new InvalidCredentialsError();
         }
         if (user.isBlocked) {
