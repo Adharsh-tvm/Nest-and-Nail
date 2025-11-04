@@ -14,7 +14,7 @@ export class AuthValidator {
       throw new ValidationError("Name must be at least 2 characters");
     }
 
-    if (!this.isValidEmail(data.email_address)) {
+    if (!this._isValidEmail(data.email_address)) {
       throw new ValidationError("Invalid email format");
     }
 
@@ -22,13 +22,13 @@ export class AuthValidator {
       throw new ValidationError("Password must be at least 8 characters");
     }
 
-    if (data.phone_number && !this.isValidPhone(data.phone_number)) {
+    if (data.phone_number && !this._isValidPhone(data.phone_number)) {
       throw new ValidationError("Invalid phone number");
     }
   }
 
   static validateLogin(data: LoginUserDTO): void {
-    if (!this.isValidEmail(data.email_address)) {
+    if (!this._isValidEmail(data.email_address)) {
       throw new ValidationError("Invalid email format");
     }
 
@@ -37,12 +37,12 @@ export class AuthValidator {
     }
   }
 
-  private static isValidEmail(email: string): boolean {
+  private static _isValidEmail(email: string): boolean {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   }
 
-  private static isValidPhone(phone: number): boolean {
+  private static _isValidPhone(phone: number): boolean {
     const phoneStr = phone.toString();
     return phoneStr.length >= 10 && phoneStr.length <= 15;
   }
