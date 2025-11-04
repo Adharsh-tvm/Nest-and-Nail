@@ -4,8 +4,9 @@ import { IRegisterClientUseCase } from "../../application/interfaces/IRegisterCl
 import { ILoginClientUseCase } from "../../application/interfaces/ILoginClientUseCase";
 import { IGetCurrentUserUseCase } from "../../application/interfaces/IGetCurrentUserUseCase";
 import { loggerInstance } from "../../infrastructure/logger/Logger";
+import { IAuthController } from "../interfaces/IAuthController";
 
-export class AuthController {
+export class AuthController implements IAuthController{
   constructor(
     private readonly _registerClient: IRegisterClientUseCase,
     private readonly _loginClient: ILoginClientUseCase,
@@ -53,27 +54,25 @@ export class AuthController {
 
 
 
-  async me(req: Request, res: Response) {
-    try {
-      if (!req.user) {
-        return res
-          .status(HttpStatusCode.UNAUTHORIZED)
-          .json({ message: "Unauthorized" });
-      }
-
-      const user = await this._getCurrentUser.execute(req.user.id);
-      res.status(HttpStatusCode.OK).json({ user });
-    } catch (error: any) {
-      res
-        .status(HttpStatusCode.FORBIDDEN)
-        .json({ message: "Failed to fetch user" });
+async me(req: Request, res: Response): Promise<void> {
+  try {
+    if (!req.user) {
+      res.status(HttpStatusCode.UNAUTHORIZED).json({ message: "Unauthorized" });
+      return;
     }
+
+    const user = await this._getCurrentUser.execute(req.user.id);
+    res.status(HttpStatusCode.OK).json({ user });
+  } catch (error: any) {
+    res.status(HttpStatusCode.FORBIDDEN).json({ message: "Failed to fetch user" });
   }
+}
+
 
   //  LOGOUT — clears cookies
   async logout(req: Request, res: Response) {
     res.clearCookie("accessToken");
     res.clearCookie("refreshToken");
-    return res.status(HttpStatusCode.OK).json({ message: "Logged out successfully" });
+    res.status(HttpStatusCode.OK).json({ message: "Logged out successfully" });
   }
 }
