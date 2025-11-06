@@ -21,7 +21,9 @@ import { IGetCurrentUserUseCase } from "./application/interfaces/IGetCurrentUser
 import { loggerInstance } from "./infrastructure/logger/Logger";
 import { RequestLogger } from "./presentation/middlewares/RequestLogger";
 import { toNodeHandler } from "better-auth/node";
-import { auth } from "./lib/auth";
+import { auth } from "./shared/lib/auth";
+import { GoogleAuthUseCase } from "./application/use-cases/GoogleAuthUseCase";
+import { IGoogleAuthUseCase } from "./application/interfaces/IGoogleAuthUseCase";
 
 dotenv.config();
 
@@ -63,11 +65,12 @@ async function bootstrap() {
 
   // Application
   const registerUseCase: IRegisterClientUseCase = new RegisterClientUseCase(repo, passwordHasher, idGenerator, tokenService);
-  const loginUseCase: ILoginClientUseCase = new LoginClientUseCase(repo, passwordHasher, tokenService , loggerInstance);
+  const loginUseCase: ILoginClientUseCase = new LoginClientUseCase(repo, passwordHasher, tokenService, loggerInstance);
   const getCurrentUserUseCase: IGetCurrentUserUseCase = new GetCurrentUserUseCase(repo);
+  const googleAuthUseCase: IGoogleAuthUseCase = new GoogleAuthUseCase(repo, idGenerator, tokenService)
 
   // Presentation
-  const authController = new AuthController(registerUseCase, loginUseCase, getCurrentUserUseCase);
+  const authController = new AuthController(registerUseCase, loginUseCase, getCurrentUserUseCase, googleAuthUseCase);
   const authMiddleware = new AuthMiddleware(tokenService)
 
   // Routes
