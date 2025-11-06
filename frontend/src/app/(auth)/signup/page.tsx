@@ -3,28 +3,8 @@
 import Link from "next/link";
 import { User, Briefcase } from "lucide-react";
 import styles from "./Signup.module.css";
-import { useEffect } from "react";
-import { useAuthStore } from "@/store/useAuthStore";
-import { useRouter } from "next/navigation";
 
 export default function SignupPage() {
-
-    const { user, isAuthenticated, loading, fetchUser } = useAuthStore();
-    const router = useRouter()
-  
-    useEffect(() => {
-      if (loading) fetchUser();
-    }, [loading, fetchUser]);
-  
-    useEffect(() => {
-      if (!loading && isAuthenticated && user) {
-        if (user.role === "admin") router.replace("/admin/dashboard");
-        else if (user.role === "worker") router.replace("/worker/home");
-        else router.replace("/client/home");
-      }
-    }, [isAuthenticated, user, loading, router]);
-  
-    if (loading || isAuthenticated) return  null;
 
   return (
     <main className={styles.container}>
