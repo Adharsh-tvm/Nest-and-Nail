@@ -20,6 +20,8 @@ import { ILoginClientUseCase } from "./application/interfaces/ILoginClientUseCas
 import { IGetCurrentUserUseCase } from "./application/interfaces/IGetCurrentUserUseCase";
 import { loggerInstance } from "./infrastructure/logger/Logger";
 import { RequestLogger } from "./presentation/middlewares/RequestLogger";
+import { toNodeHandler } from "better-auth/node";
+import { auth } from "./lib/auth";
 
 dotenv.config();
 
@@ -40,6 +42,8 @@ async function bootstrap() {
   app.use(cookieParser());
 
   app.use(RequestLogger)
+
+  app.all("/api/auth/*", toNodeHandler(auth));
 
 
   // Connect to MongoDB
