@@ -5,19 +5,31 @@ import { ILoginClientUseCase } from "../../application/interfaces/ILoginClientUs
 import { IGetCurrentUserUseCase } from "../../application/interfaces/IGetCurrentUserUseCase";
 import { loggerInstance } from "../../infrastructure/logger/Logger";
 import { IAuthController } from "../interfaces/IAuthController";
+import { IGoogleAuthUseCase } from "../../application/interfaces/IGoogleAuthUseCase";
+import { auth } from "../../shared/lib/auth";
+import { Role } from "../../shared/enums/enums";
+import { UserRequestDTO } from "../../application/dtos/UserDTO";
+import { setAuthCookies } from "../utils/setAuthCookies";
 
-export class AuthController implements IAuthController{
+export class AuthController implements IAuthController {
   constructor(
     private readonly _registerClient: IRegisterClientUseCase,
     private readonly _loginClient: ILoginClientUseCase,
     private readonly _getCurrentUser: IGetCurrentUserUseCase,
+    private readonly _googleAuthClient: IGoogleAuthUseCase
   ) { }
 
   //  REGISTER
   async register(req: Request, res: Response) {
     try {
-      const user = await this._registerClient.execute(req.body);
-      res.status(HttpStatusCode.CREATED).json(user);
+      const createdUser = await this._registerClient.execute(req.body);
+
+      const result = await this._loginClient.execute(req.body);
+      const { accessToken, refreshToken, user } = result;
+
+      setAuthCookies(res, accessToken, refreshToken);
+
+      res.status(HttpStatusCode.CREATED).json(createdUser);
     } catch (error: any) {
       res.status(HttpStatusCode.BAD_REQUEST).json({ message: error.message });
     }
@@ -30,19 +42,9 @@ export class AuthController implements IAuthController{
       const result = await this._loginClient.execute(req.body);
       const { accessToken, refreshToken, user } = result;
 
-      res
-        .cookie("accessToken", accessToken, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "strict",
-          maxAge: 15 * 60 * 1000, // 15 mins
-        })
-        .cookie("refreshToken", refreshToken, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "strict",
-          maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-        })
+      setAuthCookies(res, accessToken, refreshToken);
+
+     res
         .status(HttpStatusCode.OK)
         .json({ user });
     } catch (error: any) {
@@ -52,21 +54,56 @@ export class AuthController implements IAuthController{
     }
   }
 
+  //Google Authentication
+  async googleLogin(req: Request, res: Response): Promise<void> {
+    try {
+      const session = await auth.api.getSession({
+        headers: new Headers(
+          Object.entries(req.headers).map(([key, value]) => [key, String(value)])
+        )
+      });
+      if (!session || !session.user) {
+        res.status(HttpStatusCode.UNAUTHORIZED).json({ message: "Google session missing" });
+        return;
+      }
 
+      const googleUser = session.user;
+      const dto: UserRequestDTO = {
+        user_name: googleUser.name || "Google User",
+        email_address: googleUser.email || "",
+        password: "",
+        phone_number: undefined,
+        user_role: Role.CLIENT
+      };
 
-async me(req: Request, res: Response): Promise<void> {
-  try {
-    if (!req.user) {
-      res.status(HttpStatusCode.UNAUTHORIZED).json({ message: "Unauthorized" });
-      return;
+      const result = await this._googleAuthClient.execute(dto);
+      const { user, accessToken, refreshToken } = result;
+
+      setAuthCookies(res, accessToken, refreshToken)
+
+      res
+        .status(HttpStatusCode.OK)
+        .json({ user });
+
+    } catch (error: any) {
+      res.status(HttpStatusCode.BAD_REQUEST).json({ message: error.message });
     }
-
-    const user = await this._getCurrentUser.execute(req.user.id);
-    res.status(HttpStatusCode.OK).json({ user });
-  } catch (error: any) {
-    res.status(HttpStatusCode.FORBIDDEN).json({ message: "Failed to fetch user" });
   }
-}
+
+
+  async me(req: Request, res: Response): Promise<void> {
+    try {
+      if (!req.user) {
+        res.status(HttpStatusCode.UNAUTHORIZED).json({ message: "Unauthorized" });
+        return;
+      }
+
+      const user = await this._getCurrentUser.execute(req.user.id);
+      res.status(HttpStatusCode.OK).json({ user });
+    } catch (error: any) {
+      res.status(HttpStatusCode.FORBIDDEN).json({ message: "Failed to fetch user" });
+    }
+  }
 
 
   //  LOGOUT — clears cookies
