@@ -13,11 +13,9 @@ import { createClientRoutes } from "./presentation/routes/authRoutes";
 import { errorHandler } from "./presentation/middlewares/ErrorHandler";
 import { JwtTokenService } from "./infrastructure/utils/JwtTokenService";
 import { IRegisterClientUseCase } from "./application/interfaces/IRegisterClientUseCase";
-import { GetCurrentUserUseCase } from "./application/use-cases/GetCurrentUserUseCase";
 import { AuthMiddleware } from "./presentation/middlewares/AuthMiddleware";
 import cookieParser from "cookie-parser";
 import { ILoginClientUseCase } from "./application/interfaces/ILoginClientUseCase";
-import { IGetCurrentUserUseCase } from "./application/interfaces/IGetCurrentUserUseCase";
 import { loggerInstance } from "./infrastructure/logger/Logger";
 import { RequestLogger } from "./presentation/middlewares/RequestLogger";
 import { toNodeHandler } from "better-auth/node";
@@ -66,11 +64,10 @@ async function bootstrap() {
   // Application
   const registerUseCase: IRegisterClientUseCase = new RegisterClientUseCase(repo, passwordHasher, idGenerator, tokenService);
   const loginUseCase: ILoginClientUseCase = new LoginClientUseCase(repo, passwordHasher, tokenService, loggerInstance);
-  const getCurrentUserUseCase: IGetCurrentUserUseCase = new GetCurrentUserUseCase(repo);
   const googleAuthUseCase: IGoogleAuthUseCase = new GoogleAuthUseCase(repo, idGenerator, tokenService)
 
   // Presentation
-  const authController = new AuthController(registerUseCase, loginUseCase, getCurrentUserUseCase, googleAuthUseCase);
+  const authController = new AuthController(registerUseCase, loginUseCase, googleAuthUseCase);
   const authMiddleware = new AuthMiddleware(tokenService)
 
   // Routes
