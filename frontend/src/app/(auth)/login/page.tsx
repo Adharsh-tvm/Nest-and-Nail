@@ -1,44 +1,18 @@
 "use client";
 
-import React, { use, useEffect } from "react";
 import { KeyRound, AtSign, LogIn } from "lucide-react";
-import { useRouter } from "next/navigation";
-import authApi from "@/api/authApi";
-import { useAuthStore } from "@/store/useAuthStore";
+import { authClient } from "@/lib/authClient";
 
 const LoginPage = () => {
-  const [email_address, setEmail] = React.useState("");
-  const [password, setPassword] = React.useState("");
-  const router = useRouter();
-
-  const { user, isAuthenticated, loading, fetchUser } = useAuthStore();
-
-  useEffect(() => {
-    if (loading) fetchUser();
-  }, [loading, fetchUser]);
-
-  useEffect(() => {
-    if (!loading && isAuthenticated && user) {
-      if (user.role === "admin") router.replace("/admin/dashboard");
-      else if (user.role === "worker") router.replace("/worker/home");
-      else router.replace("/client/home");
-    }
-  }, [isAuthenticated, user, loading, router]);
-
-  if (loading || isAuthenticated) return null;
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const response = await authApi.login({ email_address, password });
-      // console.log(response.data);
-      if (response.data.user.user_role == "CLIENT") {
-        router.push("/client/home");
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
+ 
+  async function handleLogin () {
+    await authClient.signIn.social({
+      provider:"google",
+      callbackURL: "/home",
+      errorCallbackURL:"/error",
+    })
+  }
+  
 
   const focusRingClass = "focus:ring-zinc-500";
   const buttonClass = "bg-zinc-100 text-zinc-900 hover:bg-zinc-200";
@@ -82,8 +56,6 @@ const LoginPage = () => {
                     id="email"
                     type="email"
                     required
-                    value={email_address}
-                    onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@example.com"
                     className={`w-full pl-9 pr-4 py-2 bg-zinc-900 border border-zinc-800 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black ${focusRingClass}`}
                   />
@@ -104,8 +76,6 @@ const LoginPage = () => {
                     id="password"
                     type="password"
                     required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
                     className={`w-full pl-9 pr-4 py-2 bg-zinc-900 border border-zinc-800 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black ${focusRingClass}`}
                   />
@@ -157,6 +127,7 @@ const LoginPage = () => {
             <div>
               <button
                 type="button"
+                onClick={handleLogin}
                 className="w-full inline-flex justify-center items-center gap-x-3 py-2.5 px-4 font-semibold rounded-lg bg-zinc-900 border border-zinc-700 text-white hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-zinc-500 transition-colors"
               >
                 {/* Google SVG is inherently colored, so it remains as is */}

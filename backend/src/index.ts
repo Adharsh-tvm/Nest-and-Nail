@@ -20,6 +20,10 @@ import { ILoginClientUseCase } from "./application/interfaces/ILoginClientUseCas
 import { IGetCurrentUserUseCase } from "./application/interfaces/IGetCurrentUserUseCase";
 import { loggerInstance } from "./infrastructure/logger/Logger";
 import { RequestLogger } from "./presentation/middlewares/RequestLogger";
+import { toNodeHandler } from "better-auth/node";
+import { auth } from "./shared/lib/auth";
+import { GoogleAuthUseCase } from "./application/use-cases/GoogleAuthUseCase";
+import { IGoogleAuthUseCase } from "./application/interfaces/IGoogleAuthUseCase";
 
 dotenv.config();
 
@@ -41,6 +45,8 @@ async function bootstrap() {
 
   app.use(RequestLogger)
 
+  app.all("/api/auth/*", toNodeHandler(auth));
+
 
   // Connect to MongoDB
   await connectDB(process.env.MONGO_URI ?? "mongodb://localhost:27017/MEND-WAY");
@@ -59,11 +65,12 @@ async function bootstrap() {
 
   // Application
   const registerUseCase: IRegisterClientUseCase = new RegisterClientUseCase(repo, passwordHasher, idGenerator, tokenService);
-  const loginUseCase: ILoginClientUseCase = new LoginClientUseCase(repo, passwordHasher, tokenService , loggerInstance);
+  const loginUseCase: ILoginClientUseCase = new LoginClientUseCase(repo, passwordHasher, tokenService, loggerInstance);
   const getCurrentUserUseCase: IGetCurrentUserUseCase = new GetCurrentUserUseCase(repo);
+  const googleAuthUseCase: IGoogleAuthUseCase = new GoogleAuthUseCase(repo, idGenerator, tokenService)
 
   // Presentation
-  const authController = new AuthController(registerUseCase, loginUseCase, getCurrentUserUseCase);
+  const authController = new AuthController(registerUseCase, loginUseCase, getCurrentUserUseCase, googleAuthUseCase);
   const authMiddleware = new AuthMiddleware(tokenService)
 
   // Routes
