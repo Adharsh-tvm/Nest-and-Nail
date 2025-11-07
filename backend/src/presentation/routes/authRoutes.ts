@@ -13,10 +13,6 @@ export function createClientRoutes(
 
     router.post("/google-callback", (req, res) => authController.googleLogin(req, res));
 
-    router.get("/me", authMiddleware.handle.bind(authMiddleware), (req, res) =>
-        authController.me(req, res)
-    );
-
     router.post("/logout", (req, res) => authController.logout(req, res));
     return router;
 }   

@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import { HttpStatusCode } from "../enums/httpCodes";
 import { IRegisterClientUseCase } from "../../application/interfaces/IRegisterClientUseCase";
 import { ILoginClientUseCase } from "../../application/interfaces/ILoginClientUseCase";
-import { IGetCurrentUserUseCase } from "../../application/interfaces/IGetCurrentUserUseCase";
 import { loggerInstance } from "../../infrastructure/logger/Logger";
 import { IAuthController } from "../interfaces/IAuthController";
 import { IGoogleAuthUseCase } from "../../application/interfaces/IGoogleAuthUseCase";
@@ -15,7 +14,6 @@ export class AuthController implements IAuthController {
   constructor(
     private readonly _registerClient: IRegisterClientUseCase,
     private readonly _loginClient: ILoginClientUseCase,
-    private readonly _getCurrentUser: IGetCurrentUserUseCase,
     private readonly _googleAuthClient: IGoogleAuthUseCase
   ) { }
 
@@ -91,19 +89,7 @@ export class AuthController implements IAuthController {
   }
 
 
-  async me(req: Request, res: Response): Promise<void> {
-    try {
-      if (!req.user) {
-        res.status(HttpStatusCode.UNAUTHORIZED).json({ message: "Unauthorized" });
-        return;
-      }
 
-      const user = await this._getCurrentUser.execute(req.user.id);
-      res.status(HttpStatusCode.OK).json({ user });
-    } catch (error: any) {
-      res.status(HttpStatusCode.FORBIDDEN).json({ message: "Failed to fetch user" });
-    }
-  }
 
 
   //  LOGOUT — clears cookies
