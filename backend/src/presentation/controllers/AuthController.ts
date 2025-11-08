@@ -15,15 +15,24 @@ export class AuthController implements IAuthController {
   //  REGISTER
   async register(req: Request, res: Response) {
     try {
-      const createdUser = await this._registerClient.execute(req.body);
+      // Register the user
+      const registrationResult = await this._registerClient.execute(req.body);
+      
+      // The registration already returns tokens, so we can use those
+      // OR we can login again to generate fresh tokens
+      // Current implementation logs in again for fresh tokens
+      const loginResult = await this._loginClient.execute(req.body);
+      const { accessToken, refreshToken, user } = loginResult;
 
-      const result = await this._loginClient.execute(req.body);
-      const { accessToken, refreshToken, user } = result;
-
+      // Set cookies with the tokens from login
       setAuthCookies(res, accessToken, refreshToken);
 
-      res.status(HttpStatusCode.CREATED).json(createdUser);
+      // Return the user object from login result (not registrationResult)
+      res.status(HttpStatusCode.CREATED).json({ 
+        user: user  // This matches what frontend expects
+      });
     } catch (error: any) {
+      loggerInstance.error(`Registration error: ${error.message}`);
       res.status(HttpStatusCode.BAD_REQUEST).json({ message: error.message });
     }
   }
@@ -37,16 +46,16 @@ export class AuthController implements IAuthController {
 
       setAuthCookies(res, accessToken, refreshToken);
 
-     res
+      res
         .status(HttpStatusCode.OK)
         .json({ user });
     } catch (error: any) {
+      loggerInstance.error(`Login error: ${error.message}`);
       res
         .status(HttpStatusCode.UNAUTHORIZED)
         .json({ message: error.message });
     }
   }
-
 
   //  LOGOUT — clears cookies
   async logout(req: Request, res: Response) {

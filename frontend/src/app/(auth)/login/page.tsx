@@ -1,16 +1,11 @@
 "use client";
 
 import { KeyRound, AtSign, LogIn } from "lucide-react";
-import { authClient } from "@/lib/authClient";
 
 const LoginPage = () => {
  
   async function handleLogin () {
-    await authClient.signIn.social({
-      provider:"google",
-      callbackURL: "/home",
-      errorCallbackURL:"/error",
-    })
+
   }
   
 
