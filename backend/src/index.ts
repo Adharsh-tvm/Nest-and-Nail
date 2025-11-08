@@ -18,10 +18,7 @@ import cookieParser from "cookie-parser";
 import { ILoginClientUseCase } from "./application/interfaces/ILoginClientUseCase";
 import { loggerInstance } from "./infrastructure/logger/Logger";
 import { RequestLogger } from "./presentation/middlewares/RequestLogger";
-import { toNodeHandler } from "better-auth/node";
-import { auth } from "./shared/lib/auth";
 import { GoogleAuthUseCase } from "./application/use-cases/GoogleAuthUseCase";
-import { IGoogleAuthUseCase } from "./application/interfaces/IGoogleAuthUseCase";
 
 dotenv.config();
 
@@ -43,7 +40,6 @@ async function bootstrap() {
 
   app.use(RequestLogger)
 
-  app.all("/api/auth/*", toNodeHandler(auth));
 
 
   // Connect to MongoDB
@@ -64,14 +60,13 @@ async function bootstrap() {
   // Application
   const registerUseCase: IRegisterClientUseCase = new RegisterClientUseCase(repo, passwordHasher, idGenerator, tokenService);
   const loginUseCase: ILoginClientUseCase = new LoginClientUseCase(repo, passwordHasher, tokenService, loggerInstance);
-  const googleAuthUseCase: IGoogleAuthUseCase = new GoogleAuthUseCase(repo, idGenerator, tokenService)
 
   // Presentation
-  const authController = new AuthController(registerUseCase, loginUseCase, googleAuthUseCase);
+  const authController = new AuthController(registerUseCase, loginUseCase);
   const authMiddleware = new AuthMiddleware(tokenService)
 
   // Routes
-  app.use("/api/client", createClientRoutes(authController, authMiddleware));
+  app.use("/api/client", createClientRoutes(authController,));
 
   //Error Handler
   app.use(errorHandler);

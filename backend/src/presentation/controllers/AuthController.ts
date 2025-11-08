@@ -4,17 +4,12 @@ import { IRegisterClientUseCase } from "../../application/interfaces/IRegisterCl
 import { ILoginClientUseCase } from "../../application/interfaces/ILoginClientUseCase";
 import { loggerInstance } from "../../infrastructure/logger/Logger";
 import { IAuthController } from "../interfaces/IAuthController";
-import { IGoogleAuthUseCase } from "../../application/interfaces/IGoogleAuthUseCase";
-import { auth } from "../../shared/lib/auth";
-import { Role } from "../../shared/enums/enums";
-import { UserRequestDTO } from "../../application/dtos/UserDTO";
 import { setAuthCookies } from "../utils/setAuthCookies";
 
 export class AuthController implements IAuthController {
   constructor(
     private readonly _registerClient: IRegisterClientUseCase,
     private readonly _loginClient: ILoginClientUseCase,
-    private readonly _googleAuthClient: IGoogleAuthUseCase
   ) { }
 
   //  REGISTER
@@ -51,45 +46,6 @@ export class AuthController implements IAuthController {
         .json({ message: error.message });
     }
   }
-
-  //Google Authentication
-  async googleLogin(req: Request, res: Response): Promise<void> {
-    try {
-      const session = await auth.api.getSession({
-        headers: new Headers(
-          Object.entries(req.headers).map(([key, value]) => [key, String(value)])
-        )
-      });
-      if (!session || !session.user) {
-        res.status(HttpStatusCode.UNAUTHORIZED).json({ message: "Google session missing" });
-        return;
-      }
-
-      const googleUser = session.user;
-      const dto: UserRequestDTO = {
-        user_name: googleUser.name || "Google User",
-        email_address: googleUser.email || "",
-        password: "",
-        phone_number: undefined,
-        user_role: Role.CLIENT
-      };
-
-      const result = await this._googleAuthClient.execute(dto);
-      const { user, accessToken, refreshToken } = result;
-
-      setAuthCookies(res, accessToken, refreshToken)
-
-      res
-        .status(HttpStatusCode.OK)
-        .json({ user });
-
-    } catch (error: any) {
-      res.status(HttpStatusCode.BAD_REQUEST).json({ message: error.message });
-    }
-  }
-
-
-
 
 
   //  LOGOUT — clears cookies
