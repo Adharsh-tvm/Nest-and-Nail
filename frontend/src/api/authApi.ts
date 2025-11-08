@@ -25,8 +25,6 @@ export const authApi = {
   
   login: (credentials: LoginCredentials) =>
     axiosInstance.post<LoginResponse>("/api/client/login", credentials),
-  get: () =>
-    axiosInstance.get<LoginResponse>("/api/client/me"),
   logout: () =>
     axiosInstance.post("api/client/logout")
 }
