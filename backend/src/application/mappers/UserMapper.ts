@@ -1,4 +1,5 @@
 import { Client } from "../../domain/entities/Client";
+import { LoginMethod } from "../../shared/enums/enums";
 import { UserRequestDTO, UserResponseDTO } from "../dtos/UserDTO";
 
 export class UserMapper {
@@ -11,6 +12,7 @@ export class UserMapper {
             phone: userData.phone_number,
             role: userData.user_role,
             isBlocked: false,
+            loginMethod: LoginMethod.EMAIL_PASSWORD,
             profilePictureUrl: '',
             createdAt: new Date(),
             lastLoginAt: new Date(),

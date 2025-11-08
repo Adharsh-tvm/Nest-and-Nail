@@ -1,12 +1,10 @@
 import authApi from "@/api/authApi";
-import { useAuthStore } from "@/store/useAuthStore";
 import { redirect } from "next/navigation";
 import React from "react";
 
 type Props = {};
 
 function ClientHeader({}: Props) {
-  const { clearUser } = useAuthStore();
 
   async function handleLogout() {
     try {
@@ -14,7 +12,6 @@ function ClientHeader({}: Props) {
     } catch (error) {
       console.error("Error during logout: ", error);
     }
-    clearUser();
     redirect("/login");
   }
 
