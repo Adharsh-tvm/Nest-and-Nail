@@ -18,7 +18,6 @@ import cookieParser from "cookie-parser";
 import { ILoginClientUseCase } from "./application/interfaces/ILoginClientUseCase";
 import { loggerInstance } from "./infrastructure/logger/Logger";
 import { RequestLogger } from "./presentation/middlewares/RequestLogger";
-import { GoogleAuthUseCase } from "./application/use-cases/GoogleAuthUseCase";
 
 dotenv.config();
 
