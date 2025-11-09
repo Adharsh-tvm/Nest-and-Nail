@@ -1,10 +1,8 @@
-"use client";
 
 import ClientHeader from "@/components/containers/ClientHeader";
+import { requireRole } from "@/lib/auth";
 import type { NextPage } from "next";
-import { useRouter } from "next/navigation";
-import React, { useEffect } from "react";
-import { Spinner } from "@/components/ui/spinner"
+import React from "react";
 
 const Icon = ({
   children,
@@ -282,8 +280,9 @@ const howItWorksSteps = [
 ];
 
 // --- Main Page Component ---
-const HomePage: NextPage = () => {
-  const router = useRouter();
+const HomePage: NextPage = async () => {
+
+  await requireRole("client")
 
   return (
     <div className="bg-gray-900 text-gray-200 font-sans">

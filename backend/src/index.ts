@@ -18,6 +18,8 @@ import cookieParser from "cookie-parser";
 import { ILoginClientUseCase } from "./application/interfaces/ILoginClientUseCase";
 import { loggerInstance } from "./infrastructure/logger/Logger";
 import { RequestLogger } from "./presentation/middlewares/RequestLogger";
+import { IGetCurrentUserUseCase } from "./application/interfaces/IGetCurrentUserUseCase";
+import { GetCurrentUserUseCase } from "./application/use-cases/GetCurrentUserUseCase";
 
 dotenv.config();
 
@@ -59,13 +61,14 @@ async function bootstrap() {
   // Application
   const registerUseCase: IRegisterClientUseCase = new RegisterClientUseCase(repo, passwordHasher, idGenerator, tokenService);
   const loginUseCase: ILoginClientUseCase = new LoginClientUseCase(repo, passwordHasher, tokenService, loggerInstance);
+  const getCurrentUser: IGetCurrentUserUseCase = new GetCurrentUserUseCase(repo, loggerInstance)
 
   // Presentation
-  const authController = new AuthController(registerUseCase, loginUseCase);
+  const authController = new AuthController(registerUseCase, loginUseCase, getCurrentUser);
   const authMiddleware = new AuthMiddleware(tokenService)
 
   // Routes
-  app.use("/api/client", createClientRoutes(authController,));
+  app.use("/api/client", createClientRoutes(authController,authMiddleware));
 
   //Error Handler
   app.use(errorHandler);

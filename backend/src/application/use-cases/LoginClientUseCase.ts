@@ -1,5 +1,5 @@
 import { InvalidCredentialsError, UserBlockedError } from "../../domain/errors/DomainError";
-import { IClientRepository } from "../../domain/repositories/ICustomerRepository";
+import { IClientRepository } from "../../domain/repositories/IClientRepository";
 import { LoginUserDTO, UserResponseDTO } from "../dtos/UserDTO";
 import { ILogger } from "../interfaces/ILogger";
 import { ILoginClientUseCase } from "../interfaces/ILoginClientUseCase";
