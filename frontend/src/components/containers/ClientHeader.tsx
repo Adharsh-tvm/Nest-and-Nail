@@ -1,4 +1,3 @@
-import authApi from "@/api/authApi";
 import { redirect } from "next/navigation";
 import React from "react";
 
@@ -7,12 +6,7 @@ type Props = {};
 function ClientHeader({}: Props) {
 
   async function handleLogout() {
-    try {
-      await authApi.logout();
-    } catch (error) {
-      console.error("Error during logout: ", error);
-    }
-    redirect("/login");
+
   }
 
   return (

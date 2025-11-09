@@ -1,5 +1,5 @@
 import { Client } from "../../domain/entities/Client";
-import { IClientRepository } from "../../domain/repositories/ICustomerRepository";
+import { IClientRepository } from "../../domain/repositories/IClientRepository";
 import { ClientModel } from "../database/models/ClientModel";
 
 export class ClientRepository implements IClientRepository {

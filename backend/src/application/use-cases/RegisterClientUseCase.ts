@@ -6,7 +6,7 @@ import { ITokenService } from "../services/ITokenService";
 import { UserRequestDTO, UserResponseDTO } from "../dtos/UserDTO";
 import { UserMapper } from "../mappers/UserMapper";
 import { UserAlreadyExistsError } from "../../domain/errors/DomainError";
-import { IClientRepository } from "../../domain/repositories/ICustomerRepository";
+import { IClientRepository } from "../../domain/repositories/IClientRepository";
 import { LoginMethod } from "../../shared/enums/enums";
 
 export class RegisterClientUseCase implements IRegisterClientUseCase {
@@ -36,7 +36,7 @@ export class RegisterClientUseCase implements IRegisterClientUseCase {
       phone: userData.phone_number,
       role: userData.user_role,
       isBlocked: false,
-      loginMethod:LoginMethod.EMAIL_PASSWORD,
+      loginMethod: LoginMethod.EMAIL_PASSWORD,
       profilePictureUrl: "",
       createdAt: new Date(),
       updatedAt: new Date(),
