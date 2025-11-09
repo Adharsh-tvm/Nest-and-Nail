@@ -1,13 +1,13 @@
-import { redirect } from "next/navigation";
+"use client";
+
+import {  useAuth } from "@/contexts/AuthContext";
 import React from "react";
 
 type Props = {};
 
 function ClientHeader({}: Props) {
 
-  async function handleLogout() {
-
-  }
+  const {logout, isLoading} = useAuth()
 
   return (
     <div>
@@ -30,7 +30,8 @@ function ClientHeader({}: Props) {
           </nav>
           <div className="flex items-center space-x-4">
             <button
-              onClick={handleLogout}
+              onClick={logout}
+              disabled={isLoading}
               className="bg-yellow-400 text-gray-900 font-bold py-2 px-4 rounded-lg hover:bg-yellow-500 transition-colors"
             >
               Log Out

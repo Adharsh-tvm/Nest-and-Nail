@@ -1,34 +1,71 @@
-
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 export type UserRole = "client" | "worker" | "admin";
 
 export interface AuthUser {
+  id: string;
+  email: string;
+  role: UserRole;
   accessToken: string;
   refreshToken?: string;
-  role: UserRole;
+}
+
+// Helper function to decode JWT without verification
+function decodeJWT(token: string): { id: string; email: string; role: string } | null {
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) return null;
+
+    const payload = parts[1];
+    const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+
+    return JSON.parse(jsonPayload);
+  } catch (error) {
+    console.error("Failed to decode JWT:", error);
+    return null;
+  }
 }
 
 /**
  * Get the current user from cookies
  * Returns null if not authenticated
+ * SECURITY: Gets role from JWT token, not from userRole cookie
  */
 export async function getCurrentUser(): Promise<AuthUser | null> {
   const cookieStore = await cookies();
   
   const accessToken = cookieStore.get("accessToken")?.value;
   const refreshToken = cookieStore.get("refreshToken")?.value;
-  const userRole = cookieStore.get("userRole")?.value as UserRole | undefined;
 
-  if (!accessToken || !userRole) {
+  if (!accessToken && !refreshToken) {
+    return null;
+  }
+
+  // Try to decode access token first
+  let decoded = null;
+  const tokenToUse = accessToken || refreshToken;
+  
+  if (tokenToUse) {
+    decoded = decodeJWT(tokenToUse);
+  }
+
+  if (!decoded || !decoded.id || !decoded.email || !decoded.role) {
     return null;
   }
 
   return {
-    accessToken,
+    id: decoded.id,
+    email: decoded.email,
+    role: decoded.role.toLowerCase() as UserRole,
+    accessToken: accessToken || "",
     refreshToken,
-    role: userRole,
   };
 }
 
