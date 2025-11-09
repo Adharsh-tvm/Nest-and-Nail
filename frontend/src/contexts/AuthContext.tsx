@@ -67,8 +67,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         credentials: "include",
       });
 
+      // Clear cookies manually on client side
+      document.cookie = "accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+      document.cookie = "refreshToken=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+      
       setUser(null);
-      router.push("/login");
+      router.replace("/login");
     } catch (error) {
       console.error("Logout failed:", error);
     }

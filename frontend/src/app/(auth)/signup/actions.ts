@@ -108,7 +108,11 @@ export async function signup(
     }
 
     const data = await response.json();
-    console.log("Response data:", { ...data, accessToken: data.accessToken ? "[REDACTED]" : undefined });
+    console.log("Response data received:", { 
+      hasUser: !!data.user, 
+      hasAccessToken: !!data.accessToken,
+      hasRefreshToken: !!data.refreshToken 
+    });
 
     if (!response.ok) {
       return {
@@ -117,7 +121,8 @@ export async function signup(
       };
     }
 
-    // Set cookies if tokens are returned
+    // Backend returns tokens in response
+    // Set them in Next.js cookies
     const cookieStore = await cookies();
     
     if (data.accessToken) {
@@ -125,9 +130,16 @@ export async function signup(
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
-        maxAge: data.accessTokenMaxAge || 15 * 60, // 15 minutes default
+        maxAge: 15 * 60, // 15 minutes
         path: "/",
       });
+      console.log("✅ Access token cookie set");
+    } else {
+      console.error("❌ No access token in response");
+      return {
+        error: "Signup failed: No access token received",
+        fields,
+      };
     }
 
     if (data.refreshToken) {
@@ -135,21 +147,24 @@ export async function signup(
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
-        maxAge: data.refreshTokenMaxAge || 7 * 24 * 60 * 60, // 7 days default
+        maxAge: 7 * 24 * 60 * 60, // 7 days
         path: "/",
       });
+      console.log("✅ Refresh token cookie set");
+    }
+    
+    // Extract role from JWT token to determine redirect
+    const userRole = data.user?.user_role?.toLowerCase();
+    
+    if (!userRole) {
+      console.error("❌ No user role found in response");
+      return {
+        error: "Signup failed: Invalid user data",
+        fields,
+      };
     }
 
-    // Store user role for routing
-    cookieStore.set("userRole", role, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 7 * 24 * 60 * 60, // 7 days
-      path: "/",
-    });
-
-    console.log("Signup successful, redirecting to:", role === "worker" ? "/worker/home" : "/client/home");
+    console.log(`🚀 Signup successful, redirecting to: /${userRole}/home`);
 
   } catch (error) {
     console.error("Signup error:", error);
@@ -167,8 +182,11 @@ export async function signup(
     };
   }
 
-  // Redirect based on role
-  if (role === "worker") {
+  // Redirect based on role from cookie
+  const cookieStore = await cookies();
+  const userRole = cookieStore.get("userRole")?.value;
+
+  if (userRole === "worker") {
     redirect("/worker/home");
   } else {
     redirect("/client/home");
