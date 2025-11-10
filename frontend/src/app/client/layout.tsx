@@ -1,10 +1,16 @@
-"use client";
 
+import { requireRole } from "@/lib/auth";
 
-export default function ClientRootLayout({
+export default async function ClientRootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  await requireRole("client");
+
+  return (
+    <>
+      {children}
+    </>
+  );
 }
