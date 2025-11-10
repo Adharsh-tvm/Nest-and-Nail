@@ -21,7 +21,7 @@ function ClientHeader({}: Props) {
             <a href="#" className="hover:text-yellow-400 transition-colors">
               Workers
             </a>
-            <a href="#" className="hover:text-yellow-400 transition-colors">
+            <a href="/client/profile" className="hover:text-yellow-400 transition-colors">
               Pricing
             </a>
             <a href="#" className="hover:text-yellow-400 transition-colors">
