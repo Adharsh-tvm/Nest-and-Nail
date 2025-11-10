@@ -1,10 +1,24 @@
-"use client"
+"use client";
 
 import { ClientSideAuthProtection } from "@/components/containers/HistoryProtection";
-import { KeyRound, AtSign } from "lucide-react";
+import { KeyRound, AtSign, Loader2 } from "lucide-react";
+import { login } from "./actions";
+import { useActionState } from "react";
+
+type State = {
+  error: string | null;
+  fields?: {
+    email?: string;
+  };
+};
+
+const initialState: State = {
+  error: null,
+  fields: {},
+};
 
 export const LoginForm = () => {
-  function handleLogin() {}
+  const [state, formAction, pending] = useActionState(login, initialState);
 
   const focusRingClass = "focus:ring-zinc-500";
   const buttonClass = "bg-zinc-100 text-zinc-900 hover:bg-zinc-200";
@@ -16,7 +30,7 @@ export const LoginForm = () => {
     <>
       <ClientSideAuthProtection />
       <div className="px-6 pb-6">
-        <form onSubmit={handleLogin} className="space-y-4">
+        <form action={formAction} className="space-y-4">
           {/* Email Input */}
           <div className="space-y-2">
             <label
@@ -29,10 +43,13 @@ export const LoginForm = () => {
               <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
               <input
                 id="email"
+                name="email"
                 type="email"
                 required
+                disabled={pending}
+                defaultValue={state.fields?.email ?? ""}
                 placeholder="you@example.com"
-                className={`w-full pl-9 pr-4 py-2 bg-zinc-900 border border-zinc-800 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black ${focusRingClass}`}
+                className={`w-full pl-9 pr-4 py-2 bg-zinc-900 border border-zinc-800 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black disabled:opacity-50 disabled:cursor-not-allowed ${focusRingClass}`}
               />
             </div>
           </div>
@@ -49,10 +66,12 @@ export const LoginForm = () => {
               <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
               <input
                 id="password"
+                name="password"
                 type="password"
                 required
+                disabled={pending}
                 placeholder="••••••••"
-                className={`w-full pl-9 pr-4 py-2 bg-zinc-900 border border-zinc-800 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black ${focusRingClass}`}
+                className={`w-full pl-9 pr-4 py-2 bg-zinc-900 border border-zinc-800 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black disabled:opacity-50 disabled:cursor-not-allowed ${focusRingClass}`}
               />
             </div>
           </div>
@@ -63,6 +82,8 @@ export const LoginForm = () => {
               <input
                 type="checkbox"
                 id="remember-me"
+                name="remember"
+                disabled={pending}
                 className={`h-4 w-4 shrink-0 rounded-sm border border-zinc-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black disabled:cursor-not-allowed disabled:opacity-50 ${focusRingClass} ${checkboxClass}`}
               />
               <label htmlFor="remember-me" className="text-sm text-zinc-400">
@@ -74,12 +95,27 @@ export const LoginForm = () => {
             </a>
           </div>
 
+          {/* Error Message */}
+          {state?.error && (
+            <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+              <p className="text-sm text-red-400">{state.error}</p>
+            </div>
+          )}
+
           {/* Submit Button */}
           <button
             type="submit"
-            className={`w-full py-2.5 px-4 font-semibold rounded-lg transition-transform transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black ${buttonClass} ${focusRingClass}`}
+            disabled={pending}
+            className={`w-full py-2.5 px-4 font-semibold rounded-lg transition-transform transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none ${buttonClass} ${focusRingClass}`}
           >
-            Sign In
+            {pending ? (
+              <span className="flex items-center justify-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Signing in...
+              </span>
+            ) : (
+              "Sign In"
+            )}
           </button>
         </form>
 
@@ -99,10 +135,9 @@ export const LoginForm = () => {
         <div>
           <button
             type="button"
-            onClick={handleLogin}
-            className="w-full inline-flex justify-center items-center gap-x-3 py-2.5 px-4 font-semibold rounded-lg bg-zinc-900 border border-zinc-700 text-white hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-zinc-500 transition-colors"
+            disabled={pending}
+            className="w-full inline-flex justify-center items-center gap-x-3 py-2.5 px-4 font-semibold rounded-lg bg-zinc-900 border border-zinc-700 text-white hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-zinc-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {/* Google SVG is inherently colored, so it remains as is */}
             <svg
               className="w-5 h-5"
               viewBox="0 0 48 48"

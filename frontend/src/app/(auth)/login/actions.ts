@@ -119,26 +119,26 @@ export async function login(
       console.log("✅ Refresh token cookie set");
     }
 
-    const userRole = data.user?.user_role?.toLowerCase();
+    // const userRole = data.user?.user_role?.toLowerCase();
 
-    if (userRole) {
-      cookieStore.set("userRole", userRole, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: 7 * 24 * 60 * 60, // 7 days
-        path: "/",
-      });
+    // if (userRole) {
+    //   cookieStore.set("userRole", userRole, {
+    //     httpOnly: true,
+    //     secure: process.env.NODE_ENV === "production",
+    //     sameSite: "lax",
+    //     maxAge: 7 * 24 * 60 * 60, // 7 days
+    //     path: "/",
+    //   });
 
-      console.log(`✅ User role cookie set: ${userRole}`);
-      console.log("🚀 Login successful, redirecting to:", `/${userRole}/home`);
-    } else {
-      console.error("❌ No user role found in response");
-      return {
-        error: "Login failed: Invalid user data",
-        fields,
-      };
-    }
+    //   console.log(`✅ User role cookie set: ${userRole}`);
+    //   console.log("🚀 Login successful, redirecting to:", `/${userRole}/home`);
+    // } else {
+    //   console.error("❌ No user role found in response");
+    //   return {
+    //     error: "Login failed: Invalid user data",
+    //     fields,
+    //   };
+    // }
 
   } catch (error) {
     console.error("Login error:", error);
