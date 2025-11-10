@@ -11,7 +11,10 @@ export interface AuthUser {
   refreshToken?: string;
 }
 
-// Helper function to decode JWT without verification
+/**
+ * Decodes a JWT payload without verifying signature.
+ * Returns parsed data or null if token is invalid.
+ */
 function decodeJWT(token: string): { id: string; email: string; role: string } | null {
   try {
     const parts = token.split('.');
@@ -34,8 +37,8 @@ function decodeJWT(token: string): { id: string; email: string; role: string } |
 }
 
 /**
- * Get the current user from cookies
- * Returns null if not authenticated
+ * Reads auth cookies and returns the current user.
+ * Returns null if no valid token is available.
  */
 export async function getCurrentUser(): Promise<AuthUser | null> {
   const cookieStore = await cookies();
@@ -47,10 +50,9 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
     return null;
   }
 
-  // Try to decode access token first, fallback to refresh token
   let decoded = null;
   const tokenToUse = accessToken || refreshToken;
-  
+
   if (tokenToUse) {
     decoded = decodeJWT(tokenToUse);
   }
@@ -69,26 +71,23 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
 }
 
 /**
- * Require authentication - redirects to login if not authenticated
+ * Ensures the user is authenticated.
+ * Redirects unauthenticated users to login.
  */
 export async function requireAuth(): Promise<AuthUser> {
   const user = await getCurrentUser();
-  
-  if (!user) {
-    redirect("/login");
-  }
-
+  if (!user) redirect("/login");
   return user;
 }
 
 /**
- * Require specific role - redirects if user doesn't have the required role
+ * Ensures the user matches the required role.
+ * Redirects to their own home page if mismatched.
  */
 export async function requireRole(requiredRole: UserRole): Promise<AuthUser> {
   const user = await requireAuth();
   
   if (user.role !== requiredRole) {
-    // FIX: Corrected syntax - was using backticks instead of parentheses
     redirect(`/${user.role}/home`);
   }
 
@@ -96,7 +95,8 @@ export async function requireRole(requiredRole: UserRole): Promise<AuthUser> {
 }
 
 /**
- * Check if user is authenticated (doesn't redirect)
+ * Returns true if the user has valid auth data.
+ * Does not redirect or enforce protection.
  */
 export async function isAuthenticated(): Promise<boolean> {
   const user = await getCurrentUser();
@@ -104,11 +104,11 @@ export async function isAuthenticated(): Promise<boolean> {
 }
 
 /**
- * Verify token with backend (optional - for extra security)
+ * Sends token to backend for validation.
+ * Used when additional verification is required.
  */
 export async function verifyToken(token: string): Promise<boolean> {
   try {
-    // FIX: Corrected syntax - was using backticks instead of parentheses
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/verify-token`, {
       method: "POST",
       headers: {

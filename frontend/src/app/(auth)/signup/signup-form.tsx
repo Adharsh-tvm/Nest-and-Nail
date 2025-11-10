@@ -5,10 +5,8 @@ import { useActionState } from "react";
 import { User, Wrench, Shield, KeyRound, AtSign, Loader2 } from "lucide-react";
 import { signup } from "./actions";
 
-// Define the roles for type safety
 type Role = "client" | "worker" | "admin";
 
-// Configuration for each role, including icons and color schemes
 const roleConfig = {
   client: {
     icon: <User className="h-6 w-6 text-yellow-400" />,
@@ -40,7 +38,6 @@ type State = Awaited<ReturnType<typeof signup>>;
 
 const initialState: State = { error: null, fields: {} };
 
-// SignUp Component (Reusable for Client and Worker)
 const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
   const [state, formAction, pending] = useActionState(signup, initialState);
 

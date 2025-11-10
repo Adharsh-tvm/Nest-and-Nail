@@ -25,16 +25,26 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+/**
+ * Wraps the app with authentication state.
+ * Manages user data, loading state and auth actions.
+ * Fetches user on initial load.
+ */
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
- 
+
   useEffect(() => {
     fetchUser();
   }, []);
 
+  /**
+   * Retrieves current user session from backend.
+   * Updates auth state based on response.
+   * Resets loading once complete.
+   */
   const fetchUser = async () => {
     try {
       const response = await fetch(
@@ -42,7 +52,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         {
           method: "GET",
           credentials: "include",
-          cache: "no-store", // Never cache auth checks
+          cache: "no-store"
         }
       );
 
@@ -52,36 +62,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else {
         setUser(null);
       }
-    } catch (error) {
-      console.error("Failed to fetch user:", error);
+    } catch {
       setUser(null);
     } finally {
       setIsLoading(false);
     }
   };
 
+  /**
+   * Logs out the user by clearing tokens.
+   * Resets auth state and redirects to login.
+   * Ensures navigation cannot return to protected pages.
+   */
+  
   const logout = async () => {
     try {
-      // FIX: Corrected syntax error - was using backticks instead of parentheses
       await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/client/logout`, {
         method: "POST",
-        credentials: "include",
+        credentials: "include"
       });
 
-      // Clear cookies manually on client side
-      document.cookie = "accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
-      document.cookie = "refreshToken=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
-      
+      document.cookie =
+        "accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+      document.cookie =
+        "refreshToken=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+
       setUser(null);
-      
-      window.location.href = '/login';
-      // Use replace instead of push to prevent back navigation
       router.replace("/login");
     } catch (error) {
       console.error("Logout failed:", error);
     }
   };
 
+  /**
+   * Refreshes the current user state.
+   * Useful after profile updates or token refresh.
+   */
   const refreshUser = async () => {
     await fetchUser();
   };
@@ -93,7 +109,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isLoading,
         isAuthenticated: !!user,
         logout,
-        refreshUser,
+        refreshUser
       }}
     >
       {children}
@@ -101,6 +117,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
+/**
+ * Accesses the authentication context.
+ * Ensures hook is used only inside AuthProvider.
+ */
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
