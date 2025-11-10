@@ -1,10 +1,24 @@
-"use client"
 
 import Link from "next/link";
 import { User, Briefcase } from "lucide-react";
 import styles from "./Signup.module.css";
+import { getCurrentUser } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
-export default function SignupPage() {
+export default async function SignupPage() {
+
+    const user = await getCurrentUser();
+  
+    // If user is authenticated, redirect immediately (server-side)
+    if (user) {
+      if (user.role === "client") {
+        redirect("/client/home");
+      } else if (user.role === "worker") {
+        redirect("/worker/home");
+      } else if (user.role === "admin") {
+        redirect("/admin/dashboard");
+      }
+    }
 
   return (
     <main className={styles.container}>
