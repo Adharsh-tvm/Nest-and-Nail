@@ -1,5 +1,5 @@
-
 import ClientHeader from "@/components/containers/ClientHeader";
+import { PreventBackNavigation } from "@/components/containers/HistoryProtection";
 import { requireRole } from "@/lib/auth";
 import type { NextPage } from "next";
 import React from "react";
@@ -281,180 +281,184 @@ const howItWorksSteps = [
 
 // --- Main Page Component ---
 const HomePage: NextPage = async () => {
-
-  await requireRole("client")
+  await requireRole("client");
 
   return (
-    <div className="bg-gray-900 text-gray-200 font-sans">
-      {/* Header */}
+    <>
+      <PreventBackNavigation />
+      <div className="bg-gray-900 text-gray-200 font-sans">
+        {/* Header */}
 
-      <ClientHeader />
+        <ClientHeader />
 
-      <main>
-        {/* Hero Section */}
-        <section className="relative h-screen flex items-center justify-center pt-20">
-          <div className="absolute inset-0 bg-black/60 z-0"></div>
-          <div
-            className="absolute inset-0 z-[-1] bg-cover bg-center"
-            style={{
-              backgroundImage:
-                "url('https://images.unsplash.com/photo-1521791136064-7986c2920216?q=80&w=2069&auto=format&fit=crop')",
-            }}
-          ></div>
-          <div className="container mx-auto text-center z-10 px-4">
-            <h1 className="text-4xl md:text-6xl font-extrabold text-white leading-tight mb-4">
-              Find Trusted{" "}
-              <span className="text-yellow-400">Professionals</span> Near You
-            </h1>
-            <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-8">
-              Connect with vetted professionals for all your home and office
-              needs. Fast, reliable, and secure.
-            </p>
-            <div className="bg-white/10 backdrop-blur-sm p-4 rounded-xl max-w-3xl mx-auto">
-              <form className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="relative">
-                  <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="What service do you need?"
-                    className="w-full bg-gray-800 text-white rounded-lg p-3 pl-10 focus:outline-none focus:ring-2 focus:ring-yellow-400 border border-gray-700"
-                  />
-                </div>
-                <div className="relative">
-                  <MapPinIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Enter your location"
-                    className="w-full bg-gray-800 text-white rounded-lg p-3 pl-10 focus:outline-none focus:ring-2 focus:ring-yellow-400 border border-gray-700"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="w-full bg-yellow-400 text-gray-900 font-bold py-3 px-6 rounded-lg hover:bg-yellow-500 transition-all duration-300 transform hover:scale-105"
-                >
-                  Search
-                </button>
-              </form>
-            </div>
-            <p className="mt-4 text-sm text-gray-400">
-              1.5M+ services booked via WorkLink in your city
-            </p>
-          </div>
-        </section>
-
-        {/* Popular Services Section */}
-        <section className="py-20 bg-gray-900">
-          <div className="container mx-auto px-4 text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Popular Services
-            </h2>
-            <p className="text-gray-400 max-w-2xl mx-auto mb-12">
-              Browse our most requested services and find the perfect
-              professional for your needs.
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-              {popularServices.map((service, index) => (
-                <div
-                  key={index}
-                  className="bg-gray-800 p-6 rounded-xl shadow-lg hover:shadow-yellow-400/20 transform hover:-translate-y-2 transition-all duration-300"
-                >
-                  <Icon>{service.icon}</Icon>
-                  <h3 className="font-bold text-xl mt-4 mb-2">
-                    {service.title}
-                  </h3>
-                  <div className="flex items-center justify-center text-sm text-gray-400 mb-4">
-                    <StarIcon
-                      className="w-4 h-4 text-yellow-400 mr-1"
-                      isFilled={true}
+        <main>
+          {/* Hero Section */}
+          <section className="relative h-screen flex items-center justify-center pt-20">
+            <div className="absolute inset-0 bg-black/60 z-0"></div>
+            <div
+              className="absolute inset-0 z-[-1] bg-cover bg-center"
+              style={{
+                backgroundImage:
+                  "url('https://images.unsplash.com/photo-1521791136064-7986c2920216?q=80&w=2069&auto=format&fit=crop')",
+              }}
+            ></div>
+            <div className="container mx-auto text-center z-10 px-4">
+              <h1 className="text-4xl md:text-6xl font-extrabold text-white leading-tight mb-4">
+                Find Trusted{" "}
+                <span className="text-yellow-400">Professionals</span> Near You
+              </h1>
+              <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-8">
+                Connect with vetted professionals for all your home and office
+                needs. Fast, reliable, and secure.
+              </p>
+              <div className="bg-white/10 backdrop-blur-sm p-4 rounded-xl max-w-3xl mx-auto">
+                <form className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="relative">
+                    <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="What service do you need?"
+                      className="w-full bg-gray-800 text-white rounded-lg p-3 pl-10 focus:outline-none focus:ring-2 focus:ring-yellow-400 border border-gray-700"
                     />
-                    <span>
-                      {service.rating} ({service.reviews} reviews)
-                    </span>
                   </div>
-                  <div className="text-lg font-bold mb-4">
-                    Starting from{" "}
-                    <span className="text-yellow-400">${service.price}</span>
+                  <div className="relative">
+                    <MapPinIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Enter your location"
+                      className="w-full bg-gray-800 text-white rounded-lg p-3 pl-10 focus:outline-none focus:ring-2 focus:ring-yellow-400 border border-gray-700"
+                    />
                   </div>
-                  <button className="w-full bg-gray-700 hover:bg-yellow-400 hover:text-gray-900 text-white font-bold py-2 px-4 rounded-lg transition-colors">
-                    Book Now
+                  <button
+                    type="submit"
+                    className="w-full bg-yellow-400 text-gray-900 font-bold py-3 px-6 rounded-lg hover:bg-yellow-500 transition-all duration-300 transform hover:scale-105"
+                  >
+                    Search
                   </button>
-                </div>
-              ))}
+                </form>
+              </div>
+              <p className="mt-4 text-sm text-gray-400">
+                1.5M+ services booked via WorkLink in your city
+              </p>
             </div>
-            <button className="mt-12 border border-yellow-400 text-yellow-400 font-bold py-3 px-8 rounded-lg hover:bg-yellow-400 hover:text-gray-900 transition-colors">
-              View All Services
-            </button>
-          </div>
-        </section>
+          </section>
 
-        {/* Why Choose Us Section */}
-        <section className="py-20 bg-black">
-          <div className="container mx-auto px-4 text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Why Choose WorkLink?
-            </h2>
-            <p className="text-gray-400 max-w-2xl mx-auto mb-12">
-              We make it easy to find and book trusted professionals for any
-              job.
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {whyChooseUsItems.map((item, index) => (
-                <div
-                  key={index}
-                  className="bg-gray-900 p-8 rounded-xl border border-gray-800"
-                >
-                  <Icon className="mx-auto">
-                    <div className="w-8 h-8">{item.icon}</div>
-                  </Icon>
-                  <h3 className="font-bold text-2xl mt-6 mb-3">{item.title}</h3>
-                  <p className="text-gray-400">{item.description}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* How it Works Section */}
-        <section className="py-20 bg-gray-900">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-16">
+          {/* Popular Services Section */}
+          <section className="py-20 bg-gray-900">
+            <div className="container mx-auto px-4 text-center">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                How It Works
+                Popular Services
               </h2>
-            </div>
-            <div className="relative">
-              <div className="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-yellow-700 -translate-y-1/2"></div>
-              {/* <div className="hidden md:block absolute top-1/2 left-0 w-1/4 h-0.5 bg-yellow-400 -translate-y-1/2"></div> */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
-                {howItWorksSteps.map((step, index) => (
+              <p className="text-gray-400 max-w-2xl mx-auto mb-12">
+                Browse our most requested services and find the perfect
+                professional for your needs.
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                {popularServices.map((service, index) => (
                   <div
                     key={index}
-                    className="text-center bg-gray-900 p-4 rounded-lg"
+                    className="bg-gray-800 p-6 rounded-xl shadow-lg hover:shadow-yellow-400/20 transform hover:-translate-y-2 transition-all duration-300"
                   >
-                    <div className="relative mb-4 flex justify-center">
-                      <div className="w-16 h-16 rounded-full flex items-center justify-center font-bold text-2xl text-gray-900 bg-yellow-400 border-4 border-gray-900">
-                        {step.number}
-                      </div>
+                    <Icon>{service.icon}</Icon>
+                    <h3 className="font-bold text-xl mt-4 mb-2">
+                      {service.title}
+                    </h3>
+                    <div className="flex items-center justify-center text-sm text-gray-400 mb-4">
+                      <StarIcon
+                        className="w-4 h-4 text-yellow-400 mr-1"
+                        isFilled={true}
+                      />
+                      <span>
+                        {service.rating} ({service.reviews} reviews)
+                      </span>
                     </div>
-                    <h3 className="font-bold text-xl mb-2">{step.title}</h3>
-                    <p className="text-gray-400 px-2">{step.description}</p>
+                    <div className="text-lg font-bold mb-4">
+                      Starting from{" "}
+                      <span className="text-yellow-400">${service.price}</span>
+                    </div>
+                    <button className="w-full bg-gray-700 hover:bg-yellow-400 hover:text-gray-900 text-white font-bold py-2 px-4 rounded-lg transition-colors">
+                      Book Now
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <button className="mt-12 border border-yellow-400 text-yellow-400 font-bold py-3 px-8 rounded-lg hover:bg-yellow-400 hover:text-gray-900 transition-colors">
+                View All Services
+              </button>
+            </div>
+          </section>
+
+          {/* Why Choose Us Section */}
+          <section className="py-20 bg-black">
+            <div className="container mx-auto px-4 text-center">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                Why Choose WorkLink?
+              </h2>
+              <p className="text-gray-400 max-w-2xl mx-auto mb-12">
+                We make it easy to find and book trusted professionals for any
+                job.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {whyChooseUsItems.map((item, index) => (
+                  <div
+                    key={index}
+                    className="bg-gray-900 p-8 rounded-xl border border-gray-800"
+                  >
+                    <Icon className="mx-auto">
+                      <div className="w-8 h-8">{item.icon}</div>
+                    </Icon>
+                    <h3 className="font-bold text-2xl mt-6 mb-3">
+                      {item.title}
+                    </h3>
+                    <p className="text-gray-400">{item.description}</p>
                   </div>
                 ))}
               </div>
             </div>
-          </div>
-        </section>
-      </main>
+          </section>
 
-      {/* Footer */}
-      <footer className="bg-black py-10">
-        <div className="container mx-auto px-4 text-center text-gray-500">
-          <p>
-            &copy; {new Date().getFullYear()} WorkLink. All Rights Reserved.
-          </p>
-        </div>
-      </footer>
-    </div>
+          {/* How it Works Section */}
+          <section className="py-20 bg-gray-900">
+            <div className="container mx-auto px-4">
+              <div className="text-center mb-16">
+                <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                  How It Works
+                </h2>
+              </div>
+              <div className="relative">
+                <div className="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-yellow-700 -translate-y-1/2"></div>
+                {/* <div className="hidden md:block absolute top-1/2 left-0 w-1/4 h-0.5 bg-yellow-400 -translate-y-1/2"></div> */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
+                  {howItWorksSteps.map((step, index) => (
+                    <div
+                      key={index}
+                      className="text-center bg-gray-900 p-4 rounded-lg"
+                    >
+                      <div className="relative mb-4 flex justify-center">
+                        <div className="w-16 h-16 rounded-full flex items-center justify-center font-bold text-2xl text-gray-900 bg-yellow-400 border-4 border-gray-900">
+                          {step.number}
+                        </div>
+                      </div>
+                      <h3 className="font-bold text-xl mb-2">{step.title}</h3>
+                      <p className="text-gray-400 px-2">{step.description}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+        </main>
+
+        {/* Footer */}
+        <footer className="bg-black py-10">
+          <div className="container mx-auto px-4 text-center text-gray-500">
+            <p>
+              &copy; {new Date().getFullYear()} WorkLink. All Rights Reserved.
+            </p>
+          </div>
+        </footer>
+      </div>
+    </>
   );
 };
 

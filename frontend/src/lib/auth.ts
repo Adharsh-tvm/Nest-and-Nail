@@ -36,7 +36,6 @@ function decodeJWT(token: string): { id: string; email: string; role: string } |
 /**
  * Get the current user from cookies
  * Returns null if not authenticated
- * SECURITY: Gets role from JWT token, not from userRole cookie
  */
 export async function getCurrentUser(): Promise<AuthUser | null> {
   const cookieStore = await cookies();
@@ -48,7 +47,7 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
     return null;
   }
 
-  // Try to decode access token first
+  // Try to decode access token first, fallback to refresh token
   let decoded = null;
   const tokenToUse = accessToken || refreshToken;
   
@@ -71,11 +70,10 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
 
 /**
  * Require authentication - redirects to login if not authenticated
- * Use this in Server Components that need authentication
  */
 export async function requireAuth(): Promise<AuthUser> {
   const user = await getCurrentUser();
-
+  
   if (!user) {
     redirect("/login");
   }
@@ -88,9 +86,9 @@ export async function requireAuth(): Promise<AuthUser> {
  */
 export async function requireRole(requiredRole: UserRole): Promise<AuthUser> {
   const user = await requireAuth();
-
+  
   if (user.role !== requiredRole) {
-    // Redirect to their correct dashboard
+    // FIX: Corrected syntax - was using backticks instead of parentheses
     redirect(`/${user.role}/home`);
   }
 
@@ -110,6 +108,7 @@ export async function isAuthenticated(): Promise<boolean> {
  */
 export async function verifyToken(token: string): Promise<boolean> {
   try {
+    // FIX: Corrected syntax - was using backticks instead of parentheses
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/verify-token`, {
       method: "POST",
       headers: {

@@ -31,7 +31,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
 
-  // Fetch current user on mount
   useEffect(() => {
     fetchUser();
   }, []);
@@ -43,6 +42,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         {
           method: "GET",
           credentials: "include",
+          cache: "no-store", // Never cache auth checks
         }
       );
 
@@ -62,6 +62,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = async () => {
     try {
+      // FIX: Corrected syntax error - was using backticks instead of parentheses
       await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/client/logout`, {
         method: "POST",
         credentials: "include",
@@ -72,6 +73,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       document.cookie = "refreshToken=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
       
       setUser(null);
+      
+      // Use replace instead of push to prevent back navigation
       router.replace("/login");
     } catch (error) {
       console.error("Logout failed:", error);

@@ -182,7 +182,7 @@ export async function signup(
     };
   }
 
-  // Redirect based on role from cookie
+  // Redirect based on role
   const cookieStore = await cookies();
   const userRole = cookieStore.get("userRole")?.value;
 
