@@ -13,6 +13,11 @@ type LoginResponse = {
   fields?: Partial<LoginFormData>;
 };
 
+/**
+ * Handles server-side login submission.
+ * Validates input, calls backend and sets auth cookies.
+ * Redirects user based on their role after success.
+ */
 export async function login(
   prevState: LoginResponse,
   formData: FormData
@@ -22,79 +27,82 @@ export async function login(
 
   const fields = { email };
 
-  // Validation
+  /**
+   * Basic validation for required fields.
+   */
   if (!email || !password) {
     return {
       error: "All fields are required",
-      fields,
+      fields
     };
   }
 
+  /**
+   * Email format validation.
+   */
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
     return {
       error: "Please enter a valid email address",
-      fields,
+      fields
     };
   }
 
   try {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
+    /**
+     * Ensures backend URL exists.
+     */
     if (!apiUrl) {
-      console.error("API URL not configured");
       return {
         error: "Server configuration error. Please contact support.",
-        fields,
+        fields
       };
     }
 
     const endpoint = `${apiUrl}/api/client/login`;
-    console.log("Calling login endpoint:", endpoint);
 
+    /**
+     * Sends login request to backend.
+     */
     const response = await fetch(endpoint, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         email_address: email,
-        password: password,
+        password: password
       }),
       credentials: "include",
-      cache: "no-store",
+      cache: "no-store"
     });
 
-    console.log("Login response status:", response.status);
-
+    /**
+     * Ensures backend returns valid JSON.
+     */
     const contentType = response.headers.get("content-type");
     if (!contentType || !contentType.includes("application/json")) {
-      console.error("Non-JSON response received:", contentType);
-      const text = await response.text();
-      console.error("Response body:", text.substring(0, 500));
-
       return {
         error: "Server error: Invalid response format.",
-        fields,
+        fields
       };
     }
 
     const data = await response.json();
-    console.log("Login response data:", {
-      hasUser: !!data.user,
-      hasAccessToken: !!data.accessToken,
-      hasRefreshToken: !!data.refreshToken
-    });
 
+    /**
+     * Returns error if backend rejects login.
+     */
     if (!response.ok) {
       return {
         error: data.message || "Login failed. Please check your credentials.",
-        fields,
+        fields
       };
     }
 
-    // IMPORTANT: Backend returns tokens in response
-    // We need to manually set them in Next.js cookies
+    /**
+     * Stores tokens in secure cookies.
+     */
     const cookieStore = await cookies();
 
     if (data.accessToken) {
@@ -102,10 +110,9 @@ export async function login(
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
-        maxAge: 15 * 60, // 15 minutes
-        path: "/",
+        maxAge: 15 * 60,
+        path: "/"
       });
-      console.log("✅ Access token cookie set");
     }
 
     if (data.refreshToken) {
@@ -113,50 +120,31 @@ export async function login(
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
-        maxAge: 7 * 24 * 60 * 60, // 7 days
-        path: "/",
+        maxAge: 7 * 24 * 60 * 60,
+        path: "/"
       });
-      console.log("✅ Refresh token cookie set");
     }
 
-    // const userRole = data.user?.user_role?.toLowerCase();
-
-    // if (userRole) {
-    //   cookieStore.set("userRole", userRole, {
-    //     httpOnly: true,
-    //     secure: process.env.NODE_ENV === "production",
-    //     sameSite: "lax",
-    //     maxAge: 7 * 24 * 60 * 60, // 7 days
-    //     path: "/",
-    //   });
-
-    //   console.log(`✅ User role cookie set: ${userRole}`);
-    //   console.log("🚀 Login successful, redirecting to:", `/${userRole}/home`);
-    // } else {
-    //   console.error("❌ No user role found in response");
-    //   return {
-    //     error: "Login failed: Invalid user data",
-    //     fields,
-    //   };
-    // }
-
   } catch (error) {
-    console.error("Login error:", error);
-
+    /**
+     * Handles network or unreachable backend errors.
+     */
     if (error instanceof TypeError && error.message.includes("fetch")) {
       return {
         error: "Cannot connect to server. Please check if the backend is running.",
-        fields,
+        fields
       };
     }
 
     return {
       error: "Network error. Please check your connection and try again.",
-      fields,
+      fields
     };
   }
 
-  // Get the role from cookies to determine redirect
+  /**
+   * Determines redirect based on stored user role.
+   */
   const cookieStore = await cookies();
   const userRole = cookieStore.get("userRole")?.value;
 

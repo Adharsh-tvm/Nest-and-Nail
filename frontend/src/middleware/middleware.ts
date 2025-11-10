@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-// Helper function to decode JWT without verification
+/**
+ * Decodes a JWT payload without verifying signature.
+ * Returns parsed data or null on failure.
+ */
 function decodeJWT(token: string): { id: string; email: string; role: string } | null {
   try {
     const parts = token.split('.');
@@ -23,6 +26,10 @@ function decodeJWT(token: string): { id: string; email: string; role: string } |
   }
 }
 
+/**
+ * Controls route access based on auth state and user role.
+ * Handles redirects for protected and restricted routes.
+ */
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -30,66 +37,67 @@ export function middleware(request: NextRequest) {
 
   const accessToken = request.cookies.get("accessToken")?.value;
   const refreshToken = request.cookies.get("refreshToken")?.value;
-
   const isAuthenticated = !!(accessToken || refreshToken);
 
   let userRole: string | null = null;
-  
+
+  /**
+   * Extract role from access or refresh token.
+   */
   if (accessToken) {
     const decoded = decodeJWT(accessToken);
-    if (decoded) {
-      userRole = decoded.role?.toLowerCase();
-      console.log("🔐 Role from JWT token:", userRole);
-    }
+    if (decoded) userRole = decoded.role?.toLowerCase();
   } else if (refreshToken) {
     const decoded = decodeJWT(refreshToken);
-    if (decoded) {
-      userRole = decoded.role?.toLowerCase();
-      console.log("🔐 Role from refresh token:", userRole);
-    }
+    if (decoded) userRole = decoded.role?.toLowerCase();
   }
 
   const isLoginPage = pathname === "/login" || pathname.startsWith("/login/");
   const isSignupPage = pathname.startsWith("/signup");
   const isAuthRoute = isLoginPage || isSignupPage;
 
-  // CRITICAL: Block authenticated users from auth pages
+  /**
+   * Redirect authenticated users away from login and signup.
+   */
   if (isAuthRoute && isAuthenticated && userRole) {
-    console.log(`🔒 BLOCKING: Logged-in ${userRole} tried to access ${pathname}`);
-    
-    const dashboardUrl = userRole === "client" 
-      ? new URL("/client/home", request.url)
-      : userRole === "worker"
-      ? new URL("/worker/home", request.url)
-      : new URL("/admin/dashboard", request.url);
-    
-    // Use 308 (Permanent Redirect) for faster redirects
+    const dashboardUrl =
+      userRole === "client"
+        ? new URL("/client/home", request.url)
+        : userRole === "worker"
+        ? new URL("/worker/home", request.url)
+        : new URL("/admin/dashboard", request.url);
+
     const response = NextResponse.redirect(dashboardUrl, { status: 308 });
-    
-    // CRITICAL: Prevent browser caching and add instant redirect
-    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
-    response.headers.set('Pragma', 'no-cache');
-    response.headers.set('Expires', '0');
-    response.headers.set('X-Robots-Tag', 'noindex, nofollow');
-    
+
+    response.headers.set(
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0"
+    );
+    response.headers.set("Pragma", "no-cache");
+    response.headers.set("Expires", "0");
+    response.headers.set("X-Robots-Tag", "noindex, nofollow");
+
     return response;
   }
 
-  // Allow unauthenticated users to access auth pages
+  /**
+   * Allow unauthenticated access to login and signup.
+   */
   if (isAuthRoute && !isAuthenticated) {
-    console.log(`✅ Allowing unauthenticated access to: ${pathname}`);
-    
-    // Add no-cache headers to auth pages too
     const response = NextResponse.next();
-    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-    response.headers.set('Pragma', 'no-cache');
-    response.headers.set('Expires', '0');
-    
+    response.headers.set(
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, proxy-revalidate"
+    );
+    response.headers.set("Pragma", "no-cache");
+    response.headers.set("Expires", "0");
     return response;
   }
 
+  /**
+   * Allow access to public home page.
+   */
   if (pathname === "/") {
-    console.log(`✅ Allowing access to homepage`);
     return NextResponse.next();
   }
 
@@ -98,55 +106,65 @@ export function middleware(request: NextRequest) {
     pathname.startsWith("/worker") ||
     pathname.startsWith("/admin");
 
+  /**
+   * Block unauthenticated users from protected routes.
+   */
   if (isProtectedRoute && !isAuthenticated) {
-    console.log(`🔒 BLOCKING: Unauthenticated user tried to access ${pathname}`);
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("redirect", pathname);
-    
+
     const response = NextResponse.redirect(loginUrl, { status: 303 });
-    
-    // Add aggressive cache prevention for protected routes
-    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
-    response.headers.set('Pragma', 'no-cache');
-    response.headers.set('Expires', '0');
-    
+    response.headers.set(
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0"
+    );
+    response.headers.set("Pragma", "no-cache");
+    response.headers.set("Expires", "0");
+
     return response;
   }
 
-  // Role-based access control
+  /**
+   * Block users trying to access the wrong role-based area.
+   */
   if (isAuthenticated && userRole && isProtectedRoute) {
     if (pathname.startsWith("/client") && userRole !== "client") {
-      console.log(`⚠️ BLOCKING: ${userRole} tried to access client area`);
-      const correctUrl = new URL(`/${userRole}/home`, request.url);
-      return NextResponse.redirect(correctUrl, { status: 303 });
+      return NextResponse.redirect(new URL(`/${userRole}/home`, request.url), {
+        status: 303
+      });
     }
     if (pathname.startsWith("/worker") && userRole !== "worker") {
-      console.log(`⚠️ BLOCKING: ${userRole} tried to access worker area`);
-      const correctUrl = new URL(`/${userRole}/home`, request.url);
-      return NextResponse.redirect(correctUrl, { status: 303 });
+      return NextResponse.redirect(new URL(`/${userRole}/home`, request.url), {
+        status: 303
+      });
     }
     if (pathname.startsWith("/admin") && userRole !== "admin") {
-      console.log(`⚠️ BLOCKING: ${userRole} tried to access admin area`);
-      const correctUrl = new URL(`/${userRole}/home`, request.url);
-      return NextResponse.redirect(correctUrl, { status: 303 });
+      return NextResponse.redirect(new URL(`/${userRole}/home`, request.url), {
+        status: 303
+      });
     }
   }
 
-  // Invalid token handling
+  /**
+   * Handle invalid tokens where role cannot be extracted.
+   */
   if (isProtectedRoute && isAuthenticated && !userRole) {
-    console.log("⚠️ BLOCKING: Invalid token - couldn't extract role");
-    const response = NextResponse.redirect(new URL("/login", request.url), { status: 303 });
+    const response = NextResponse.redirect(new URL("/login", request.url), {
+      status: 303
+    });
     response.cookies.delete("accessToken");
     response.cookies.delete("refreshToken");
     return response;
   }
 
-  console.log(`✅ Allowing access to: ${pathname}`);
+  /**
+   * Default allow.
+   */
   return NextResponse.next();
 }
 
 export const config = {
   matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico|.*\\..*|_next).*)",
-  ],
+    "/((?!api|_next/static|_next/image|favicon.ico|.*\\..*|_next).*)"
+  ]
 };

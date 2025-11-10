@@ -12,23 +12,25 @@ export class AuthController implements IAuthController {
     private readonly _registerClient: IRegisterClientUseCase,
     private readonly _loginClient: ILoginClientUseCase,
     private readonly _getCurrentuser: IGetCurrentUserUseCase
-  ) { }
+  ) {}
 
-  //  REGISTER - RETURN TOKENS IN RESPONSE
+  /**
+   * Registers a new user.
+   * Generates tokens and sets cookies.
+   * Returns user data and tokens to client.
+   */
   async register(req: Request, res: Response) {
     try {
       const registrationResult = await this._registerClient.execute(req.body);
       const loginResult = await this._loginClient.execute(req.body);
       const { accessToken, refreshToken, user } = loginResult;
 
-      // Set cookies for browser clients (optional - for direct API usage)
       setAuthCookies(res, accessToken, refreshToken);
 
-      // IMPORTANT: Also return tokens in response for Next.js server actions
       res.status(HttpStatusCode.CREATED).json({
-        user: user,
-        accessToken: accessToken,
-        refreshToken: refreshToken
+        user,
+        accessToken,
+        refreshToken
       });
     } catch (error: any) {
       loggerInstance.error(`Registration error: ${error.message}`);
@@ -36,18 +38,19 @@ export class AuthController implements IAuthController {
     }
   }
 
-  //  LOGIN - RETURN TOKENS IN RESPONSE
+  /**
+   * Authenticates user and generates tokens.
+   * Sets cookies and returns tokens for Next.js usage.
+   */
   async login(req: Request, res: Response) {
     try {
       loggerInstance.info(`Login attempt from ${req.body.email_address}`);
       const result = await this._loginClient.execute(req.body);
       const { accessToken, refreshToken, user } = result;
 
-      // Set cookies for browser clients (optional - for direct API usage)
       setAuthCookies(res, accessToken, refreshToken);
 
-      // IMPORTANT: Also return tokens in response for Next.js server actions
-      res.status(HttpStatusCode.OK).json({ 
+      res.status(HttpStatusCode.OK).json({
         user,
         accessToken,
         refreshToken
@@ -58,10 +61,15 @@ export class AuthController implements IAuthController {
     }
   }
 
+  /**
+   * Fetches currently authenticated user.
+   * Relies on decoded user ID inserted by middleware.
+   */
   async getCurrentUser(req: Request, res: Response) {
     try {
       const userId = (req as any).user?.id;
       const userResponse = await this._getCurrentuser.execute(userId);
+
       return res.status(HttpStatusCode.OK).json({ user: userResponse });
     } catch (error: any) {
       loggerInstance.error(`Get current user error: ${error.message}`);
@@ -73,10 +81,14 @@ export class AuthController implements IAuthController {
     }
   }
 
-  //  LOGOUT — clears cookies
+  /**
+   * Logs out user by clearing auth cookies.
+   * Does not invalidate tokens server-side.
+   */
   async logout(req: Request, res: Response) {
     res.clearCookie("accessToken", { path: "/" });
     res.clearCookie("refreshToken", { path: "/" });
+
     res.status(HttpStatusCode.OK).json({ message: "Logged out successfully" });
   }
 }
