@@ -74,6 +74,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       setUser(null);
       
+      window.location.href = '/login';
       // Use replace instead of push to prevent back navigation
       router.replace("/login");
     } catch (error) {

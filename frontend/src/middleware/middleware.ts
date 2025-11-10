@@ -63,12 +63,14 @@ export function middleware(request: NextRequest) {
       ? new URL("/worker/home", request.url)
       : new URL("/admin/dashboard", request.url);
     
-    const response = NextResponse.redirect(dashboardUrl, { status: 303 });
+    // Use 308 (Permanent Redirect) for faster redirects
+    const response = NextResponse.redirect(dashboardUrl, { status: 308 });
     
-    // CRITICAL: Prevent browser caching of this redirect
-    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    // CRITICAL: Prevent browser caching and add instant redirect
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
     response.headers.set('Pragma', 'no-cache');
     response.headers.set('Expires', '0');
+    response.headers.set('X-Robots-Tag', 'noindex, nofollow');
     
     return response;
   }
@@ -100,7 +102,15 @@ export function middleware(request: NextRequest) {
     console.log(`🔒 BLOCKING: Unauthenticated user tried to access ${pathname}`);
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("redirect", pathname);
-    return NextResponse.redirect(loginUrl, { status: 303 });
+    
+    const response = NextResponse.redirect(loginUrl, { status: 303 });
+    
+    // Add aggressive cache prevention for protected routes
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+    response.headers.set('Pragma', 'no-cache');
+    response.headers.set('Expires', '0');
+    
+    return response;
   }
 
   // Role-based access control
