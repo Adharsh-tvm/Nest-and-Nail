@@ -42,16 +42,19 @@ const LoginPage = async () => {
 
           {/* Card Footer */}
           <div className="p-6 border-t border-zinc-800 text-center text-sm">
-            <p className="text-zinc-500">
-              Don't have an account?{" "}
+            <p className="text-zinc-500 mb-2">Don't have an account?</p>
+
+            <div className="flex justify-center items-center gap-2">
               <a href="/signup/client" className={`font-medium ${linkClass}`}>
                 Sign up as Client
               </a>
-              {" or "}
+
+              <span className="text-zinc-500">or</span>
+
               <a href="/signup/worker" className={`font-medium ${linkClass}`}>
                 Sign up as Worker
               </a>
-            </p>
+            </div>
           </div>
         </div>
       </div>

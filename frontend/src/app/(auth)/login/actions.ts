@@ -61,7 +61,7 @@ export async function login(
       };
     }
 
-    const endpoint = `${apiUrl}/api/client/login`;
+    const endpoint = `${apiUrl}/api/auth/login`;
 
     /**
      * Sends login request to backend.
