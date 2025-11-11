@@ -21,7 +21,7 @@ export interface UserResponseDTO {
 export interface LoginUserDTO {
     email_address: string;
     password: string;
-    user_role?: Role; // Make it optional since we'll detect it
+    user_role?: Role; 
 }    
 
 export interface LoginResponseDTO {

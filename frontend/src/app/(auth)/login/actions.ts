@@ -17,6 +17,10 @@ type LoginResponse = {
  * Handles server-side login submission.
  * Validates input, calls backend and sets auth cookies.
  * Redirects user based on their role after success.
+ *
+ * @param prevState - Previous login state returned by useActionState
+ * @param formData - Form data submitted from the login form
+ * @returns {Promise<LoginResponse>} - Either an error or triggers a redirect
  */
 export async function login(
   prevState: LoginResponse,
@@ -27,9 +31,7 @@ export async function login(
 
   const fields = { email };
 
-  /**
-   * Basic validation for required fields.
-   */
+  // Basic validation for required fields.
   if (!email || !password) {
     return {
       error: "All fields are required",
@@ -37,9 +39,7 @@ export async function login(
     };
   }
 
-  /**
-   * Email format validation.
-   */
+  // Email format validation.
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
     return {
@@ -51,9 +51,7 @@ export async function login(
   try {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-    /**
-     * Ensures backend URL exists.
-     */
+    // Ensures backend URL exists.
     if (!apiUrl) {
       return {
         error: "Server configuration error. Please contact support.",
@@ -63,9 +61,7 @@ export async function login(
 
     const endpoint = `${apiUrl}/api/auth/login`;
 
-    /**
-     * Sends login request to backend.
-     */
+    // Sends login request to backend.
     const response = await fetch(endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -77,9 +73,7 @@ export async function login(
       cache: "no-store"
     });
 
-    /**
-     * Ensures backend returns valid JSON.
-     */
+    // Ensures backend returns valid JSON.
     const contentType = response.headers.get("content-type");
     if (!contentType || !contentType.includes("application/json")) {
       return {
@@ -90,9 +84,7 @@ export async function login(
 
     const data = await response.json();
 
-    /**
-     * Returns error if backend rejects login.
-     */
+    // Returns error if backend rejects login.
     if (!response.ok) {
       return {
         error: data.message || "Login failed. Please check your credentials.",
@@ -100,9 +92,7 @@ export async function login(
       };
     }
 
-    /**
-     * Stores tokens in secure cookies.
-     */
+    // Stores tokens in secure cookies.
     const cookieStore = await cookies();
 
     if (data.accessToken) {
@@ -126,9 +116,7 @@ export async function login(
     }
 
   } catch (error) {
-    /**
-     * Handles network or unreachable backend errors.
-     */
+    // Handles network or unreachable backend errors.
     if (error instanceof TypeError && error.message.includes("fetch")) {
       return {
         error: "Cannot connect to server. Please check if the backend is running.",
@@ -142,9 +130,7 @@ export async function login(
     };
   }
 
-  /**
-   * Determines redirect based on stored user role.
-   */
+  // Determines redirect based on stored user role.
   const cookieStore = await cookies();
   const userRole = cookieStore.get("userRole")?.value;
 

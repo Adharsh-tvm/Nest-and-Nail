@@ -1,22 +1,20 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-/**
- * Decodes a JWT payload without verifying signature.
- * Returns parsed data or null on failure.
- */
+// Decodes a JWT payload without verifying signature.
+// Returns parsed data or null on failure.
 function decodeJWT(token: string): { id: string; email: string; role: string } | null {
   try {
-    const parts = token.split('.');
+    const parts = token.split(".");
     if (parts.length !== 3) return null;
 
     const payload = parts[1];
-    const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+    const base64 = payload.replace(/-/g, "+").replace(/_/g, "/");
     const jsonPayload = decodeURIComponent(
       atob(base64)
-        .split('')
-        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-        .join('')
+        .split("")
+        .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+        .join("")
     );
 
     return JSON.parse(jsonPayload);
@@ -29,7 +27,11 @@ function decodeJWT(token: string): { id: string; email: string; role: string } |
 /**
  * Controls route access based on auth state and user role.
  * Handles redirects for protected and restricted routes.
+ *
+ * @param request - Incoming request from Next.js runtime
+ * @returns Redirect or NextResponse.next()
  */
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -41,9 +43,7 @@ export function middleware(request: NextRequest) {
 
   let userRole: string | null = null;
 
-  /**
-   * Extract role from access or refresh token.
-   */
+  // Extract role from access or refresh token.
   if (accessToken) {
     const decoded = decodeJWT(accessToken);
     if (decoded) userRole = decoded.role?.toLowerCase();
@@ -56,9 +56,7 @@ export function middleware(request: NextRequest) {
   const isSignupPage = pathname.startsWith("/signup");
   const isAuthRoute = isLoginPage || isSignupPage;
 
-  /**
-   * Redirect authenticated users away from login and signup.
-   */
+  // Redirect authenticated users away from login and signup.
   if (isAuthRoute && isAuthenticated && userRole) {
     const dashboardUrl =
       userRole === "client"
@@ -80,9 +78,7 @@ export function middleware(request: NextRequest) {
     return response;
   }
 
-  /**
-   * Allow unauthenticated access to login and signup.
-   */
+  // Allow unauthenticated access to login and signup.
   if (isAuthRoute && !isAuthenticated) {
     const response = NextResponse.next();
     response.headers.set(
@@ -94,9 +90,7 @@ export function middleware(request: NextRequest) {
     return response;
   }
 
-  /**
-   * Allow access to public home page.
-   */
+  // Allow access to public home page.
   if (pathname === "/") {
     return NextResponse.next();
   }
@@ -106,9 +100,7 @@ export function middleware(request: NextRequest) {
     pathname.startsWith("/worker") ||
     pathname.startsWith("/admin");
 
-  /**
-   * Block unauthenticated users from protected routes.
-   */
+  // Block unauthenticated users from protected routes.
   if (isProtectedRoute && !isAuthenticated) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("redirect", pathname);
@@ -124,9 +116,7 @@ export function middleware(request: NextRequest) {
     return response;
   }
 
-  /**
-   * Block users trying to access the wrong role-based area.
-   */
+  // Block users trying to access the wrong role-based area.
   if (isAuthenticated && userRole && isProtectedRoute) {
     if (pathname.startsWith("/client") && userRole !== "client") {
       return NextResponse.redirect(new URL(`/${userRole}/home`, request.url), {
@@ -145,9 +135,7 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  /**
-   * Handle invalid tokens where role cannot be extracted.
-   */
+  // Handle invalid tokens where role cannot be extracted.
   if (isProtectedRoute && isAuthenticated && !userRole) {
     const response = NextResponse.redirect(new URL("/login", request.url), {
       status: 303
@@ -157,14 +145,10 @@ export function middleware(request: NextRequest) {
     return response;
   }
 
-  /**
-   * Default allow.
-   */
+  // Default allow.
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico|.*\\..*|_next).*)"
-  ]
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|.*\\..*|_next).*)"]
 };
