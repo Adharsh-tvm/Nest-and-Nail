@@ -17,12 +17,14 @@ type SignupResponse = {
 };
 
 /**
- * 
- * @param prevState 
- * @param formData 
- * @returns 
- * 
- * 
+ * Handles server-side signup submission.
+ * Validates fields, communicates with backend,
+ * sets authentication cookies, and redirects user
+ * based on role after successful registration.
+ *
+ * @param prevState - Previous state from useActionState
+ * @param formData - Submitted signup form data
+ * @returns {Promise<SignupResponse>} - Error or redirect
  */
 export async function signup(
   prevState: SignupResponse,
@@ -38,9 +40,7 @@ export async function signup(
   // Persist these fields when returning errors
   const fields = { name, email, role };
 
-  /**
-   * Basic field and password validation.
-   */
+  // Basic field and password validation.
   if (!name || !email || !password || !confirmPassword) {
     return { error: "All fields are required", fields };
   }
@@ -53,9 +53,7 @@ export async function signup(
     return { error: "Password must be at least 8 characters long", fields };
   }
 
-  /**
-   * Email format validation.
-   */
+  // Email format validation.
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
     return { error: "Please enter a valid email address", fields };
@@ -64,9 +62,7 @@ export async function signup(
   try {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-    /**
-     * Ensures API URL is configured.
-     */
+    // Ensures API URL is configured.
     if (!apiUrl) {
       return {
         error: "Server configuration error. Please contact support.",
@@ -76,9 +72,7 @@ export async function signup(
 
     const endpoint = `${apiUrl}/api/auth/register`;
 
-    /**
-     * Sends signup request to backend.
-     */
+    // Sends signup request to backend.
     const response = await fetch(endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -92,9 +86,7 @@ export async function signup(
       cache: "no-store"
     });
 
-    /**
-     * Ensures backend returns valid JSON.
-     */
+    // Ensures backend returns valid JSON.
     const contentType = response.headers.get("content-type");
     if (!contentType || !contentType.includes("application/json")) {
       return {
@@ -105,9 +97,7 @@ export async function signup(
 
     const data = await response.json();
 
-    /**
-     * Handles API errors returned by backend.
-     */
+    // Handles API errors returned by backend.
     if (!response.ok) {
       return {
         error: data.message || data.error || "Signup failed. Please try again.",
@@ -115,9 +105,7 @@ export async function signup(
       };
     }
 
-    /**
-     * Stores tokens received from backend.
-     */
+    // Stores tokens received from backend.
     const cookieStore = await cookies();
 
     if (data.accessToken) {
@@ -145,9 +133,7 @@ export async function signup(
       });
     }
 
-    /**
-     * Extracts user role from response for redirect.
-     */
+    // Extracts user role from response for redirect.
     const userRole = data.user?.user_role?.toLowerCase();
     if (!userRole) {
       return {
@@ -157,9 +143,7 @@ export async function signup(
     }
 
   } catch (error) {
-    /**
-     * Handles backend connection failures.
-     */
+    // Handles backend connection failures.
     if (error instanceof TypeError && error.message.includes("fetch")) {
       return {
         error: "Cannot connect to server. Please check if the backend is running.",
@@ -173,9 +157,7 @@ export async function signup(
     };
   }
 
-  /**
-   * Redirects user based on stored role.
-   */
+  // Redirects user based on stored role.
   const cookieStore = await cookies();
   const userRole = cookieStore.get("userRole")?.value;
 

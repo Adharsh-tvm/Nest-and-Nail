@@ -11,22 +11,20 @@ export interface AuthUser {
   refreshToken?: string;
 }
 
-/**
- * Decodes a JWT payload without verifying signature.
- * Returns parsed data or null if token is invalid.
- */
+// Decodes a JWT payload without verifying signature.
+// Returns parsed data or null if token is invalid.
 function decodeJWT(token: string): { id: string; email: string; role: string } | null {
   try {
-    const parts = token.split('.');
+    const parts = token.split(".");
     if (parts.length !== 3) return null;
 
     const payload = parts[1];
-    const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+    const base64 = payload.replace(/-/g, "+").replace(/_/g, "/");
     const jsonPayload = decodeURIComponent(
       atob(base64)
-        .split('')
-        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-        .join('')
+        .split("")
+        .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+        .join("")
     );
 
     return JSON.parse(jsonPayload);
@@ -39,10 +37,12 @@ function decodeJWT(token: string): { id: string; email: string; role: string } |
 /**
  * Reads auth cookies and returns the current user.
  * Returns null if no valid token is available.
+ *
+ * @returns {Promise<AuthUser | null>}
  */
 export async function getCurrentUser(): Promise<AuthUser | null> {
   const cookieStore = await cookies();
-  
+
   const accessToken = cookieStore.get("accessToken")?.value;
   const refreshToken = cookieStore.get("refreshToken")?.value;
 
@@ -66,27 +66,32 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
     email: decoded.email,
     role: decoded.role.toLowerCase() as UserRole,
     accessToken: accessToken || "",
-    refreshToken,
+    refreshToken
   };
 }
 
 /**
  * Ensures the user is authenticated.
  * Redirects unauthenticated users to login.
+ *
+ * @returns {Promise<AuthUser>}
  */
 export async function requireAuth(): Promise<AuthUser> {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
-  return user;
+  return user!;
 }
 
 /**
  * Ensures the user matches the required role.
  * Redirects to their own home page if mismatched.
+ *
+ * @param requiredRole - Role that is required to access the desired route
+ * @returns {Promise<AuthUser>}
  */
 export async function requireRole(requiredRole: UserRole): Promise<AuthUser> {
   const user = await requireAuth();
-  
+
   if (user.role !== requiredRole) {
     redirect(`/${user.role}/home`);
   }
@@ -97,6 +102,8 @@ export async function requireRole(requiredRole: UserRole): Promise<AuthUser> {
 /**
  * Returns true if the user has valid auth data.
  * Does not redirect or enforce protection.
+ *
+ * @returns {Promise<boolean>}
  */
 export async function isAuthenticated(): Promise<boolean> {
   const user = await getCurrentUser();
@@ -106,17 +113,23 @@ export async function isAuthenticated(): Promise<boolean> {
 /**
  * Sends token to backend for validation.
  * Used when additional verification is required.
+ *
+ * @param token - JWT token to validate
+ * @returns {Promise<boolean>}
  */
 export async function verifyToken(token: string): Promise<boolean> {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/verify-token`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      credentials: "include",
-    });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/verify-token`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        credentials: "include"
+      }
+    );
 
     return response.ok;
   } catch (error) {
