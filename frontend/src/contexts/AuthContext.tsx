@@ -48,11 +48,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const fetchUser = async () => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/client/me`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`,
         {
           method: "GET",
           credentials: "include",
-          cache: "no-store"
+          cache: "no-store",
         }
       );
 
@@ -74,12 +74,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
    * Resets auth state and redirects to login.
    * Ensures navigation cannot return to protected pages.
    */
-  
+
   const logout = async () => {
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/client/logout`, {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/logout`, {
         method: "POST",
-        credentials: "include"
+        credentials: "include",
       });
 
       document.cookie =
@@ -109,7 +109,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isLoading,
         isAuthenticated: !!user,
         logout,
-        refreshUser
+        refreshUser,
       }}
     >
       {children}

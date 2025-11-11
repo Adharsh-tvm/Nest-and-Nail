@@ -1,7 +1,6 @@
-import { Client } from "../entities/Client";
 
-export interface IBaseRepository {
-    findByEmail(email: string): Promise<Client | null>;
-    findById(id: string): Promise<Client | null>;
-    create(user: Client): Promise<Client>;
+export interface IBaseRepository <T > {
+    findByEmail(email: string): Promise<T | null>;
+    findById(id: string): Promise<T | null>;
+    create(user: T): Promise<T>;
 }

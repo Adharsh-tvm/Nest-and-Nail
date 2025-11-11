@@ -4,7 +4,7 @@ import { AuthMiddleware } from '../middlewares/AuthMiddleware';
 
 const router = express.Router();
 
-export function createClientRoutes(
+export function createAuthRoutes(
     authController: AuthController,
     authMiddleware: AuthMiddleware
 ) {

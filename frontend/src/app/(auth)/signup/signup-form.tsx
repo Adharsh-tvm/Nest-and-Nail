@@ -42,7 +42,7 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
   const [state, formAction, pending] = useActionState(signup, initialState);
 
   const currentRoleConfig = roleConfig[role];
-  const roleName = role.charAt(0).toUpperCase() + role.slice(1);
+  const roleName = role.charAt(0) + role.slice(1);
 
   return (
     <div className="w-full max-w-sm">

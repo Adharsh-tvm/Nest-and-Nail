@@ -1,7 +1,5 @@
 import { Role } from "../../shared/enums/enums";
 
-Role
-
 export interface UserRequestDTO {
     user_name: string;
     email_address: string;
@@ -20,10 +18,10 @@ export interface UserResponseDTO {
     isBlocked: boolean;
 }
 
-export interface LoginUserDTO{
+export interface LoginUserDTO {
     email_address: string;
     password: string;
-    user_role: Role
+    user_role?: Role; // Make it optional since we'll detect it
 }    
 
 export interface LoginResponseDTO {

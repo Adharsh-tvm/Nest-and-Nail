@@ -17,9 +17,12 @@ type SignupResponse = {
 };
 
 /**
- * Handles server-side signup request.
- * Validates form input and sends data to backend.
- * Sets auth cookies and redirects user after success.
+ * 
+ * @param prevState 
+ * @param formData 
+ * @returns 
+ * 
+ * 
  */
 export async function signup(
   prevState: SignupResponse,
@@ -71,7 +74,7 @@ export async function signup(
       };
     }
 
-    const endpoint = `${apiUrl}/api/client/register`;
+    const endpoint = `${apiUrl}/api/auth/register`;
 
     /**
      * Sends signup request to backend.
@@ -83,7 +86,7 @@ export async function signup(
         user_name: name,
         email_address: email,
         password: password,
-        user_role: role.toUpperCase()
+        user_role: role
       }),
       credentials: "include",
       cache: "no-store"
