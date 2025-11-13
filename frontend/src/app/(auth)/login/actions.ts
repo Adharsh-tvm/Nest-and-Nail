@@ -2,6 +2,8 @@
 
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
+import axiosInstance from "@/lib/axiosInstance";
+import { AxiosError } from "axios";
 
 type LoginFormData = {
   email: string;
@@ -49,48 +51,13 @@ export async function login(
   }
 
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-
-    // Ensures backend URL exists.
-    if (!apiUrl) {
-      return {
-        error: "Server configuration error. Please contact support.",
-        fields
-      };
-    }
-
-    const endpoint = `${apiUrl}/api/auth/login`;
-
-    // Sends login request to backend.
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email_address: email,
-        password: password
-      }),
-      credentials: "include",
-      cache: "no-store"
+    // Sends login request to backend using axios.
+    const response = await axiosInstance.post("/api/auth/login", {
+      email_address: email,
+      password: password
     });
 
-    // Ensures backend returns valid JSON.
-    const contentType = response.headers.get("content-type");
-    if (!contentType || !contentType.includes("application/json")) {
-      return {
-        error: "Server error: Invalid response format.",
-        fields
-      };
-    }
-
-    const data = await response.json();
-
-    // Returns error if backend rejects login.
-    if (!response.ok) {
-      return {
-        error: data.message || "Login failed. Please check your credentials.",
-        fields
-      };
-    }
+    const data = response.data;
 
     // Stores tokens in secure cookies.
     const cookieStore = await cookies();
@@ -103,6 +70,11 @@ export async function login(
         maxAge: 15 * 60,
         path: "/"
       });
+    } else {
+      return {
+        error: "Login failed: No access token received",
+        fields
+      };
     }
 
     if (data.refreshToken) {
@@ -115,13 +87,37 @@ export async function login(
       });
     }
 
+    // Store user role for redirect
+    const userRole = data.user?.user_role?.toLowerCase();
+    if (userRole) {
+      cookieStore.set("userRole", userRole, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 7 * 24 * 60 * 60,
+        path: "/"
+      });
+    }
+
   } catch (error) {
-    // Handles network or unreachable backend errors.
-    if (error instanceof TypeError && error.message.includes("fetch")) {
-      return {
-        error: "Cannot connect to server. Please check if the backend is running.",
-        fields
-      };
+    // Handles axios errors
+    if (error instanceof AxiosError) {
+      // Backend returned an error response
+      if (error.response) {
+        const data = error.response.data;
+        return {
+          error: data.message || "Login failed. Please check your credentials.",
+          fields
+        };
+      }
+      
+      // Network error or backend unreachable
+      if (error.code === "ECONNREFUSED" || error.message.includes("Network Error")) {
+        return {
+          error: "Cannot connect to server. Please check if the backend is running.",
+          fields
+        };
+      }
     }
 
     return {

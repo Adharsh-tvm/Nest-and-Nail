@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import authApi from "@/services/auth/auth.api";
 
 export type UserRole = "client" | "worker" | "admin";
 
@@ -47,17 +48,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
    */
   const fetchUser = async () => {
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`,
-        {
-          method: "GET",
-          credentials: "include",
-          cache: "no-store",
-        }
-      );
+      const response = await authApi.getMe()
 
-      if (response.ok) {
-        const data = await response.json();
+      if (response.data) {
+        const data = await response.data
         setUser(data.user);
       } else {
         setUser(null);
@@ -77,10 +71,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = async () => {
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/logout`, {
-        method: "POST",
-        credentials: "include",
-      });
+      await authApi.logout()
 
       document.cookie =
         "accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
