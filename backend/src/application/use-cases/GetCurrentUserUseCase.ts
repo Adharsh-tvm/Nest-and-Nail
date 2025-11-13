@@ -1,14 +1,14 @@
 import { AuthenticationError, UserBlockedError, UserNotFoundError } from "../../domain/errors/DomainError";
-import { IBaseRepository } from "../../domain/repositories/IBaseRepository";
 import { UserResponseDTO } from "../dtos/UserDTO";
 import { IGetCurrentUserUseCase } from "../interfaces/IGetCurrentUserUseCase";
 import { ILogger } from "../interfaces/ILogger";
 import { UserMapper } from "../mappers/UserMapper";
-import { User } from "../../domain/entities/User";
+import { UserRepositoryFactory } from "../../infrastructure/repo/UserRepositoryFactory";
+import { Role } from "../../shared/enums/enums";
 
-export class GetCurrentUserUseCase<T extends User> implements IGetCurrentUserUseCase {
+export class GetCurrentUserUseCase implements IGetCurrentUserUseCase {
     constructor(
-        private readonly _userRepository: IBaseRepository<T>,
+        private readonly _repositoryFactory: UserRepositoryFactory,
         private readonly _logger: ILogger,
     ) {}
 
@@ -18,8 +18,35 @@ export class GetCurrentUserUseCase<T extends User> implements IGetCurrentUserUse
             throw new AuthenticationError();
         }
 
-        const user = await this._userRepository.findById(userId);
-        
+        this._logger.info(`[GetCurrentUserUseCase] Finding user with ID: ${userId}`);
+
+        // Try to find user across all repositories
+        let user = null;
+
+        // Search in Client repository
+        try {
+            const clientRepo = this._repositoryFactory.getRepository(Role.CLIENT);
+            user = await clientRepo.findById(userId);
+            if (user) {
+                this._logger.info(`[GetCurrentUserUseCase] User found as CLIENT`);
+            }
+        } catch (error) {
+            // Continue to next repository
+        }
+
+        // If not found, search in Worker repository
+        if (!user) {
+            try {
+                const workerRepo = this._repositoryFactory.getRepository(Role.WORKER);
+                user = await workerRepo.findById(userId);
+                if (user) {
+                    this._logger.info(`[GetCurrentUserUseCase] User found as WORKER`);
+                }
+            } catch (error) {
+                // Continue
+            }
+        }
+
         if (!user) {
             this._logger.warn(`[GetCurrentUserUseCase] User not found: ${userId}`);
             throw new UserNotFoundError();

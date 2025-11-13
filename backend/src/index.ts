@@ -13,6 +13,9 @@ import cookieParser from "cookie-parser";
 import { loggerInstance } from "./infrastructure/logger/Logger";
 import { RequestLogger } from "./presentation/middlewares/RequestLogger";
 import { UserRepositoryFactory } from "./infrastructure/repo/UserRepositoryFactory";
+import { RegisterUserUseCase } from "./application/use-cases/RegisterUserUseCase";
+import { LoginUserUseCase } from "./application/use-cases/LoginUserUseCase";
+import { GetCurrentUserUseCase } from "./application/use-cases/GetCurrentUserUseCase";
 
 dotenv.config();
 
@@ -36,27 +39,46 @@ async function bootstrap() {
   // Connect to MongoDB
   await connectDB(process.env.MONGO_URI ?? "mongodb://localhost:27017/MEND-WAY");
 
-  // Infrastructure - Factory Pattern
+  // Infrastructure Layer
   const repositoryFactory = new UserRepositoryFactory();
   const passwordHasher = new BcryptPasswordHasher();
   const idGenerator = new UUIDGenerator();
-
-  // JWT
   const tokenService = new JwtTokenService(
     process.env.ACCESS_TOKEN_SECRET ?? "default-access-secret",
     process.env.REFRESH_TOKEN_SECRET ?? "default-refresh-secret",
   );
 
-  // Presentation - Controller now uses factory
-  const authController = new AuthController(
+  // Application Layer - Use Cases (with proper dependency injection)
+  const registerUserUseCase = new RegisterUserUseCase(
     repositoryFactory,
     passwordHasher,
     idGenerator,
-    tokenService
+    tokenService,
+    loggerInstance
   );
+
+  const loginUserUseCase = new LoginUserUseCase(
+    repositoryFactory,
+    passwordHasher,
+    tokenService,
+    loggerInstance
+  );
+
+  const getCurrentUserUseCase = new GetCurrentUserUseCase(
+    repositoryFactory,
+    loggerInstance
+  );
+
+  // Presentation Layer - Controller (depends on use cases, NOT repositories)
+  const authController = new AuthController(
+    registerUserUseCase,
+    loginUserUseCase,
+    getCurrentUserUseCase
+  );
+
   const authMiddleware = new AuthMiddleware(tokenService);
 
-  // Routes - Now generic for all user types
+  // Routes
   app.use("/api/auth", createAuthRoutes(authController, authMiddleware));
 
   // Error Handler
