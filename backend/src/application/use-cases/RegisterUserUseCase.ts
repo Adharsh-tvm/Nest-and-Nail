@@ -1,63 +1,59 @@
-import { IRegisterUserUseCase } from "../interfaces/IRegisterUserUseCase";
-import { IPasswordHasher } from "../services/IPasswordHasher";
-import { IGenerateUserID } from "../services/IGenerateUserID";
-import { ITokenService } from "../services/ITokenService";
-import { UserRequestDTO, UserResponseDTO } from "../dtos/UserDTO";
-import { UserMapper } from "../mappers/UserMapper";
 import { UserAlreadyExistsError } from "../../domain/errors/DomainError";
-import { IBaseRepository } from "../../domain/repositories/IBaseRepository";
-import { User } from "../../domain/entities/User";
-import { LoginMethod, Role } from "../../shared/enums/enums";
+import { UserRepositoryFactory } from "../../infrastructure/repo/UserRepositoryFactory";
+import { LoginMethod } from "../../shared/enums/enums";
+import { UserRequestDTO, UserResponseDTO } from "../dtos/UserDTO";
 import { ILogger } from "../interfaces/ILogger";
+import { IRegisterUserUseCase } from "../interfaces/IRegisterUserUseCase";
+import { UserMapper } from "../mappers/UserMapper";
+import { IGenerateUserID } from "../services/IGenerateUserID";
+import { IPasswordHasher } from "../services/IPasswordHasher";
+import { ITokenService } from "../services/ITokenService";
 
-export class RegisterUserUseCase<T extends User> implements IRegisterUserUseCase {
+export class RegisterUserUseCase implements IRegisterUserUseCase {
   constructor(
-    private readonly _userRepository: IBaseRepository<T>,
+    private readonly _repositoryFactory: UserRepositoryFactory,
     private readonly _passwordHasher: IPasswordHasher,
     private readonly _userIdGenerator: IGenerateUserID,
     private readonly _tokenService: ITokenService,
     private readonly _logger: ILogger
-  ) {}
+  ) { }
 
   async execute(
     userData: UserRequestDTO
   ): Promise<{ user: UserResponseDTO; accessToken: string; refreshToken: string }> {
     this._logger.info(`[RegisterUserUseCase] Registration attempt for ${userData.email_address} as ${userData.user_role}`);
 
-    const existingUser = await this._userRepository.findByEmail(userData.email_address);
+    const repository = this._repositoryFactory.getRepository(userData.user_role);
+
+    const existingUser = await repository.findByEmail(userData.email_address);
     if (existingUser) {
       this._logger.warn(`[RegisterUserUseCase] User already exists: ${userData.email_address}`);
       throw new UserAlreadyExistsError();
     }
-
     this._logger.info(`[RegisterUserUseCase] Hashing password`);
     const hashedPassword = await this._passwordHasher.hash(userData.password);
     const userId = await this._userIdGenerator.create();
 
     this._logger.info(`[RegisterUserUseCase] Creating user with ID: ${userId}`);
 
-    const role = userData.user_role.toLowerCase() as Role;
-
-    const newUser = await this._userRepository.create({
+    const newUser = await repository.create({
       userId: userId,
       name: userData.user_name,
       email: userData.email_address,
       passwordhash: hashedPassword,
       phone: userData.phone_number,
-      role,
+      role: userData.user_role,
       isBlocked: false,
       loginMethod: LoginMethod.EMAIL_PASSWORD,
       profilePictureUrl: "",
       createdAt: new Date(),
       updatedAt: new Date(),
       lastLoginAt: new Date(),
-    } as T);
+    } as any);
 
-    this._logger.info(`[RegisterUserUseCase] User created: ${JSON.stringify(newUser)}`);
+    this._logger.info(`[RegisterUserUseCase] User created successfully`);
 
     const userResponse = UserMapper.toResponseDTO(newUser);
-    
-    this._logger.info(`[RegisterUserUseCase] User response mapped: ${JSON.stringify(userResponse)}`);
 
     const accessToken = this._tokenService.generateAccessToken({
       id: userResponse.user_id,
