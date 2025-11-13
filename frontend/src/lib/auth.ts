@@ -1,5 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import axiosInstance from "@/lib/axiosInstance";
+import authApi from "@/services/auth/auth.api";
 
 export type UserRole = "client" | "worker" | "admin";
 
@@ -119,19 +121,9 @@ export async function isAuthenticated(): Promise<boolean> {
  */
 export async function verifyToken(token: string): Promise<boolean> {
   try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/verify-token`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
-        },
-        credentials: "include"
-      }
-    );
+    const response = await authApi.verfify({token})
 
-    return response.ok;
+    return response.status === 200;
   } catch (error) {
     console.error("Token verification failed:", error);
     return false;

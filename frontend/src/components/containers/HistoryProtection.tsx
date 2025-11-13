@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import authApi from "@/services/auth/auth.api";
 
 /**
  * Blocks authenticated users from visiting login or signup pages
@@ -20,17 +21,11 @@ export function ClientSideAuthProtection() {
 
         if (!isAuthPage) return;
 
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`,
-          {
-            method: "GET",
-            credentials: "include",
-            cache: "no-store"
-          }
-        );
+        const response = await authApi.getMe()
+    
+        const data = await response.data;
 
-        if (response.ok) {
-          const data = await response.json();
+        if (response.data) {
           const role = data.user?.user_role?.toLowerCase();
 
           if (role === "client") router.replace("/client/home");
