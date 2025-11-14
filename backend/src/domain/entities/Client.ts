@@ -1,17 +1,8 @@
-import { LoginMethod, Role } from "../../shared/enums/enums";
+import { Role } from "../../shared/enums/enums";
+import { User } from "./User";
 
-export interface Client {
-    clientId: string,
-    name: string,
-    email: string,
-    phone?: number,
-    passwordhash: string,
-    isBlocked?: boolean,
-    profilePictureUrl?: string,
-    role: Role,
-    loginMethod: LoginMethod,
-    lastLoginAt: Date,
-    createdAt: Date,
-    updatedAt: Date,
+export interface Client extends User {
+    role: Role.CLIENT;
+    address?: string;
 }
 

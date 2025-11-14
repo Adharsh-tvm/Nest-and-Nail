@@ -1,57 +1,145 @@
 import { Request, Response } from "express";
 import { HttpStatusCode } from "../enums/httpCodes";
-import { IRegisterClientUseCase } from "../../application/interfaces/IRegisterClientUseCase";
-import { ILoginClientUseCase } from "../../application/interfaces/ILoginClientUseCase";
 import { loggerInstance } from "../../infrastructure/logger/Logger";
 import { IAuthController } from "../interfaces/IAuthController";
 import { setAuthCookies } from "../utils/setAuthCookies";
+import { IRegisterUserUseCase } from "../../application/interfaces/IRegisterUserUseCase";
+import { ILoginUserUseCase } from "../../application/interfaces/ILoginUserUseCase";
+import { IGetCurrentUserUseCase } from "../../application/interfaces/IGetCurrentUserUseCase";
 
 export class AuthController implements IAuthController {
   constructor(
-    private readonly _registerClient: IRegisterClientUseCase,
-    private readonly _loginClient: ILoginClientUseCase,
-  ) { }
+    private readonly _registerUserUseCase: IRegisterUserUseCase,
+    private readonly _loginUserUseCase: ILoginUserUseCase,
+    private readonly _getCurrentUserUseCase: IGetCurrentUserUseCase
+  ) {}
 
-  //  REGISTER
-  async register(req: Request, res: Response) {
+  async register(req: Request, res: Response): Promise<void> {
     try {
-      const createdUser = await this._registerClient.execute(req.body);
+      loggerInstance.info(`[AuthController] Register request for ${req.body.email_address}`);
+      
+      const { user_role } = req.body;
+      
+      if (!user_role) {
+        loggerInstance.error("[AuthController] Missing user_role in request");
+        res.status(HttpStatusCode.BAD_REQUEST).json({ 
+          message: "user_role is required for registration" 
+        });
+        return;
+      }
 
-      const result = await this._loginClient.execute(req.body);
-      const { accessToken, refreshToken, user } = result;
+      // Register the user
+      const registrationResult = await this._registerUserUseCase.execute(req.body);
+      
+      loggerInstance.info(`[AuthController] Registration successful for ${req.body.email_address}`);
+      
+      // Login after registration (no role needed)
+      const loginResult = await this._loginUserUseCase.execute({
+        email_address: req.body.email_address,
+        password: req.body.password
+      });
+      
+      loggerInstance.info(`[AuthController] Login after registration successful`);
+      
+      const { accessToken, refreshToken, user } = loginResult;
 
+      console.log("[AuthController] About to set cookies...");
+      console.log(`[AuthController] AccessToken exists: ${!!accessToken}, length: ${accessToken?.length}`);
+      console.log(`[AuthController] RefreshToken exists: ${!!refreshToken}, length: ${refreshToken?.length}`);
+      
       setAuthCookies(res, accessToken, refreshToken);
+      
+      console.log("[AuthController] Cookies set, sending response...");
+      
+      res.status(HttpStatusCode.CREATED).json({
+        user,
+        accessToken,
+        refreshToken
+      });
 
-      res.status(HttpStatusCode.CREATED).json(createdUser);
+      console.log("[AuthController] Response sent successfully");
+      
     } catch (error: any) {
-      res.status(HttpStatusCode.BAD_REQUEST).json({ message: error.message });
+      loggerInstance.error(`[AuthController] Registration error: ${error.message}`);
+      res.status(HttpStatusCode.BAD_REQUEST).json({ 
+        message: error.message || "Registration failed" 
+      });
     }
   }
 
-  //  LOGIN — sets HttpOnly cookies
-  async login(req: Request, res: Response) {
+  async login(req: Request, res: Response): Promise<void> {
     try {
-      loggerInstance.info(`Login attempt from ${req.body.email_address}`);
-      const result = await this._loginClient.execute(req.body);
+      const { email_address, password } = req.body;
+
+      if (!email_address || !password) {
+        res.status(HttpStatusCode.BAD_REQUEST).json({ 
+          message: "email_address and password are required" 
+        });
+        return;
+      }
+      
+      loggerInstance.info(`[AuthController] Login attempt from ${email_address}`);
+      
+      const result = await this._loginUserUseCase.execute({ email_address, password });
+      
+      loggerInstance.info(`[AuthController] Login successful for ${email_address}`);
+      
       const { accessToken, refreshToken, user } = result;
 
+      console.log("[AuthController] About to set cookies...");
+      console.log(`[AuthController] AccessToken exists: ${!!accessToken}, length: ${accessToken?.length}`);
+      console.log(`[AuthController] RefreshToken exists: ${!!refreshToken}, length: ${refreshToken?.length}`);
+      
       setAuthCookies(res, accessToken, refreshToken);
+      
+      console.log("[AuthController] Cookies set, sending response...");
+      
+      res.status(HttpStatusCode.OK).json({ 
+        user,
+        accessToken,
+        refreshToken 
+      });
 
-     res
-        .status(HttpStatusCode.OK)
-        .json({ user });
+      console.log("[AuthController] Response sent successfully");
+      
     } catch (error: any) {
-      res
-        .status(HttpStatusCode.UNAUTHORIZED)
-        .json({ message: error.message });
+      loggerInstance.error(`[AuthController] Login error: ${error.message}`);
+      res.status(HttpStatusCode.UNAUTHORIZED).json({ 
+        message: error.message || "Login failed" 
+      });
     }
   }
 
+  async getCurrentUser(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = (req as any).user?.id;
+      
+      console.log(`[AuthController] getCurrentUser - userId: ${userId}`);
+      
+      if (!userId) {
+        console.log("[AuthController] No userId found in request");
+        res.status(HttpStatusCode.UNAUTHORIZED).json({ 
+          message: "User ID not found in token" 
+        });
+        return;
+      }
 
-  //  LOGOUT — clears cookies
-  async logout(req: Request, res: Response) {
-    res.clearCookie("accessToken");
-    res.clearCookie("refreshToken");
+      const userResponse = await this._getCurrentUserUseCase.execute(userId);
+      res.status(HttpStatusCode.OK).json({ user: userResponse });
+      
+    } catch (error: any) {
+      loggerInstance.error(`[AuthController] Get current user error: ${error.message}`);
+      const status = error.status || HttpStatusCode.INTERNAL_SERVER;
+      res.status(status).json({
+        message: error.message || "Failed to get current user"
+      });
+    }
+  }
+
+  async logout(req: Request, res: Response): Promise<void> {
+    console.log("[AuthController] Logout - clearing cookies");
+    res.clearCookie("accessToken", { path: "/" });
+    res.clearCookie("refreshToken", { path: "/" });
     res.status(HttpStatusCode.OK).json({ message: "Logged out successfully" });
   }
 }

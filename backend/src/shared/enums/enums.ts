@@ -1,7 +1,7 @@
 export enum Role {
-    ADMIN = 'ADMIN',
-    CLIENT = 'CLIENT',
-    WORKER = 'WORKER'
+  ADMIN = 'admin',
+  CLIENT = 'client',
+  WORKER = 'worker'
 }
 
 export enum LoginMethod {

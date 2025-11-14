@@ -1,34 +1,24 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import { connectDB } from "./infrastructure/database/connection";
-import { ClientRepository } from "./infrastructure/repo/ClientRepository";
-import { BcryptPasswordHasher } from "./infrastructure/utils/BcryptPasswordHasher";
-import { UUIDGenerator } from "./infrastructure/utils/UUIDGenerator";
-import { ClientModel } from "./infrastructure/database/models/ClientModel";
-import { RegisterClientUseCase } from "./application/use-cases/RegisterClientUseCase";
-import { LoginClientUseCase } from "./application/use-cases/LoginClientUseCase";
-import { AuthController } from "./presentation/controllers/AuthController";
-import { createClientRoutes } from "./presentation/routes/authRoutes";
-import { errorHandler } from "./presentation/middlewares/ErrorHandler";
-import { JwtTokenService } from "./infrastructure/utils/JwtTokenService";
-import { IRegisterClientUseCase } from "./application/interfaces/IRegisterClientUseCase";
-import { AuthMiddleware } from "./presentation/middlewares/AuthMiddleware";
 import cookieParser from "cookie-parser";
-import { ILoginClientUseCase } from "./application/interfaces/ILoginClientUseCase";
-import { loggerInstance } from "./infrastructure/logger/Logger";
+import { connectDB } from "./infrastructure/database/connection";
+import { createAuthRoutes } from "./presentation/routes/authRoutes";
+import { errorHandler } from "./presentation/middlewares/ErrorHandler";
 import { RequestLogger } from "./presentation/middlewares/RequestLogger";
-import { GoogleAuthUseCase } from "./application/use-cases/GoogleAuthUseCase";
+import { DIContainer } from "./infrastructure/di/DIContainer";
 
+// Load environment variables
 dotenv.config();
 
 async function bootstrap() {
   const app = express();
 
+  // Middleware
   app.use(
     cors({
       origin: process.env.FRONTEND_URL || "http://localhost:3000",
-      credentials: true, // Allow cookies
+      credentials: true,
       methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
       allowedHeaders: ["Content-Type", "Authorization"],
     })
@@ -37,45 +27,30 @@ async function bootstrap() {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
   app.use(cookieParser());
-
-  app.use(RequestLogger)
-
-
+  app.use(RequestLogger);
 
   // Connect to MongoDB
   await connectDB(process.env.MONGO_URI ?? "mongodb://localhost:27017/MEND-WAY");
 
-  // Infrastructure
-  const repo = new ClientRepository(ClientModel);
-  const passwordHasher = new BcryptPasswordHasher();
-  const idGenerator = new UUIDGenerator();
-
-  //jwt
-  const tokenService = new JwtTokenService(
-    process.env.ACCESS_TOKEN_SECRET ?? "default-access-secret",
-    process.env.REFRESH_TOKEN_SECRET ?? "default-refresh-secret",
-  );
-
-
-  // Application
-  const registerUseCase: IRegisterClientUseCase = new RegisterClientUseCase(repo, passwordHasher, idGenerator, tokenService);
-  const loginUseCase: ILoginClientUseCase = new LoginClientUseCase(repo, passwordHasher, tokenService, loggerInstance);
-
-  // Presentation
-  const authController = new AuthController(registerUseCase, loginUseCase);
-  const authMiddleware = new AuthMiddleware(tokenService)
+  // Initialize Dependency Injection Container
+  const container = new DIContainer();
 
   // Routes
-  app.use("/api/client", createClientRoutes(authController,));
-
-  //Error Handler
+  app.use("/api/auth", createAuthRoutes(
+    container.authController,
+    container.authMiddleware
+  ));
+  // Error Handler
   app.use(errorHandler);
 
   // Start server
-  const PORT = process.env.PORT ?? 3000;
+  const PORT = process.env.PORT ?? 4000;
   app.listen(PORT, () => {
-    loggerInstance.info(`Server running on http://localhost:${PORT}`)
+    container.logger.info(`Server running on http://localhost:${PORT}`);
   });
 }
 
-bootstrap();
+bootstrap().catch((error) => {
+  console.error("Failed to start server:", error);
+  process.exit(1);
+});
