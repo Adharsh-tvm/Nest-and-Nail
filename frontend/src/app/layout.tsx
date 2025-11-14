@@ -1,19 +1,19 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import "./globals.css";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-
   return (
     <div>
       <html lang="en">
         <body>
-          {children}
+          <AuthProvider>{children}</AuthProvider>
         </body>
       </html>
     </div>

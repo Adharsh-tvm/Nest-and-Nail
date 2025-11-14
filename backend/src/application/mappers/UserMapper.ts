@@ -1,33 +1,34 @@
-import { Client } from "../../domain/entities/Client";
+import { User } from "../../domain/entities/User";
 import { LoginMethod } from "../../shared/enums/enums";
 import { UserRequestDTO, UserResponseDTO } from "../dtos/UserDTO";
 
 export class UserMapper {
-    static toDomain(userData: UserRequestDTO, hashedPassword: string, clientId: string): Client {
+    static toDomain(userData: UserRequestDTO, hashedPassword: string, userId: string): User {
         return {
-            clientId,
+            userId,
             name: userData.user_name,
             email: userData.email_address,
             passwordhash: hashedPassword,
             phone: userData.phone_number,
-            role: userData.user_role,
+            role: userData.user_role, 
             isBlocked: false,
             loginMethod: LoginMethod.EMAIL_PASSWORD,
             profilePictureUrl: '',
             createdAt: new Date(),
             lastLoginAt: new Date(),
-            updatedAt: new Date(0)
-        }
+            updatedAt: new Date()
+        };
     }
-    static toResponseDTO(clientData: Client): UserResponseDTO {
+
+    static toResponseDTO(userData: User): UserResponseDTO {
         return {
-            user_id: clientData.clientId,
-            user_name: clientData.name,
-            email_address: clientData.email,
-            phone_number: clientData.phone,
-            user_role: clientData.role,
-            profileImageUrl: clientData.profilePictureUrl,
-            isBlocked: clientData.isBlocked ?? false,
-        }
+            user_id: userData.userId,
+            user_name: userData.name,
+            email_address: userData.email,
+            phone_number: userData.phone,
+            user_role: userData.role,
+            profileImageUrl: userData.profilePictureUrl,
+            isBlocked: userData.isBlocked ?? false,
+        };
     }
 }

@@ -1,16 +1,7 @@
-import { Role } from "../enums";
+import { Role } from "../../shared/enums/enums";
+import { User } from "./User";
 
-export interface Worker {
-    workerId:string,
-    name:string,
-    email:string,
-    passwordHash?:string,
-    phone:number,
-    role: Role.WORKER,
+export interface Worker extends User {
+    role: Role.WORKER;
     skills: string[],
-    isBlocked:boolean,
-    profilePictureUrl?:string,
-    lastLoginAt: Date,
-    createdAt:Date,
-    updatedAt:Date,
 } 

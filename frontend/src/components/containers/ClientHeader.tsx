@@ -1,19 +1,13 @@
-import authApi from "@/api/authApi";
-import { redirect } from "next/navigation";
+"use client";
+
+import {  useAuth } from "@/contexts/AuthContext";
 import React from "react";
 
 type Props = {};
 
 function ClientHeader({}: Props) {
 
-  async function handleLogout() {
-    try {
-      await authApi.logout();
-    } catch (error) {
-      console.error("Error during logout: ", error);
-    }
-    redirect("/login");
-  }
+  const {logout, isLoading} = useAuth()
 
   return (
     <div>
@@ -27,7 +21,7 @@ function ClientHeader({}: Props) {
             <a href="#" className="hover:text-yellow-400 transition-colors">
               Workers
             </a>
-            <a href="#" className="hover:text-yellow-400 transition-colors">
+            <a href="/client/profile" className="hover:text-yellow-400 transition-colors">
               Pricing
             </a>
             <a href="#" className="hover:text-yellow-400 transition-colors">
@@ -36,7 +30,8 @@ function ClientHeader({}: Props) {
           </nav>
           <div className="flex items-center space-x-4">
             <button
-              onClick={handleLogout}
+              onClick={logout}
+              disabled={isLoading}
               className="bg-yellow-400 text-gray-900 font-bold py-2 px-4 rounded-lg hover:bg-yellow-500 transition-colors"
             >
               Log Out

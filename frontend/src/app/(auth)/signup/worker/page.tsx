@@ -1,4 +1,4 @@
-import SignUpComponent from "@/components/containers/signup-form";
+import SignUpComponent from "@/app/(auth)/signup/signup-form";
 import React from "react";
 
 type Props = {};
