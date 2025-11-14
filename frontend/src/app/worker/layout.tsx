@@ -1,16 +1,16 @@
 import { requireRole } from "@/lib/auth";
-import { HistoryProtection } from "@/components/containers/HistoryProtection";
+import { ClientSideAuthProtection } from "@/components/containers/HistoryProtection";
 
 export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  await requireRole("admin");
+  await requireRole("worker");
 
   return (
     <>
-      <HistoryProtection />
+     <ClientSideAuthProtection />
       {children}
     </>
   );

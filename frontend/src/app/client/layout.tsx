@@ -1,4 +1,4 @@
-
+import { ClientSideAuthProtection } from "@/components/containers/HistoryProtection";
 import { requireRole } from "@/lib/auth";
 
 export default async function ClientRootLayout({
@@ -10,6 +10,7 @@ export default async function ClientRootLayout({
 
   return (
     <>
+      <ClientSideAuthProtection />
       {children}
     </>
   );
