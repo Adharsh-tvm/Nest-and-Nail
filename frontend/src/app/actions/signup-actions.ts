@@ -54,7 +54,9 @@ export async function signup(
     // Send OTP to email (user not registered yet)
     const response = await axiosInstance.post("/api/auth/send-otp", {
       email_address: email,
+      role: role,       // ⬅️ ADD THIS
     });
+
 
     // OTP sent successfully - return success to trigger modal
     return {
@@ -72,7 +74,7 @@ export async function signup(
           fields
         };
       }
-      
+
       if (error.code === "ECONNREFUSED" || error.message.includes("Network Error")) {
         return {
           error: "Cannot connect to server. Please check if the backend is running.",
@@ -142,7 +144,7 @@ export async function completeSignup(
 
     // Set cookies for authentication
     const cookieStore = await cookies();
-    
+
     // Set access token cookie
     cookieStore.set("accessToken", accessToken, {
       httpOnly: true,
@@ -192,7 +194,7 @@ export async function completeSignup(
           error: data.message || data.error || "Verification or registration failed. Please try again.",
         };
       }
-      
+
       if (error.code === "ECONNREFUSED" || error.message.includes("Network Error")) {
         return {
           success: false,
@@ -209,10 +211,14 @@ export async function completeSignup(
 }
 
 // Helper function to resend OTP
-export async function resendOtp(email: string): Promise<{ success: boolean; error: string | null }> {
+export async function resendOtp(
+  email: string,
+  role: "client" | "worker"
+): Promise<{ success: boolean; error: string | null }> {
   try {
     await axiosInstance.post("/api/auth/send-otp", {
       email_address: email,
+      role: role,
     });
 
     return {
@@ -227,7 +233,7 @@ export async function resendOtp(email: string): Promise<{ success: boolean; erro
           error: error.response.data.message || "Failed to resend OTP",
         };
       }
-      
+
       if (error.code === "ECONNREFUSED" || error.message.includes("Network Error")) {
         return {
           success: false,
