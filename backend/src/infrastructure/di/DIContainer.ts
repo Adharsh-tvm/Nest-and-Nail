@@ -162,12 +162,15 @@ export class DIContainer {
     return this._getCurrentUserUseCase;
   }
 
+
+
   get sendOtpUseCase(): ISendOtpUseCase {
     if (!this._sendOtpUseCase) {
       this._sendOtpUseCase = new SendOtpUseCase(
         this.emailService,
         this.otpService,
         this.otpRepository,
+        this.repositoryFactory,
         this.logger
       );
     }

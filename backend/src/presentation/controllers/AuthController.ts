@@ -140,11 +140,27 @@ export class AuthController implements IAuthController {
     }
   }
 
-   sendOtp = async (req: Request, res: Response) => {
-    const email = req.body.email || req.body.email_address;
-    await this.sendOtpUseCase.execute(email);
-    return res.json({ message: "OTP sent" });
+  sendOtp = async (req: Request, res: Response) => {
+    try {
+      const email = req.body.email || req.body.email_address;
+      const role = req.body.role || req.body.user_role;
+
+      if (!email || !role) {
+        return res.status(400).json({ message: "Email and role are required" });
+      }
+
+      await this.sendOtpUseCase.execute(email, role);
+
+      return res.json({ message: "OTP sent" });
+
+    } catch (error: any) {
+      return res.status(400).json({
+        message: error.message || "Failed to send OTP"
+      });
+    }
   };
+
+
 
   verifyOtp = async (req: Request, res: Response) => {
     const email = req.body.email || req.body.email_address;
