@@ -141,18 +141,19 @@ export class AuthController implements IAuthController {
   }
 
    sendOtp = async (req: Request, res: Response) => {
-    const { email } = req.body;
+    const email = req.body.email || req.body.email_address;
     await this.sendOtpUseCase.execute(email);
     return res.json({ message: "OTP sent" });
   };
 
   verifyOtp = async (req: Request, res: Response) => {
-    const { email, otp } = req.body;
+    const email = req.body.email || req.body.email_address;
+    const otp = req.body.otp;
     const result = await this.verifyOtpUseCase.execute(email, otp);
 
     if (!result) return res.status(400).json({ message: "Invalid OTP" });
 
-    return res.json({ message: "OTP verified" });
+    return res.status(HttpStatusCode.OK).json({ message: "OTP verified" });
   };
 
   async logout(req: Request, res: Response): Promise<void> {

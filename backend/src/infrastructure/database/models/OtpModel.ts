@@ -1,10 +1,13 @@
-import { model, Schema } from "mongoose";
+import { Schema, model } from "mongoose";
 
-const otpSchema = new Schema({
-    email: String,
-    otp: String,
-    expiresAt: Date
+const OtpSchema = new Schema({
+  email: { type: String, required: true },
+  otp: { type: String, required: true },
+  expiresAt: {
+    type: Date,
+    required: true,
+    index: { expires: 120 }  // Auto-delete after 120 seconds (2 minutes)
+  }
 });
 
-export const OtpModel = model("Otp", otpSchema);
-
+export const OtpModel = model("Otp", OtpSchema);

@@ -9,7 +9,7 @@ export class SendOtpUseCase implements ISendOtpUseCase {
         private emailService: IEmailService,
         private otpService: IOtpService,
         private otpRepo: OtpRepository,
-        private logger?: ILogger   // OPTIONAL (does not break DI)
+        private logger?: ILogger  
     ) { }
 
     async execute(email: string) {
