@@ -1,4 +1,4 @@
-import { signup } from "@/app/(auth)/signup/actions";
+import { signup } from "@/app/actions/signup-actions";
 import axiosInstance from "@/lib/axiosInstance";
 
 export type LoginPayload = {
@@ -16,7 +16,7 @@ export const authApi = {
     refresh: () =>
         axiosInstance.post("/api/auth/refresh"),
 
-    verfify: (payload: {token:string}) => 
+    verfify: (payload: { token: string }) =>
         axiosInstance.post("api/auth/verify"),
 
     logout: () =>

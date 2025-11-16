@@ -2,7 +2,7 @@
 
 import { ClientSideAuthProtection } from "@/components/containers/HistoryProtection";
 import { KeyRound, AtSign, Loader2 } from "lucide-react";
-import { login } from "./actions";
+import { login } from "../../actions/login-actions";
 import { useActionState } from "react";
 
 type State = {
