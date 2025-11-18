@@ -1,10 +1,10 @@
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { LoginMethod, Role } from "../../shared/enums/enums";
-import { IGoogleLoginUseCase } from "../interfaces/IGoogleLoginUseCase";
+import { IGoogleSignUpUseCase } from "../interfaces/IGoogleSignUpUseCase"; 
 import { IGoogleAuthService } from "../services/IGoogleAuthService";
 import { ITokenService } from "../services/ITokenService";
 
-export class GoogleLoginUseCase implements IGoogleLoginUseCase {
+export class GoogleSignUpUseCase implements IGoogleSignUpUseCase {
     constructor(
         private userRepositoryFactory: IUserRepository,
         private tokenService: ITokenService,

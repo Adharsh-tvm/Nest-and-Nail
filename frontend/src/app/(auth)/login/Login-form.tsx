@@ -134,7 +134,6 @@ export const LoginForm = () => {
 
         {/* Google Auth Button */}
         <div>
-         <GoogleAuthButton />
         </div>
       </div>
     </>

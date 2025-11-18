@@ -28,11 +28,11 @@ import { NodemailerEmailService } from "../services/NodemailerEmailService";
 
 import { AuthController } from "../../presentation/controllers/AuthController";
 import { AuthMiddleware } from "../../presentation/middlewares/AuthMiddleware";
-import { IGoogleLoginUseCase } from "../../application/interfaces/IGoogleLoginUseCase";
+import { IGoogleSignUpUseCase } from "../../application/interfaces/IGoogleSignUpUseCase"; 
 import { GoogleAuthController } from "../../presentation/controllers/GoogleAuthController";
 import { IGoogleAuthService } from "../../application/services/IGoogleAuthService";
 import { GoogleAuthService } from "../services/GoogleAuthService";
-import { GoogleLoginUseCase } from "../../application/use-cases/GoogleLoginUseCase";
+import { GoogleSignUpUseCase } from "../../application/use-cases/GoogleSignUpUseCase"; 
 
 
 export class DIContainer {
@@ -61,7 +61,7 @@ export class DIContainer {
   private _sendOtpUseCase?: ISendOtpUseCase;
   private _verifyOtpUseCase?: IVerifyOtpUseCase;
 
-  private _googleLoginUseCase?: IGoogleLoginUseCase;
+  private _googleLoginUseCase?: IGoogleSignUpUseCase;
   // -------------------------
   // Presentation Layer
   // -------------------------
@@ -233,9 +233,9 @@ export class DIContainer {
   }
 
 
-  get googleLoginUseCase(): IGoogleLoginUseCase {
+  get googleLoginUseCase(): IGoogleSignUpUseCase {
     if (!this._googleLoginUseCase) {
-      this._googleLoginUseCase = new GoogleLoginUseCase(
+      this._googleLoginUseCase = new GoogleSignUpUseCase(
         this.repositoryFactory,
         this.tokenService,
         this.googleAuthService
