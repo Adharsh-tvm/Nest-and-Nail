@@ -1,5 +1,5 @@
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
-import { Role } from "../../shared/enums/enums";
+import { LoginMethod, Role } from "../../shared/enums/enums";
 import { IGoogleLoginUseCase } from "../interfaces/IGoogleLoginUseCase";
 import { IGoogleAuthService } from "../services/IGoogleAuthService";
 import { ITokenService } from "../services/ITokenService";
@@ -26,7 +26,8 @@ export class GoogleLoginUseCase implements IGoogleLoginUseCase {
                 email: googleUser.email,
                 avatar: googleUser.picture,
                 role,
-                provider: "google",
+                loginMethod: LoginMethod.GOOGLE,
+                passwordhash: null,
             } as any);
         }
 
