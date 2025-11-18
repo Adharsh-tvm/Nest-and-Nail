@@ -8,14 +8,15 @@ import { ILoginUserUseCase } from "../../application/interfaces/ILoginUserUseCas
 import { IGetCurrentUserUseCase } from "../../application/interfaces/IGetCurrentUserUseCase";
 import { ISendOtpUseCase } from "../../application/interfaces/ISendOtpUseCase";
 import { IVerifyOtpUseCase } from "../../application/interfaces/IVerifyOtpUseCase";
+import { IGoogleLoginUseCase } from "../../application/interfaces/IGoogleLoginUseCase";
 
 export class AuthController implements IAuthController {
   constructor(
     private readonly _registerUserUseCase: IRegisterUserUseCase,
     private readonly _loginUserUseCase: ILoginUserUseCase,
     private readonly _getCurrentUserUseCase: IGetCurrentUserUseCase,
-    private sendOtpUseCase: ISendOtpUseCase,
-    private verifyOtpUseCase: IVerifyOtpUseCase
+    private readonly sendOtpUseCase: ISendOtpUseCase,
+    private readonly verifyOtpUseCase: IVerifyOtpUseCase,
   ) { }
 
   async register(req: Request, res: Response): Promise<void> {
@@ -178,4 +179,7 @@ export class AuthController implements IAuthController {
     res.clearCookie("refreshToken", { path: "/" });
     res.status(HttpStatusCode.OK).json({ message: "Logged out successfully" });
   }
+
+ 
+
 }

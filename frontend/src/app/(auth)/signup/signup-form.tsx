@@ -6,6 +6,7 @@ import { User, Wrench, Shield, KeyRound, AtSign, Loader2, X } from "lucide-react
 import { signup, completeSignup, resendOtp } from "../../actions/signup-actions";
 import OtpVerificationForm from "../otp/page"; 
 import { useRouter } from "next/navigation";
+import GoogleAuthButton from "@/components/ui/GoogleLoginButton";
 
 type Role = "client" | "worker" | "admin";
 
@@ -111,7 +112,7 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
     setOtpError(null);
 
     try {
-      const result = await resendOtp(signupData.email);
+      const result = await resendOtp(signupData.email, role);
 
       if (!result.success) {
         setOtpError(result.error || "Failed to resend OTP");
@@ -259,6 +260,7 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
                   `Sign Up as ${roleName}`
                 )}
               </button>
+                <GoogleAuthButton role={role} />
             </form>
           </div>
 

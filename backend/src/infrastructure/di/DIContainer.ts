@@ -9,9 +9,9 @@ import { IGetCurrentUserUseCase } from "../../application/interfaces/IGetCurrent
 import { ISendOtpUseCase } from "../../application/interfaces/ISendOtpUseCase";
 import { IVerifyOtpUseCase } from "../../application/interfaces/IVerifyOtpUseCase";
 
-import { BcryptPasswordHasher } from "../utils/BcryptPasswordHasher";
-import { UUIDGenerator } from "../utils/UUIDGenerator";
-import { JwtTokenService } from "../utils/JwtTokenService";
+import { BcryptPasswordHasher } from "../services/BcryptPasswordHasher";
+import { UUIDGenerator } from "../services/UUIDGenerator";
+import { JwtTokenService } from "../services/JwtTokenService";
 import { loggerInstance } from "../logger/Logger";
 
 import { UserRepositoryFactory } from "../repo/UserRepositoryFactory";
@@ -23,11 +23,16 @@ import { GetCurrentUserUseCase } from "../../application/use-cases/GetCurrentUse
 import { SendOtpUseCase } from "../../application/use-cases/SendOtpUseCase";
 import { VerifyOtpUseCase } from "../../application/use-cases/VerifyOtpUseCase";
 
-import { OtpService } from "../utils/OtpService";
-import { NodemailerEmailService } from "../utils/NodemailerEmailService";
+import { OtpService } from "../services/OtpService";
+import { NodemailerEmailService } from "../services/NodemailerEmailService";
 
 import { AuthController } from "../../presentation/controllers/AuthController";
 import { AuthMiddleware } from "../../presentation/middlewares/AuthMiddleware";
+import { IGoogleLoginUseCase } from "../../application/interfaces/IGoogleLoginUseCase";
+import { GoogleAuthController } from "../../presentation/controllers/GoogleAuthController";
+import { IGoogleAuthService } from "../../application/services/IGoogleAuthService";
+import { GoogleAuthService } from "../services/GoogleAuthService";
+import { GoogleLoginUseCase } from "../../application/use-cases/GoogleLoginUseCase";
 
 
 export class DIContainer {
@@ -44,6 +49,7 @@ export class DIContainer {
 
   private _otpService?: OtpService;
   private _emailService?: NodemailerEmailService;
+  private _googleAuthService?: IGoogleAuthService;
 
   // -------------------------
   // Application Layer
@@ -55,11 +61,14 @@ export class DIContainer {
   private _sendOtpUseCase?: ISendOtpUseCase;
   private _verifyOtpUseCase?: IVerifyOtpUseCase;
 
+  private _googleLoginUseCase?: IGoogleLoginUseCase;
   // -------------------------
   // Presentation Layer
   // -------------------------
   private _authController?: AuthController;
   private _authMiddleware?: AuthMiddleware;
+
+  private _googleAuthController?: GoogleAuthController;
 
 
   // ==========================================
@@ -205,6 +214,36 @@ export class DIContainer {
     }
     return this._authController;
   }
+
+  get googleAuthService(): IGoogleAuthService {
+    if (!this._googleAuthService) {
+      this._googleAuthService = new GoogleAuthService();
+
+    }
+    return this._googleAuthService;
+  }
+
+  get googleAuthController(): GoogleAuthController {
+    if (!this._googleAuthController) {
+      this._googleAuthController = new GoogleAuthController(
+        this.googleLoginUseCase
+      );
+    }
+    return this._googleAuthController;
+  }
+
+
+  get googleLoginUseCase(): IGoogleLoginUseCase {
+    if (!this._googleLoginUseCase) {
+      this._googleLoginUseCase = new GoogleLoginUseCase(
+        this.repositoryFactory,
+        this.tokenService,
+        this.googleAuthService
+      );
+    }
+    return this._googleLoginUseCase;
+  }
+
 
   get authMiddleware(): AuthMiddleware {
     if (!this._authMiddleware) {
