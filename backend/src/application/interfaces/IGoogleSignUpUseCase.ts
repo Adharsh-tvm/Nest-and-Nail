@@ -1,6 +1,6 @@
 import { Role } from "../../shared/enums/enums";
 
-export interface IGoogleLoginUseCase {
+export interface IGoogleSignUpUseCase {
     execute(idToken: string, role: Role): Promise<{
         user: any;
         accessToken: string;

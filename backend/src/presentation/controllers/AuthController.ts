@@ -8,7 +8,6 @@ import { ILoginUserUseCase } from "../../application/interfaces/ILoginUserUseCas
 import { IGetCurrentUserUseCase } from "../../application/interfaces/IGetCurrentUserUseCase";
 import { ISendOtpUseCase } from "../../application/interfaces/ISendOtpUseCase";
 import { IVerifyOtpUseCase } from "../../application/interfaces/IVerifyOtpUseCase";
-import { IGoogleLoginUseCase } from "../../application/interfaces/IGoogleLoginUseCase";
 
 export class AuthController implements IAuthController {
   constructor(
@@ -180,6 +179,6 @@ export class AuthController implements IAuthController {
     res.status(HttpStatusCode.OK).json({ message: "Logged out successfully" });
   }
 
- 
+
 
 }
