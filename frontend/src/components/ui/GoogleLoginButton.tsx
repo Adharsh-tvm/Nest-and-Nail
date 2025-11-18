@@ -1,10 +1,10 @@
 "use client";
 
 import { useGoogleLogin } from "@react-oauth/google";
-import axios from "axios";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { handleGoogleLogin } from "@/app/actions/google-actions";
 
 export default function GoogleAuthButton({ role }: { role: "client" | "worker" }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -23,31 +23,19 @@ const login = useGoogleLogin({
         throw new Error("No access token returned from Google");
       }
 
-      console.log("Google access token received:", accessToken);
+      const user = await handleGoogleLogin(accessToken, role.toUpperCase());
 
-      const result = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}/api/auth/google`,
-        {
-          accessToken,
-          role: role.toUpperCase()
-        },
-        {
-          withCredentials: true,
-          headers: { "Content-Type": "application/json" }
-        }
-      );
+      router.push(user.role === "worker" ? "/worker/home" : "/client/home");
 
-      console.log("Google login success:", result.data);
-
-      router.push(role === "worker" ? "/worker/home" : "/client/home");
     } catch (err: any) {
       console.error("Google login error:", err);
-      setError(err.response?.data?.error || "Google login failed. Please try again.");
+      setError("Google login failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
   },
 });
+
 
 
 
