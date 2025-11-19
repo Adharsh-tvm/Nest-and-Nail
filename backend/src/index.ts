@@ -7,6 +7,7 @@ import { createAuthRoutes } from "./presentation/routes/authRoutes";
 import { errorHandler } from "./presentation/middlewares/ErrorHandler";
 import { RequestLogger } from "./presentation/middlewares/RequestLogger";
 import { DIContainer } from "./infrastructure/di/DIContainer";
+import { createGoogleAuthRoutes } from "./presentation/routes/GoogleAuthRoutes";
 
 // Load environment variables
 dotenv.config();
@@ -29,6 +30,8 @@ async function bootstrap() {
   app.use(cookieParser());
   app.use(RequestLogger);
 
+  app.options("*", cors());
+
   // Connect to MongoDB
   await connectDB(process.env.MONGO_URI ?? "mongodb://localhost:27017/MEND-WAY");
 
@@ -40,6 +43,11 @@ async function bootstrap() {
     container.authController,
     container.authMiddleware
   ));
+
+  app.use(
+    "/api/auth",
+    createGoogleAuthRoutes(container.googleAuthController)
+  );
   // Error Handler
   app.use(errorHandler);
 

@@ -12,6 +12,8 @@ export function createAuthRoutes(
     router.post("/login", (req, res) => authController.login(req, res));
     router.post("/logout", (req, res) => authController.logout(req, res));
     router.get("/me", authMiddleware.verify, (req, res) => authController.getCurrentUser(req, res));
-    
+    router.post("/send-otp", authController.sendOtp);
+    router.post("/verify-otp", authController.verifyOtp);
+
     return router;
 }   
