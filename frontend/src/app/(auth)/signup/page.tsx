@@ -13,7 +13,7 @@ export default async function SignupPage() {
       redirect("/client/home");
     } else if (user.role === "worker") {
       if (user.isVerified) {
-        redirect("/worker/home");
+        redirect("/worker/portal");
       } else {
         redirect("/worker/documents");
       }

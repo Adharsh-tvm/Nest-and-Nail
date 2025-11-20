@@ -42,7 +42,7 @@ export default function GoogleAuthButton({ role, mode = "signup" }: GoogleAuthBu
         
         console.log("[GoogleAuthButton] User received:", user);
 
-        router.push(user.role === "worker" ? "/worker/home" : "/client/home");
+        router.push(user.role === "worker" ? "/worker/portal" : "/client/home");
 
       } catch (err: any) {
         console.error("Google authentication error:", err);

@@ -14,7 +14,7 @@ async function ClientSignup({}: Props) {
     if (user.role === "client") {
       redirect("/client/home");
     } else if (user.role === "worker") {
-      redirect("/worker/home");
+      redirect("/worker/portal");
     } else if (user.role === "admin") {
       redirect("/admin/dashboard");
     } else {
