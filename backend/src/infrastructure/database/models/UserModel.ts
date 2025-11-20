@@ -9,6 +9,7 @@ const userSchema = new Schema<User>({
     phone: { type: Number },
     passwordhash: { type: String, required: false, default: null },
     isBlocked: { type: Boolean, default: false },
+    isVerfied: {type: Boolean, default: false},
     profilePictureUrl: { type: String, default: "" },
     role: { 
         type: String, 

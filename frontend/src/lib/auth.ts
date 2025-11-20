@@ -1,6 +1,7 @@
+"use server"
+
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import axiosInstance from "@/lib/axiosInstance";
 import authApi from "@/services/auth/auth.api";
 
 export type UserRole = "client" | "worker" | "admin";
@@ -9,13 +10,14 @@ export interface AuthUser {
   id: string;
   email: string;
   role: UserRole;
+  isVerified: boolean,
   accessToken: string;
   refreshToken?: string;
 }
 
 // Decodes a JWT payload without verifying signature.
 // Returns parsed data or null if token is invalid.
-function decodeJWT(token: string): { id: string; email: string; role: string } | null {
+function decodeJWT(token: string): { id: string; email: string; role: string; isVerified: boolean } | null {
   try {
     const parts = token.split(".");
     if (parts.length !== 3) return null;
@@ -67,6 +69,7 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
     id: decoded.id,
     email: decoded.email,
     role: decoded.role.toLowerCase() as UserRole,
+    isVerified: decoded.isVerified,
     accessToken: accessToken || "",
     refreshToken
   };

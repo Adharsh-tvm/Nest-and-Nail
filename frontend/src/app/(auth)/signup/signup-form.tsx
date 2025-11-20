@@ -260,8 +260,12 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
                   `Sign Up as ${roleName}`
                 )}
               </button>
-                <GoogleAuthButton role={role} />
             </form>
+
+            {/* Google Auth Button - OUTSIDE the form */}
+            <div className="mt-4">
+              <GoogleAuthButton role={role} mode="signup" />
+            </div>
           </div>
 
           <div className="p-6 border-t border-zinc-800 text-center text-sm">
@@ -291,7 +295,7 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
               <X className="h-8 w-8" />
             </button>
 
-            {/* OTP Form - Remove the min-h-screen and bg from OtpVerificationForm */}
+            {/* OTP Form */}
             <div className="bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl overflow-hidden">
               <OtpVerificationForm
                 email={signupData.email}
