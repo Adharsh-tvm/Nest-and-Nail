@@ -124,7 +124,7 @@ export async function isAuthenticated(): Promise<boolean> {
  */
 export async function verifyToken(token: string): Promise<boolean> {
   try {
-    const response = await authApi.verfify({token})
+    const response = await authApi.verify({token})
 
     return response.status === 200;
   } catch (error) {

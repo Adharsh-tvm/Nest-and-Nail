@@ -1,9 +1,11 @@
+// app/actions/signup-actions.ts
 "use server";
 
-import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { AxiosError } from "axios";
-import axiosInstance from "@/lib/axiosInstance";
+import authApi from "@/services/auth/auth.api";
+
+// ---------------- Types ----------------
 
 type SignupFormData = {
   name: string;
@@ -13,22 +15,39 @@ type SignupFormData = {
   role: "client" | "worker";
 };
 
-type SignupResponse = {
+export type SignupResponse = {
   error: string | null;
   fields?: Partial<SignupFormData>;
-  otpSent?: boolean; // New field to trigger OTP modal
+  otpSent?: boolean;
 };
 
-// Step 1: Initiate signup by sending OTP (user NOT registered yet)
+type CompleteSignupData = {
+  name: string;
+  email: string;
+  password: string;
+  role: "client" | "worker";
+  otp: string;
+};
+
+export type CompleteSignupResponse = {
+  success: boolean;
+  error: string | null;
+  isVerified?: boolean;
+};
+
+// ----------------------
+// STEP 1: START SIGNUP (SEND OTP)
+// ----------------------
+
 export async function signup(
   prevState: SignupResponse,
   formData: FormData
 ): Promise<SignupResponse> {
-  const name = formData.get("name") as string;
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
-  const confirmPassword = formData.get("confirmPassword") as string;
-  const role = formData.get("role") as "client" | "worker";
+  const name = (formData.get("name") as string) || "";
+  const email = (formData.get("email") as string) || "";
+  const password = (formData.get("password") as string) || "";
+  const confirmPassword = (formData.get("confirmPassword") as string) || "";
+  const role = (formData.get("role") as "client" | "worker") || "client";
 
   const fields = { name, email, role };
 
@@ -51,124 +70,108 @@ export async function signup(
   }
 
   try {
-    // Send OTP to email (user not registered yet)
-    const response = await axiosInstance.post("/api/auth/send-otp", {
+    // Use authApi.sendOtp with payload shape the backend expects
+    await authApi.sendOtp({
       email_address: email,
-      role: role,       // ⬅️ ADD THIS
+      role,
     });
 
-
-    // OTP sent successfully - return success to trigger modal
     return {
       error: null,
       otpSent: true,
-      fields
+      fields,
     };
-
   } catch (error) {
+    // Improved logging for debugging (server logs)
     if (error instanceof AxiosError) {
-      if (error.response) {
-        const data = error.response.data;
-        return {
-          error: data.message || data.error || "Failed to send OTP. Please try again.",
-          fields
-        };
-      }
+      console.error("signup -> sendOtp failed:", {
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message,
+      });
 
-      if (error.code === "ECONNREFUSED" || error.message.includes("Network Error")) {
-        return {
-          error: "Cannot connect to server. Please check if the backend is running.",
-          fields
-        };
-      }
+      return {
+        error:
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Failed to send OTP. Please try again.",
+        fields,
+      };
     }
 
+    console.error("signup -> unknown error:", error);
     return {
       error: "Network error. Please check your connection and try again.",
-      fields
+      fields,
     };
   }
 }
 
-// Step 2: Complete signup after OTP verification
-type CompleteSignupData = {
-  name: string;
-  email: string;
-  password: string;
-  role: "client" | "worker";
-  otp: string;
-  
-};
-
-type CompleteSignupResponse = {
-  success: boolean;
-  error: string | null;
-  isVerified?: boolean;
-};
-
+// ----------------------
+// STEP 2: COMPLETE SIGNUP AFTER OTP
+// ----------------------
 
 export async function completeSignup(
   data: CompleteSignupData
 ): Promise<CompleteSignupResponse> {
   try {
-    // First verify the OTP
-    const otpVerifyResponse = await axiosInstance.post("/api/auth/verify-otp", {
+    // Verify OTP via authApi
+    const otpResponse = await authApi.verifyOtp({
       email_address: data.email,
       otp: data.otp,
     });
 
-    // Check if OTP verification was successful
-    if (!otpVerifyResponse.data || otpVerifyResponse.status !== 200) {
-      return {
-        success: false,
-        error: "Invalid or expired OTP",
-      };
+    // OTP verify should return 200; check data if needed
+    if (!otpResponse?.data) {
+      return { success: false, error: "Invalid or expired OTP" };
     }
 
-    // OTP verified successfully - now register the user
-    const registerResponse = await axiosInstance.post("/api/auth/register", {
+    // Register user
+    const registerResponse = await authApi.signup({
       user_name: data.name,
       email_address: data.email,
       password: data.password,
-      user_role: data.role
+      user_role: data.role,
     });
 
-    const registerData = registerResponse.data;
+    const registerData = registerResponse?.data;
 
-    // Extract tokens from response body
+    if (!registerData) {
+      return { success: false, error: "Signup failed: empty response" };
+    }
+
     const { accessToken, refreshToken, user } = registerData;
 
     if (!accessToken || !refreshToken) {
+      console.error("completeSignup -> missing tokens:", registerData);
       return {
         success: false,
         error: "Signup failed: No tokens received",
       };
     }
 
-    // Set cookies for authentication
+    // Persist tokens & role in cookies (server-side)
     const cookieStore = await cookies();
 
-    // Set access token cookie
     cookieStore.set("accessToken", accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 15 * 60, // 15 minutes in seconds
+      maxAge: 15 * 60, // 15 minutes
       path: "/",
     });
 
-    // Set refresh token cookie
     cookieStore.set("refreshToken", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 7 * 24 * 60 * 60, // 7 days in seconds
+      maxAge: 7 * 24 * 60 * 60, // 7 days
       path: "/",
     });
 
-    // Store user role for redirect
-    const userRole = user?.user_role?.toLowerCase();
+    const userRole = (user?.user_role || user?.role || "").toString().toLowerCase();
     if (!userRole) {
+      console.error("completeSignup -> invalid user role in response:", user);
       return {
         success: false,
         error: "Signup failed: Invalid user data",
@@ -186,26 +189,26 @@ export async function completeSignup(
     return {
       success: true,
       error: null,
+      isVerified: !!user?.isVerified,
     };
-
   } catch (error) {
     if (error instanceof AxiosError) {
-      if (error.response) {
-        const data = error.response.data;
-        return {
-          success: false,
-          error: data.message || data.error || "Verification or registration failed. Please try again.",
-        };
-      }
+      console.error("completeSignup -> error:", {
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message,
+      });
 
-      if (error.code === "ECONNREFUSED" || error.message.includes("Network Error")) {
-        return {
-          success: false,
-          error: "Cannot connect to server. Please check if the backend is running.",
-        };
-      }
+      return {
+        success: false,
+        error:
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Verification or registration failed. Please try again.",
+      };
     }
 
+    console.error("completeSignup -> unknown error:", error);
     return {
       success: false,
       error: "Network error. Please check your connection and try again.",
@@ -213,15 +216,18 @@ export async function completeSignup(
   }
 }
 
-// Helper function to resend OTP
+// ----------------------
+// RESEND OTP
+// ----------------------
+
 export async function resendOtp(
   email: string,
   role: "client" | "worker"
 ): Promise<{ success: boolean; error: string | null }> {
   try {
-    await axiosInstance.post("/api/auth/send-otp", {
+    await authApi.sendOtp({
       email_address: email,
-      role: role,
+      role,
     });
 
     return {
@@ -230,24 +236,19 @@ export async function resendOtp(
     };
   } catch (error) {
     if (error instanceof AxiosError) {
-      if (error.response) {
-        return {
-          success: false,
-          error: error.response.data.message || "Failed to resend OTP",
-        };
-      }
+      console.error("resendOtp -> error:", {
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message,
+      });
 
-      if (error.code === "ECONNREFUSED" || error.message.includes("Network Error")) {
-        return {
-          success: false,
-          error: "Cannot connect to server",
-        };
-      }
+      return {
+        success: false,
+        error: error.response?.data?.message || "Failed to resend OTP",
+      };
     }
 
-    return {
-      success: false,
-      error: "Network error occurred",
-    };
+    console.error("resendOtp -> unknown error:", error);
+    return { success: false, error: "Network error occurred" };
   }
 }
