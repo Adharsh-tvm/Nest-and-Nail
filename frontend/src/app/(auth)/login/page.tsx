@@ -11,7 +11,11 @@ const LoginPage = async () => {
     if (user.role === "client") {
       redirect("/client/home");
     } else if (user.role === "worker") {
-      redirect("/worker/home");
+      if(user.isVerified){
+        redirect("/worker/home");
+      }else{
+        redirect("/worker/documents");
+      }
     } else if (user.role === "admin") {
       redirect("/admin/dashboard");
     }

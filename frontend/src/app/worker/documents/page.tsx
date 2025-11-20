@@ -15,6 +15,7 @@ import {
   LucideIcon,
   FileBadge
 } from 'lucide-react';
+import WorkerHeader from '@/components/containers/WorkerHeader';
 
 // --- Types ---
 
@@ -247,7 +248,6 @@ export default function WorkerDocumentsPage() {
   if (success) {
     return (
       <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col font-sans">
-        <Header />
         <div className="flex-1 flex items-center justify-center p-4">
           <Card className="max-w-md w-full border-emerald-900/50 bg-zinc-900/80">
             <CardContent className="pt-6 flex flex-col items-center text-center space-y-4">
@@ -269,8 +269,9 @@ export default function WorkerDocumentsPage() {
   }
 
   return (
+
     <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col font-sans selection:bg-emerald-500/30">
-      <Header />
+      <WorkerHeader />
 
       <main className="flex-1 container mx-auto max-w-4xl px-4 py-8 md:py-12">
         <div className="mb-8 space-y-2">
@@ -425,36 +426,7 @@ export default function WorkerDocumentsPage() {
 
 // --- Sub-components ---
 
-function Header() {
-  return (
-    <header className="sticky top-0 z-50 w-full border-b border-zinc-800 bg-zinc-950/80 backdrop-blur supports-[backdrop-filter]:bg-zinc-950/60">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <div className="flex items-center gap-2">
-          <span className="text-lg font-bold text-white tracking-tight">
-            <span className="text-emerald-500">Mend</span> On
-          </span>
-        </div>
 
-        <div className="flex items-center gap-4">
-          <div className="hidden md:flex items-center gap-3 mr-2">
-            <div className="text-right">
-              <p className="text-sm font-medium text-white">Alex Walker</p>
-              <p className="text-xs text-zinc-500">Electrician Pending</p>
-            </div>
-            <div className="h-9 w-9 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center">
-              <User className="h-5 w-5 text-zinc-400" />
-            </div>
-          </div>
-          <div className="h-6 w-px bg-zinc-800 hidden md:block" />
-          <Button className="gap-2 text-xs md:text-sm bg-emerald-500 hover:bg-emerald-600">
-            <LogOut className="h-4 w-4" />
-            Logout
-          </Button>
-        </div>
-      </div>
-    </header>
-  );
-}
 
 interface StatusItemProps {
   label: string;

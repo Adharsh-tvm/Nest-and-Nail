@@ -1,4 +1,3 @@
-
 import Link from "next/link";
 import { User, Briefcase } from "lucide-react";
 import styles from "./Signup.module.css";
@@ -6,23 +5,29 @@ import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
 export default async function SignupPage() {
+  const user = await getCurrentUser();
 
-    const user = await getCurrentUser();
-  
-    // If user is authenticated, redirect immediately (server-side)
-    if (user) {
-      if (user.role === "client") {
-        redirect("/client/home");
-      } else if (user.role === "worker") {
+  // If user is authenticated, redirect immediately (server-side)
+  if (user) {
+    if (user.role === "client") {
+      redirect("/client/home");
+    } else if (user.role === "worker") {
+      if (user.isVerified) {
         redirect("/worker/home");
-      } else if (user.role === "admin") {
-        redirect("/admin/dashboard");
+      } else {
+        redirect("/worker/documents");
       }
+    } else if (user.role === "admin") {
+      redirect("/admin/dashboard");
     }
+  }
 
   return (
     <main className={styles.container}>
-      <Link href="/signup/client" className={`${styles.panel} ${styles.userPanel}`}>
+      <Link
+        href="/signup/client"
+        className={`${styles.panel} ${styles.userPanel}`}
+      >
         <div className={styles.content}>
           <User className={styles.icon} size={64} strokeWidth={1.5} />
           <h2 className={styles.title}>Join as a Client</h2>
@@ -31,7 +36,10 @@ export default async function SignupPage() {
           </p>
         </div>
       </Link>
-      <Link href="/signup/worker" className={`${styles.panel} ${styles.workerPanel}`}>
+      <Link
+        href="/signup/worker"
+        className={`${styles.panel} ${styles.workerPanel}`}
+      >
         <div className={styles.content}>
           <Briefcase className={styles.icon} size={64} strokeWidth={1.5} />
           <h2 className={styles.title}>Join as a Worker</h2>

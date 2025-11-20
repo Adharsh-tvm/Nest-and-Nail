@@ -97,12 +97,15 @@ type CompleteSignupData = {
   password: string;
   role: "client" | "worker";
   otp: string;
+  
 };
 
 type CompleteSignupResponse = {
   success: boolean;
   error: string | null;
+  isVerified?: boolean;
 };
+
 
 export async function completeSignup(
   data: CompleteSignupData
