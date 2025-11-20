@@ -10,16 +10,18 @@ import {
   MessageCircle,
   Power,
   Menu,
-  LogOut, // Imported LogOut icon
+  LogOut,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation"; // Imported useRouter
+import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 
 type UserType = { isVerified?: boolean } | null;
 
 const WorkerHeader: React.FC = () => {
-  const router = useRouter(); // Initialize router
+  const router = useRouter();
+  const { logout } = useAuth();
 
   type NavItemProps = {
     icon: React.ElementType;
@@ -66,27 +68,20 @@ const WorkerHeader: React.FC = () => {
     };
   }, []);
 
-
-  
-
-  // --- LOGOUT HANDLER ---
+  // --- UNIFIED LOGOUT HANDLER ---
   const handleLogout = async () => {
     try {
-      // Replace with your actual logout endpoint
-      await fetch("/api/auth/logout", { method: "POST" });
-      
-      // Clear local state
-      setUser(null);
-      
-      // Redirect to login page
-      router.push("/login"); 
-      router.refresh();
+      // Use the logout from AuthContext (handles API call + cookie clearing)
+      await logout();
+      // AuthContext already handles redirect, but we ensure it happens
+      router.replace("/login");
     } catch (error) {
       console.error("Failed to logout", error);
+      // Force redirect even if logout fails
+      router.replace("/login");
     }
   };
 
-  // while loading you can show skeleton or return null
   if (loading) {
     return (
       <header className="bg-neutral-900 text-white p-4">
@@ -95,7 +90,7 @@ const WorkerHeader: React.FC = () => {
     );
   }
 
-  // safe to read user now (no state updates during render)
+  // VERIFIED USER VIEW
   if (user?.isVerified) {
     return (
       <header className="bg-neutral-900 text-white p-4 flex flex-col md:flex-row items-center justify-between border-b border-neutral-800">
@@ -141,13 +136,13 @@ const WorkerHeader: React.FC = () => {
               {isOnline ? "Online" : "Offline"}
             </span>
           </div>
-          
+
           <button className="text-neutral-300 hover:text-white">
             <MessageCircle className="w-6 h-6" />
           </button>
 
-          {/* LOGOUT BUTTON (Verified View) */}
-          <button 
+          {/* LOGOUT BUTTON - VERIFIED VIEW */}
+          <button
             onClick={handleLogout}
             className="text-neutral-300 hover:text-red-400 transition-colors"
             title="Sign out"
@@ -163,51 +158,52 @@ const WorkerHeader: React.FC = () => {
         </div>
       </header>
     );
-  } else {
-    return (
-      <header className="sticky top-0 z-50 w-full border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-md">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" className="md:hidden">
-              <Menu className="h-5 w-5" />
-            </Button>
-            <span className="text-lg font-bold text-white tracking-tight">
-              <span className="text-emerald-500">Mend</span> On
+  }
+
+  // UNVERIFIED USER VIEW
+  return (
+    <header className="sticky top-0 z-50 w-full border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-md">
+      <div className="container mx-auto flex h-16 items-center justify-between px-4">
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" className="md:hidden">
+            <Menu className="h-5 w-5" />
+          </Button>
+          <span className="text-lg font-bold text-white tracking-tight">
+            <span className="text-emerald-500">Mend</span> On
+          </span>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setIsOnline((v) => !v)}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all ${
+              isOnline
+                ? "bg-emerald-950/30 border-emerald-500/30 text-emerald-500"
+                : "bg-zinc-900 border-zinc-700 text-zinc-400"
+            }`}
+          >
+            <Power className="w-4 h-4" />
+            <span className="text-sm font-medium hidden sm:inline">
+              {isOnline ? "Online" : "Offline"}
             </span>
-          </div>
+          </button>
 
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setIsOnline((v) => !v)}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all ${
-                isOnline
-                  ? "bg-emerald-950/30 border-emerald-500/30 text-emerald-500"
-                  : "bg-zinc-900 border-zinc-700 text-zinc-400"
-              }`}
-            >
-              <Power className="w-4 h-4" />
-              <span className="text-sm font-medium hidden sm:inline">
-                {isOnline ? "Online" : "Offline"}
-              </span>
-            </button>
+          {/* LOGOUT BUTTON - UNVERIFIED VIEW */}
+          <button
+            onClick={handleLogout}
+            className="h-9 w-9 flex items-center justify-center rounded-full border border-zinc-700 bg-zinc-800 text-zinc-400 hover:text-red-400 hover:border-red-900/50 transition-all"
+            title="Sign out"
+          >
+            <LogOut className="h-4 w-4" />
+          </button>
 
-            {/* LOGOUT BUTTON (Unverified View) */}
-            <button
-              onClick={handleLogout}
-              className="h-9 w-9 flex items-center justify-center rounded-full border border-zinc-700 bg-zinc-800 text-zinc-400 hover:text-red-400 hover:border-red-900/50 transition-all"
-              title="Sign out"
-            >
-              <LogOut className="h-4 w-4" />
-            </button>
-
-            <div className="h-9 w-9 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center overflow-hidden">
-              <User className="h-5 w-5 text-zinc-400" />
-            </div>
+          <div className="h-9 w-9 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center overflow-hidden">
+            <User className="h-5 w-5 text-zinc-400" />
           </div>
         </div>
-      </header>
-    );
-  }
+      </div>
+    </header>
+  );
 };
 
 export default WorkerHeader;

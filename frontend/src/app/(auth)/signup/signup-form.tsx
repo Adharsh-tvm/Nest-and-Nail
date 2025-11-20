@@ -4,7 +4,7 @@ import * as React from "react";
 import { useActionState, useState, useEffect } from "react";
 import { User, Wrench, Shield, KeyRound, AtSign, Loader2, X } from "lucide-react";
 import { signup, completeSignup, resendOtp } from "../../actions/signup-actions";
-import OtpVerificationForm from "../otp/page"; 
+import OtpVerificationForm from "../otp/page";
 import { useRouter } from "next/navigation";
 import GoogleAuthButton from "@/components/ui/GoogleLoginButton";
 
@@ -58,20 +58,20 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
   const currentRoleConfig = roleConfig[role];
   const roleName = role.charAt(0).toUpperCase() + role.slice(1);
 
-  // When OTP is sent successfully, open modal
+  // When OTP is sent successfully, open modal and capture form values
   useEffect(() => {
     if (state.otpSent && state.fields) {
       const formElement = document.querySelector('form[data-signup-form]') as HTMLFormElement;
       if (formElement) {
         const formData = new FormData(formElement);
-        
+
         setSignupData({
-          name: formData.get("name") as string,
-          email: formData.get("email") as string,
-          password: formData.get("password") as string,
+          name: (formData.get("name") as string) || "",
+          email: (formData.get("email") as string) || "",
+          password: (formData.get("password") as string) || "",
           role: role,
         });
-        
+
         setShowOtpModal(true);
       }
     }
@@ -90,9 +90,13 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
       });
 
       if (result.success) {
-        // Registration successful, redirect based on role
+        // Worker-specific redirect based on verification status returned from server
         if (signupData.role === "worker") {
-          router.push("/worker/home");
+          if (result.isVerified) {
+            router.push("/worker/home");
+          } else {
+            router.push("/worker/documents");
+          }
         } else {
           router.push("/client/home");
         }
