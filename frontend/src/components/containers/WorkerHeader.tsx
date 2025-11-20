@@ -16,6 +16,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
 import { useAuth } from "@/contexts/AuthContext";
+import { AxiosResponse } from "axios";
+import authApi from "@/services/auth/auth.api";
 
 type UserType = { isVerified?: boolean } | null;
 
@@ -30,7 +32,12 @@ const WorkerHeader: React.FC = () => {
     active?: boolean;
   };
 
-  const NavItem: React.FC<NavItemProps> = ({ icon: Icon, label, href, active }) => (
+  const NavItem: React.FC<NavItemProps> = ({
+    icon: Icon,
+    label,
+    href,
+    active,
+  }) => (
     <a
       href={href}
       className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors duration-200 ${
@@ -50,19 +57,26 @@ const WorkerHeader: React.FC = () => {
 
   useEffect(() => {
     let mounted = true;
+
     (async () => {
       try {
-        const res = await fetch("/api/current-user");
+    
+        const res: AxiosResponse<{ user?: UserType }> = await authApi.getMe();
+
         if (!mounted) return;
-        const data = await res.json();
+
+        // Axios response body is in res.data
+        const data = res.data;
         setUser(data?.user ?? null);
       } catch (err) {
         if (!mounted) return;
+        console.error("Failed to fetch current user:", err);
         setUser(null);
       } finally {
         if (mounted) setLoading(false);
       }
     })();
+
     return () => {
       mounted = false;
     };
