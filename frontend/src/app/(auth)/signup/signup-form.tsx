@@ -93,7 +93,7 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
         // Worker-specific redirect based on verification status returned from server
         if (signupData.role === "worker") {
           if (result.isVerified) {
-            router.push("/worker/home");
+            router.push("/worker/portal");
           } else {
             router.push("/worker/documents");
           }

@@ -62,7 +62,7 @@ export function middleware(request: NextRequest) {
       userRole === "client"
         ? new URL("/client/home", request.url)
         : userRole === "worker"
-        ? new URL("/worker/home", request.url)
+        ? new URL("/worker/portal", request.url)
         : new URL("/admin/dashboard", request.url);
 
     const response = NextResponse.redirect(dashboardUrl, { status: 308 });

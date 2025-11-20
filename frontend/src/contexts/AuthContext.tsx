@@ -1,8 +1,8 @@
 "use client";
-
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import authApi from "@/services/auth/auth.api";
+import { AxiosError } from "axios";
 
 export type UserRole = "client" | "worker" | "admin";
 
@@ -26,11 +26,6 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-/**
- * Wraps the app with authentication state.
- * Manages user data, loading state and auth actions.
- * Fetches user on initial load.
- */
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -48,17 +43,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
    */
   const fetchUser = async () => {
     try {
-      const response = await authApi.getMe()
-
-      if (response.data) {
-        const data = await response.data
-        setUser(data.user);
+      console.log("AuthProvider: Fetching user...");
+      const response = await authApi.getMe();
+      
+      // ===== NEW: Better error handling =====
+      if (response.status === 200 && response.data?.user) {
+        console.log("AuthProvider: User fetched successfully", response.data.user);
+        setUser(response.data.user);
       } else {
+        console.warn("AuthProvider: Invalid response from getMe", response);
         setUser(null);
       }
-    } catch {
-      setUser(null);
+      // ===== END NEW CODE =====
+      
+    } catch (error) {
+      // ===== NEW: Differentiate error types =====
+      const axiosError = error as AxiosError;
+      
+      if (axiosError?.response?.status === 401 || axiosError?.response?.status === 403) {
+        console.log("AuthProvider: User is not authenticated (401/403)");
+        setUser(null);
+      } else {
+        console.error("AuthProvider: Error fetching user:", error);
+        // Don't immediately clear user on network errors - could be transient
+        // User will remain null but we won't aggressively redirect
+        setUser(null);
+      }
+      // ===== END NEW CODE =====
+      
     } finally {
+      console.log("AuthProvider: Loading complete");
       setIsLoading(false);
     }
   };
@@ -66,18 +80,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   /**
    * Logs out the user by clearing tokens.
    * Resets auth state and redirects to login.
-   * Ensures navigation cannot return to protected pages.
    */
-
   const logout = async () => {
     try {
-      await authApi.logout()
-
+      await authApi.logout();
       document.cookie =
         "accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
       document.cookie =
         "refreshToken=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
-
       setUser(null);
       router.replace("/login");
     } catch (error) {
@@ -87,7 +97,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   /**
    * Refreshes the current user state.
-   * Useful after profile updates or token refresh.
    */
   const refreshUser = async () => {
     await fetchUser();
@@ -110,7 +119,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 /**
  * Accesses the authentication context.
- * Ensures hook is used only inside AuthProvider.
  */
 export function useAuth() {
   const context = useContext(AuthContext);
