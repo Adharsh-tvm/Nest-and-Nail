@@ -1,18 +1,17 @@
 "use server";
 
 import { cookies } from "next/headers";
-import axiosInstance from "@/lib/axiosInstance";
+import authApi from "@/services/auth/auth.api";
 
 export async function handleGoogleLogin(
   accessToken: string, 
   role?: string,
   mode: "signup" | "login" = "signup"
 ) {
-  const res = await axiosInstance.post("/api/auth/google", {
+  const res = await authApi.googleAuth({
     accessToken,
-    role,
-    mode,
-  });
+    role
+  })
 
   const { accessToken: jwtAccess, refreshToken, user } = res.data;
 

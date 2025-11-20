@@ -1,8 +1,8 @@
 "use server";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
-import axiosInstance from "@/lib/axiosInstance";
 import { AxiosError } from "axios";
+import authApi from "@/services/auth/auth.api";
 
 type LoginFormData = {
   email: string;
@@ -40,10 +40,10 @@ export async function login(
 
   try {
     // Step 1: Call login endpoint
-    const response = await axiosInstance.post("/api/auth/login", {
-      email_address: email,
-      password: password
-    });
+    const response = await authApi.login({
+      email_address:email,
+      password
+    })
 
     const data = response.data;
 
@@ -58,11 +58,7 @@ export async function login(
     // ===== NEW: Verify token works before setting cookies =====
     try {
       console.log("Verifying token by calling /me endpoint...");
-      const verifyResponse = await axiosInstance.get("/api/auth/me", {
-        headers: {
-          Authorization: `Bearer ${data.accessToken}`
-        }
-      });
+      const verifyResponse = await authApi.getMe()
 
       if (!verifyResponse.data?.user) {
         return {
