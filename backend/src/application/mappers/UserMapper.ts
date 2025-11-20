@@ -12,6 +12,7 @@ export class UserMapper {
             phone: userData.phone_number,
             role: userData.user_role, 
             isBlocked: false,
+            isVerfied: false,
             loginMethod: LoginMethod.EMAIL_PASSWORD,
             profilePictureUrl: '',
             createdAt: new Date(),
@@ -29,6 +30,7 @@ export class UserMapper {
             user_role: userData.role,
             profileImageUrl: userData.profilePictureUrl,
             isBlocked: userData.isBlocked ?? false,
+            isVerified: userData.isVerfied ?? false,
         };
     }
 }

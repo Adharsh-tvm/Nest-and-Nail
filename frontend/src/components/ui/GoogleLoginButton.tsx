@@ -6,39 +6,72 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { handleGoogleLogin } from "@/app/actions/google-actions";
 
-export default function GoogleAuthButton({ role }: { role: "client" | "worker" }) {
+interface GoogleAuthButtonProps {
+  role?: "client" | "worker";
+  mode?: "signup" | "login";
+}
+
+export default function GoogleAuthButton({ role, mode = "signup" }: GoogleAuthButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-const login = useGoogleLogin({
-  onSuccess: async (tokenResponse) => {
-    setIsLoading(true);
-    setError(null);
+  const login = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      setIsLoading(true);
+      setError(null);
 
-    try {
-      const accessToken = tokenResponse.access_token;
+      try {
+        const accessToken = tokenResponse.access_token;
 
-      if (!accessToken) {
-        throw new Error("No access token returned from Google");
+        if (!accessToken) {
+          throw new Error("No access token returned from Google");
+        }
+
+        // For login mode without specific role, pass undefined
+        // Backend will determine role based on existing user
+        const userRole = role ? role.toUpperCase() : undefined;
+        
+        console.log("[GoogleAuthButton] Calling handleGoogleLogin with:", {
+          role: userRole,
+          mode,
+          hasAccessToken: !!accessToken
+        });
+        
+        const user = await handleGoogleLogin(accessToken, userRole, mode);
+        
+        console.log("[GoogleAuthButton] User received:", user);
+
+        router.push(user.role === "worker" ? "/worker/home" : "/client/home");
+
+      } catch (err: any) {
+        console.error("Google authentication error:", err);
+        
+        // Handle Axios errors
+        if (err.response?.data?.error) {
+          setError(err.response.data.error);
+        } else {
+          setError(err.message || "Google authentication failed. Please try again.");
+        }
+      } finally {
+        setIsLoading(false);
       }
+    },
+    onError: (error) => {
+      console.error("Google OAuth error:", error);
+      setError("Failed to connect to Google. Please try again.");
+    },
+  });
 
-      const user = await handleGoogleLogin(accessToken, role.toUpperCase());
-
-      router.push(user.role === "worker" ? "/worker/home" : "/client/home");
-
-    } catch (err: any) {
-      console.error("Google login error:", err);
-      setError("Google login failed. Please try again.");
-    } finally {
-      setIsLoading(false);
+  const getButtonText = () => {
+    if (isLoading) return "Signing in...";
+    
+    if (mode === "login") {
+      return "Sign in with Google";
     }
-  },
-});
-
-
-
-
+    
+    return role ? `Sign up as ${role} with Google` : "Continue with Google";
+  };
 
   return (
     <div className="space-y-2">
@@ -96,7 +129,7 @@ const login = useGoogleLogin({
           </svg>
         )}
 
-        {isLoading ? "Signing in..." : "Sign in with Google"}
+        {getButtonText()}
       </button>
 
       {error && (
