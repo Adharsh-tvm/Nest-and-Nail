@@ -1,9 +1,8 @@
 "use server";
-
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
-import axiosInstance from "@/lib/axiosInstance";
 import { AxiosError } from "axios";
+import authApi from "@/services/auth/auth.api";
 
 type LoginFormData = {
   email: string;
@@ -15,25 +14,15 @@ type LoginResponse = {
   fields?: Partial<LoginFormData>;
 };
 
-/**
- * Handles server-side login submission.
- * Validates input, calls backend and sets auth cookies.
- * Redirects user based on their role after success.
- *
- * @param prevState - Previous login state returned by useActionState
- * @param formData - Form data submitted from the login form
- * @returns {Promise<LoginResponse>} - Either an error or triggers a redirect
- */
 export async function login(
   prevState: LoginResponse,
   formData: FormData
 ): Promise<LoginResponse> {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
-
   const fields = { email };
 
-  // Basic validation for required fields.
+  // Basic validation
   if (!email || !password) {
     return {
       error: "All fields are required",
@@ -41,7 +30,6 @@ export async function login(
     };
   }
 
-  // Email format validation.
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
     return {
@@ -51,17 +39,47 @@ export async function login(
   }
 
   try {
-    // Sends login request to backend using axios.
-    const response = await axiosInstance.post("/api/auth/login", {
-      email_address: email,
-      password: password
-    });
+    // Step 1: Call login endpoint
+    const response = await authApi.login({
+      email_address:email,
+      password
+    })
 
     const data = response.data;
 
-    // Stores tokens in secure cookies.
-    const cookieStore = await cookies();
+    // Step 2: Validate we got tokens
+    if (!data.accessToken) {
+      return {
+        error: "Login failed: No access token received",
+        fields
+      };
+    }
 
+    // ===== NEW: Verify token works before setting cookies =====
+    try {
+      console.log("Verifying token by calling /me endpoint...");
+      const verifyResponse = await authApi.getMe()
+
+      if (!verifyResponse.data?.user) {
+        return {
+          error: "Failed to retrieve user information. Please try again.",
+          fields
+        };
+      }
+
+      console.log("Token verified successfully");
+    } catch (verifyError) {
+      console.error("Token verification failed:", verifyError);
+      return {
+        error: "Token validation failed. Please try logging in again.",
+        fields
+      };
+    }
+    // ===== END NEW CODE =====
+
+    // Step 3: Set cookies (only if verification passed)
+    const cookieStore = await cookies();
+    
     if (data.accessToken) {
       cookieStore.set("accessToken", data.accessToken, {
         httpOnly: true,
@@ -70,11 +88,6 @@ export async function login(
         maxAge: 15 * 60,
         path: "/"
       });
-    } else {
-      return {
-        error: "Login failed: No access token received",
-        fields
-      };
     }
 
     if (data.refreshToken) {
@@ -87,7 +100,6 @@ export async function login(
       });
     }
 
-    // Store user role for redirect
     const userRole = data.user?.user_role?.toLowerCase();
     if (userRole) {
       cookieStore.set("userRole", userRole, {
@@ -99,10 +111,18 @@ export async function login(
       });
     }
 
+    // Step 4: Redirect based on role
+    if (userRole === "worker") {
+      redirect("/worker/portal");
+    } else if (userRole === "admin") {
+      redirect("/admin/dashboard");
+    } else {
+      redirect("/client/home");
+    }
+
   } catch (error) {
-    // Handles axios errors
+    // Existing error handling...
     if (error instanceof AxiosError) {
-      // Backend returned an error response
       if (error.response) {
         const data = error.response.data;
         return {
@@ -110,8 +130,7 @@ export async function login(
           fields
         };
       }
-      
-      // Network error or backend unreachable
+
       if (error.code === "ECONNREFUSED" || error.message.includes("Network Error")) {
         return {
           error: "Cannot connect to server. Please check if the backend is running.",
@@ -124,17 +143,5 @@ export async function login(
       error: "Network error. Please check your connection and try again.",
       fields
     };
-  }
-
-  // Determines redirect based on stored user role.
-  const cookieStore = await cookies();
-  const userRole = cookieStore.get("userRole")?.value;
-
-  if (userRole === "worker") {
-    redirect("/worker/home");
-  } else if (userRole === "admin") {
-    redirect("/admin/dashboard");
-  } else {
-    redirect("/client/home");
   }
 }

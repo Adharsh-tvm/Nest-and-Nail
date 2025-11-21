@@ -1,7 +1,6 @@
-// app/actions/otp-actions.ts
 "use server";
 
-import axiosInstance from "@/lib/axiosInstance";
+import authApi from "@/services/auth/auth.api";
 import { AxiosError } from "axios";
 
 type OtpResponse = {
@@ -12,9 +11,10 @@ type OtpResponse = {
 
 export async function sendOtp(email: string): Promise<OtpResponse> {
   try {
-    const response = await axiosInstance.post("/api/auth/send-otp", {
-      email_address: email,
-    });
+    const response = await authApi.sendOtp({
+      email_address:email
+      
+    })
 
     return {
       success: true,
@@ -50,11 +50,10 @@ export async function verifyOtp(
   otp: string
 ): Promise<OtpResponse> {
   try {
-    const response = await axiosInstance.post("/api/auth/verify-otp", {
-      email_address: email,
-      otp: otp,
-    });
-
+    const response = await authApi.verifyOtp({
+      email_address:email,
+      otp
+    })
     return {
       success: true,
       error: null,

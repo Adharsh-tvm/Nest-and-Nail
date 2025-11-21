@@ -16,6 +16,7 @@ export interface UserResponseDTO {
     user_role: Role;
     profileImageUrl?: string;
     isBlocked: boolean;
+    isVerified: boolean;
 }
 
 export interface LoginUserDTO {
@@ -33,6 +34,7 @@ export interface LoginResponseDTO {
         phone_number?: number;
         profileImageUrl?: string;
         isBlocked: boolean;
+        isVerified: boolean;
     };
     accessToken: string;
     refreshToken: string;

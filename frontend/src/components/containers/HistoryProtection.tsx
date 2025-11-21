@@ -29,7 +29,7 @@ export function ClientSideAuthProtection() {
           const role = data.user?.user_role?.toLowerCase();
 
           if (role === "client") router.replace("/client/home");
-          else if (role === "worker") router.replace("/worker/home");
+          else if (role === "worker") router.replace("/worker/portal");
           else if (role === "admin") router.replace("/admin/dashboard");
         }
       } catch {

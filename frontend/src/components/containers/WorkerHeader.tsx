@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Home,
   Briefcase,
@@ -6,10 +8,23 @@ import {
   Users,
   User,
   MessageCircle,
+  Power,
+  Menu,
+  LogOut,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "../ui/button";
+import { useAuth } from "@/contexts/AuthContext";
+import { AxiosResponse } from "axios";
+import authApi from "@/services/auth/auth.api";
 
-const Header: React.FC = () => {
+type UserType = { isVerified?: boolean } | null;
+
+const WorkerHeader: React.FC = () => {
+  const router = useRouter();
+  const { logout } = useAuth();
+
   type NavItemProps = {
     icon: React.ElementType;
     label: string;
@@ -37,65 +52,172 @@ const Header: React.FC = () => {
   );
 
   const [isOnline, setIsOnline] = useState(true);
+  const [user, setUser] = useState<UserType>(null);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    let mounted = true;
+
+    (async () => {
+      try {
+    
+        const res: AxiosResponse<{ user?: UserType }> = await authApi.getMe();
+
+        if (!mounted) return;
+
+        // Axios response body is in res.data
+        const data = res.data;
+        setUser(data?.user ?? null);
+      } catch (err) {
+        if (!mounted) return;
+        console.error("Failed to fetch current user:", err);
+        setUser(null);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    })();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  // --- UNIFIED LOGOUT HANDLER ---
+  const handleLogout = async () => {
+    try {
+      // Use the logout from AuthContext (handles API call + cookie clearing)
+      await logout();
+      // AuthContext already handles redirect, but we ensure it happens
+      router.replace("/login");
+    } catch (error) {
+      console.error("Failed to logout", error);
+      // Force redirect even if logout fails
+      router.replace("/login");
+    }
+  };
+
+  if (loading) {
+    return (
+      <header className="bg-neutral-900 text-white p-4">
+        <div className="container mx-auto">Loading header…</div>
+      </header>
+    );
+  }
+
+  // VERIFIED USER VIEW
+  if (user?.isVerified) {
+    return (
+      <header className="bg-neutral-900 text-white p-4 flex flex-col md:flex-row items-center justify-between border-b border-neutral-800">
+        <div className="flex items-center justify-between w-full md:w-auto">
+          <h1 className="text-2xl font-bold text-green-400">ServiceHub</h1>
+          <button className="md:hidden text-neutral-300">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-6 h-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+              />
+            </svg>
+          </button>
+        </div>
+
+        <nav className="hidden md:flex items-center space-x-2 mt-4 md:mt-0">
+          <NavItem icon={Home} label="Home" href="#" active />
+          <NavItem icon={Briefcase} label="Jobs" href="#" />
+          <NavItem icon={Calendar} label="Bookings" href="#" />
+          <NavItem icon={CreditCard} label="Payments" href="#" />
+          <NavItem icon={Users} label="Meetings" href="#" />
+          <NavItem icon={User} label="Profile" href="#" />
+        </nav>
+
+        <div className="hidden md:flex items-center space-x-4 mt-4 md:mt-0">
+          <div className="flex items-center space-x-2">
+            <span className="text-sm text-neutral-400">Status:</span>
+            <span
+              className={`px-3 py-1 rounded-full text-sm font-medium ${
+                isOnline
+                  ? "bg-green-800 text-green-200"
+                  : "bg-neutral-700 text-neutral-300"
+              }`}
+            >
+              {isOnline ? "Online" : "Offline"}
+            </span>
+          </div>
+
+          <button className="text-neutral-300 hover:text-white">
+            <MessageCircle className="w-6 h-6" />
+          </button>
+
+          {/* LOGOUT BUTTON - VERIFIED VIEW */}
+          <button
+            onClick={handleLogout}
+            className="text-neutral-300 hover:text-red-400 transition-colors"
+            title="Sign out"
+          >
+            <LogOut className="w-6 h-6" />
+          </button>
+
+          <img
+            src="https://placehold.co/40x40/334155/e2e8f0?text=U"
+            alt="User Avatar"
+            className="w-10 h-10 rounded-full border-2 border-neutral-700"
+          />
+        </div>
+      </header>
+    );
+  }
+
+  // UNVERIFIED USER VIEW
   return (
-    <header className="bg-neutral-900 text-white p-4 flex flex-col md:flex-row items-center justify-between border-b border-neutral-800">
-      <div className="flex items-center justify-between w-full md:w-auto">
-        <h1 className="text-2xl font-bold text-green-400">ServiceHub</h1>
-        {/* Mobile menu button (placeholder) */}
-        <button className="md:hidden text-neutral-300">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="w-6 h-6"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-            />
-          </svg>
-        </button>
-      </div>
-
-      {/* Navigation */}
-      <nav className="hidden md:flex items-center space-x-2 mt-4 md:mt-0">
-        <NavItem icon={Home} label="Home" href="#" active />
-        <NavItem icon={Briefcase} label="Jobs" href="#" />
-        <NavItem icon={Calendar} label="Bookings" href="#" />
-        <NavItem icon={CreditCard} label="Payments" href="#" />
-        <NavItem icon={Users} label="Meetings" href="#" />
-        <NavItem icon={User} label="Profile" href="#" />
-      </nav>
-
-      {/* User Status & Profile */}
-      <div className="hidden md:flex items-center space-x-4 mt-4 md:mt-0">
-        <div className="flex items-center space-x-2">
-          <span className="text-sm text-neutral-400">Status:</span>
-          <span
-            className={`px-3 py-1 rounded-full text-sm font-medium ${
-              isOnline
-                ? "bg-green-800 text-green-200"
-                : "bg-neutral-700 text-neutral-300"
-            }`}
-          >
-            {isOnline ? "Online" : "Offline"}
+    <header className="sticky top-0 z-50 w-full border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-md">
+      <div className="container mx-auto flex h-16 items-center justify-between px-4">
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" className="md:hidden">
+            <Menu className="h-5 w-5" />
+          </Button>
+          <span className="text-lg font-bold text-white tracking-tight">
+            <span className="text-emerald-500">Mend</span> On
           </span>
         </div>
-        <button className="text-neutral-300 hover:text-white">
-          <MessageCircle className="w-6 h-6" />
-        </button>
-        <img
-          src="https://placehold.co/40x40/334155/e2e8f0?text=U"
-          alt="User Avatar"
-          className="w-10 h-10 rounded-full border-2 border-neutral-700"
-        />
+
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setIsOnline((v) => !v)}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all ${
+              isOnline
+                ? "bg-emerald-950/30 border-emerald-500/30 text-emerald-500"
+                : "bg-zinc-900 border-zinc-700 text-zinc-400"
+            }`}
+          >
+            <Power className="w-4 h-4" />
+            <span className="text-sm font-medium hidden sm:inline">
+              {isOnline ? "Online" : "Offline"}
+            </span>
+          </button>
+
+          {/* LOGOUT BUTTON - UNVERIFIED VIEW */}
+          <button
+            onClick={handleLogout}
+            className="h-9 w-9 flex items-center justify-center rounded-full border border-zinc-700 bg-zinc-800 text-zinc-400 hover:text-red-400 hover:border-red-900/50 transition-all"
+            title="Sign out"
+          >
+            <LogOut className="h-4 w-4" />
+          </button>
+
+          <div className="h-9 w-9 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center overflow-hidden">
+            <User className="h-5 w-5 text-zinc-400" />
+          </div>
+        </div>
       </div>
     </header>
   );
 };
 
-export default Header;
+export default WorkerHeader;
