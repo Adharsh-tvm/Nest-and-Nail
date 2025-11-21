@@ -5,6 +5,8 @@ import React from "react";
 
 type Props = {};
 
+
+
 function ClientHeader({}: Props) {
 
   const {logout, isLoading} = useAuth()

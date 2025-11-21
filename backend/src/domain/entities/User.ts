@@ -7,6 +7,7 @@ export interface User {
     phone?: number,
     passwordhash: string,
     isBlocked?: boolean,
+    isVerfied?:boolean,
     profilePictureUrl?: string,
     role: Role,
     loginMethod: LoginMethod,

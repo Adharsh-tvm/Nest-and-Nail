@@ -4,7 +4,7 @@ import * as React from "react";
 import { useActionState, useState, useEffect } from "react";
 import { User, Wrench, Shield, KeyRound, AtSign, Loader2, X } from "lucide-react";
 import { signup, completeSignup, resendOtp } from "../../actions/signup-actions";
-import OtpVerificationForm from "../otp/page"; 
+import OtpVerificationForm from "../otp/page";
 import { useRouter } from "next/navigation";
 import GoogleAuthButton from "@/components/ui/GoogleLoginButton";
 
@@ -58,20 +58,20 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
   const currentRoleConfig = roleConfig[role];
   const roleName = role.charAt(0).toUpperCase() + role.slice(1);
 
-  // When OTP is sent successfully, open modal
+  // When OTP is sent successfully, open modal and capture form values
   useEffect(() => {
     if (state.otpSent && state.fields) {
       const formElement = document.querySelector('form[data-signup-form]') as HTMLFormElement;
       if (formElement) {
         const formData = new FormData(formElement);
-        
+
         setSignupData({
-          name: formData.get("name") as string,
-          email: formData.get("email") as string,
-          password: formData.get("password") as string,
+          name: (formData.get("name") as string) || "",
+          email: (formData.get("email") as string) || "",
+          password: (formData.get("password") as string) || "",
           role: role,
         });
-        
+
         setShowOtpModal(true);
       }
     }
@@ -90,9 +90,13 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
       });
 
       if (result.success) {
-        // Registration successful, redirect based on role
+        // Worker-specific redirect based on verification status returned from server
         if (signupData.role === "worker") {
-          router.push("/worker/home");
+          if (result.isVerified) {
+            router.push("/worker/portal");
+          } else {
+            router.push("/worker/documents");
+          }
         } else {
           router.push("/client/home");
         }
@@ -260,8 +264,12 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
                   `Sign Up as ${roleName}`
                 )}
               </button>
-                <GoogleAuthButton role={role} />
             </form>
+
+            {/* Google Auth Button - OUTSIDE the form */}
+            <div className="mt-4">
+              <GoogleAuthButton role={role} mode="signup" />
+            </div>
           </div>
 
           <div className="p-6 border-t border-zinc-800 text-center text-sm">
@@ -291,7 +299,7 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
               <X className="h-8 w-8" />
             </button>
 
-            {/* OTP Form - Remove the min-h-screen and bg from OtpVerificationForm */}
+            {/* OTP Form */}
             <div className="bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl overflow-hidden">
               <OtpVerificationForm
                 email={signupData.email}
