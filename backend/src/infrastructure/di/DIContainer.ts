@@ -27,11 +27,11 @@ import { NodemailerEmailService } from "../services/NodemailerEmailService";
 
 import { AuthController } from "../../presentation/controllers/AuthController";
 import { AuthMiddleware } from "../../presentation/middlewares/AuthMiddleware";
-import { IGoogleSignUpUseCase } from "../../application/interfaces/IGoogleSignUpUseCase"; 
+import { IGoogleSignUpUseCase } from "../../application/interfaces/IGoogleSignUpUseCase";
 import { GoogleAuthController } from "../../presentation/controllers/GoogleAuthController";
 import { IGoogleAuthService } from "../../application/services/IGoogleAuthService";
 import { GoogleAuthService } from "../services/GoogleAuthService";
-import { GoogleSignUpUseCase } from "../../application/use-cases/GoogleSignUpUseCase"; 
+import { GoogleSignUpUseCase } from "../../application/use-cases/GoogleSignUpUseCase";
 
 
 export class DIContainer {
@@ -221,12 +221,8 @@ export class DIContainer {
 
   get googleLoginUseCase(): IGoogleSignUpUseCase {
     if (!this._googleLoginUseCase) {
-      this._googleLoginUseCase = new GoogleSignUpUseCase(
-        this.repositoryFactory,
-        this.tokenService,
-        this.googleAuthService
-      );
-    } 
+      this._googleLoginUseCase = new GoogleSignUpUseCase(this.repositoryFactory, this.passwordHasher, this.tokenService, this.googleAuthService, this.idGenerator)
+    }
     return this._googleLoginUseCase;
   }
 

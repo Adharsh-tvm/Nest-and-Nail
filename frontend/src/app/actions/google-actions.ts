@@ -1,43 +1,103 @@
 "use server";
 
-import { cookies } from "next/headers";
 import authApi from "@/services/auth/auth.api";
+import { OAuth2Client } from "google-auth-library";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
-export async function handleGoogleLogin(
-  accessToken: string, 
-  role?: string,
-  mode: "signup" | "login" = "signup"
-) {
-  const res = await authApi.googleAuth({
-    accessToken,
-    role
-  })
+const googleClient = new OAuth2Client(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID);
 
-  const { accessToken: jwtAccess, refreshToken, user } = res.data;
-
-  if (!jwtAccess || !refreshToken) {
-    throw new Error("Failed to receive tokens from Google authentication");
+type GoogleAuthState =
+  | {
+    success: boolean;
+    message: string;
+    user?: any; //need to check the right shape for user
   }
+  | undefined;
 
-  const cookieStore = await cookies();
+export async function handleGoogleSignIn(
+  googleToken: string,
+  role: string,
+): Promise<GoogleAuthState> {
+  try {
 
-  // Save JWT access token
-  cookieStore.set("accessToken", jwtAccess, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    maxAge: 15 * 60, // 15 minutes
-    path: "/",
-  });
+    // console.log(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID, "hiuoihuihsdlfihgolighu")
+    const ticket = await googleClient.verifyIdToken({
+      idToken: googleToken,
+      audience: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+    });
 
-  // Save refresh token
-  cookieStore.set("refreshToken", refreshToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    maxAge: 7 * 24 * 60 * 60, // 7 days
-    path: "/",
-  });
+    const payload = ticket.getPayload();
+    if (!payload || !payload.email || !payload.name) {
+      return { success: false, message: "Invalid Google token." };
+    }
 
-  return user;
+    const { email, name, picture } = payload;
+
+    // 2. Call your backend's new 'google-auth' endpoint
+
+    const response = await authApi.googleAuth({
+      email,
+      name,
+      role
+    });
+
+    console.log("Google action response: ccccccccccc : ", response.data)
+
+    if (!response.data.success) {
+      return { success: false, message: response.data.message };
+    }
+
+    if (response.data.payload) {
+
+      const { user, refreshToken, accessToken } = response.data.payload;
+
+
+      // create cookies
+      const cookieStore = await cookies();
+
+      cookieStore.set("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 7 * 24 * 60 * 60,
+        path: "/"
+      });
+
+
+      cookieStore.set("accessToken", accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 15 * 60,
+        path: "/"
+      });
+
+      cookieStore.set("userRole", user.user_role, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 7 * 24 * 60 * 60,
+        path: "/"
+      });
+
+
+
+
+      return {
+        success: true,
+        message: response.data.message,
+        user: user,
+      };
+    } else {
+      throw new Error("User payload not recieved")
+    }
+
+  } catch (error: any) {
+    console.error("Google Sign-In Error:", error);
+    return {
+      success: false,
+      message: error.response?.data?.message || "An unknown error occurred.",
+    };
+  }
 }
