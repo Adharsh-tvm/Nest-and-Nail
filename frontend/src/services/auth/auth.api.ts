@@ -35,17 +35,9 @@ export const authApi = {
 
   getMe: (config?: any) => axiosInstance.get("/api/auth/me", config),
 
-  /**
-   * Send OTP to user email.
-   * Backend expects: { email_address: string, role?: string }
-   */
   sendOtp: (payload: { email_address: string; role?: string }) =>
     axiosInstance.post("/api/auth/send-otp", payload),
 
-  /**
-   * Verify OTP.
-   * Backend expects: { email_address: string, otp: string }
-   */
   verifyOtp: (payload: { email_address: string; otp: string }) =>
     axiosInstance.post("/api/auth/verify-otp", payload),
 

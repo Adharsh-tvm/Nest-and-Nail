@@ -21,6 +21,9 @@ export class RegisterUserUseCase implements IRegisterUserUseCase {
   async execute(
     userData: UserRequestDTO
   ): Promise<{ user: UserResponseDTO; accessToken: string; refreshToken: string }> {
+    console.log(`[RegisterUserUseCase] DEBUG - Received password: "${userData.password}"`);
+    console.log(`[RegisterUserUseCase] DEBUG - Password length: ${userData.password.length}`);
+
     this._logger.info(`[RegisterUserUseCase] Registration attempt for ${userData.email_address} as ${userData.user_role}`);
 
     const repository = this._repositoryFactory.getRepository(userData.user_role);
@@ -30,8 +33,16 @@ export class RegisterUserUseCase implements IRegisterUserUseCase {
       this._logger.warn(`[RegisterUserUseCase] User already exists: ${userData.email_address}`);
       throw new UserAlreadyExistsError();
     }
+
     this._logger.info(`[RegisterUserUseCase] Hashing password`);
+    console.log(`[RegisterUserUseCase] DEBUG - About to hash password`);
+    
     const hashedPassword = await this._passwordHasher.hash(userData.password);
+    
+    console.log(`[RegisterUserUseCase] DEBUG - Password hashed successfully`);
+    console.log(`[RegisterUserUseCase] DEBUG - Hashed password: "${hashedPassword}"`);
+    console.log(`[RegisterUserUseCase] DEBUG - Hashed password length: ${hashedPassword.length}`);
+
     const userId = await this._userIdGenerator.create();
 
     this._logger.info(`[RegisterUserUseCase] Creating user with ID: ${userId}`);
@@ -50,6 +61,10 @@ export class RegisterUserUseCase implements IRegisterUserUseCase {
       updatedAt: new Date(),
       lastLoginAt: new Date(),
     } as any);
+
+    console.log(`[RegisterUserUseCase] DEBUG - User created in DB`);
+    console.log(`[RegisterUserUseCase] DEBUG - User ID: ${newUser.userId}`);
+    console.log(`[RegisterUserUseCase] DEBUG - Stored hash: "${newUser.passwordhash}"`);
 
     this._logger.info(`[RegisterUserUseCase] User created successfully`);
 

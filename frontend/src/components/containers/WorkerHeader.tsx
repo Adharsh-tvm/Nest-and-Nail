@@ -15,15 +15,14 @@ import {
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
-import { useAuth } from "@/contexts/AuthContext";
 import { AxiosResponse } from "axios";
 import authApi from "@/services/auth/auth.api";
+import { logoutAction } from "@/app/actions/logout-actions";
 
 type UserType = { isVerified?: boolean } | null;
 
 const WorkerHeader: React.FC = () => {
   const router = useRouter();
-  const { logout } = useAuth();
 
   type NavItemProps = {
     icon: React.ElementType;
@@ -81,20 +80,6 @@ const WorkerHeader: React.FC = () => {
       mounted = false;
     };
   }, []);
-
-  // --- UNIFIED LOGOUT HANDLER ---
-  const handleLogout = async () => {
-    try {
-      // Use the logout from AuthContext (handles API call + cookie clearing)
-      await logout();
-      // AuthContext already handles redirect, but we ensure it happens
-      router.replace("/login");
-    } catch (error) {
-      console.error("Failed to logout", error);
-      // Force redirect even if logout fails
-      router.replace("/login");
-    }
-  };
 
   if (loading) {
     return (
@@ -157,7 +142,7 @@ const WorkerHeader: React.FC = () => {
 
           {/* LOGOUT BUTTON - VERIFIED VIEW */}
           <button
-            onClick={handleLogout}
+            onClick={logoutAction}
             className="text-neutral-300 hover:text-red-400 transition-colors"
             title="Sign out"
           >
@@ -204,7 +189,7 @@ const WorkerHeader: React.FC = () => {
 
           {/* LOGOUT BUTTON - UNVERIFIED VIEW */}
           <button
-            onClick={handleLogout}
+            onClick={logoutAction}
             className="h-9 w-9 flex items-center justify-center rounded-full border border-zinc-700 bg-zinc-800 text-zinc-400 hover:text-red-400 hover:border-red-900/50 transition-all"
             title="Sign out"
           >

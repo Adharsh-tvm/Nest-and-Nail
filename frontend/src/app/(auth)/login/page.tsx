@@ -1,25 +1,9 @@
 import { LogIn } from "lucide-react";
 import { LoginForm } from "./Login-form";
-import { getCurrentUser } from "@/lib/auth";
-import { redirect } from "next/navigation";
 
 const LoginPage = async () => {
-  const user = await getCurrentUser();
 
-  // If user is authenticated, redirect immediately (server-side)
-  if (user) {
-    if (user.role === "client") {
-      redirect("/client/home");
-    } else if (user.role === "worker") {
-      if(user.isVerified){
-        redirect("/worker/portal");
-      }else{
-        redirect("/worker/documents");
-      }
-    } else if (user.role === "admin") {
-      redirect("/admin/dashboard");
-    }
-  }
+
 
   const linkClass = "text-zinc-400 hover:text-zinc-200";
 

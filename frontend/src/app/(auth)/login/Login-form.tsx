@@ -1,6 +1,5 @@
 "use client";
 
-import { ClientSideAuthProtection } from "@/components/containers/HistoryProtection";
 import { KeyRound, AtSign, Loader2 } from "lucide-react";
 import { login } from "../../actions/login-actions";
 import { useActionState } from "react";
@@ -29,7 +28,6 @@ export const LoginForm = () => {
 
   return (
     <>
-      <ClientSideAuthProtection />
       <div className="px-6 pb-6">
         <form action={formAction} className="space-y-4">
           {/* Email Input */}
