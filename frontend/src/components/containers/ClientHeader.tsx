@@ -1,5 +1,6 @@
 "use client";
 
+import { logoutAction } from "@/app/actions/logout-actions";
 import React from "react";
 
 type Props = {};
@@ -30,8 +31,8 @@ function ClientHeader({}: Props) {
           </nav>
           <div className="flex items-center space-x-4">
             <button
-              
-              disabled
+              onClick={logoutAction}
+              disabled={false}
               className="bg-yellow-400 text-gray-900 font-bold py-2 px-4 rounded-lg hover:bg-yellow-500 transition-colors"
             >
               Log Out
