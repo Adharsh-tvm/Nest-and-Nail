@@ -12,18 +12,13 @@ import {
   Menu,
   LogOut,
 } from "lucide-react";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
-import { AxiosResponse } from "axios";
-import authApi from "@/services/auth/auth.api";
 import { logoutAction } from "@/app/actions/logout-actions";
+import { useState } from "react";
 
 type UserType = { isVerified?: boolean } | null;
 
 const WorkerHeader: React.FC = () => {
-  const router = useRouter();
-
   type NavItemProps = {
     icon: React.ElementType;
     label: string;
@@ -50,44 +45,18 @@ const WorkerHeader: React.FC = () => {
     </a>
   );
 
-  const [isOnline, setIsOnline] = useState(true);
-  const [user, setUser] = useState<UserType>(null);
-  const [loading, setLoading] = useState(true);
+  let user = {
+    user_id: "string",
+    user_name: "string",
+    email_address: "string",
+    phone_number: "number",
+    user_role: "Role",
+    profileImageUrl: "string",
+    isBlocked: "boolean",
+    isVerified: "boolean",
+  };
 
-  useEffect(() => {
-    let mounted = true;
-
-    (async () => {
-      try {
-    
-        const res: AxiosResponse<{ user?: UserType }> = await authApi.getMe();
-
-        if (!mounted) return;
-
-        // Axios response body is in res.data
-        const data = res.data;
-        setUser(data?.user ?? null);
-      } catch (err) {
-        if (!mounted) return;
-        console.error("Failed to fetch current user:", err);
-        setUser(null);
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    })();
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  if (loading) {
-    return (
-      <header className="bg-neutral-900 text-white p-4">
-        <div className="container mx-auto">Loading header…</div>
-      </header>
-    );
-  }
+  const [isOnline, setIsOnline] = useState(true)
 
   // VERIFIED USER VIEW
   if (user?.isVerified) {

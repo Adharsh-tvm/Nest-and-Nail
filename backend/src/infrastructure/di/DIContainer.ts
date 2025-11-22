@@ -19,7 +19,6 @@ import { OtpRepository } from "../repo/OtpRepository";
 
 import { RegisterUserUseCase } from "../../application/use-cases/RegisterUserUseCase";
 import { LoginUserUseCase } from "../../application/use-cases/LoginUserUseCase";
-import { GetCurrentUserUseCase } from "../../application/use-cases/GetCurrentUserUseCase";
 import { SendOtpUseCase } from "../../application/use-cases/SendOtpUseCase";
 import { VerifyOtpUseCase } from "../../application/use-cases/VerifyOtpUseCase";
 
@@ -161,18 +160,6 @@ export class DIContainer {
     return this._loginUserUseCase;
   }
 
-  get getCurrentUserUseCase(): IGetCurrentUserUseCase {
-    if (!this._getCurrentUserUseCase) {
-      this._getCurrentUserUseCase = new GetCurrentUserUseCase(
-        this.repositoryFactory,
-        this.logger
-      );
-    }
-    return this._getCurrentUserUseCase;
-  }
-
-
-
   get sendOtpUseCase(): ISendOtpUseCase {
     if (!this._sendOtpUseCase) {
       this._sendOtpUseCase = new SendOtpUseCase(
@@ -207,7 +194,6 @@ export class DIContainer {
       this._authController = new AuthController(
         this.registerUserUseCase,
         this.loginUserUseCase,
-        this.getCurrentUserUseCase,
         this.sendOtpUseCase,
         this.verifyOtpUseCase
       );
@@ -240,7 +226,7 @@ export class DIContainer {
         this.tokenService,
         this.googleAuthService
       );
-    }
+    } 
     return this._googleLoginUseCase;
   }
 
