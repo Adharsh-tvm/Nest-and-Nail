@@ -3,7 +3,9 @@
 import { KeyRound, AtSign, Loader2 } from "lucide-react";
 import { login } from "../../actions/login-actions";
 import { useActionState } from "react";
-import GoogleAuthButton from "@/components/ui/GoogleLoginButton";
+import { GoogleLogin } from "@react-oauth/google";
+import { handleGoogleSignIn } from "@/app/actions/google-actions";
+import { redirect, useRouter } from "next/navigation";
 
 type State = {
   error: string | null;
@@ -18,13 +20,27 @@ const initialState: State = {
 };
 
 export const LoginForm = () => {
+  const router = useRouter();
   const [state, formAction, pending] = useActionState(login, initialState);
 
   const focusRingClass = "focus:ring-zinc-500";
   const buttonClass = "bg-zinc-100 text-zinc-900 hover:bg-zinc-200";
-  const checkboxClass = 
+  const checkboxClass =
     "data-[state=checked]:bg-zinc-700 data-[state=checked]:text-zinc-100";
   const linkClass = "text-zinc-400 hover:text-zinc-200";
+
+  async function onGoogleSuccess(credentialResponse: any) {
+    const token = credentialResponse.credential;
+
+    const result = await handleGoogleSignIn(token, "client");
+
+    if (result?.success) {
+      const redirectPath = result.user.user_role;
+      redirect(redirectPath);
+    } else {
+      console.log("Google login error ", result?.message);
+    }
+  }
 
   return (
     <>
@@ -120,16 +136,12 @@ export const LoginForm = () => {
 
         {/* Divider */}
         <div className="relative my-6">
-          <div className="absolute inset-0 flex items-center">
-
-          </div>
-
+          <div className="absolute inset-0 flex items-center"></div>
         </div>
 
         {/* Google Auth Button */}
 
-        <GoogleAuthButton mode="login" />
-        <div></div>
+        <GoogleLogin onSuccess={onGoogleSuccess} useOneTap />
       </div>
     </>
   );

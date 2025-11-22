@@ -2,9 +2,9 @@ import { Role } from "../../shared/enums/enums";
 
 export interface IGoogleSignUpUseCase {
     execute(
-        idToken: string, 
-        role?: Role,
-        mode?: "signup" | "login"
+        email: string,
+        name: string,
+        role: string
     ): Promise<{
         user: any;
         accessToken: string;

@@ -8,15 +8,25 @@ export type LoginPayload = {
 };
 
 export type GoogleAuthPayload = {
-  accessToken: string;
-  role?: string;
-  mode?: "signup" | "login";
+  name: string,
+  email: string,
+  role?: string
 };
 
+type googleAuthResponse = {
+  success: boolean;
+  message: string;
+  payload?: {
+    user: any,
+    accessToken: string;
+    refreshToken: string
+  }
+}
+
 export type AuthResponse<UserType = any> = {
+  user?: UserType;
   accessToken?: string;
   refreshToken?: string;
-  user?: UserType;
 };
 
 export const authApi = {
@@ -33,7 +43,6 @@ export const authApi = {
 
   logout: () => axiosInstance.post("/api/auth/logout"),
 
-
   sendOtp: (payload: { email_address: string; role?: string }) =>
     axiosInstance.post("/api/auth/send-otp", payload),
 
@@ -41,7 +50,8 @@ export const authApi = {
     axiosInstance.post("/api/auth/verify-otp", payload),
 
   googleAuth: (payload: GoogleAuthPayload) =>
-    axiosInstance.post<AuthResponse>("/api/auth/google", payload),
+    axiosInstance.post<googleAuthResponse>("/api/auth/google", payload),
 };
 
 export default authApi;
+

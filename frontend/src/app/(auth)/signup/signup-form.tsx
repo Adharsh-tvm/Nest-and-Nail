@@ -2,11 +2,24 @@
 
 import * as React from "react";
 import { useActionState, useState, useEffect, useRef } from "react";
-import { User, Wrench, Shield, KeyRound, AtSign, Loader2, X } from "lucide-react";
-import { signup, completeSignup, resendOtp } from "../../actions/signup-actions";
+import {
+  User,
+  Wrench,
+  Shield,
+  KeyRound,
+  AtSign,
+  Loader2,
+  X,
+} from "lucide-react";
+import {
+  signup,
+  completeSignup,
+  resendOtp,
+} from "../../actions/signup-actions";
 import OtpVerificationForm from "../otp/page";
-import { useRouter } from "next/navigation";
-import GoogleAuthButton from "@/components/ui/GoogleLoginButton";
+import { redirect, useRouter } from "next/navigation";
+import { GoogleLogin } from "@react-oauth/google";
+import { handleGoogleSignIn } from "@/app/actions/google-actions";
 
 type Role = "client" | "worker" | "admin";
 
@@ -67,16 +80,14 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
     // Capture password immediately before form processing
     const formData = new FormData(event.currentTarget);
     const password = formData.get("password") as string;
-    
+
     console.log("[SignUpComponent] Form submit - capturing password:", {
       hasPassword: !!password,
       length: password?.length,
-      preview: password ? password.substring(0, 3) + "..." : "[EMPTY]"
+      preview: password ? password.substring(0, 3) + "..." : "[EMPTY]",
     });
-    
+
     passwordCaptureRef.current = password;
-    
-  
   };
 
   // When OTP is sent successfully, use the captured password
@@ -89,11 +100,16 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
         role: role,
       };
 
-      console.log("[SignUpComponent] Capturing signup data from state.fields:", {
-        ...capturedData,
-        password: capturedData.password ? `[${capturedData.password.length} chars]` : "[EMPTY]",
-        ACTUAL_PASSWORD_DEBUG: capturedData.password
-      });
+      console.log(
+        "[SignUpComponent] Capturing signup data from state.fields:",
+        {
+          ...capturedData,
+          password: capturedData.password
+            ? `[${capturedData.password.length} chars]`
+            : "[EMPTY]",
+          ACTUAL_PASSWORD_DEBUG: capturedData.password,
+        }
+      );
 
       setSignupData(capturedData);
       setShowOtpModal(true);
@@ -109,9 +125,11 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
     // 🔍 CRITICAL DEBUG: Log exactly what we're sending
     console.log("[SignUpComponent CLIENT] Verifying OTP with data:", {
       ...signupData,
-      password: signupData.password ? `[${signupData.password.length} chars]` : "[EMPTY]",
+      password: signupData.password
+        ? `[${signupData.password.length} chars]`
+        : "[EMPTY]",
       otp: otp ? `[${otp.length} chars]` : "[EMPTY]",
-      ACTUAL_PASSWORD_DEBUG: signupData.password
+      ACTUAL_PASSWORD_DEBUG: signupData.password,
     });
 
     setIsVerifying(true);
@@ -126,11 +144,16 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
         otp: otp,
       };
 
-      console.log("[SignUpComponent CLIENT] Calling completeSignup with payload:", {
-        ...payload,
-        password: payload.password ? `[${payload.password.length} chars]` : "[EMPTY]",
-        ACTUAL_PASSWORD_DEBUG: payload.password
-      });
+      console.log(
+        "[SignUpComponent CLIENT] Calling completeSignup with payload:",
+        {
+          ...payload,
+          password: payload.password
+            ? `[${payload.password.length} chars]`
+            : "[EMPTY]",
+          ACTUAL_PASSWORD_DEBUG: payload.password,
+        }
+      );
 
       const result = await completeSignup(payload);
 
@@ -154,6 +177,19 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
       setIsVerifying(false);
     }
   };
+
+  async function onGoogleSuccess(credentialResponse: any) {
+    const token = credentialResponse.credential;
+
+    const result = await handleGoogleSignIn(token, "client");
+
+    if (result?.success) {
+      const redirectPath = result.user.user_role;
+      redirect(redirectPath);
+    } else {
+      console.log("Google login error");
+    }
+  }
 
   const handleResendOtp = async () => {
     if (!signupData?.email) return;
@@ -197,11 +233,11 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
           </div>
 
           <div className="px-6 pb-6">
-            <form 
+            <form
               ref={formRef}
-              action={formAction} 
+              action={formAction}
               onSubmit={handleFormSubmit}
-              data-signup-form 
+              data-signup-form
               className="space-y-4"
             >
               {/* Hidden field for role */}
@@ -319,7 +355,7 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
             </form>
 
             <div className="mt-4">
-              <GoogleAuthButton role={role} mode="signup" />
+              <GoogleLogin onSuccess={onGoogleSuccess} useOneTap />
             </div>
           </div>
 

@@ -1,160 +1,86 @@
+import { User } from "../../domain/entities/User";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { LoginMethod, Role } from "../../shared/enums/enums";
-import { IGoogleSignUpUseCase } from "../interfaces/IGoogleSignUpUseCase"; 
+import { IGoogleSignUpUseCase } from "../interfaces/IGoogleSignUpUseCase";
+import { UserMapper } from "../mappers/UserMapper";
+import { IGenerateUserID } from "../services/IGenerateUserID";
 import { IGoogleAuthService } from "../services/IGoogleAuthService";
+import { IPasswordHasher } from "../services/IPasswordHasher";
 import { ITokenService } from "../services/ITokenService";
 
 export class GoogleSignUpUseCase implements IGoogleSignUpUseCase {
     constructor(
-        private userRepositoryFactory: IUserRepository,
-        private tokenService: ITokenService,
-        private googleAuthService: IGoogleAuthService
+        private _userRepositoryFactory: IUserRepository,
+        private readonly _passwordHasher: IPasswordHasher,
+        private _tokenService: ITokenService,
+        private _googleAuthService: IGoogleAuthService,
+        private readonly _userIdGenerator: IGenerateUserID,
     ) { }
 
     async execute(
-        accessToken: string, 
-        role?: Role,
-        mode: "signup" | "login" = "signup"
+        email: string,
+        name: string,
+        role: string
     ) {
-        console.log("[GoogleSignUpUseCase] Starting execution with:", { role, mode });
+        try {
+            let user: User | null = null
+            const clientRepository = this._userRepositoryFactory.getRepository(Role.CLIENT)
+            const workerRepository = this._userRepositoryFactory.getRepository(Role.WORKER)
 
-        // Get user info from Google
-        const googleUser = await this.googleAuthService.getUserFromAccessToken(accessToken);
-        
-        console.log("[GoogleSignUpUseCase] Google user info:", googleUser.email);
-
-        // For login mode, check if user exists in either repository
-        if (mode === "login") {
-            // Try to find user as client first
-            let clientRepo = this.userRepositoryFactory.getRepository(Role.CLIENT);
-            let user = await clientRepo.findByEmail(googleUser.email);
-            
-            if (user) {
-                // User exists as client
-                const accessToken = this.tokenService.generateAccessToken({
-                    id: user.userId,
-                    email: user.email,
-                    role: user.role,
-                });
-
-                const refreshToken = this.tokenService.generateRefreshToken({
-                    id: user.userId,
-                    email: user.email,
-                    role: user.role,
-                });
-
-                return {
-                    user,
-                    accessToken,
-                    refreshToken
-                };
+            user = await clientRepository.findByEmail(email)
+            if (!user) {
+                user = await workerRepository.findByEmail(email)
             }
 
-            // Try to find user as worker
-            let workerRepo = this.userRepositoryFactory.getRepository(Role.WORKER);
-            user = await workerRepo.findByEmail(googleUser.email);
-            
-            if (user) {
-                // User exists as worker
-                const accessToken = this.tokenService.generateAccessToken({
-                    id: user.userId,
-                    email: user.email,
-                    role: user.role,
+            if (!user) {
+                //register a new user based on role.
+                const repository = this._userRepositoryFactory.getRepository(role as Role);
+                const hashedPassword = await this._passwordHasher.hash("11111111");
+                const userId = await this._userIdGenerator.create();
+                const newUser = await repository.create({
+                    userId: userId,
+                    name: name,
+                    email: email,
+                    passwordhash: hashedPassword,
+                    role: role as Role,
+                    isBlocked: false,
+                    loginMethod: LoginMethod.GOOGLE,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    lastLoginAt: new Date(),
                 });
-
-                const refreshToken = this.tokenService.generateRefreshToken({
-                    id: user.userId,
-                    email: user.email,
-                    role: user.role,
-                });
-
-                return {
-                    user,
-                    accessToken,
-                    refreshToken
-                };
+                user = newUser
             }
 
-            // User doesn't exist
-            throw new Error("No account found with this Google email. Please sign up first.");
-        }
 
-        // Signup mode - role must be provided
-        if (!role) {
-            throw new Error("Role is required for signup");
-        }
-
-        // Get the repository for the specified role
-        const repo = this.userRepositoryFactory.getRepository(role);
-
-        // Check if user already exists WITH THIS SPECIFIC ROLE
-        let user = await repo.findByEmail(googleUser.email);
-
-        if (user) {
-            // User already exists with this exact role
-            if (user.loginMethod === LoginMethod.EMAIL_PASSWORD) {
-                throw new Error("An account with this email already exists. Please sign in with email and password.");
-            }
-            
-            // User exists with Google login and same role - just log them in
-            const newAccessToken = this.tokenService.generateAccessToken({
+            const userResponse = UserMapper.toResponseDTO(user);
+            const accessToken = this._tokenService.generateAccessToken({
                 id: user.userId,
                 email: user.email,
-                role: user.role,
+                role: user.role
             });
-
-            const refreshToken = this.tokenService.generateRefreshToken({
+            const refreshToken = this._tokenService.generateRefreshToken({
                 id: user.userId,
                 email: user.email,
-                role: user.role,
+                role: user.role
             });
+
+
 
             return {
-                user,
-                accessToken: newAccessToken,
+                user: userResponse,
+                accessToken,
                 refreshToken
-            };
+            }
+
+
+        } catch (error) {
+            console.log("Reg GOog Use case error: ", error)
+            return {
+                user: null,
+                accessToken: "",
+                refreshToken: ""
+            }
         }
-
-        // Check if user exists with a DIFFERENT role
-        const otherRole = role === Role.CLIENT ? Role.WORKER : Role.CLIENT;
-        const otherRepo = this.userRepositoryFactory.getRepository(otherRole);
-        const existingUserWithOtherRole = await otherRepo.findByEmail(googleUser.email);
-
-        if (existingUserWithOtherRole) {
-            throw new Error(`An account with this email already exists as a ${otherRole.toLowerCase()}. Please use the login page instead.`);
-        }
-
-        // Create new user with the specified role
-        user = await repo.create({
-            userId: crypto.randomUUID(),
-            name: googleUser.name,
-            email: googleUser.email,
-            profilePictureUrl: googleUser.picture,
-            role,
-            loginMethod: LoginMethod.GOOGLE,
-            passwordhash: null,
-            lastLoginAt: new Date(),
-            createdAt: new Date(),
-            updatedAt: new Date(),
-        } as any);
-
-        const newAccessToken = this.tokenService.generateAccessToken({
-            id: user.userId,
-            email: user.email,
-            role: user.role,
-        });
-
-        const refreshToken = this.tokenService.generateRefreshToken({
-            id: user.userId,
-            email: user.email,
-            role: user.role,
-        });
-
-        return {
-            user,
-            accessToken: newAccessToken,
-            refreshToken
-        };
     }
 }
