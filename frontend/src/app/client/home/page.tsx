@@ -1,6 +1,4 @@
 import ClientHeader from "@/components/containers/ClientHeader";
-import { PreventBackNavigation } from "@/components/containers/HistoryProtection";
-import { requireRole } from "@/lib/auth";
 import type { NextPage } from "next";
 import React from "react";
 
@@ -281,11 +279,9 @@ const howItWorksSteps = [
 
 // --- Main Page Component ---
 const HomePage: NextPage = async () => {
-  await requireRole("client");
 
   return (
     <>
-      <PreventBackNavigation />
       <div className="bg-gray-900 text-gray-200 font-sans">
         {/* Header */}
 
