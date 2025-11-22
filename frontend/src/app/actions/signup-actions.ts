@@ -70,7 +70,6 @@ export async function signup(
   }
 
   try {
-    // Use authApi.sendOtp with payload shape the backend expects
     await authApi.sendOtp({
       email_address: email,
       role,
@@ -82,7 +81,6 @@ export async function signup(
       fields,
     };
   } catch (error) {
-    // Improved logging for debugging (server logs)
     if (error instanceof AxiosError) {
       console.error("signup -> sendOtp failed:", {
         status: error.response?.status,
@@ -115,24 +113,53 @@ export async function completeSignup(
   data: CompleteSignupData
 ): Promise<CompleteSignupResponse> {
   try {
+    // 🔍 CRITICAL DEBUG: Log what we received
+    console.log("[completeSignup SERVER] Received data:", {
+      name: data.name,
+      email: data.email,
+      role: data.role,
+      hasPassword: !!data.password,
+      passwordLength: data.password?.length,
+      passwordPreview: data.password ? data.password.substring(0, 3) + "..." : "[EMPTY]"
+    });
+
     // Verify OTP via authApi
     const otpResponse = await authApi.verifyOtp({
       email_address: data.email,
       otp: data.otp,
     });
 
-    // OTP verify should return 200; check data if needed
+    console.log("[completeSignup SERVER] OTP verified successfully");
+
     if (!otpResponse?.data) {
       return { success: false, error: "Invalid or expired OTP" };
     }
 
-    // Register user
-    const registerResponse = await authApi.signup({
+    // 🔍 CRITICAL: Log the exact payload being sent to backend
+    const signupPayload = {
       user_name: data.name,
       email_address: data.email,
       password: data.password,
       user_role: data.role,
+    };
+
+    console.log("[completeSignup SERVER] Payload to be sent:", {
+      user_name: signupPayload.user_name,
+      email_address: signupPayload.email_address,
+      user_role: signupPayload.user_role,
+      password_exists: !!signupPayload.password,
+      password_length: signupPayload.password?.length,
+      password_preview: signupPayload.password 
+        ? signupPayload.password.substring(0, 3) + "..." 
+        : "[EMPTY]",
+      // 🚨 Let's see the ACTUAL password for debugging (REMOVE THIS IN PRODUCTION!)
+      ACTUAL_PASSWORD_DEBUG: signupPayload.password
     });
+
+    // Register user
+    console.log("[completeSignup SERVER] Calling authApi.signup...");
+    const registerResponse = await authApi.signup(signupPayload);
+    console.log("[completeSignup SERVER] Registration response received");
 
     const registerData = registerResponse?.data;
 
@@ -185,6 +212,8 @@ export async function completeSignup(
       maxAge: 7 * 24 * 60 * 60,
       path: "/",
     });
+
+    console.log("[completeSignup SERVER] Success, cookies set");
 
     return {
       success: true,

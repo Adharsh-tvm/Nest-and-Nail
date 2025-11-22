@@ -1,6 +1,6 @@
 "use client";
 
-import {  useAuth } from "@/contexts/AuthContext";
+import { logoutAction } from "@/app/actions/logout-actions";
 import React from "react";
 
 type Props = {};
@@ -9,7 +9,6 @@ type Props = {};
 
 function ClientHeader({}: Props) {
 
-  const {logout, isLoading} = useAuth()
 
   return (
     <div>
@@ -32,8 +31,8 @@ function ClientHeader({}: Props) {
           </nav>
           <div className="flex items-center space-x-4">
             <button
-              onClick={logout}
-              disabled={isLoading}
+              onClick={logoutAction}
+              disabled={false}
               className="bg-yellow-400 text-gray-900 font-bold py-2 px-4 rounded-lg hover:bg-yellow-500 transition-colors"
             >
               Log Out

@@ -1,4 +1,3 @@
-// app/page.tsx or components/LandingPage.tsx
 import {
   ArrowRight,
   Wrench,

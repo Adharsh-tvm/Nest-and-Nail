@@ -113,11 +113,11 @@ export async function login(
 
     // Step 4: Redirect based on role
     if (userRole === "worker") {
-      redirect("/worker/portal");
+      redirect("/worker");
     } else if (userRole === "admin") {
       redirect("/admin/dashboard");
     } else {
-      redirect("/client/home");
+      redirect("/client");
     }
 
   } catch (error) {
