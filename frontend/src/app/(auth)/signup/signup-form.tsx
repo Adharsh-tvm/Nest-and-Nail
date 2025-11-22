@@ -137,12 +137,12 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
       if (result.success) {
         if (signupData.role === "worker") {
           if (result.isVerified) {
-            router.push("/worker/portal");
+            router.push("/worker");
           } else {
             router.push("/worker/documents");
           }
         } else {
-          router.push("/client/home");
+          router.push("/client");
         }
       } else {
         setOtpError(result.error || "Verification failed");
