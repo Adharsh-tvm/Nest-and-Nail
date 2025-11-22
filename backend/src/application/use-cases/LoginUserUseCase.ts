@@ -15,7 +15,7 @@ export class LoginUserUseCase implements ILoginUserUseCase {
         private readonly _passwordHasher: IPasswordHasher,
         private readonly _tokenService: ITokenService,
         private readonly _logger: ILogger
-    ) {}
+    ) { }
 
     async execute(userLoginData: LoginUserDTO): Promise<{
         user: UserResponseDTO; accessToken: string; refreshToken: string;
@@ -93,18 +93,18 @@ export class LoginUserUseCase implements ILoginUserUseCase {
 
         this._logger.info(`[LoginUserUseCase] Password verified, mapping response`);
         const userResponse = UserMapper.toResponseDTO(user);
-        
+
         this._logger.info(`[LoginUserUseCase] User response: ${JSON.stringify(userResponse)}`);
 
-        const accessToken = this._tokenService.generateAccessToken({ 
+        const accessToken = this._tokenService.generateAccessToken({
             id: user.userId,
-            email: user.email, 
-            role: user.role 
+            email: user.email,
+            role: user.role
         });
-        const refreshToken = this._tokenService.generateRefreshToken({ 
+        const refreshToken = this._tokenService.generateRefreshToken({
             id: user.userId,
-            email: user.email, 
-            role: user.role 
+            email: user.email,
+            role: user.role
         });
 
         this._logger.info(`[LoginUserUseCase] Tokens generated successfully for role: ${userRole}`);

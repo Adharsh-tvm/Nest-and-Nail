@@ -1,4 +1,5 @@
 "use server";
+
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { AxiosError } from "axios";
@@ -38,7 +39,7 @@ export async function login(
     };
   }
 
-  try {
+  
     // Step 1: Call login endpoint
     const response = await authApi.login({
       email_address:email,
@@ -55,26 +56,6 @@ export async function login(
       };
     }
 
-    // ===== NEW: Verify token works before setting cookies =====
-    try {
-      console.log("Verifying token by calling /me endpoint...");
-      const verifyResponse = await authApi.getMe()
-
-      if (!verifyResponse.data?.user) {
-        return {
-          error: "Failed to retrieve user information. Please try again.",
-          fields
-        };
-      }
-
-      console.log("Token verified successfully");
-    } catch (verifyError) {
-      console.error("Token verification failed:", verifyError);
-      return {
-        error: "Token validation failed. Please try logging in again.",
-        fields
-      };
-    }
     // ===== END NEW CODE =====
 
     // Step 3: Set cookies (only if verification passed)
@@ -115,33 +96,9 @@ export async function login(
     if (userRole === "worker") {
       redirect("/worker");
     } else if (userRole === "admin") {
-      redirect("/admin/dashboard");
+      redirect("/admin");
     } else {
       redirect("/client");
     }
 
-  } catch (error) {
-    // Existing error handling...
-    if (error instanceof AxiosError) {
-      if (error.response) {
-        const data = error.response.data;
-        return {
-          error: data.message || "Login failed. Please check your credentials.",
-          fields
-        };
-      }
-
-      if (error.code === "ECONNREFUSED" || error.message.includes("Network Error")) {
-        return {
-          error: "Cannot connect to server. Please check if the backend is running.",
-          fields
-        };
-      }
-    }
-
-    return {
-      error: "Network error. Please check your connection and try again.",
-      fields
-    };
-  }
 }

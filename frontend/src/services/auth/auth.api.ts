@@ -33,7 +33,6 @@ export const authApi = {
 
   logout: () => axiosInstance.post("/api/auth/logout"),
 
-  getMe: (config?: any) => axiosInstance.get("/api/auth/me", config),
 
   sendOtp: (payload: { email_address: string; role?: string }) =>
     axiosInstance.post("/api/auth/send-otp", payload),

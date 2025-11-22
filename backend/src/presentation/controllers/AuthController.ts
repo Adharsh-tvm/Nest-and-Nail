@@ -12,7 +12,6 @@ export class AuthController implements IAuthController {
   constructor(
     private readonly _registerUserUseCase: IRegisterUserUseCase,
     private readonly _loginUserUseCase: ILoginUserUseCase,
-    private readonly _getCurrentUserUseCase: IGetCurrentUserUseCase,
     private readonly sendOtpUseCase: ISendOtpUseCase,
     private readonly verifyOtpUseCase: IVerifyOtpUseCase,
   ) { }
@@ -107,32 +106,6 @@ export class AuthController implements IAuthController {
       loggerInstance.error(`[AuthController] Login error: ${error.message}`);
       res.status(HttpStatusCode.UNAUTHORIZED).json({
         message: error.message || "Login failed"
-      });
-    }
-  }
-
-  async getCurrentUser(req: Request, res: Response): Promise<void> {
-    try {
-      const userId = (req as any).user?.id;
-
-      console.log(`[AuthController] getCurrentUser - userId: ${userId}`);
-
-      if (!userId) {
-        console.log("[AuthController] No userId found in request");
-        res.status(HttpStatusCode.UNAUTHORIZED).json({
-          message: "User ID not found in token"
-        });
-        return;
-      }
-
-      const userResponse = await this._getCurrentUserUseCase.execute(userId);
-      res.status(HttpStatusCode.OK).json({ user: userResponse });
-
-    } catch (error: any) {
-      loggerInstance.error(`[AuthController] Get current user error: ${error.message}`);
-      const status = error.status || HttpStatusCode.INTERNAL_SERVER;
-      res.status(status).json({
-        message: error.message || "Failed to get current user"
       });
     }
   }

@@ -5,11 +5,7 @@ import React from "react";
 
 type Props = {};
 
-
-
 function ClientHeader({}: Props) {
-
-
   return (
     <div>
       <header className="absolute top-0 left-0 right-0 z-10 p-4">
@@ -22,7 +18,10 @@ function ClientHeader({}: Props) {
             <a href="#" className="hover:text-yellow-400 transition-colors">
               Workers
             </a>
-            <a href="/client/profile" className="hover:text-yellow-400 transition-colors">
+            <a
+              href="/client/profile"
+              className="hover:text-yellow-400 transition-colors"
+            >
               Pricing
             </a>
             <a href="#" className="hover:text-yellow-400 transition-colors">
@@ -31,7 +30,9 @@ function ClientHeader({}: Props) {
           </nav>
           <div className="flex items-center space-x-4">
             <button
-              onClick={logoutAction}
+              onClick={() => {
+                logoutAction();
+              }}
               disabled={false}
               className="bg-yellow-400 text-gray-900 font-bold py-2 px-4 rounded-lg hover:bg-yellow-500 transition-colors"
             >

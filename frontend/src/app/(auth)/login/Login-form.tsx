@@ -22,7 +22,7 @@ export const LoginForm = () => {
 
   const focusRingClass = "focus:ring-zinc-500";
   const buttonClass = "bg-zinc-100 text-zinc-900 hover:bg-zinc-200";
-  const checkboxClass =
+  const checkboxClass = 
     "data-[state=checked]:bg-zinc-700 data-[state=checked]:text-zinc-100";
   const linkClass = "text-zinc-400 hover:text-zinc-200";
 

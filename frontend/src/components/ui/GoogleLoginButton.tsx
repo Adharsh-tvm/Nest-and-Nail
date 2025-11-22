@@ -22,6 +22,8 @@ export default function GoogleAuthButton({ role, mode = "signup" }: GoogleAuthBu
       setError(null);
 
       try {
+
+        console.log("ifsssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssuo",tokenResponse)
         const accessToken = tokenResponse.access_token;
 
         if (!accessToken) {
@@ -35,7 +37,7 @@ export default function GoogleAuthButton({ role, mode = "signup" }: GoogleAuthBu
         console.log("[GoogleAuthButton] Calling handleGoogleLogin with:", {
           role: userRole,
           mode,
-          hasAccessToken: !!accessToken
+          hasAccessToken: accessToken
         });
         
         const user = await handleGoogleLogin(accessToken, userRole, mode);
