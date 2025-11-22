@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import { HttpStatusCode } from "../enums/httpCodes";
 import { loggerInstance } from "../../infrastructure/logger/Logger";
 import { IAuthController } from "../interfaces/IAuthController";
-import { setAuthCookies } from "../utils/setAuthCookies";
 import { IRegisterUserUseCase } from "../../application/interfaces/IRegisterUserUseCase";
 import { ILoginUserUseCase } from "../../application/interfaces/ILoginUserUseCase";
 import { IGetCurrentUserUseCase } from "../../application/interfaces/IGetCurrentUserUseCase";
@@ -51,7 +50,6 @@ export class AuthController implements IAuthController {
       console.log(`[AuthController] AccessToken exists: ${!!accessToken}, length: ${accessToken?.length}`);
       console.log(`[AuthController] RefreshToken exists: ${!!refreshToken}, length: ${refreshToken?.length}`);
 
-      setAuthCookies(res, accessToken, refreshToken);
 
       console.log("[AuthController] Cookies set, sending response...");
 
@@ -94,7 +92,6 @@ export class AuthController implements IAuthController {
       console.log(`[AuthController] AccessToken exists: ${!!accessToken}, length: ${accessToken?.length}`);
       console.log(`[AuthController] RefreshToken exists: ${!!refreshToken}, length: ${refreshToken?.length}`);
 
-      setAuthCookies(res, accessToken, refreshToken);
 
       console.log("[AuthController] Cookies set, sending response...");
 

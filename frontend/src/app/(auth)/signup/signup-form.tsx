@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useActionState, useState, useEffect } from "react";
+import { useActionState, useState, useEffect, useRef } from "react";
 import { User, Wrench, Shield, KeyRound, AtSign, Loader2, X } from "lucide-react";
 import { signup, completeSignup, resendOtp } from "../../actions/signup-actions";
 import OtpVerificationForm from "../otp/page";
@@ -55,42 +55,86 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
   const [otpError, setOtpError] = useState<string | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
 
+  // ✅ Store password in a ref that persists across renders
+  const passwordCaptureRef = useRef<string>("");
+  const formRef = useRef<HTMLFormElement>(null);
+
   const currentRoleConfig = roleConfig[role];
   const roleName = role.charAt(0).toUpperCase() + role.slice(1);
 
-  // When OTP is sent successfully, open modal and capture form values
+  // ✅ Handle form submission to capture password BEFORE it's cleared
+  const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    // Capture password immediately before form processing
+    const formData = new FormData(event.currentTarget);
+    const password = formData.get("password") as string;
+    
+    console.log("[SignUpComponent] Form submit - capturing password:", {
+      hasPassword: !!password,
+      length: password?.length,
+      preview: password ? password.substring(0, 3) + "..." : "[EMPTY]"
+    });
+    
+    passwordCaptureRef.current = password;
+    
+  
+  };
+
+  // When OTP is sent successfully, use the captured password
   useEffect(() => {
     if (state.otpSent && state.fields) {
-      const formElement = document.querySelector('form[data-signup-form]') as HTMLFormElement;
-      if (formElement) {
-        const formData = new FormData(formElement);
+      const capturedData = {
+        name: state.fields.name || "",
+        email: state.fields.email || "",
+        password: passwordCaptureRef.current, // Use the captured password
+        role: role,
+      };
 
-        setSignupData({
-          name: (formData.get("name") as string) || "",
-          email: (formData.get("email") as string) || "",
-          password: (formData.get("password") as string) || "",
-          role: role,
-        });
+      console.log("[SignUpComponent] Capturing signup data from state.fields:", {
+        ...capturedData,
+        password: capturedData.password ? `[${capturedData.password.length} chars]` : "[EMPTY]",
+        ACTUAL_PASSWORD_DEBUG: capturedData.password
+      });
 
-        setShowOtpModal(true);
-      }
+      setSignupData(capturedData);
+      setShowOtpModal(true);
     }
   }, [state.otpSent, state.fields, role]);
 
   const handleVerifyOtp = async (otp: string) => {
-    if (!signupData) return;
+    if (!signupData) {
+      console.error("[SignUpComponent] No signup data available");
+      return;
+    }
+
+    // 🔍 CRITICAL DEBUG: Log exactly what we're sending
+    console.log("[SignUpComponent CLIENT] Verifying OTP with data:", {
+      ...signupData,
+      password: signupData.password ? `[${signupData.password.length} chars]` : "[EMPTY]",
+      otp: otp ? `[${otp.length} chars]` : "[EMPTY]",
+      ACTUAL_PASSWORD_DEBUG: signupData.password
+    });
 
     setIsVerifying(true);
     setOtpError(null);
 
     try {
-      const result = await completeSignup({
-        ...signupData,
-        otp,
+      const payload = {
+        name: signupData.name,
+        email: signupData.email,
+        password: signupData.password,
+        role: signupData.role,
+        otp: otp,
+      };
+
+      console.log("[SignUpComponent CLIENT] Calling completeSignup with payload:", {
+        ...payload,
+        password: payload.password ? `[${payload.password.length} chars]` : "[EMPTY]",
+        ACTUAL_PASSWORD_DEBUG: payload.password
       });
 
+      const result = await completeSignup(payload);
+
       if (result.success) {
-        // Worker-specific redirect based on verification status returned from server
         if (signupData.role === "worker") {
           if (result.isVerified) {
             router.push("/worker/portal");
@@ -104,6 +148,7 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
         setOtpError(result.error || "Verification failed");
       }
     } catch (err) {
+      console.error("[SignUpComponent] Verification error:", err);
       setOtpError("An unexpected error occurred");
     } finally {
       setIsVerifying(false);
@@ -130,6 +175,7 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
     setShowOtpModal(false);
     setSignupData(null);
     setOtpError(null);
+    passwordCaptureRef.current = "";
   };
 
   return (
@@ -151,7 +197,13 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
           </div>
 
           <div className="px-6 pb-6">
-            <form action={formAction} data-signup-form className="space-y-4">
+            <form 
+              ref={formRef}
+              action={formAction} 
+              onSubmit={handleFormSubmit}
+              data-signup-form 
+              className="space-y-4"
+            >
               {/* Hidden field for role */}
               <input type="hidden" name="role" value={role} />
 
@@ -266,7 +318,6 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
               </button>
             </form>
 
-            {/* Google Auth Button - OUTSIDE the form */}
             <div className="mt-4">
               <GoogleAuthButton role={role} mode="signup" />
             </div>
@@ -286,11 +337,9 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
         </div>
       </div>
 
-      {/* OTP Modal */}
       {showOtpModal && signupData && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="relative w-full max-w-md">
-            {/* Close button */}
             <button
               onClick={handleCloseModal}
               className="absolute -top-12 right-0 text-zinc-400 hover:text-white transition-colors"
@@ -299,7 +348,6 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
               <X className="h-8 w-8" />
             </button>
 
-            {/* OTP Form */}
             <div className="bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl overflow-hidden">
               <OtpVerificationForm
                 email={signupData.email}
@@ -308,14 +356,12 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
               />
             </div>
 
-            {/* Error display */}
             {otpError && (
               <div className="mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
                 <p className="text-sm text-red-400 text-center">{otpError}</p>
               </div>
             )}
 
-            {/* Loading overlay */}
             {isVerifying && (
               <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center rounded-xl">
                 <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-lg">

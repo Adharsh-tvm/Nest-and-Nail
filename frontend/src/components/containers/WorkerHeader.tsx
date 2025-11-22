@@ -15,7 +15,6 @@ import {
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
-import { useAuth } from "@/contexts/AuthContext";
 import { AxiosResponse } from "axios";
 import authApi from "@/services/auth/auth.api";
 
@@ -23,7 +22,6 @@ type UserType = { isVerified?: boolean } | null;
 
 const WorkerHeader: React.FC = () => {
   const router = useRouter();
-  const { logout } = useAuth();
 
   type NavItemProps = {
     icon: React.ElementType;
@@ -86,7 +84,6 @@ const WorkerHeader: React.FC = () => {
   const handleLogout = async () => {
     try {
       // Use the logout from AuthContext (handles API call + cookie clearing)
-      await logout();
       // AuthContext already handles redirect, but we ensure it happens
       router.replace("/login");
     } catch (error) {
