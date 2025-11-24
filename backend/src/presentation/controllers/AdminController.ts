@@ -1,11 +1,15 @@
 import { Request, Response } from "express";
 import { IAdminController } from "../interfaces/IAdminController";
 import { IGetAllClientsUseCase } from "../../application/interfaces/IGetAllClientsUseCase";
+import { IGetAllWorkersUseCase } from "../../application/interfaces/IGetAllWorkersUseCase";
 
 export class AdminController implements IAdminController {
-    constructor(private readonly _getAllClientsUseCase: IGetAllClientsUseCase) { }
+    constructor(
+        private readonly _getAllClientsUseCase: IGetAllClientsUseCase,
+        private readonly _getAllWorkersUseCase: IGetAllWorkersUseCase
+    ) { }
 
-    async handle(req: Request, res: Response): Promise<void> {
+    async getAllClients(req: Request, res: Response): Promise<void> {
         try {
             console.log('Admin controller called')
             const clients = await this._getAllClientsUseCase.execute();
@@ -28,5 +32,30 @@ export class AdminController implements IAdminController {
             });
         }
 
+    }
+
+    async getAllWorkers(req: Request, res: Response): Promise<void> {
+
+        try {
+            console.log('Admin controller called')
+            const workers = await this._getAllWorkersUseCase.execute();
+
+            res.status(200).json({
+                success: true,
+                message: "Workers fetched successfully",
+                data: workers
+            });
+        } catch (error: unknown) {
+            console.error("[GetAllWorkersController] Error:", error);
+
+            const message =
+                error instanceof Error ? error.message : typeof error === "string" ? error : JSON.stringify(error);
+
+            res.status(500).json({
+                success: false,
+                message: "Failed to fetch workers",
+                error: message || "Unknown error"
+            });
+        }
     }
 }

@@ -11,6 +11,17 @@ export type Client = {
   isBlocked: boolean;
   isVerified: boolean;
 };
+export type Worker = {
+  user_id: string;
+  user_name: string; 
+  email_address: string;
+  phone?: string;
+  user_role: string;  
+  skills:string[];
+  profileImageUrl?: string;
+  isBlocked: boolean;
+  isVerified: boolean;
+};
 
 type ApiListResponse<T> = {
   success: boolean;
@@ -25,9 +36,9 @@ export const adminApi = {
     return res.data.data;
   },
 
-  // returns Client[] (or Worker[] if you have a Worker type)
-  getAllWorkers: async (): Promise<Client[]> => {
-    const res: AxiosResponse<ApiListResponse<Client[]>> = await axiosInstance.get("/api/admin/workers");
+  // returns Worker[] 
+  getAllWorkers: async (): Promise<Worker[]> => {
+    const res: AxiosResponse<ApiListResponse<Worker[]>> = await axiosInstance.get("/api/admin/workers");
     return res.data.data;
   }
 };
