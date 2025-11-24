@@ -1,6 +1,5 @@
 // services/auth/auth.api.ts
 import axiosInstance from "@/lib/axiosInstance";
-import type { AxiosResponse } from "axios";
 
 export type LoginPayload = {
   email_address: string;

@@ -1,3 +1,5 @@
+// Adjust path to where you keep DIContainer; this path is example: src/infrastructure/di/DIContainer.ts
+
 import { IPasswordHasher } from "../../application/services/IPasswordHasher";
 import { IGenerateUserID } from "../../application/services/IGenerateUserID";
 import { ITokenService } from "../../application/services/ITokenService";
@@ -5,7 +7,6 @@ import { ILogger } from "../../application/interfaces/ILogger";
 
 import { IRegisterUserUseCase } from "../../application/interfaces/IRegisterUserUseCase";
 import { ILoginUserUseCase } from "../../application/interfaces/ILoginUserUseCase";
-import { IGetCurrentUserUseCase } from "../../application/interfaces/IGetCurrentUserUseCase";
 import { ISendOtpUseCase } from "../../application/interfaces/ISendOtpUseCase";
 import { IVerifyOtpUseCase } from "../../application/interfaces/IVerifyOtpUseCase";
 
@@ -32,13 +33,21 @@ import { GoogleAuthController } from "../../presentation/controllers/GoogleAuthC
 import { IGoogleAuthService } from "../../application/services/IGoogleAuthService";
 import { GoogleAuthService } from "../services/GoogleAuthService";
 import { GoogleSignUpUseCase } from "../../application/use-cases/GoogleSignUpUseCase";
-
+import { IGetAllClientsUseCase } from "../../application/interfaces/IGetAllClientsUseCase";
+import { GetAllClientsUseCase } from "../../application/use-cases/GetAllClientsUseCase";
+import { IClientRepository } from "../../domain/repositories/IClientRepository";
+import { ClientRepository } from "../repo/ClientRepository";
+import { IAuthController } from "../../presentation/interfaces/IAuthController";
+import { IAdminController } from "../../presentation/interfaces/IAdminController";
+import { IGoogleAuthController } from "../../presentation/interfaces/IGoogleAuthController";
+import { AdminController } from "../../presentation/controllers/AdminController";
 
 export class DIContainer {
   // -------------------------
   // Infrastructure Layer
   // -------------------------
   private _repositoryFactory?: UserRepositoryFactory;
+  private _clientRepository?: IClientRepository;
   private _otpRepository?: OtpRepository;
 
   private _passwordHasher?: IPasswordHasher;
@@ -55,20 +64,21 @@ export class DIContainer {
   // -------------------------
   private _registerUserUseCase?: IRegisterUserUseCase;
   private _loginUserUseCase?: ILoginUserUseCase;
-  private _getCurrentUserUseCase?: IGetCurrentUserUseCase;
 
   private _sendOtpUseCase?: ISendOtpUseCase;
   private _verifyOtpUseCase?: IVerifyOtpUseCase;
 
   private _googleLoginUseCase?: IGoogleSignUpUseCase;
+
+  private _getAllClientsUseCase?: IGetAllClientsUseCase;
   // -------------------------
   // Presentation Layer
   // -------------------------
-  private _authController?: AuthController;
+  private _authController?: IAuthController;
   private _authMiddleware?: AuthMiddleware;
 
-  private _googleAuthController?: GoogleAuthController;
-
+  private _googleAuthController?: IGoogleAuthController;
+  private _adminController?: IAdminController;
 
   // ==========================================
   // Infrastructure Lazy Getters
@@ -79,6 +89,13 @@ export class DIContainer {
       this._repositoryFactory = new UserRepositoryFactory();
     }
     return this._repositoryFactory;
+  }
+
+  get clientRepository(): IClientRepository {
+    if (!this._clientRepository) {
+      this._clientRepository = new ClientRepository();
+    }
+    return this._clientRepository;
   }
 
   get otpRepository(): OtpRepository {
@@ -160,6 +177,27 @@ export class DIContainer {
     return this._loginUserUseCase;
   }
 
+  get getAllClientsUseCase(): IGetAllClientsUseCase {
+    if (!this._getAllClientsUseCase) {
+      // instantiate concrete implementation and store as the interface type
+      this._getAllClientsUseCase = new GetAllClientsUseCase(this.clientRepository);
+    }
+    return this._getAllClientsUseCase;
+  }
+
+  get googleLoginUseCase(): IGoogleSignUpUseCase {
+    if (!this._googleLoginUseCase) {
+      this._googleLoginUseCase = new GoogleSignUpUseCase(
+        this.repositoryFactory,
+        this.passwordHasher,
+        this.tokenService,
+        this.googleAuthService,
+        this.idGenerator
+      );
+    }
+    return this._googleLoginUseCase;
+  }
+
   get sendOtpUseCase(): ISendOtpUseCase {
     if (!this._sendOtpUseCase) {
       this._sendOtpUseCase = new SendOtpUseCase(
@@ -175,21 +213,16 @@ export class DIContainer {
 
   get verifyOtpUseCase(): IVerifyOtpUseCase {
     if (!this._verifyOtpUseCase) {
-      this._verifyOtpUseCase = new VerifyOtpUseCase(
-        this.otpService,
-        this.otpRepository,
-        this.logger
-      );
+      this._verifyOtpUseCase = new VerifyOtpUseCase(this.otpService, this.otpRepository, this.logger);
     }
     return this._verifyOtpUseCase;
   }
-
 
   // ==========================================
   // Presentation Layer
   // ==========================================
 
-  get authController(): AuthController {
+  get authController(): IAuthController {
     if (!this._authController) {
       this._authController = new AuthController(
         this.registerUserUseCase,
@@ -201,15 +234,15 @@ export class DIContainer {
     return this._authController;
   }
 
-  get googleAuthService(): IGoogleAuthService {
-    if (!this._googleAuthService) {
-      this._googleAuthService = new GoogleAuthService();
-
+  get adminController(): IAdminController {
+    if (!this._adminController) {
+      // pass the interface instance (not the function)
+      this._adminController = new AdminController(this.getAllClientsUseCase);
     }
-    return this._googleAuthService;
+    return this._adminController;
   }
 
-  get googleAuthController(): GoogleAuthController {
+  get googleAuthController(): IGoogleAuthController {
     if (!this._googleAuthController) {
       this._googleAuthController = new GoogleAuthController(
         this.googleLoginUseCase
@@ -219,13 +252,12 @@ export class DIContainer {
   }
 
 
-  get googleLoginUseCase(): IGoogleSignUpUseCase {
-    if (!this._googleLoginUseCase) {
-      this._googleLoginUseCase = new GoogleSignUpUseCase(this.repositoryFactory, this.passwordHasher, this.tokenService, this.googleAuthService, this.idGenerator)
+  get googleAuthService(): IGoogleAuthService {
+    if (!this._googleAuthService) {
+      this._googleAuthService = new GoogleAuthService();
     }
-    return this._googleLoginUseCase;
+    return this._googleAuthService;
   }
-
 
   get authMiddleware(): AuthMiddleware {
     if (!this._authMiddleware) {
