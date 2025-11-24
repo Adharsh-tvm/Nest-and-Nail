@@ -8,11 +8,11 @@ import { Role } from "../../shared/enums/enums";
 
 export class SendOtpUseCase implements ISendOtpUseCase {
     constructor(
-        private emailService: IEmailService,
-        private otpService: IOtpService,
-        private otpRepo: OtpRepository,
-        private userRepositoryFactory: UserRepositoryFactory,
-        private logger?: ILogger
+        private readonly _emailService: IEmailService,
+        private readonly _otpService: IOtpService,
+        private readonly _otpRepo: OtpRepository,
+        private readonly _userRepositoryFactory: UserRepositoryFactory,
+        private readonly _logger?: ILogger
     ) { }
 
 
@@ -27,30 +27,30 @@ export class SendOtpUseCase implements ISendOtpUseCase {
         }
 
         // Check if user exists
-        const repository = this.userRepositoryFactory.getRepository(userRole);
+        const repository = this._userRepositoryFactory.getRepository(userRole);
 
         const existing = await repository.findByEmail(email);
 
         if (existing) {
-            this.logger?.warn(`OTP request blocked. User already exists: ${email}`);
+            this._logger?.warn(`OTP request blocked. User already exists: ${email}`);
             throw new Error("User already exists");
         }
 
         // Generate OTP
-        const otp = this.otpService.generateOtp();
-        const hashed = await this.otpService.hashOtp(otp);
+        const otp = this._otpService.generateOtp();
+        const hashed = await this._otpService.hashOtp(otp);
 
         // Save OTP
-        await this.otpRepo.save(email, hashed);
+        await this._otpRepo.save(email, hashed);
 
         // Send Email
-        await this.emailService.sendEmail(
+        await this._emailService.sendEmail(
             email,
             "Your OTP Code",
             `<p>Your OTP is <b>${otp}</b>. It is valid for 1 minute.</p>`
         );
 
-        this.logger?.info(`OTP sent to ${email}`);
+        this._logger?.info(`OTP sent to ${email}`);
         return { message: "OTP sent" };
     }
 

@@ -11,8 +11,8 @@ export class AuthController implements IAuthController {
   constructor(
     private readonly _registerUserUseCase: IRegisterUserUseCase,
     private readonly _loginUserUseCase: ILoginUserUseCase,
-    private readonly sendOtpUseCase: ISendOtpUseCase,
-    private readonly verifyOtpUseCase: IVerifyOtpUseCase,
+    private readonly _sendOtpUseCase: ISendOtpUseCase,
+    private readonly _verifyOtpUseCase: IVerifyOtpUseCase,
   ) { }
 
   async register(req: Request, res: Response): Promise<void> {
@@ -118,7 +118,7 @@ export class AuthController implements IAuthController {
         return res.status(400).json({ message: "Email and role are required" });
       }
 
-      await this.sendOtpUseCase.execute(email, role);
+      await this._sendOtpUseCase.execute(email, role);
 
       return res.json({ message: "OTP sent" });
 
@@ -134,7 +134,7 @@ export class AuthController implements IAuthController {
   verifyOtp = async (req: Request, res: Response) => {
     const email = req.body.email || req.body.email_address;
     const otp = req.body.otp;
-    const result = await this.verifyOtpUseCase.execute(email, otp);
+    const result = await this._verifyOtpUseCase.execute(email, otp);
 
     if (!result) return res.status(400).json({ message: "Invalid OTP" });
 
