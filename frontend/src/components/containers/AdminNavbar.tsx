@@ -2,6 +2,7 @@
 
 import React from "react";
 import { User, Bell, Settings, Menu, ChevronLeft } from "lucide-react";
+import { logoutAction } from "@/app/actions/logout-actions";
 
 interface NavbarProps {
   onMenuClick: () => void;
@@ -37,7 +38,6 @@ export default function Navbar({ onMenuClick, sidebarOpen }: NavbarProps) {
           </button>
 
           <div>
-            <h2 className="text-xl font-bold text-slate-800">Dashboard</h2>
             <p className="text-sm text-slate-500 hidden sm:block">
               Manage your service booking platform
             </p>
@@ -61,6 +61,9 @@ export default function Navbar({ onMenuClick, sidebarOpen }: NavbarProps) {
           <button className="hidden sm:flex items-center gap-2 px-4 py-2 text-slate-600 hover:bg-slate-50 rounded-lg border border-slate-200 transition-colors">
             <User className="w-4 h-4" />
             <span className="text-sm font-medium">Profile</span>
+          </button>
+          <button onClick={logoutAction} className="hidden sm:flex items-center gap-2 px-4 py-2 text-slate-600 hover:bg-slate-50 rounded-lg border border-slate-200 transition-colors">
+            <span className="text-sm font-medium">Logout</span>
           </button>
 
           {/* Mobile Profile Icon */}
