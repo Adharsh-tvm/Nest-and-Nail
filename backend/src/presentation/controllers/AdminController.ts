@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { IAdminController } from "../interfaces/IAdminController";
 import { IGetAllClientsUseCase } from "../../application/interfaces/IGetAllClientsUseCase";
 import { IGetAllWorkersUseCase } from "../../application/interfaces/IGetAllWorkersUseCase";
+import { HttpStatusCode } from "../enums/httpCodes";
 
 export class AdminController implements IAdminController {
     constructor(
@@ -14,7 +15,7 @@ export class AdminController implements IAdminController {
             console.log('Admin controller called')
             const clients = await this._getAllClientsUseCase.execute();
 
-            res.status(200).json({
+            res.status(HttpStatusCode.OK).json({
                 success: true,
                 message: "Clients fetched successfully",
                 data: clients
@@ -25,7 +26,7 @@ export class AdminController implements IAdminController {
             const message =
                 error instanceof Error ? error.message : typeof error === "string" ? error : JSON.stringify(error);
 
-            res.status(500).json({
+            res.status(HttpStatusCode.INTERNAL_SERVER).json({
                 success: false,
                 message: "Failed to fetch clients",
                 error: message || "Unknown error"
@@ -40,7 +41,7 @@ export class AdminController implements IAdminController {
             console.log('Admin controller called')
             const workers = await this._getAllWorkersUseCase.execute();
 
-            res.status(200).json({
+            res.status(HttpStatusCode.OK).json({
                 success: true,
                 message: "Workers fetched successfully",
                 data: workers
@@ -51,7 +52,7 @@ export class AdminController implements IAdminController {
             const message =
                 error instanceof Error ? error.message : typeof error === "string" ? error : JSON.stringify(error);
 
-            res.status(500).json({
+            res.status(HttpStatusCode.INTERNAL_SERVER).json({
                 success: false,
                 message: "Failed to fetch workers",
                 error: message || "Unknown error"

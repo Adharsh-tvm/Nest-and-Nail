@@ -115,7 +115,7 @@ export class AuthController implements IAuthController {
       const role = req.body.role || req.body.user_role;
 
       if (!email || !role) {
-        return res.status(400).json({ message: "Email and role are required" });
+        return res.status(HttpStatusCode.BAD_REQUEST).json({ message: "Email and role are required" });
       }
 
       await this._sendOtpUseCase.execute(email, role);
@@ -123,7 +123,7 @@ export class AuthController implements IAuthController {
       return res.json({ message: "OTP sent" });
 
     } catch (error: any) {
-      return res.status(400).json({
+      return res.status(HttpStatusCode.BAD_REQUEST).json({
         message: error.message || "Failed to send OTP"
       });
     }
@@ -136,7 +136,7 @@ export class AuthController implements IAuthController {
     const otp = req.body.otp;
     const result = await this._verifyOtpUseCase.execute(email, otp);
 
-    if (!result) return res.status(400).json({ message: "Invalid OTP" });
+    if (!result) return res.status(HttpStatusCode.BAD_REQUEST).json({ message: "Invalid OTP" });
 
     return res.status(HttpStatusCode.OK).json({ message: "OTP verified" });
   };
