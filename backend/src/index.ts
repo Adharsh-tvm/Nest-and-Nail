@@ -48,6 +48,8 @@ async function bootstrap() {
     "/api/auth",
     createGoogleAuthRoutes(container.googleAuthController)
   );
+
+  app.
   // Error Handler
   app.use(errorHandler);
 
