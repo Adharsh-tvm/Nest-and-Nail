@@ -6,7 +6,7 @@ export function createGoogleAuthRoutes(
 ) {
   const router = Router();
 
-  router.post("/google-login", (req, res) =>
+  router.post("/google", (req, res) =>
     googleAuthController.googleLogin(req, res)
   );
 

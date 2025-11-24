@@ -181,7 +181,7 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
   async function onGoogleSuccess(credentialResponse: any) {
     const token = credentialResponse.credential;
 
-    const result = await handleGoogleSignIn(token, "client");
+    const result = await handleGoogleSignIn(token, role);
 
     if (result?.success) {
       const redirectPath = result.user.user_role;

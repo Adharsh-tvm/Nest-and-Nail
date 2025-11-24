@@ -55,7 +55,7 @@ const Button = ({
       } ${className}`}
       {...props}
     >
-      {children}
+      {/* {children} */}
     </button>
   );
 };
@@ -64,16 +64,16 @@ const Card = ({ children, className = "" }: any) => (
   <div
     className={`rounded-xl border border-zinc-800 bg-zinc-900/50 text-zinc-100 shadow-sm backdrop-blur-xl ${className}`}
   >
-    {children}
+    {/* {children} */}
   </div>
 );
 
 const Badge = ({ children, variant = "default" }: any) => {
   const styles = {
-    default: "bg-zinc-800 text-zinc-300 border-zinc-700",
-    success: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
-    warning: "bg-amber-500/10 text-amber-500 border-amber-500/20",
-    blue: "bg-blue-500/10 text-blue-500 border-blue-500/20",
+    // default: "bg-zinc-800 text-zinc-300 border-zinc-700",
+    // success: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
+    // warning: "bg-amber-500/10 text-amber-500 border-amber-500/20",
+    // blue: "bg-blue-500/10 text-blue-500 border-blue-500/20",
   };
 
   return (
@@ -90,43 +90,44 @@ const Badge = ({ children, variant = "default" }: any) => {
 // --- Mock Map Component ---
 
 const MapView = () => (
-  <div className="relative w-full h-64 bg-zinc-800 rounded-lg overflow-hidden border border-zinc-700 group">
-    {/* Mock Map Background Pattern */}
-    <div
-      className="absolute inset-0 opacity-20"
-      style={{
-        backgroundImage: "radial-gradient(#4b5563 1px, transparent 1px)",
-        backgroundSize: "20px 20px",
-      }}
-    />
+  <div></div>
+  // <div className="relative w-full h-64 bg-zinc-800 rounded-lg overflow-hidden border border-zinc-700 group">
+  //   {/* Mock Map Background Pattern */}
+  //   <div
+  //     className="absolute inset-0 opacity-20"
+  //     style={{
+  //       backgroundImage: "radial-gradient(#4b5563 1px, transparent 1px)",
+  //       backgroundSize: "20px 20px",
+  //     }}
+  //   />
 
-    {/* Mock Streets */}
-    <div className="absolute top-0 left-1/3 w-4 h-full bg-zinc-700/50 transform -skew-x-12" />
-    <div className="absolute top-1/2 left-0 w-full h-3 bg-zinc-700/50 transform rotate-3" />
+  //   {/* Mock Streets */}
+  //   <div className="absolute top-0 left-1/3 w-4 h-full bg-zinc-700/50 transform -skew-x-12" />
+  //   <div className="absolute top-1/2 left-0 w-full h-3 bg-zinc-700/50 transform rotate-3" />
 
-    {/* Destination Pin */}
-    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
-      <div className="relative">
-        <div className="w-4 h-4 bg-emerald-500 rounded-full animate-ping absolute opacity-75" />
-        <div className="w-4 h-4 bg-emerald-600 rounded-full border-2 border-zinc-900 z-10 relative shadow-lg shadow-emerald-900/50" />
-      </div>
-      <div className="mt-1 bg-zinc-900/90 px-2 py-1 rounded text-xs font-medium text-white border border-zinc-700 shadow-xl">
-        Customer Location
-      </div>
-    </div>
+  //   {/* Destination Pin */}
+  //   <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+  //     <div className="relative">
+  //       <div className="w-4 h-4 bg-emerald-500 rounded-full animate-ping absolute opacity-75" />
+  //       <div className="w-4 h-4 bg-emerald-600 rounded-full border-2 border-zinc-900 z-10 relative shadow-lg shadow-emerald-900/50" />
+  //     </div>
+  //     <div className="mt-1 bg-zinc-900/90 px-2 py-1 rounded text-xs font-medium text-white border border-zinc-700 shadow-xl">
+  //       Customer Location
+  //     </div>
+  //   </div>
 
-    {/* Map Controls Overlay */}
-    <div className="absolute bottom-4 right-4 flex gap-2">
-      <Button
-        size="sm"
-        variant="secondary"
-        className="shadow-lg bg-zinc-900/90"
-      >
-        <Navigation className="w-4 h-4 mr-2 text-emerald-500" />
-        Open Maps
-      </Button>
-    </div>
-  </div>
+  //   {/* Map Controls Overlay */}
+  //   <div className="absolute bottom-4 right-4 flex gap-2">
+  //     <Button
+  //       size="sm"
+  //       variant="secondary"
+  //       className="shadow-lg bg-zinc-900/90"
+  //     >
+  //       <Navigation className="w-4 h-4 mr-2 text-emerald-500" />
+  //       Open Maps
+  //     </Button>
+  //   </div>
+  // </div>
 );
 
 // --- Main Page Component ---
@@ -158,13 +159,13 @@ export default function WorkerHomePage() {
         {/* Current Active Job Card */}
         <section>
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-semibold flex items-center gap-2">
+            {/* <h2 className="text-lg font-semibold flex items-center gap-2">
               <span className="relative flex h-3 w-3">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
               </span>
               Current Job
-            </h2>
+            </h2> */}
             <Badge variant="success">In Progress</Badge>
           </div>
 
