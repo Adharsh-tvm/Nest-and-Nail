@@ -4,7 +4,6 @@ import { loggerInstance } from "../../infrastructure/logger/Logger";
 import { IAuthController } from "../interfaces/IAuthController";
 import { IRegisterUserUseCase } from "../../application/interfaces/IRegisterUserUseCase";
 import { ILoginUserUseCase } from "../../application/interfaces/ILoginUserUseCase";
-import { IGetCurrentUserUseCase } from "../../application/interfaces/IGetCurrentUserUseCase";
 import { ISendOtpUseCase } from "../../application/interfaces/ISendOtpUseCase";
 import { IVerifyOtpUseCase } from "../../application/interfaces/IVerifyOtpUseCase";
 

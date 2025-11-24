@@ -1,0 +1,32 @@
+import { Request, Response } from "express";
+import { IAdminController } from "../interfaces/IAdminController";
+import { IGetAllClientsUseCase } from "../../application/interfaces/IGetAllClientsUseCase";
+
+export class AdminController implements IAdminController {
+    constructor(private readonly _getAllClientsUseCase: IGetAllClientsUseCase) { }
+
+    async handle(req: Request, res: Response): Promise<void> {
+        try {
+            console.log('Admin controller called')
+            const clients = await this._getAllClientsUseCase.execute();
+
+            res.status(200).json({
+                success: true,
+                message: "Clients fetched successfully",
+                data: clients
+            });
+        } catch (error: unknown) {
+            console.error("[GetAllClientsController] Error:", error);
+
+            const message =
+                error instanceof Error ? error.message : typeof error === "string" ? error : JSON.stringify(error);
+
+            res.status(500).json({
+                success: false,
+                message: "Failed to fetch clients",
+                error: message || "Unknown error"
+            });
+        }
+
+    }
+}

@@ -1,10 +1,12 @@
 import { Router } from "express";
-import { GoogleAuthController } from "../controllers/GoogleAuthController";
+import { IGoogleAuthController } from "../interfaces/IGoogleAuthController";
 
-export function createGoogleAuthRoutes(googleAuthController: GoogleAuthController) {
+export function createGoogleAuthRoutes(
+  googleAuthController: IGoogleAuthController
+) {
   const router = Router();
 
-  router.post("/google", (req, res) =>
+  router.post("/google-login", (req, res) =>
     googleAuthController.googleLogin(req, res)
   );
 

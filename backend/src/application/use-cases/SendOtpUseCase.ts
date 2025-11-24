@@ -47,7 +47,7 @@ export class SendOtpUseCase implements ISendOtpUseCase {
         await this.emailService.sendEmail(
             email,
             "Your OTP Code",
-            `<p>Your OTP is <b>${otp}</b>. It is valid for 5 minutes.</p>`
+            `<p>Your OTP is <b>${otp}</b>. It is valid for 1 minute.</p>`
         );
 
         this.logger?.info(`OTP sent to ${email}`);

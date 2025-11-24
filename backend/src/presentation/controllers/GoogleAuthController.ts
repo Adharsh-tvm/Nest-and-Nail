@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { IGoogleSignUpUseCase } from "../../application/interfaces/IGoogleSignUpUseCase";
-import { Role } from "../../shared/enums/enums";
 import { HttpStatusCode } from "../enums/httpCodes";
 import { IGoogleAuthController } from "../interfaces/IGoogleAuthController";
 
