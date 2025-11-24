@@ -10,10 +10,10 @@ import { ITokenService } from "../services/ITokenService";
 
 export class GoogleSignUpUseCase implements IGoogleSignUpUseCase {
     constructor(
-        private _userRepositoryFactory: IUserRepository,
+        private readonly _userRepositoryFactory: IUserRepository,
         private readonly _passwordHasher: IPasswordHasher,
-        private _tokenService: ITokenService,
-        private _googleAuthService: IGoogleAuthService,
+        private readonly _tokenService: ITokenService,
+        private readonly _googleAuthService: IGoogleAuthService,
         private readonly _userIdGenerator: IGenerateUserID,
     ) { }
 

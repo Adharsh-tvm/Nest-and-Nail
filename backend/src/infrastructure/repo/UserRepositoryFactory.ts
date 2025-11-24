@@ -6,24 +6,24 @@ import { WorkerRepository } from "./WorkerRepository";
 import { AdminRepository } from "./AdminRepository";
 
 export class UserRepositoryFactory {
-    private readonly clientRepository: ClientRepository;
-    private readonly workerRepository: WorkerRepository;
-    private readonly adminRepository: AdminRepository;
+    private readonly _clientRepository: ClientRepository;
+    private readonly _workerRepository: WorkerRepository;
+    private readonly _adminRepository: AdminRepository;
 
     constructor() {
-        this.clientRepository = new ClientRepository();
-        this.workerRepository = new WorkerRepository();
-        this.adminRepository = new AdminRepository();
+        this._clientRepository = new ClientRepository();
+        this._workerRepository = new WorkerRepository();
+        this._adminRepository = new AdminRepository();
     }
 
     getRepository<T extends User>(role: Role): IBaseRepository<T> {
         switch (role) {
             case Role.CLIENT:
-                return this.clientRepository as unknown as IBaseRepository<T>;
+                return this._clientRepository as unknown as IBaseRepository<T>;
             case Role.WORKER:
-                return this.workerRepository as unknown as IBaseRepository<T>;
+                return this._workerRepository as unknown as IBaseRepository<T>;
             case Role.ADMIN:
-                return this.adminRepository as unknown as IBaseRepository<T>;
+                return this._adminRepository as unknown as IBaseRepository<T>;
             default:
                 throw new Error(`Unknown role: ${role}`);
         }
