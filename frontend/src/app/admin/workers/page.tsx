@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   LayoutDashboard, 
   Users, 
@@ -47,18 +47,6 @@ interface Worker {
   status: 'Active' | 'Suspended' | 'Inactive';
   verificationStatus: 'Approved' | 'Pending' | 'Rejected';
   earnings: string;
-  avatarColor: string;
-}
-
-interface Customer {
-  id: number;
-  name: string;
-  email: string;
-  phone: string;
-  services: number;
-  totalPaid: string;
-  status: 'Active' | 'Blocked';
-  joinDate: string;
   avatarColor: string;
 }
 
@@ -135,54 +123,6 @@ const workersData: Worker[] = [
     avatarColor: 'bg-indigo-600'
   },
 ];
-
-const customersData: Customer[] = [
-  {
-    id: 1,
-    name: "Alice Johnson",
-    email: "alice.johnson@email.com",
-    phone: "+1 (555) 123-4567",
-    services: 23,
-    totalPaid: "$2,340",
-    status: "Active",
-    joinDate: "1/15/2024",
-    avatarColor: "bg-blue-900"
-  },
-  {
-    id: 2,
-    name: "Robert Smith",
-    email: "robert.smith@email.com",
-    phone: "+1 (555) 234-5678",
-    services: 45,
-    totalPaid: "$5,670",
-    status: "Active",
-    joinDate: "11/22/2023",
-    avatarColor: "bg-blue-800"
-  },
-  {
-    id: 3,
-    name: "Emma Davis",
-    email: "emma.davis@email.com",
-    phone: "+1 (555) 345-6789",
-    services: 12,
-    totalPaid: "$1,890",
-    status: "Blocked",
-    joinDate: "2/8/2024",
-    avatarColor: "bg-blue-700"
-  },
-  {
-    id: 4,
-    name: "Michael Wilson",
-    email: "michael.wilson@email.com",
-    phone: "+1 (555) 456-7890",
-    services: 67,
-    totalPaid: "$8,920",
-    status: "Active",
-    joinDate: "9/14/2023",
-    avatarColor: "bg-blue-900"
-  }
-];
-
 
 // --- Sub-Components (Nav & Sidebar) ---
 
@@ -427,145 +367,11 @@ const DashboardTable = () => (
   </div>
 );
 
-// --- CUSTOMERS PAGE COMPONENT (New) ---
-
-const CustomersView = () => {
-  return (
-    <div className="max-w-7xl mx-auto space-y-6 pt-4">
-      
-      {/* Top Stats - Specific to Customers Page */}
-      <div className="flex justify-end gap-4 mb-2">
-        <div className="bg-white px-6 py-3 rounded-lg border border-slate-200 shadow-sm flex items-center gap-3">
-          <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
-             <Users className="w-5 h-5" />
-          </div>
-          <div>
-            <p className="text-xs text-slate-500 font-medium">Total Customers</p>
-            <p className="text-lg font-bold text-slate-800">5</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Filters & Search Section */}
-      <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-        <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
-          
-          {/* Search Bar */}
-          <div className="relative w-full lg:w-96">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
-            <input 
-              type="text" 
-              placeholder="Search by name or email..." 
-              className="w-full pl-10 pr-4 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-slate-600"
-            />
-          </div>
-
-          {/* Filter Toggles */}
-          <div className="flex flex-wrap gap-4 w-full lg:w-auto">
-            <div className="flex items-center bg-slate-100 p-1 rounded-lg">
-              <button className="px-4 py-1.5 text-xs font-medium bg-blue-900 text-white rounded-md shadow-sm">All</button>
-              <button className="px-4 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900">Active</button>
-              <button className="px-4 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900">Blocked</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Customer List Table */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="p-6 border-b border-slate-200">
-          <h3 className="text-lg font-bold text-slate-800">Customer List</h3>
-          <p className="text-sm text-slate-500">View and manage customer accounts and activity</p>
-        </div>
-        
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-slate-600">
-            <thead className="bg-slate-50 text-slate-800 font-semibold border-b border-slate-200">
-              <tr>
-                <th className="p-5 min-w-[200px]">Customer</th>
-                <th className="p-5 min-w-[250px]">Contact</th>
-                <th className="p-5">Services</th>
-                <th className="p-5">Total Paid</th>
-                <th className="p-5">Status</th>
-                <th className="p-5">Join Date</th>
-                <th className="p-5 text-right"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {customersData.map((customer) => (
-                <tr key={customer.id} className="hover:bg-slate-50 transition-colors group">
-                  {/* Customer Column */}
-                  <td className="p-5">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-full ${customer.avatarColor} text-white flex items-center justify-center font-bold text-sm`}>
-                        {customer.name.split(' ').map(n => n[0]).join('')}
-                      </div>
-                      <div>
-                        <p className="font-semibold text-slate-800">{customer.name}</p>
-                        <p className="text-xs text-slate-400">ID: {customer.id}</p>
-                      </div>
-                    </div>
-                  </td>
-
-                  {/* Contact */}
-                  <td className="p-5">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2 text-xs text-slate-500">
-                        <Mail className="w-3 h-3" />
-                        {customer.email}
-                      </div>
-                      <div className="flex items-center gap-2 text-xs text-slate-500">
-                        <Phone className="w-3 h-3" />
-                        {customer.phone}
-                      </div>
-                    </div>
-                  </td>
-
-                  {/* Services */}
-                  <td className="p-5">
-                    <span className="font-medium text-slate-700">{customer.services}</span>
-                  </td>
-
-                  {/* Total Paid */}
-                  <td className="p-5 font-semibold text-slate-700">{customer.totalPaid}</td>
-
-                  {/* Status */}
-                  <td className="p-5">
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium border ${
-                      customer.status === 'Active' 
-                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
-                        : 'bg-white text-rose-600 border-rose-200'
-                    }`}>
-                      {customer.status}
-                    </span>
-                  </td>
-
-                   {/* Join Date */}
-                   <td className="p-5 text-slate-500">
-                    {customer.joinDate}
-                  </td>
-
-                  {/* Actions */}
-                  <td className="p-5 text-right">
-                    <button className="p-2 hover:bg-slate-200 rounded-full text-slate-400 hover:text-slate-600">
-                      <MoreHorizontal className="w-4 h-4" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// --- WORKERS PAGE COMPONENT ---
+// --- WORKERS PAGE COMPONENT (New) ---
 
 const WorkersView = () => {
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
+    <div className="max-w-7xl mx-auto space-y-6 pt-5">
       
       {/* Top Stats - Specific to Workers Page */}
       <div className="flex justify-end gap-4 mb-2">
@@ -591,7 +397,6 @@ const WorkersView = () => {
 
       {/* Filters & Search Section */}
       <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-        <h3 className="text-base font-bold text-slate-800">Filters & Search</h3>
         <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
           
           {/* Search Bar */}
@@ -628,7 +433,7 @@ const WorkersView = () => {
       <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
         <div className="p-6 border-b border-slate-200">
           <h3 className="text-lg font-bold text-slate-800">Worker Directory</h3>
-          <p className="text-sm text-slate-500">View and manage worker profiles, performance, and verification status</p>
+          {/* <p className="text-sm text-slate-500">View and manage worker profiles, performance, and verification status</p> */}
         </div>
         
         <div className="overflow-x-auto">
@@ -739,4 +544,4 @@ const WorkersView = () => {
 };
 
 
-export default CustomersView;
+export default WorkersView;

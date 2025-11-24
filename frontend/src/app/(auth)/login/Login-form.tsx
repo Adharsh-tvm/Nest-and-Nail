@@ -141,7 +141,13 @@ export const LoginForm = () => {
 
         {/* Google Auth Button */}
 
-        <GoogleLogin onSuccess={onGoogleSuccess} useOneTap />
+                      <GoogleLogin
+                        onSuccess={onGoogleSuccess}
+                        useOneTap
+                        theme="filled_black"
+                        shape="circle"
+                        width="330"
+                      />
       </div>
     </>
   );
