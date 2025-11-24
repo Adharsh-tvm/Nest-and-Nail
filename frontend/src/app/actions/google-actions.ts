@@ -34,7 +34,6 @@ export async function handleGoogleSignIn(
 
     const { email, name, picture } = payload;
 
-    // 2. Call your backend's new 'google-auth' endpoint
 
     const response = await authApi.googleAuth({
       email,
