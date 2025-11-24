@@ -355,7 +355,13 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
             </form>
 
             <div className="mt-4">
-              <GoogleLogin onSuccess={onGoogleSuccess} useOneTap />
+              <GoogleLogin
+                onSuccess={onGoogleSuccess}
+                useOneTap
+                theme="filled_black"
+                shape="circle"
+                width="330"
+              />
             </div>
           </div>
 
