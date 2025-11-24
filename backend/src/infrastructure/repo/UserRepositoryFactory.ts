@@ -3,14 +3,17 @@ import { IBaseRepository } from "../../domain/repositories/IBaseRepository";
 import { User } from "../../domain/entities/User";
 import { ClientRepository } from "./ClientRepository";
 import { WorkerRepository } from "./WorkerRepository";
+import { AdminRepository } from "./AdminRepository";
 
 export class UserRepositoryFactory {
-    private clientRepository: ClientRepository;
-    private workerRepository: WorkerRepository;
+    private readonly clientRepository: ClientRepository;
+    private readonly workerRepository: WorkerRepository;
+    private readonly adminRepository: AdminRepository;
 
     constructor() {
         this.clientRepository = new ClientRepository();
         this.workerRepository = new WorkerRepository();
+        this.adminRepository = new AdminRepository();
     }
 
     getRepository<T extends User>(role: Role): IBaseRepository<T> {
@@ -20,7 +23,7 @@ export class UserRepositoryFactory {
             case Role.WORKER:
                 return this.workerRepository as unknown as IBaseRepository<T>;
             case Role.ADMIN:
-                throw new Error("Admin repository not implemented yet");
+                return this.adminRepository as unknown as IBaseRepository<T>;
             default:
                 throw new Error(`Unknown role: ${role}`);
         }

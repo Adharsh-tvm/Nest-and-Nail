@@ -55,18 +55,18 @@ export class LoginUserUseCase implements ILoginUserUseCase {
         }
 
         // If not found, search in Admin repository (if you have one)
-        // if (!user) {
-        //     try {
-        //         const adminRepo = this._repositoryFactory.getRepository(Role.ADMIN);
-        //         user = await adminRepo.findByEmail(email_address);
-        //         if (user) {
-        //             userRole = Role.ADMIN;
-        //             this._logger.info(`[LoginUserUseCase] User found as ADMIN`);
-        //         }
-        //     } catch (error) {
-        //         this._logger.info(`[LoginUserUseCase] User not found in ADMIN repository`);
-        //     }
-        // }
+        if (!user) {
+            try {
+                const adminRepo = this._repositoryFactory.getRepository(Role.ADMIN);
+                user = await adminRepo.findByEmail(email_address);
+                if (user) {
+                    userRole = Role.ADMIN;
+                    this._logger.info(`[LoginUserUseCase] User found as ADMIN`);
+                }
+            } catch (error) {
+                this._logger.info(`[LoginUserUseCase] User not found in ADMIN repository`);
+            }
+        }
 
         if (!user || !userRole) {
             const errorMessage = `[LoginUseCase] ERROR: User not found for email: ${email_address}`;

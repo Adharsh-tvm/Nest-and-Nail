@@ -17,7 +17,7 @@ import { usePathname } from "next/navigation";
 
 const navItems = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, href: "/admin" },
-  { id: "customers", label: "Customers", icon: Users, href: "/admin/customers" },
+  { id: "clients", label: "clients", icon: Users, href: "/admin/clients" },
   { id: "workers", label: "Workers", icon: Briefcase, href: "/admin/workers" },
   { id: "services", label: "Services", icon: Wrench, href: "/admin/services" },
   { id: "payments", label: "Payments", icon: CreditCard, href: "/admin/payments" },
@@ -54,7 +54,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
             </div>
             {isOpen && (
               <div>
-                <h1 className="text-white font-bold text-lg leading-none">ServicePro</h1>
+                <h1 className="text-white font-bold text-lg leading-none">Mend<span className="text-red-950">O</span>n</h1>
                 <span className="text-xs text-slate-400">Admin Portal</span>
               </div>
             )}
