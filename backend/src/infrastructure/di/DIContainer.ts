@@ -41,6 +41,10 @@ import { IAuthController } from "../../presentation/interfaces/IAuthController";
 import { IAdminController } from "../../presentation/interfaces/IAdminController";
 import { IGoogleAuthController } from "../../presentation/interfaces/IGoogleAuthController";
 import { AdminController } from "../../presentation/controllers/AdminController";
+import { IGetAllWorkersUseCase } from "../../application/interfaces/IGetAllWorkersUseCase";
+import { IWorkerRepository } from "../../domain/repositories/IWorkerRepository";
+import { WorkerRepository } from "../repo/WorkerRepository";
+import { GetAllWorkersUseCase } from "../../application/use-cases/GetAllWorkersUseCase";
 
 export class DIContainer {
   // -------------------------
@@ -48,6 +52,7 @@ export class DIContainer {
   // -------------------------
   private _repositoryFactory?: UserRepositoryFactory;
   private _clientRepository?: IClientRepository;
+  private _workerRepository?: IWorkerRepository;
   private _otpRepository?: OtpRepository;
 
   private _passwordHasher?: IPasswordHasher;
@@ -71,6 +76,7 @@ export class DIContainer {
   private _googleLoginUseCase?: IGoogleSignUpUseCase;
 
   private _getAllClientsUseCase?: IGetAllClientsUseCase;
+  private _getAllWorkersUseCase?: IGetAllWorkersUseCase;
   // -------------------------
   // Presentation Layer
   // -------------------------
@@ -96,6 +102,13 @@ export class DIContainer {
       this._clientRepository = new ClientRepository();
     }
     return this._clientRepository;
+  }
+
+  get workerRepository(): IWorkerRepository {
+    if (!this._workerRepository) {
+      this._workerRepository = new WorkerRepository()
+    }
+    return this._workerRepository;
   }
 
   get otpRepository(): OtpRepository {
@@ -179,10 +192,16 @@ export class DIContainer {
 
   get getAllClientsUseCase(): IGetAllClientsUseCase {
     if (!this._getAllClientsUseCase) {
-      // instantiate concrete implementation and store as the interface type
       this._getAllClientsUseCase = new GetAllClientsUseCase(this.clientRepository);
     }
     return this._getAllClientsUseCase;
+  }
+
+  get getAllWorkersUseCase(): IGetAllWorkersUseCase {
+    if (!this._getAllWorkersUseCase) {
+      this._getAllWorkersUseCase = new GetAllWorkersUseCase(this.workerRepository);
+    }
+    return this._getAllWorkersUseCase;
   }
 
   get googleLoginUseCase(): IGoogleSignUpUseCase {
@@ -213,7 +232,10 @@ export class DIContainer {
 
   get verifyOtpUseCase(): IVerifyOtpUseCase {
     if (!this._verifyOtpUseCase) {
-      this._verifyOtpUseCase = new VerifyOtpUseCase(this.otpService, this.otpRepository, this.logger);
+      this._verifyOtpUseCase = new VerifyOtpUseCase(
+        this.otpService,
+        this.otpRepository,
+        this.logger);
     }
     return this._verifyOtpUseCase;
   }
@@ -237,7 +259,10 @@ export class DIContainer {
   get adminController(): IAdminController {
     if (!this._adminController) {
       // pass the interface instance (not the function)
-      this._adminController = new AdminController(this.getAllClientsUseCase);
+      this._adminController = new AdminController(
+        this.getAllClientsUseCase,
+        this.getAllWorkersUseCase
+      );
     }
     return this._adminController;
   }
