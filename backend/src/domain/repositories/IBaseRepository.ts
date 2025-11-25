@@ -3,4 +3,5 @@ export interface IBaseRepository<T> {
     findById(id: string): Promise<T | null>;
     create(user: T): Promise<T>;
     findAll(): Promise<T[]>;
+    update(email: string, updateData: Partial<T>): Promise<T | null>;
 }    

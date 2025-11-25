@@ -6,4 +6,6 @@ export interface IAuthController {
   sendOtp(req: Request, res: Response): Promise<Response>;
   verifyOtp(req: Request, res: Response): Promise<Response>;
   logout(req: Request, res: Response): Promise<void>;
+  forgotPassword(req: Request, res: Response): Promise<Response | void>;
+  resetPassword(req: Request, res: Response): Promise<Response | void>;
 }

@@ -73,4 +73,21 @@ export abstract class BaseRepository<T extends User> implements IBaseRepository<
             return { id: _id.toString(), ...rest } as T;
         });
     }
+
+    async update(email: string, updateData: Partial<T>): Promise<T | null> {
+        const updated = await this.model
+            .findOneAndUpdate(
+                { email } as FilterQuery<T>,  
+                updateData,
+                { new: true }
+            )
+            .lean()
+            .exec();
+
+        if (!updated) return null;
+
+        const { _id, __v, ...clean } = updated as any;
+        return clean as T;
+    }
+
 }

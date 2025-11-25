@@ -45,15 +45,20 @@ import { IGetAllWorkersUseCase } from "../../application/interfaces/IGetAllWorke
 import { IWorkerRepository } from "../../domain/repositories/IWorkerRepository";
 import { WorkerRepository } from "../repo/WorkerRepository";
 import { GetAllWorkersUseCase } from "../../application/use-cases/GetAllWorkersUseCase";
+import { IForgotPasswordUseCase } from "../../application/interfaces/IForgotPasswordUseCase";
+import { ForgotPasswordUseCase } from "../../application/use-cases/ForgotPasswordUseCase";
+import { IResetPasswordUseCase } from "../../application/interfaces/IResetPasswordUseCase";
+import { ResetPasswordUseCase } from "../../application/use-cases/ResetPasswordUseCase";
 
 export class DIContainer {
   // -------------------------
   // Infrastructure Layer
   // -------------------------
-  private _repositoryFactory?: UserRepositoryFactory;
+  private _userRepositoryFactory?: UserRepositoryFactory;
   private _clientRepository?: IClientRepository;
   private _workerRepository?: IWorkerRepository;
   private _otpRepository?: OtpRepository;
+
 
   private _passwordHasher?: IPasswordHasher;
   private _idGenerator?: IGenerateUserID;
@@ -77,6 +82,10 @@ export class DIContainer {
 
   private _getAllClientsUseCase?: IGetAllClientsUseCase;
   private _getAllWorkersUseCase?: IGetAllWorkersUseCase;
+
+  private _forgotpasswordUseCase?: IForgotPasswordUseCase;
+  private _resetPasswordUseCase?: IResetPasswordUseCase;
+
   // -------------------------
   // Presentation Layer
   // -------------------------
@@ -90,11 +99,11 @@ export class DIContainer {
   // Infrastructure Lazy Getters
   // ==========================================
 
-  get repositoryFactory(): UserRepositoryFactory {
-    if (!this._repositoryFactory) {
-      this._repositoryFactory = new UserRepositoryFactory();
+  get userRepositoryFactory(): UserRepositoryFactory {
+    if (!this._userRepositoryFactory) {
+      this._userRepositoryFactory = new UserRepositoryFactory();
     }
-    return this._repositoryFactory;
+    return this._userRepositoryFactory;
   }
 
   get clientRepository(): IClientRepository {
@@ -168,7 +177,7 @@ export class DIContainer {
   get registerUserUseCase(): IRegisterUserUseCase {
     if (!this._registerUserUseCase) {
       this._registerUserUseCase = new RegisterUserUseCase(
-        this.repositoryFactory,
+        this.userRepositoryFactory,
         this.passwordHasher,
         this.idGenerator,
         this.tokenService,
@@ -181,7 +190,7 @@ export class DIContainer {
   get loginUserUseCase(): ILoginUserUseCase {
     if (!this._loginUserUseCase) {
       this._loginUserUseCase = new LoginUserUseCase(
-        this.repositoryFactory,
+        this.userRepositoryFactory,
         this.passwordHasher,
         this.tokenService,
         this.logger
@@ -207,7 +216,7 @@ export class DIContainer {
   get googleLoginUseCase(): IGoogleSignUpUseCase {
     if (!this._googleLoginUseCase) {
       this._googleLoginUseCase = new GoogleSignUpUseCase(
-        this.repositoryFactory,
+        this.userRepositoryFactory,
         this.passwordHasher,
         this.tokenService,
         this.googleAuthService,
@@ -223,7 +232,7 @@ export class DIContainer {
         this.emailService,
         this.otpService,
         this.otpRepository,
-        this.repositoryFactory,
+        this.userRepositoryFactory,
         this.logger
       );
     }
@@ -240,6 +249,28 @@ export class DIContainer {
     return this._verifyOtpUseCase;
   }
 
+  get forgotPasswordUseCase(): IForgotPasswordUseCase {
+    if (!this._forgotpasswordUseCase) {
+      this._forgotpasswordUseCase = new ForgotPasswordUseCase(
+        this.emailService,
+        this.otpService,
+        this.otpRepository,
+        this.userRepositoryFactory);
+    }
+    return this._forgotpasswordUseCase;
+  }
+
+  get resetPasswordUseCase(): IResetPasswordUseCase {
+    if (!this._resetPasswordUseCase) {
+      this._resetPasswordUseCase = new ResetPasswordUseCase(
+        this.userRepositoryFactory,
+        this.passwordHasher,
+        this.otpRepository,
+        this.logger);
+    }
+    return this._resetPasswordUseCase;
+  }
+
   // ==========================================
   // Presentation Layer
   // ==========================================
@@ -250,15 +281,15 @@ export class DIContainer {
         this.registerUserUseCase,
         this.loginUserUseCase,
         this.sendOtpUseCase,
-        this.verifyOtpUseCase
-      );
+        this.verifyOtpUseCase,
+        this.forgotPasswordUseCase,
+        this.resetPasswordUseCase);
     }
     return this._authController;
   }
 
   get adminController(): IAdminController {
     if (!this._adminController) {
-      // pass the interface instance (not the function)
       this._adminController = new AdminController(
         this.getAllClientsUseCase,
         this.getAllWorkersUseCase

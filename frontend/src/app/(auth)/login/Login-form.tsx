@@ -94,13 +94,11 @@ export const LoginForm = () => {
           {/* Options */}
           <div className="flex items-center justify-between">
             <div className="flex items-center  space-x-2">
-            <a href="#" className={`text-sm font-medium ${linkClass}`}>
-              Forgot password?
-            </a>
+              <a href="#" className={`text-sm font-medium ${linkClass}`}>
+                Forgot password?
+              </a>
             </div>
           </div>
-             
-          
 
           {/* Error Message */}
           {state?.error && (
@@ -133,13 +131,13 @@ export const LoginForm = () => {
 
         {/* Google Auth Button */}
 
-                      <GoogleLogin
-                        onSuccess={onGoogleSuccess}
-                        useOneTap
-                        theme="filled_black"
-                        shape="circle"
-                        width="330"
-                      />
+        <GoogleLogin
+          onSuccess={onGoogleSuccess}
+          useOneTap
+          theme="filled_black"
+          shape="circle"
+          width="330"
+        />
       </div>
     </>
   );
