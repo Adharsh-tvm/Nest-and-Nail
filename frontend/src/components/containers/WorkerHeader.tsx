@@ -63,7 +63,7 @@ const WorkerHeader: React.FC = () => {
     return (
       <header className="bg-neutral-900 text-white p-4 flex flex-col md:flex-row items-center justify-between border-b border-neutral-800">
         <div className="flex items-center justify-between w-full md:w-auto">
-          <h1 className="text-2xl font-bold text-green-400">ServiceHub</h1>
+          <h1 className="text-2xl font-bold text-green-400">MendOn</h1>
           <button className="md:hidden text-neutral-300">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -83,16 +83,16 @@ const WorkerHeader: React.FC = () => {
         </div>
 
         <nav className="hidden md:flex items-center space-x-2 mt-4 md:mt-0">
-          <NavItem icon={Home} label="Home" href="#" active />
-          <NavItem icon={Briefcase} label="Jobs" href="#" />
+          {/* <NavItem icon={Home} label="Home" href="#" active /> */}
+          {/* <NavItem icon={Briefcase} label="Jobs" href="#" />
           <NavItem icon={Calendar} label="Bookings" href="#" />
           <NavItem icon={CreditCard} label="Payments" href="#" />
           <NavItem icon={Users} label="Meetings" href="#" />
-          <NavItem icon={User} label="Profile" href="#" />
+          <NavItem icon={User} label="Profile" href="#" /> */}
         </nav>
 
         <div className="hidden md:flex items-center space-x-4 mt-4 md:mt-0">
-          <div className="flex items-center space-x-2">
+          {/* <div className="flex items-center space-x-2">
             <span className="text-sm text-neutral-400">Status:</span>
             <span
               className={`px-3 py-1 rounded-full text-sm font-medium ${
@@ -103,11 +103,11 @@ const WorkerHeader: React.FC = () => {
             >
               {isOnline ? "Online" : "Offline"}
             </span>
-          </div>
+          </div> */}
 
-          <button className="text-neutral-300 hover:text-white">
+          {/* <button className="text-neutral-300 hover:text-white">
             <MessageCircle className="w-6 h-6" />
-          </button>
+          </button> */}
 
           {/* LOGOUT BUTTON - VERIFIED VIEW */}
           <button

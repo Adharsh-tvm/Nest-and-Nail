@@ -93,22 +93,14 @@ export const LoginForm = () => {
 
           {/* Options */}
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                id="remember-me"
-                name="remember"
-                disabled={pending}
-                className={`h-4 w-4 shrink-0 rounded-sm border border-zinc-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black disabled:cursor-not-allowed disabled:opacity-50 ${focusRingClass} ${checkboxClass}`}
-              />
-              <label htmlFor="remember-me" className="text-sm text-zinc-400">
-                Remember me
-              </label>
-            </div>
+            <div className="flex items-center  space-x-2">
             <a href="#" className={`text-sm font-medium ${linkClass}`}>
               Forgot password?
             </a>
+            </div>
           </div>
+             
+          
 
           {/* Error Message */}
           {state?.error && (
