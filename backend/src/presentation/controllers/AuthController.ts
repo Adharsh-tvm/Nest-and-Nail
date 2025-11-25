@@ -6,6 +6,8 @@ import { IRegisterUserUseCase } from "../../application/interfaces/IRegisterUser
 import { ILoginUserUseCase } from "../../application/interfaces/ILoginUserUseCase";
 import { ISendOtpUseCase } from "../../application/interfaces/ISendOtpUseCase";
 import { IVerifyOtpUseCase } from "../../application/interfaces/IVerifyOtpUseCase";
+import { IForgotPasswordUseCase } from "../../application/interfaces/IForgotPasswordUseCase";
+import { IResetPasswordUseCase } from "../../application/interfaces/IResetPasswordUseCase";
 
 export class AuthController implements IAuthController {
   constructor(
@@ -13,6 +15,9 @@ export class AuthController implements IAuthController {
     private readonly _loginUserUseCase: ILoginUserUseCase,
     private readonly _sendOtpUseCase: ISendOtpUseCase,
     private readonly _verifyOtpUseCase: IVerifyOtpUseCase,
+
+    private readonly _forgotPasswordUseCase: IForgotPasswordUseCase,
+    private readonly _resetPasswordUseCase: IResetPasswordUseCase
   ) { }
 
   async register(req: Request, res: Response): Promise<void> {
@@ -148,6 +153,55 @@ export class AuthController implements IAuthController {
     res.status(HttpStatusCode.OK).json({ message: "Logged out successfully" });
   }
 
+  forgotPassword = async (req: Request, res: Response) => {
+    try {
+      const { email } = req.body;
+
+      if (!email) {
+        return res.status(HttpStatusCode.BAD_REQUEST).json({
+          message: "Email is required"
+        });
+      }
+
+      const result = await this._forgotPasswordUseCase.execute(email);
+
+      return res.status(HttpStatusCode.OK).json(result);
+
+    } catch (error: any) {
+      return res.status(HttpStatusCode.BAD_REQUEST).json({
+        message: error.message || "Failed to send OTP"
+      });
+    }
+  };
+
+  resetPassword = async (req: Request, res: Response) => {
+    try {
+      const { email, newPassword, confirmPassword } = req.body;
+
+      if (!email || !newPassword || !confirmPassword) {
+        return res.status(HttpStatusCode.BAD_REQUEST).json({
+          message: "Email, newPassword, and confirmPassword are required"
+        });
+      }
+
+      if (newPassword !== confirmPassword) {
+        return res.status(HttpStatusCode.BAD_REQUEST).json({
+          message: "Passwords do not match"
+        });
+      }
+
+      await this._resetPasswordUseCase.execute(email, newPassword);
+
+      return res.status(HttpStatusCode.OK).json({
+        message: "Password reset successful"
+      });
+
+    } catch (error: any) {
+      return res.status(HttpStatusCode.BAD_REQUEST).json({
+        message: error.message
+      });
+    }
+  };
 
 
 }

@@ -12,8 +12,8 @@ type OtpResponse = {
 export async function sendOtp(email: string): Promise<OtpResponse> {
   try {
     const response = await authApi.sendOtp({
-      email_address:email
-      
+      email_address: email
+
     })
 
     return {
@@ -29,7 +29,7 @@ export async function sendOtp(email: string): Promise<OtpResponse> {
           error: error.response.data.message || "Failed to send OTP",
         };
       }
-      
+
       if (error.code === "ECONNREFUSED" || error.message.includes("Network Error")) {
         return {
           success: false,
@@ -51,7 +51,7 @@ export async function verifyOtp(
 ): Promise<OtpResponse> {
   try {
     const response = await authApi.verifyOtp({
-      email_address:email,
+      email_address: email,
       otp
     })
     return {
@@ -67,7 +67,7 @@ export async function verifyOtp(
           error: error.response.data.message || "Invalid or expired OTP",
         };
       }
-      
+
       if (error.code === "ECONNREFUSED" || error.message.includes("Network Error")) {
         return {
           success: false,
@@ -79,6 +79,60 @@ export async function verifyOtp(
     return {
       success: false,
       error: "Network error. Please try again.",
+    };
+  }
+}
+
+export async function forgotPasswordAction(email_address: string) {
+  try {
+    const res = await authApi.forgotPassword({ email_address });
+
+    return {
+      success: res.data.message || "OTP sent successfully",
+    };
+  } catch (error: any) {
+    return {
+      error:
+        error.response?.data?.message ||
+        "Something went wrong while sending OTP",
+    };
+  }
+}
+
+export async function verifyResetOtpAction(email_address: string, otp: string) {
+  try {
+    const response = await authApi.verifyOtp({ email_address, otp });
+
+    return { success: true };
+  } catch (error: any) {
+    return {
+      error:
+        error.response?.data?.message ||
+        "Invalid or expired OTP",
+    };
+  }
+}
+
+export async function resetPasswordAction(
+  email_address: string,
+  newPassword: string,
+  confirmPassword: string
+) {
+  try {
+    const response = await authApi.resetPassword({
+      email_address,
+      newPassword,
+      confirmPassword,
+    });
+
+    return {
+      success: response.data.message || "Password reset successful",
+    };
+  } catch (error: any) {
+    return {
+      error:
+        error.response?.data?.message ||
+        "Failed to reset password",
     };
   }
 }
