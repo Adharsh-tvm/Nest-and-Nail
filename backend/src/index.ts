@@ -7,7 +7,7 @@ import { createAuthRoutes } from "./presentation/routes/authRoutes";
 import { errorHandler } from "./presentation/middlewares/ErrorHandler";
 import { RequestLogger } from "./presentation/middlewares/RequestLogger";
 import { DIContainer } from "./infrastructure/di/DIContainer";
-import { createGoogleAuthRoutes } from "./presentation/routes/googleAuthRoutes"; 
+import { createGoogleAuthRoutes } from "./presentation/routes/GoogleAuthRoutes"; 
 import { createAdminRoutes } from "./presentation/routes/adminRoutes";
 
 // Load environment variables
