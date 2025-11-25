@@ -1,42 +1,67 @@
 import express from "express";
 import dotenv from "dotenv";
+import cors from "cors";
+import cookieParser from "cookie-parser";
 import { connectDB } from "./infrastructure/database/connection";
-import { CustomerRepository } from "./infrastructure/repo/CustomerRepository";
-import { BcryptPasswordHasher } from "./infrastructure/utils/BcryptPasswordHasher";
-import { UUIDGenerator } from "./infrastructure/utils/UUIDGenerator";
-import { CustomerModel } from "./infrastructure/database/models/CustomerModel";
-import { RegisterCustomerUseCase } from "./application/use-cases/RegisterCustomerUseCase";
-import { LoginCustomerUseCase } from "./application/use-cases/LoginCustomerUseCase";
-import { CustomerController } from "./presentation/controllers/CustomerController";
-import { createCustomerRoutes } from "./presentation/routes/authRoutes";
+import { createAuthRoutes } from "./presentation/routes/authRoutes";
+import { errorHandler } from "./presentation/middlewares/ErrorHandler";
+import { RequestLogger } from "./presentation/middlewares/RequestLogger";
+import { DIContainer } from "./infrastructure/di/DIContainer";
+import { createGoogleAuthRoutes } from "./presentation/routes/googleAuthRoutes"; 
+import { createAdminRoutes } from "./presentation/routes/adminRoutes";
 
+// Load environment variables
 dotenv.config();
 
 async function bootstrap() {
   const app = express();
+
+  // Middleware
+  app.use(
+    cors({
+      origin: process.env.FRONTEND_URL || "http://localhost:3000",
+      credentials: true,
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      allowedHeaders: ["Content-Type", "Authorization"],
+    })
+  );
+
   app.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
+  app.use(cookieParser());
+  app.use(RequestLogger);
+
+  app.options("*", cors());
 
   // Connect to MongoDB
-  await connectDB(process.env.MONGO_URI || "mongodb://localhost:27017/clean-arch");
+  await connectDB(process.env.MONGO_URI ?? "mongodb://localhost:27017/MEND-WAY");
 
-  // Infrastructure
-  const repo = new CustomerRepository(CustomerModel);
-  const passwordHasher = new BcryptPasswordHasher();
-  const idGenerator = new UUIDGenerator();
-
-  // Application
-  const registerUseCase = new RegisterCustomerUseCase(repo, passwordHasher, idGenerator);
-  const loginUseCase = new LoginCustomerUseCase(repo, passwordHasher);
-
-  // Presentation
-  const customerController = new CustomerController(registerUseCase, loginUseCase);
+  // Initialize Dependency Injection Container
+  const container = new DIContainer();
 
   // Routes
-  app.use("/api/customers", createCustomerRoutes(customerController));
+  app.use("/api/auth", createAuthRoutes(
+    container.authController,
+    container.authMiddleware
+  ));
+
+  app.use(
+    "/api/auth",
+    createGoogleAuthRoutes(container.googleAuthController)
+  );
+
+  app.use("/api/admin",createAdminRoutes(container.adminController))
+  // Error Handler
+  app.use(errorHandler);
 
   // Start server
-  const PORT = process.env.PORT || 3000;
-  app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+  const PORT = process.env.PORT ?? 4000;
+  app.listen(PORT, () => {
+    container.logger.info(`Server running on http://localhost:${PORT}`);
+  });
 }
 
-bootstrap();
+bootstrap().catch((error) => {
+  console.error("Failed to start server:", error);
+  process.exit(1);
+});

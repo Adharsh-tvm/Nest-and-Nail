@@ -1,13 +1,8 @@
+"use client";
+
+import React from "react";
 import "./globals.css";
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-
-const inter = Inter({ subsets: ["latin"] });
-
-export const metadata: Metadata = {
-  title: "My Next.js App",
-  description: "Sample Next.js App with components",
-};
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 export default function RootLayout({
   children,
@@ -15,8 +10,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
-    </html>
+    <div>
+      <html lang="en">
+        <body>
+          <GoogleOAuthProvider
+            clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}
+          >
+            {children}
+          </GoogleOAuthProvider>
+        </body>
+      </html>
+    </div>
   );
 }

@@ -1,4 +1,4 @@
-import { Role } from "../../domain/Enums";
+import { Role } from "../../shared/enums/enums";
 
 export interface UserRequestDTO {
     user_name: string;
@@ -16,9 +16,26 @@ export interface UserResponseDTO {
     user_role: Role;
     profileImageUrl?: string;
     isBlocked: boolean;
+    isVerified: boolean;
 }
 
-export interface LoginUserDTO{
+export interface LoginUserDTO {
     email_address: string;
     password: string;
+    user_role?: Role; 
 }    
+
+export interface LoginResponseDTO {
+    user: {
+        user_id: string;
+        user_name: string;
+        email_address: string;
+        user_role: Role;
+        phone_number?: number;
+        profileImageUrl?: string;
+        isBlocked: boolean;
+        isVerified: boolean;
+    };
+    accessToken: string;
+    refreshToken: string;
+}
