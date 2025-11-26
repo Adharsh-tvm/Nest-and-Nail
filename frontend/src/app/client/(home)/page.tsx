@@ -2,6 +2,7 @@ import ClientHeader from "@/components/containers/ClientHeader";
 import type { NextPage } from "next";
 import React from "react";
 
+// Updated Icon to use Primary (Forest Green) instead of Gold
 const Icon = ({
   children,
   className,
@@ -10,7 +11,7 @@ const Icon = ({
   className?: string;
 }) => (
   <div
-    className={`flex-shrink-0 w-12 h-12 bg-yellow-400/10 text-yellow-400 rounded-lg flex items-center justify-center ${className}`}
+    className={`flex-shrink-0 w-12 h-12 bg-primary/10 text-primary rounded-xl flex items-center justify-center ${className}`}
   >
     {children}
   </div>
@@ -279,18 +280,17 @@ const howItWorksSteps = [
 
 // --- Main Page Component ---
 const HomePage: NextPage = async () => {
-
   return (
     <>
-      <div className="bg-gray-900 text-gray-200 font-sans">
+      <div className="bg-background text-foreground font-sans min-h-screen">
         {/* Header */}
-
         <ClientHeader />
 
         <main>
           {/* Hero Section */}
           <section className="relative h-screen flex items-center justify-center pt-20">
-            <div className="absolute inset-0 bg-black/60 z-0"></div>
+            {/* Dark overlay to make text pop */}
+            <div className="absolute inset-0 bg-primary/80 z-0 mix-blend-multiply"></div>
             <div
               className="absolute inset-0 z-[-1] bg-cover bg-center"
               style={{
@@ -299,53 +299,56 @@ const HomePage: NextPage = async () => {
               }}
             ></div>
             <div className="container mx-auto text-center z-10 px-4">
-              <h1 className="text-4xl md:text-6xl font-extrabold text-white leading-tight mb-4">
+              <h1 className="text-4xl md:text-6xl font-extrabold text-white leading-tight mb-4 drop-shadow-sm">
                 Find Trusted{" "}
-                <span className="text-yellow-400">Professionals</span> Near You
+                {/* Changed text-gold to text-emerald-400 for a bright green highlight */}
+                <span className="text-emerald-400">Professionals</span> Near You
               </h1>
-              <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-8">
+              <p className="text-lg md:text-xl text-gray-100/90 max-w-3xl mx-auto mb-8 font-medium">
                 Connect with vetted professionals for all your home and office
                 needs. Fast, reliable, and secure.
               </p>
-              <div className="bg-white/10 backdrop-blur-sm p-4 rounded-xl max-w-3xl mx-auto">
+              
+              {/* Glassmorphism search bar */}
+              <div className="bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-2xl max-w-3xl mx-auto shadow-2xl">
                 <form className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="relative">
-                    <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <div className="relative group">
+                    <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-primary transition-colors" />
                     <input
                       type="text"
                       placeholder="What service do you need?"
-                      className="w-full bg-gray-800 text-white rounded-lg p-3 pl-10 focus:outline-none focus:ring-2 focus:ring-yellow-400 border border-gray-700"
+                      className="w-full bg-background text-foreground rounded-xl p-3 pl-12 focus:outline-none focus:ring-2 focus:ring-primary border-none placeholder:text-muted-foreground shadow-inner"
                     />
                   </div>
-                  <div className="relative">
-                    <MapPinIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <div className="relative group">
+                    <MapPinIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-primary transition-colors" />
                     <input
                       type="text"
                       placeholder="Enter your location"
-                      className="w-full bg-gray-800 text-white rounded-lg p-3 pl-10 focus:outline-none focus:ring-2 focus:ring-yellow-400 border border-gray-700"
+                      className="w-full bg-background text-foreground rounded-xl p-3 pl-12 focus:outline-none focus:ring-2 focus:ring-primary border-none placeholder:text-muted-foreground shadow-inner"
                     />
                   </div>
                   <button
                     type="submit"
-                    className="w-full bg-yellow-400 text-gray-900 font-bold py-3 px-6 rounded-lg hover:bg-yellow-500 transition-all duration-300 transform hover:scale-105"
+                    className="w-full bg-primary text-primary-foreground font-bold py-3 px-6 rounded-xl hover:bg-primary/90 transition-all duration-300 transform hover:scale-[1.02] shadow-lg shadow-primary/20"
                   >
                     Search
                   </button>
                 </form>
               </div>
-              <p className="mt-4 text-sm text-gray-400">
-                1.5M+ services booked via WorkLink in your city
+              <p className="mt-6 text-sm text-gray-200 font-medium">
+                <span className="text-emerald-400">★</span> 1.5M+ services booked via WorkLink in your city
               </p>
             </div>
           </section>
 
           {/* Popular Services Section */}
-          <section className="py-20 bg-gray-900">
+          <section className="py-24 bg-background">
             <div className="container mx-auto px-4 text-center">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4 text-primary">
                 Popular Services
               </h2>
-              <p className="text-gray-400 max-w-2xl mx-auto mb-12">
+              <p className="text-muted-foreground max-w-2xl mx-auto mb-16">
                 Browse our most requested services and find the perfect
                 professional for your needs.
               </p>
@@ -353,44 +356,47 @@ const HomePage: NextPage = async () => {
                 {popularServices.map((service, index) => (
                   <div
                     key={index}
-                    className="bg-gray-800 p-6 rounded-xl shadow-lg hover:shadow-yellow-400/20 transform hover:-translate-y-2 transition-all duration-300"
+                    className="group bg-card border border-border p-8 rounded-2xl shadow-sm hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 transition-all duration-300"
                   >
-                    <Icon>{service.icon}</Icon>
-                    <h3 className="font-bold text-xl mt-4 mb-2">
+                    <div className="flex justify-center mb-6 transform group-hover:scale-110 transition-transform duration-300">
+                      <Icon>{service.icon}</Icon>
+                    </div>
+                    <h3 className="font-bold text-xl mb-2 text-foreground">
                       {service.title}
                     </h3>
-                    <div className="flex items-center justify-center text-sm text-gray-400 mb-4">
+                    <div className="flex items-center justify-center text-sm text-muted-foreground mb-6">
                       <StarIcon
-                        className="w-4 h-4 text-yellow-400 mr-1"
+                        className="w-4 h-4 text-primary mr-1"
                         isFilled={true}
                       />
                       <span>
                         {service.rating} ({service.reviews} reviews)
                       </span>
                     </div>
-                    <div className="text-lg font-bold mb-4">
+                    <div className="text-lg font-bold mb-6 text-foreground">
                       Starting from{" "}
-                      <span className="text-yellow-400">${service.price}</span>
+                      <span className="text-emerald-600 text-xl">${service.price}</span>
                     </div>
-                    <button className="w-full bg-gray-700 hover:bg-yellow-400 hover:text-gray-900 text-white font-bold py-2 px-4 rounded-lg transition-colors">
+                    {/* Secondary button style */}
+                    <button className="w-full bg-secondary text-secondary-foreground hover:bg-primary hover:text-primary-foreground font-bold py-3 px-4 rounded-xl transition-all duration-300">
                       Book Now
                     </button>
                   </div>
                 ))}
               </div>
-              <button className="mt-12 border border-yellow-400 text-yellow-400 font-bold py-3 px-8 rounded-lg hover:bg-yellow-400 hover:text-gray-900 transition-colors">
+              <button className="mt-16 border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground font-bold py-3 px-10 rounded-full transition-all duration-300">
                 View All Services
               </button>
             </div>
           </section>
 
           {/* Why Choose Us Section */}
-          <section className="py-20 bg-black">
+          <section className="py-24 bg-primary text-primary-foreground">
             <div className="container mx-auto px-4 text-center">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
                 Why Choose WorkLink?
               </h2>
-              <p className="text-gray-400 max-w-2xl mx-auto mb-12">
+              <p className="text-primary-foreground/80 max-w-2xl mx-auto mb-16">
                 We make it easy to find and book trusted professionals for any
                 job.
               </p>
@@ -398,15 +404,15 @@ const HomePage: NextPage = async () => {
                 {whyChooseUsItems.map((item, index) => (
                   <div
                     key={index}
-                    className="bg-gray-900 p-8 rounded-xl border border-gray-800"
+                    className="bg-white/5 backdrop-blur-sm p-8 rounded-2xl border border-white/10 hover:bg-white/10 transition-colors duration-300"
                   >
-                    <Icon className="mx-auto">
-                      <div className="w-8 h-8">{item.icon}</div>
-                    </Icon>
-                    <h3 className="font-bold text-2xl mt-6 mb-3">
+                    <div className="mx-auto w-16 h-16 bg-white/10 rounded-full flex items-center justify-center text-emerald-300 mb-6">
+                       {item.icon}
+                    </div>
+                    <h3 className="font-bold text-2xl mb-4 text-white">
                       {item.title}
                     </h3>
-                    <p className="text-gray-400">{item.description}</p>
+                    <p className="text-primary-foreground/70 leading-relaxed">{item.description}</p>
                   </div>
                 ))}
               </div>
@@ -414,29 +420,31 @@ const HomePage: NextPage = async () => {
           </section>
 
           {/* How it Works Section */}
-          <section className="py-20 bg-gray-900">
+          <section className="py-24 bg-background">
             <div className="container mx-auto px-4">
-              <div className="text-center mb-16">
-                <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              <div className="text-center mb-20">
+                <span className="text-primary font-bold uppercase tracking-wider text-sm mb-2 block">Simple Process</span>
+                <h2 className="text-3xl md:text-4xl font-bold text-primary">
                   How It Works
                 </h2>
               </div>
               <div className="relative">
-                <div className="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-yellow-700 -translate-y-1/2"></div>
-                {/* <div className="hidden md:block absolute top-1/2 left-0 w-1/4 h-0.5 bg-yellow-400 -translate-y-1/2"></div> */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
+                {/* Connecting line */}
+                <div className="hidden md:block absolute top-[2rem] left-0 w-full h-0.5 bg-border -z-10"></div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-12 relative">
                   {howItWorksSteps.map((step, index) => (
                     <div
                       key={index}
-                      className="text-center bg-gray-900 p-4 rounded-lg"
+                      className="text-center bg-background group"
                     >
-                      <div className="relative mb-4 flex justify-center">
-                        <div className="w-16 h-16 rounded-full flex items-center justify-center font-bold text-2xl text-gray-900 bg-yellow-400 border-4 border-gray-900">
+                      <div className="relative mb-6 flex justify-center">
+                        <div className="w-16 h-16 rounded-full flex items-center justify-center font-bold text-2xl text-white bg-primary border-[6px] border-background shadow-lg group-hover:scale-110 transition-transform duration-300">
                           {step.number}
                         </div>
                       </div>
-                      <h3 className="font-bold text-xl mb-2">{step.title}</h3>
-                      <p className="text-gray-400 px-2">{step.description}</p>
+                      <h3 className="font-bold text-xl mb-3 text-foreground">{step.title}</h3>
+                      <p className="text-muted-foreground px-2 leading-relaxed">{step.description}</p>
                     </div>
                   ))}
                 </div>
@@ -446,8 +454,8 @@ const HomePage: NextPage = async () => {
         </main>
 
         {/* Footer */}
-        <footer className="bg-black py-10">
-          <div className="container mx-auto px-4 text-center text-gray-500">
+        <footer className="bg-foreground py-12 text-background/80">
+          <div className="container mx-auto px-4 text-center">
             <p>
               &copy; {new Date().getFullYear()} WorkLink. All Rights Reserved.
             </p>

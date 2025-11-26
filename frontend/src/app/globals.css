@@ -1,3 +1,201 @@
+@import "tailwindcss";
 
-@import 'tailwindcss';
-/* Global Reset - Normalize/Reset Styles */
+/* FIX: The error occurred because "tailwindcss-animate" wasn't installed.
+   1. Run `pnpm add tailwindcss-animate` in your terminal.
+   2. Uncomment the line below to enable Shadcn animations.
+*/
+/* @plugin "tailwindcss-animate"; */
+
+@theme {
+  /* 1. Map Shadcn Semantic Colors */
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+
+  /* 2. Add Your Custom "Gold" Utility Class 
+     Usage: bg-gold text-gold-foreground
+  */
+  --color-gold: hsl(var(--gold));
+  --color-gold-foreground: hsl(var(--gold-foreground));
+
+  /* 3. Map Sidebar Colors (New Shadcn Feature) */
+  --color-sidebar: hsl(var(--sidebar-background));
+  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
+  --color-sidebar-primary: hsl(var(--sidebar-primary));
+  --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
+  --color-sidebar-accent: hsl(var(--sidebar-accent));
+  --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
+  --color-sidebar-border: hsl(var(--sidebar-border));
+  --color-sidebar-ring: hsl(var(--sidebar-ring));
+
+  /* 4. Radius Mapping */
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  /* 5. Custom Animation (Optional fade-in for classy load) */
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+
+  @keyframes accordion-down {
+    from { height: 0; }
+    to { height: var(--radix-accordion-content-height); }
+  }
+  @keyframes accordion-up {
+    from { height: var(--radix-accordion-content-height); }
+    to { height: 0; }
+  }
+}
+
+@layer base {
+  :root {
+    /* --- Classy Light Theme --- */
+    
+    /* Background: A very pale, warm "Alabaster" white. Less harsh than #ffffff */
+    --background: 40 33% 98%;
+    /* Foreground: Deep Charcoal with a hint of green. Softer than pure black. */
+    --foreground: 160 5% 20%;
+
+    /* Card: Pure white to pop against the warm background */
+    --card: 0 0% 100%;
+    --card-foreground: 160 5% 20%;
+
+    /* Popover: Matches card */
+    --popover: 0 0% 100%;
+    --popover-foreground: 160 5% 20%;
+
+    /* Primary: "Deep Jungle Green" - Luxurious and authoritative */
+    --primary: 166 45% 18%;
+    --primary-foreground: 40 33% 98%;
+
+    /* Secondary: "Sage Mist" - A subtle greenish-grey for secondary actions */
+    --secondary: 150 20% 93%;
+    --secondary-foreground: 166 45% 18%;
+
+    /* Muted: Warm Greige for disabled text or skeletons */
+    --muted: 40 20% 92%;
+    --muted-foreground: 160 2% 45%;
+
+    /* Accent: Used for HOVER states in dropdowns. A very light warm beige. */
+    --accent: 40 30% 94%;
+    --accent-foreground: 166 45% 18%;
+
+    /* Destructive: Muted Terracotta Red - Elegant, not alarming */
+    --destructive: 0 70% 60%;
+    --destructive-foreground: 40 33% 98%;
+
+    /* Border: Subtle Warm Grey */
+    --border: 150 10% 88%;
+    --input: 150 10% 88%;
+
+    /* Ring: THE GOLD ACCENT. 
+       This makes focus states glow with your brand gold. */
+    --ring: 35 85% 55%;
+
+    /* Custom Gold Color Variable */
+    --gold: 35 85% 55%;
+    --gold-foreground: 0 0% 100%;
+
+    /* Radius: slightly rounded for a modern, friendly feel */
+    --radius: 0.75rem;
+
+    /* --- Sidebar Variables (Matches Light Theme) --- */
+    --sidebar-background: 40 33% 98%;
+    --sidebar-foreground: 160 5% 20%;
+    --sidebar-primary: 166 45% 18%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 40 30% 94%;
+    --sidebar-accent-foreground: 166 45% 18%;
+    --sidebar-border: 150 10% 88%;
+    --sidebar-ring: 35 85% 55%;
+  }
+
+  .dark {
+    /* --- Classy Dark Theme --- */
+    
+    /* Background: Very Dark Green/Charcoal */
+    --background: 166 45% 6%;
+    --foreground: 40 33% 98%;
+
+    /* Card: Slightly lighter dark green */
+    --card: 166 45% 8%;
+    --card-foreground: 40 33% 98%;
+
+    --popover: 166 45% 8%;
+    --popover-foreground: 40 33% 98%;
+
+    /* Primary: In dark mode, we brighten the green slightly or use the Gold? 
+       Let's keep the Green identity but make it vibrant, or swap to Gold.
+       Let's stick to a vibrant Emerald. */
+    --primary: 150 40% 40%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary: Dark Moss */
+    --secondary: 166 30% 15%;
+    --secondary-foreground: 40 33% 98%;
+
+    --muted: 166 30% 15%;
+    --muted-foreground: 150 10% 65%;
+
+    --accent: 166 30% 15%;
+    --accent-foreground: 40 33% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 40 33% 98%;
+
+    --border: 166 30% 15%;
+    --input: 166 30% 15%;
+    
+    /* Ring: Gold still pops beautifully in dark mode */
+    --ring: 35 85% 55%;
+
+    --gold: 35 85% 55%;
+    --gold-foreground: 0 0% 100%;
+
+    --sidebar-background: 166 45% 6%;
+    --sidebar-foreground: 40 33% 98%;
+    --sidebar-primary: 150 40% 40%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 166 30% 15%;
+    --sidebar-accent-foreground: 40 33% 98%;
+    --sidebar-border: 166 30% 15%;
+    --sidebar-ring: 35 85% 55%;
+  }
+}
+
+/* Apply Base Styles */
+@layer base {
+  * {
+    border-color: var(--border);
+    outline-color: var(--ring);
+  }
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
