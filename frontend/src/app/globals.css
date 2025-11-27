@@ -75,56 +75,54 @@
   :root {
     /* --- Classy Light Theme --- */
     
-    /* Background: A very pale, warm "Alabaster" white. Less harsh than #ffffff */
-    --background: 40 33% 98%;
-    /* Foreground: Deep Charcoal with a hint of green. Softer than pure black. */
+    /* Background: CHANGED TO PURE WHITE */
+    --background: 0 0% 100%;
+    /* Foreground: Deep Charcoal */
     --foreground: 160 5% 20%;
 
-    /* Card: Pure white to pop against the warm background */
+    /* Card: White */
     --card: 0 0% 100%;
     --card-foreground: 160 5% 20%;
 
-    /* Popover: Matches card */
+    /* Popover */
     --popover: 0 0% 100%;
     --popover-foreground: 160 5% 20%;
 
-    /* Primary: "Deep Jungle Green" - Luxurious and authoritative */
+    /* Primary: Deep Jungle Green */
     --primary: 166 45% 18%;
-    --primary-foreground: 40 33% 98%;
+    --primary-foreground: 0 0% 100%;
 
-    /* Secondary: "Sage Mist" - A subtle greenish-grey for secondary actions */
+    /* Secondary: Sage Mist */
     --secondary: 150 20% 93%;
     --secondary-foreground: 166 45% 18%;
 
-    /* Muted: Warm Greige for disabled text or skeletons */
+    /* Muted */
     --muted: 40 20% 92%;
     --muted-foreground: 160 2% 45%;
 
-    /* Accent: Used for HOVER states in dropdowns. A very light warm beige. */
+    /* Accent */
     --accent: 40 30% 94%;
     --accent-foreground: 166 45% 18%;
 
-    /* Destructive: Muted Terracotta Red - Elegant, not alarming */
+    /* Destructive */
     --destructive: 0 70% 60%;
-    --destructive-foreground: 40 33% 98%;
+    --destructive-foreground: 0 0% 100%;
 
-    /* Border: Subtle Warm Grey */
+    /* Border */
     --border: 150 10% 88%;
     --input: 150 10% 88%;
 
-    /* Ring: THE GOLD ACCENT. 
-       This makes focus states glow with your brand gold. */
+    /* Ring: Gold Accent */
     --ring: 35 85% 55%;
 
-    /* Custom Gold Color Variable */
+    /* Custom Gold */
     --gold: 35 85% 55%;
     --gold-foreground: 0 0% 100%;
 
-    /* Radius: slightly rounded for a modern, friendly feel */
     --radius: 0.75rem;
 
-    /* --- Sidebar Variables (Matches Light Theme) --- */
-    --sidebar-background: 40 33% 98%;
+    /* Sidebar Variables */
+    --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 160 5% 20%;
     --sidebar-primary: 166 45% 18%;
     --sidebar-primary-foreground: 0 0% 100%;
@@ -137,24 +135,19 @@
   .dark {
     /* --- Classy Dark Theme --- */
     
-    /* Background: Very Dark Green/Charcoal */
+    /* Background: Deep Forest Green (instead of Pitch Black) */
     --background: 166 45% 6%;
     --foreground: 40 33% 98%;
 
-    /* Card: Slightly lighter dark green */
     --card: 166 45% 8%;
     --card-foreground: 40 33% 98%;
 
     --popover: 166 45% 8%;
     --popover-foreground: 40 33% 98%;
 
-    /* Primary: In dark mode, we brighten the green slightly or use the Gold? 
-       Let's keep the Green identity but make it vibrant, or swap to Gold.
-       Let's stick to a vibrant Emerald. */
     --primary: 150 40% 40%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary: Dark Moss */
     --secondary: 166 30% 15%;
     --secondary-foreground: 40 33% 98%;
 
@@ -170,7 +163,6 @@
     --border: 166 30% 15%;
     --input: 166 30% 15%;
     
-    /* Ring: Gold still pops beautifully in dark mode */
     --ring: 35 85% 55%;
 
     --gold: 35 85% 55%;
