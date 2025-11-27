@@ -1,36 +1,17 @@
-import Link from "next/link";
-import { User, Briefcase } from "lucide-react";
-import styles from "./Signup.module.css";
-import { redirect } from "next/navigation";
+import SignUpComponent from "@/app/(auth)/signup/signup-form";
+import React from "react";
 
-export default async function SignupPage() {
+type Props = {};
+
+async function ClientSignup({}: Props) {
 
   return (
-    <main className={styles.container}>
-      <Link
-        href="/signup/client"
-        className={`${styles.panel} ${styles.userPanel}`}
-      >
-        <div className={styles.content}>
-          <User className={styles.icon} size={64} strokeWidth={1.5} />
-          <h2 className={styles.title}>Join as a Client</h2>
-          <p className={styles.description}>
-            Find and hire professionals for any task.
-          </p>
-        </div>
-      </Link>
-      <Link
-        href="/signup/worker"
-        className={`${styles.panel} ${styles.workerPanel}`}
-      >
-        <div className={styles.content}>
-          <Briefcase className={styles.icon} size={64} strokeWidth={1.5} />
-          <h2 className={styles.title}>Join as a Worker</h2>
-          <p className={styles.description}>
-            Offer your skills and find your next project.
-          </p>
-        </div>
-      </Link>
-    </main>
+    <>
+      <main className="flex items-center justify-center min-h-screen bg-zinc-950 font-sans p-4">
+        <SignUpComponent role="client" />
+      </main>
+    </>
   );
 }
+
+export default ClientSignup;
