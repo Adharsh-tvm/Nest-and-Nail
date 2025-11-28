@@ -1,7 +1,6 @@
 import { FilterQuery, Model } from "mongoose";
 import { IBaseRepository } from "../../domain/repositories/IBaseRepository";
 import { User } from "../../domain/entities/User";
-import { LoginMethod } from "../../shared/enums/enums";
 
 export abstract class BaseRepository<T extends User> implements IBaseRepository<T> {
     constructor(protected readonly model: Model<T>) { }

@@ -17,8 +17,8 @@ export class ForgotPasswordUseCase implements IForgotPasswordUseCase {
 
     async execute(email: string) {
         // Try to find user in all roles
+        console.log("caleedddddddddddd use") 
         const roles = [Role.CLIENT, Role.WORKER, Role.ADMIN];
-
         let user = null;
         let foundRole: Role | null = null;
 
