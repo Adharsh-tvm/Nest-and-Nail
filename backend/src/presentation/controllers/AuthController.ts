@@ -155,7 +155,8 @@ export class AuthController implements IAuthController {
 
   forgotPassword = async (req: Request, res: Response) => {
     try {
-      const { email } = req.body;
+      const email = req.body.email_address || req.body.email
+      console.log(email)
 
       if (!email) {
         return res.status(HttpStatusCode.BAD_REQUEST).json({
@@ -176,7 +177,8 @@ export class AuthController implements IAuthController {
 
   resetPassword = async (req: Request, res: Response) => {
     try {
-      const { email, newPassword, confirmPassword } = req.body;
+      const email = req.body.email || req.body.email_address;
+      const { newPassword, confirmPassword } = req.body;
 
       if (!email || !newPassword || !confirmPassword) {
         return res.status(HttpStatusCode.BAD_REQUEST).json({
