@@ -25,7 +25,7 @@ const LandingPage: NextPage = () => {
           <div className="container mx-auto px-6 py-4 flex justify-between items-center">
             <div className="text-2xl font-bold text-yellow-400 flex items-center">
               <Wrench className="mr-2" />
-              Mendway
+              MendOn
             </div>
             <nav className="hidden md:flex items-center space-x-6 text-gray-300">
               <a
@@ -191,7 +191,7 @@ const LandingPage: NextPage = () => {
                   </div>
                   <p className="text-gray-400 italic">
                     "Found a reliable plumber in minutes after my pipe burst.
-                    Mendway was a lifesaver! The process was so simple and
+                    MendOn was a lifesaver! The process was so simple and
                     transparent."
                   </p>
                 </div>
@@ -212,7 +212,7 @@ const LandingPage: NextPage = () => {
                     </div>
                   </div>
                   <p className="text-gray-400 italic">
-                    "As a professional, Mendway helps me connect with serious
+                    "As a professional, MendOn helps me connect with serious
                     clients in my area. It has filled my schedule and grown my
                     business."
                   </p>
@@ -252,7 +252,7 @@ const LandingPage: NextPage = () => {
         {/* Footer */}
         <footer className="bg-black text-gray-400 py-10">
           <div className="container mx-auto px-6 text-center">
-            <p className="text-lg font-bold text-yellow-400 mb-2">Mendway</p>
+            <p className="text-lg font-bold text-yellow-400 mb-2">MendOn</p>
             <div className="space-x-6 mb-4">
               <a href="#" className="hover:text-white">
                 About
@@ -268,7 +268,7 @@ const LandingPage: NextPage = () => {
               </a>
             </div>
             <p>
-              &copy; {new Date().getFullYear()} Mendway. All rights reserved.
+              &copy; {new Date().getFullYear()} MendOn. All rights reserved.
             </p>
           </div>
         </footer>

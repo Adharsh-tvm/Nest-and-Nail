@@ -6,7 +6,7 @@
 */
 /* @plugin "tailwindcss-animate"; */
 
-@theme {
+theme {
   /* 1. Map Shadcn Semantic Colors */
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
