@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { GalleryVerticalEnd, Instagram, Twitter, Linkedin } from "lucide-react";
 
@@ -13,7 +13,7 @@ const Footer = () => (
               <GalleryVerticalEnd size={18} />
             </div>
             <span className="text-2xl font-bold text-white tracking-tight">
-              MENDON
+              NEST & NAIL
             </span>
           </div>
           <p className="text-sm leading-relaxed max-w-xs">
@@ -98,7 +98,7 @@ const Footer = () => (
       </div>
 
       <div className="pt-8 flex flex-col md:flex-row justify-between items-center text-sm">
-        <p>© 2024 MendOn Inc. All rights reserved.</p>
+        <p>© 2024 Nest & Nail Inc. All rights reserved.</p>
         <div className="flex gap-8 mt-4 md:mt-0">
           <a href="#" className="hover:text-white transition-colors">
             Privacy
@@ -114,6 +114,5 @@ const Footer = () => (
     </div>
   </footer>
 );
-
 
 export default Footer;

@@ -56,7 +56,7 @@ const Navbar = () => {
               <GalleryVerticalEnd size={20} />
             </div>
             <span className="text-2xl font-bold text-[#1B4332] tracking-tight group-hover:text-[#DC2626] transition-colors duration-300">
-              MENDON
+              NEST & NAIL
             </span>
           </div>
 
@@ -423,7 +423,7 @@ const Footer = () => (
               <GalleryVerticalEnd size={18} />
             </div>
             <span className="text-2xl font-bold text-white tracking-tight">
-              MENDON
+              NEST & NAIL
             </span>
           </div>
           <p className="text-sm leading-relaxed max-w-xs">

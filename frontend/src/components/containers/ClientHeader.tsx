@@ -1,18 +1,16 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { 
-  Menu, 
-  X, 
-  GalleryVerticalEnd, 
-  User, 
-  LogOut, 
-  Settings, 
-  ChevronDown 
+import {
+  Menu,
+  X,
+  GalleryVerticalEnd,
+  User,
+  LogOut,
+  Settings,
+  ChevronDown,
 } from "lucide-react";
 import { logoutAction } from "@/app/actions/logout-actions";
-
-
 
 type Props = {
   // You can pass the actual user object here in the future
@@ -26,16 +24,19 @@ type Props = {
 const ClientHeader = ({ user }: Props) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  
+
   // Use a mock logged-in state. Toggle this to false to see the logged-out view.
   const [isLoggedIn, setIsLoggedIn] = useState(true);
-  
+
   const userMenuRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+      if (
+        userMenuRef.current &&
+        !userMenuRef.current.contains(event.target as Node)
+      ) {
         setIsUserMenuOpen(false);
       }
     };
@@ -65,7 +66,7 @@ const ClientHeader = ({ user }: Props) => {
                 <GalleryVerticalEnd size={20} />
               </div>
               <span className="text-2xl font-bold text-[#1B4332] tracking-tight group-hover:text-[#DC2626] transition-colors duration-300">
-                MENDON
+                NEST & NAIL
               </span>
             </div>
 
@@ -95,37 +96,49 @@ const ClientHeader = ({ user }: Props) => {
                     <div className="w-8 h-8 rounded-full bg-[#1B4332] text-white flex items-center justify-center shadow-sm">
                       <User size={18} />
                     </div>
-                    <span className="text-sm font-semibold text-gray-700 group-hover:text-[#1B4332]">
-                      Account
-                    </span>
-                    <ChevronDown size={16} className={`text-gray-400 transition-transform duration-200 ${isUserMenuOpen ? 'rotate-180' : ''}`} />
+                    <span className="text-sm font-semibold text-gray-700 group-hover:text-[#1B4332]"></span>
+                    <ChevronDown
+                      size={16}
+                      className={`text-gray-400 transition-transform duration-200 ${
+                        isUserMenuOpen ? "rotate-180" : ""
+                      }`}
+                    />
                   </button>
 
                   {/* Dropdown Dialog */}
                   {isUserMenuOpen && (
                     <div className="absolute right-0 mt-3 w-60 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden animate-in fade-in zoom-in-95 duration-200 origin-top-right ring-1 ring-black/5">
-                      <div className="px-4 py-3 border-b border-gray-50 bg-gray-50/50">
+                      {/* <div className="px-4 py-3 border-b border-gray-50 bg-gray-50/50">
                         <p className="text-sm font-bold text-[#1B4332]">John Doe</p>
                         <p className="text-xs text-gray-500 truncate">john.doe@example.com</p>
-                      </div>
-                      
+                      </div> */}
+
                       <div className="p-1.5 space-y-0.5">
                         <button className="w-full flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-[#1B4332] rounded-lg transition-colors text-left group">
-                          <User size={16} className="text-gray-400 group-hover:text-[#1B4332]" />
+                          <User
+                            size={16}
+                            className="text-gray-400 group-hover:text-[#1B4332]"
+                          />
                           Profile
                         </button>
                         <button className="w-full flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-[#1B4332] rounded-lg transition-colors text-left group">
-                          <Settings size={16} className="text-gray-400 group-hover:text-[#1B4332]" />
+                          <Settings
+                            size={16}
+                            className="text-gray-400 group-hover:text-[#1B4332]"
+                          />
                           Settings
                         </button>
                       </div>
 
                       <div className="border-t border-gray-100 p-1.5">
-                        <button 
+                        <button
                           onClick={handleLogout}
                           className="w-full flex items-center gap-2 px-3 py-2 text-sm font-medium text-[#DC2626] hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors text-left group"
                         >
-                          <LogOut size={16} className="group-hover:text-red-700" />
+                          <LogOut
+                            size={16}
+                            className="group-hover:text-red-700"
+                          />
                           Log Out
                         </button>
                       </div>
@@ -169,7 +182,7 @@ const ClientHeader = ({ user }: Props) => {
                   </a>
                 )
               )}
-              
+
               <div className="pt-4 mt-4 border-t border-gray-100">
                 {isLoggedIn ? (
                   <div className="space-y-2">
@@ -179,7 +192,9 @@ const ClientHeader = ({ user }: Props) => {
                       </div>
                       <div>
                         <p className="font-bold text-[#1B4332]">John Doe</p>
-                        <p className="text-xs text-gray-500">john.doe@example.com</p>
+                        <p className="text-xs text-gray-500">
+                          john.doe@example.com
+                        </p>
                       </div>
                     </div>
                     <button className="w-full flex items-center gap-3 px-4 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-xl transition-colors">
@@ -188,11 +203,11 @@ const ClientHeader = ({ user }: Props) => {
                     <button className="w-full flex items-center gap-3 px-4 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-xl transition-colors">
                       <Settings size={18} /> Settings
                     </button>
-                    <button 
+                    <button
                       onClick={logoutAction}
                       className="w-full flex items-center gap-3 px-4 py-3 text-base font-bold text-[#DC2626] hover:bg-red-50 rounded-xl transition-colors"
                     >
-                      <LogOut size={18}  /> Log Out
+                      <LogOut size={18} /> Log Out
                     </button>
                   </div>
                 ) : (
