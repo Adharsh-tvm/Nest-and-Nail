@@ -137,10 +137,10 @@ const HeroSection = () => (
     ></div>
 
     {/* Abstract Shapes */}
-    <div
+    {/* <div
       className="absolute top-0 right-0 w-[800px] h-[800px] bg-white opacity-5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 animate-pulse"
       style={{ animationDuration: "10s" }}
-    ></div>
+    ></div> */}
     <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-[#DC2626] opacity-10 rounded-full blur-3xl translate-y-1/3 -translate-x-1/4"></div>
 
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32 relative z-10">

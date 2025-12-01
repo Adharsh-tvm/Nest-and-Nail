@@ -11,6 +11,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { logoutAction } from "@/app/actions/logout-actions";
+import { useUserStore } from "@/store/userStore";
 
 type Props = {
   // You can pass the actual user object here in the future
@@ -21,7 +22,7 @@ type Props = {
   } | null;
 };
 
-const ClientHeader = ({ user }: Props) => {
+const ClientHeader = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
@@ -29,6 +30,9 @@ const ClientHeader = ({ user }: Props) => {
   const [isLoggedIn, setIsLoggedIn] = useState(true);
 
   const userMenuRef = useRef<HTMLDivElement>(null);
+
+  const currentUser = useUserStore((state) => state.user);
+  console.log(currentUser);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -108,10 +112,15 @@ const ClientHeader = ({ user }: Props) => {
                   {/* Dropdown Dialog */}
                   {isUserMenuOpen && (
                     <div className="absolute right-0 mt-3 w-60 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden animate-in fade-in zoom-in-95 duration-200 origin-top-right ring-1 ring-black/5">
-                      {/* <div className="px-4 py-3 border-b border-gray-50 bg-gray-50/50">
-                        <p className="text-sm font-bold text-[#1B4332]">John Doe</p>
-                        <p className="text-xs text-gray-500 truncate">john.doe@example.com</p>
-                      </div> */}
+                      <div className="px-4 py-3 border-b border-gray-50 bg-gray-50/50">
+                        <p className="text-sm font-bold text-[#1B4332]">
+                          {currentUser?.email}
+                        </p>
+
+                        <p className="text-xs text-gray-500 truncate">
+                          {currentUser?.role}
+                        </p>
+                      </div>
 
                       <div className="p-1.5 space-y-0.5">
                         <button className="w-full flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-[#1B4332] rounded-lg transition-colors text-left group">
