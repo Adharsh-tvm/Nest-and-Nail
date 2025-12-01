@@ -19,7 +19,6 @@ const UserProfile = () => {
   const [role, setRole] = useState<'client' | 'worker'>('client');
   const [isEditing, setIsEditing] = useState(false);
 
-  // Mock User Data
   const user = {
     name: "Alex Johnson",
     email: "alex.johnson@example.com",
