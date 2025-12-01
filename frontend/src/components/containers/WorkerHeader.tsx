@@ -56,14 +56,14 @@ const WorkerHeader: React.FC = () => {
     isVerified: "boolean",
   };
 
-  const [isOnline, setIsOnline] = useState(true)
+  const [isOnline, setIsOnline] = useState(true);
 
   // VERIFIED USER VIEW
   if (user?.isVerified) {
     return (
       <header className="bg-neutral-900 text-white p-4 flex flex-col md:flex-row items-center justify-between border-b border-neutral-800">
         <div className="flex items-center justify-between w-full md:w-auto">
-          <h1 className="text-2xl font-bold text-green-400">MendOn</h1>
+          <h1 className="text-2xl font-bold text-green-400">Nest & Nail</h1>
           <button className="md:hidden text-neutral-300">
             <svg
               xmlns="http://www.w3.org/2000/svg"
