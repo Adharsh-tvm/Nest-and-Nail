@@ -11,17 +11,15 @@ export default async function RootLayout({
 }) {
   const user = await getUserFromServer();
   return (
-    <div>
-      <html lang="en">
-        <body>
-          <GoogleOAuthProvider
-            clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}
-          >
-            <UserHydration user={user} />
-            {children}
-          </GoogleOAuthProvider>
-        </body>
-      </html>
-    </div>
+    <html lang="en">
+      <body className="min-h-screen flex flex-col">
+        <GoogleOAuthProvider
+          clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}
+        >
+          <UserHydration user={user} />
+          {children}
+        </GoogleOAuthProvider>
+      </body>
+    </html>
   );
 }
