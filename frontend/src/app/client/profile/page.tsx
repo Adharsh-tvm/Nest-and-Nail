@@ -14,21 +14,14 @@ import {
   ShieldCheck,
   Star
 } from 'lucide-react';
+import { useUserStore } from '@/store/userStore';
 
 const UserProfile = () => {
   const [role, setRole] = useState<'client' | 'worker'>('client');
   const [isEditing, setIsEditing] = useState(false);
 
   // Mock User Data
-  const user = {
-    name: "Alex Johnson",
-    email: "alex.johnson@example.com",
-    phone: "+1 (555) 012-3456",
-    location: "San Francisco, CA",
-    joinedDate: "September 2023",
-    role_description: role === 'client' ? "Looking for trusted pros" : "Master Electrician & Handyman",
-    avatar: "https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=400&h=400&fit=crop&q=80"
-  };
+  const currentUser = useUserStore((state) => state.user);
 
   const toggleRole = () => {
     // In a real app, this might trigger a server action or redirect
@@ -53,7 +46,7 @@ const UserProfile = () => {
             <div className="flex flex-col sm:flex-row justify-between items-end -mt-16 mb-6 gap-4">
               <div className="relative group">
                 <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-full border-[6px] border-white shadow-lg overflow-hidden bg-gray-100 relative z-10">
-                  <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                  <img  alt={currentUser?.name} className="w-full h-full object-cover" />
                 </div>
                 <button className="absolute bottom-2 right-2 z-20 bg-white p-2.5 rounded-full shadow-md text-gray-600 hover:text-[#DC2626] transition-colors border border-gray-100 group-hover:scale-110 duration-200">
                   <Camera size={18} />
@@ -80,22 +73,21 @@ const UserProfile = () => {
             <div className="flex flex-col lg:flex-row justify-between items-start gap-6 border-b border-gray-100 pb-8 mb-8">
                <div className="space-y-2">
                   <div className="flex items-center gap-3">
-                    <h1 className="text-3xl font-bold text-[#1B4332]">{user.name}</h1>
+                    <h1 className="text-3xl font-bold text-[#1B4332]">{currentUser?.name}</h1>
                     <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${role === 'client' ? 'bg-gray-100 text-gray-600' : 'bg-red-100 text-[#DC2626]'}`}>
                       {role === 'client' ? 'Client' : 'Pro Worker'}
                     </span>
                   </div>
-                  <p className="text-gray-500 font-medium text-lg">{user.role_description}</p>
                   
                   <div className="flex flex-wrap gap-x-6 gap-y-2 mt-2 text-sm text-gray-600">
-                    <div className="flex items-center gap-1.5">
+                    {/* <div className="flex items-center gap-1.5">
                       <MapPin size={16} className="text-[#DC2626]" />
                       {user.location}
-                    </div>
-                    <div className="flex items-center gap-1.5">
+                    </div> */}
+                    {/* <div className="flex items-center gap-1.5">
                       <Calendar size={16} className="text-[#DC2626]" />
                       Member since {user.joinedDate}
-                    </div>
+                    </div> */}
                     {role === 'worker' && (
                        <div className="flex items-center gap-1.5 font-semibold text-[#1B4332]">
                          <ShieldCheck size={16} /> Verified Professional
@@ -122,7 +114,7 @@ const UserProfile = () => {
                        <Mail size={22} />
                     </div>
                     <div>
-                       <span className="block font-bold text-gray-900">{user.email}</span>
+                       <span className="block font-bold text-gray-900">{currentUser?.email}</span>
                        <span className="text-xs text-gray-500">Primary Contact</span>
                     </div>
                  </div>
@@ -135,7 +127,7 @@ const UserProfile = () => {
                        <Phone size={22} />
                     </div>
                     <div>
-                       <span className="block font-bold text-gray-900">{user.phone}</span>
+                       {/* <span className="block font-bold text-gray-900">{currentUser?.phone}</span> */}
                        <span className="text-xs text-gray-500">Mobile</span>
                     </div>
                  </div>
