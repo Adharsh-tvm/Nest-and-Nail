@@ -56,11 +56,13 @@ export class GoogleSignUpUseCase implements IGoogleSignUpUseCase {
             const userResponse = UserMapper.toResponseDTO(user);
             const accessToken = this._tokenService.generateAccessToken({
                 id: user.userId,
+                name: user.name,
                 email: user.email,
                 role: user.role
             });
             const refreshToken = this._tokenService.generateRefreshToken({
                 id: user.userId,
+                name: user.name,
                 email: user.email,
                 role: user.role
             });

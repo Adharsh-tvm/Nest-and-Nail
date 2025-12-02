@@ -12,9 +12,9 @@ import {
 } from "lucide-react";
 import { logoutAction } from "@/app/actions/logout-actions";
 import { useUserStore } from "@/store/userStore";
+import Link from "next/link";
 
 type Props = {
-  // You can pass the actual user object here in the future
   user?: {
     name?: string;
     email?: string;
@@ -34,7 +34,6 @@ const ClientHeader = () => {
   const currentUser = useUserStore((state) => state.user);
   console.log(currentUser);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -51,9 +50,8 @@ const ClientHeader = () => {
   const handleLogout = async () => {
     try {
       await logoutAction();
-      setIsLoggedIn(false); // Update local state for demo
+      setIsLoggedIn(false);
       setIsUserMenuOpen(false);
-      // In a real app: window.location.href = '/login' or router.push('/login')
     } catch (error) {
       console.error("Logout failed", error);
     }
@@ -100,7 +98,9 @@ const ClientHeader = () => {
                     <div className="w-8 h-8 rounded-full bg-[#1B4332] text-white flex items-center justify-center shadow-sm">
                       <User size={18} />
                     </div>
-                    <span className="text-sm font-semibold text-gray-700 group-hover:text-[#1B4332]"></span>
+                    <span className="text-sm font-semibold text-gray-700 group-hover:text-[#1B4332]">
+                      <p>{currentUser?.name}</p>
+                    </span>
                     <ChevronDown
                       size={16}
                       className={`text-gray-400 transition-transform duration-200 ${
@@ -113,23 +113,25 @@ const ClientHeader = () => {
                   {isUserMenuOpen && (
                     <div className="absolute right-0 mt-3 w-60 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden animate-in fade-in zoom-in-95 duration-200 origin-top-right ring-1 ring-black/5">
                       <div className="px-4 py-3 border-b border-gray-50 bg-gray-50/50">
-                        <p className="text-sm font-bold text-[#1B4332]">
-                          {currentUser?.email}
-                        </p>
-
                         <p className="text-xs text-gray-500 truncate">
                           {currentUser?.role}
                         </p>
                       </div>
 
                       <div className="p-1.5 space-y-0.5">
-                        <button className="w-full flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-[#1B4332] rounded-lg transition-colors text-left group">
-                          <User
-                            size={16}
-                            className="text-gray-400 group-hover:text-[#1B4332]"
-                          />
-                          Profile
-                        </button>
+                        <Link href="/client/profile" className="block">
+                          <div
+                            className="w-full flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 
+    hover:bg-gray-50 hover:text-[#1B4332] rounded-lg transition-colors text-left group cursor-pointer"
+                          >
+                            <User
+                              size={16}
+                              className="text-gray-400 group-hover:text-[#1B4332]"
+                            />
+                            Profile
+                          </div>
+                        </Link>
+
                         <button className="w-full flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-[#1B4332] rounded-lg transition-colors text-left group">
                           <Settings
                             size={16}
@@ -200,9 +202,12 @@ const ClientHeader = () => {
                         <User size={20} />
                       </div>
                       <div>
-                        <p className="font-bold text-[#1B4332]">John Doe</p>
-                        <p className="text-xs text-gray-500">
-                          john.doe@example.com
+                        <p className="text-sm font-bold text-[#1B4332]">
+                          {currentUser?.name}
+                        </p>
+
+                        <p className="text-xs text-gray-500 truncate">
+                          {currentUser?.role}
                         </p>
                       </div>
                     </div>
