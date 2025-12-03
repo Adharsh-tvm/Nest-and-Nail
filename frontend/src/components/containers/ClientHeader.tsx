@@ -149,14 +149,6 @@ const ClientHeader = () => {
                           Profile
                         </div>
                       </Link>
-
-                      <button className="w-full flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-[#1B4332] rounded-lg transition-colors text-left group">
-                        <Settings
-                          size={16}
-                          className="text-gray-400 group-hover:text-[#1B4332]"
-                        />
-                        Settings
-                      </button>
                     </div>
 
                     <div className="border-t border-gray-100 p-1.5">
