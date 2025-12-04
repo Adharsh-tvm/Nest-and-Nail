@@ -282,7 +282,8 @@ export class DIContainer {
     if(!this._changeUserRoleuseCase) {
       this._changeUserRoleuseCase = new ChangeUserRoleUseCase(
         this.userRepositoryFactory,
-        this.logger
+        this.logger,
+        this.tokenService
       )
     }
     return this._changeUserRoleuseCase

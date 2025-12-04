@@ -4,74 +4,107 @@ import { UserResponseDTO } from "../dtos/UserDTO";
 import { IChangeUserRoleUseCase } from "../interfaces/IChangeUserRoleUseCase";
 import { ILogger } from "../interfaces/ILogger";
 import { UserMapper } from "../mappers/UserMapper";
+import { ITokenService } from "../services/ITokenService";
 
 export class ChangeUserRoleUseCase implements IChangeUserRoleUseCase {
     constructor(
         private readonly _repositoryFactory: UserRepositoryFactory,
-        private readonly _logger: ILogger
+        private readonly _logger: ILogger,
+        private readonly _tokenService: ITokenService
     ) { }
 
-    async execute(userId: string, newRole: Role): Promise<UserResponseDTO> {
-        this._logger.info(`[ChangeUserRoleUseCase] User ${userId} switching to ${newRole}`);
+async execute(userId: string, newRole: Role): Promise<{
+    user: UserResponseDTO;
+    accessToken: string;
+    refreshToken: string;
+}>
+ {
+    this._logger.info(`[ChangeUserRoleUseCase] User ${userId} switching to ${newRole}`);
 
-        const clientRepo = this._repositoryFactory.getRepository(Role.CLIENT);
-        const workerRepo = this._repositoryFactory.getRepository(Role.WORKER);
+    const clientRepo = this._repositoryFactory.getRepository(Role.CLIENT);
+    const workerRepo = this._repositoryFactory.getRepository(Role.WORKER);
 
-        // Check both collections
-        let user = await clientRepo.findById(userId);
-        let currentRole: Role | null = user ? Role.CLIENT : null;
+    let user = await clientRepo.findById(userId);
+    let currentRole: Role | null = user ? Role.CLIENT : null;
 
-        if (!user) {
-            user = await workerRepo.findById(userId);
-            currentRole = user ? Role.WORKER : null;
-        }
-
-        if (!user) throw new Error("User not found");
-
-        // Return early if same role
-        if (currentRole === newRole) {
-            return UserMapper.toResponseDTO(user);
-        }
-
-        // Convert user safely
-        const rawUser = user as any;
-
-        if (newRole === Role.WORKER) {
-            // 1. delete from client
-            await clientRepo.deleteByUserId(userId);
-
-            // 2. create worker
-            const workerData: any = {
-                ...rawUser,
-                role: Role.WORKER,
-                skills: rawUser.skills ?? [],
-                isVerfied: rawUser.isVerfied ?? false,
-            };
-
-            const created = await workerRepo.create(workerData);
-            return UserMapper.toResponseDTO(created);
-        }
-
-        if (newRole === Role.CLIENT) {
-            // 1. delete from worker
-            await workerRepo.deleteByUserId(userId);
-
-            // 2. create client
-            const clientData: any = {
-                ...rawUser,
-                role: Role.CLIENT,
-            };
-
-            // Remove worker-only fields
-            delete clientData.skills;
-            delete clientData.isVerfied;
-
-            const created = await clientRepo.create(clientData);
-            return UserMapper.toResponseDTO(created);
-        }
-
-        throw new Error("Invalid role switch");
+    if (!user) {
+        user = await workerRepo.findById(userId);
+        currentRole = user ? Role.WORKER : null;
     }
+
+    if (!user) throw new Error("User not found");
+
+    const raw = user as any;
+
+    // no-op if same role
+    if (currentRole === newRole) {
+        const response = UserMapper.toResponseDTO(user);
+
+        return {
+            user: response,
+            accessToken: this._tokenService.generateAccessToken({
+                id: user.userId,
+                name: user.name,
+                email: user.email,
+                role: newRole
+            }),
+            refreshToken: this._tokenService.generateRefreshToken({
+                id: user.userId,
+                name: user.name,
+                email: user.email,
+                role: newRole
+            })
+        };
+    }
+
+    let newUser: any;
+
+    if (newRole === Role.WORKER) {
+        await clientRepo.deleteByUserId(userId);
+
+        const workerData = {
+            ...raw,
+            role: Role.WORKER,
+            skills: raw.skills ?? [],
+            isVerfied: raw.isVerfied ?? false
+        };
+
+        newUser = await workerRepo.create(workerData);
+    }
+
+    if (newRole === Role.CLIENT) {
+        await workerRepo.deleteByUserId(userId);
+
+        const clientData = {
+            ...raw,
+            role: Role.CLIENT
+        };
+
+        delete clientData.skills;
+        delete clientData.isVerfied;
+
+        newUser = await clientRepo.create(clientData);
+    }
+
+    const userDto = UserMapper.toResponseDTO(newUser);
+
+    return {
+        user: userDto,
+        accessToken: this._tokenService.generateAccessToken({
+            id: newUser.userId,
+            name: newUser.name,
+            email: newUser.email,
+            role: newRole
+        }),
+        refreshToken: this._tokenService.generateRefreshToken({
+            id: newUser.userId,
+            name: newUser.name,
+            email: newUser.email,
+            role: newRole
+        })
+    };
+}
+
 
 
 }

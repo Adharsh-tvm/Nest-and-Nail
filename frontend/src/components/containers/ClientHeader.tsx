@@ -15,7 +15,7 @@ import {
 import { logoutAction } from "@/app/actions/logout-actions";
 import { useUserStore } from "@/store/userStore";
 import Link from "next/link";
-import { updateUserMode } from "@/services/auth/user.api";
+import { changeRoleAction } from "@/app/actions/change-role-action";
 
 const ClientHeader = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -66,7 +66,7 @@ const ClientHeader = () => {
     setIsTogglingRole(true);
     try {
       // Call API to update role in database
-      const updatedUser = await updateUserMode(newMode);
+      const updatedUser = await changeRoleAction(newMode);
       
       console.log("Role updated successfully:", updatedUser);
 

@@ -19,17 +19,20 @@ export class UserController implements IUserController {
             const { role } = req.body;
 
             if (!Object.values(Role).includes(role)) {
-                return res
-                    .status(HttpStatusCode.BAD_REQUEST)
+                return res.status(HttpStatusCode.BAD_REQUEST)
                     .json({ message: "Invalid role. Must be 'client' or 'worker'." });
             }
 
-            const updatedUser = await this.changeUserRoleUseCase.execute(userId, role);
+            const result = await this.changeUserRoleUseCase.execute(userId, role);
 
             console.log("=== ROLE CHANGE SUCCESS ===");
-            console.log("Updated user:", updatedUser);
+            console.log("Updated user:", result.user);
 
-            return res.status(HttpStatusCode.OK).json(updatedUser);
+            return res.status(HttpStatusCode.OK).json({
+                user: result.user,
+                accessToken: result.accessToken,
+                refreshToken: result.refreshToken
+            });
 
         } catch (err: any) {
             console.error("[UserController] Error:", err);
@@ -38,4 +41,5 @@ export class UserController implements IUserController {
                 .json({ message: err.message ?? "Internal server error" });
         }
     };
+
 }

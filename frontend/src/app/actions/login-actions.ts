@@ -2,7 +2,6 @@
 
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
-import { AxiosError } from "axios";
 import authApi from "@/services/auth/auth.api";
 
 type LoginFormData = {
