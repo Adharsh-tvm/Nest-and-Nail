@@ -44,9 +44,9 @@ app.use(
 
   app.use("/api/auth", createGoogleAuthRoutes(container.googleAuthController));
   
-  app.use("/api/auth", createUserRoutes(container.userController,container.authMiddleware ))
+  app.use("/api/auth", createUserRoutes(container.userController,container.authMiddleware ));
 
-  app.use("/api/admin", createAdminRoutes(container.adminController))
+  app.use("/api/admin", createAdminRoutes(container.adminController));
 
 
   // Error Handler
@@ -62,4 +62,4 @@ app.use(
 bootstrap().catch((error) => {
   console.error("Failed to start server:", error);
   process.exit(1);
-});
+});                           

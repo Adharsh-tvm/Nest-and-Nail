@@ -15,7 +15,7 @@ const userSchema = new Schema<User>({
 
     profilePictureUrl: { type: String, default: "" },
 
-    role: { 
+    role: {
         type: String,
         enum: Object.values(Role),
         required: true
