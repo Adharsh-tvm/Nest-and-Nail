@@ -14,4 +14,7 @@ export interface User {
     lastLoginAt: Date,
     createdAt: Date,
     updatedAt: Date,
+
+     skills?: string[];
+    address?: string;
 }

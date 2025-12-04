@@ -19,14 +19,11 @@ export abstract class BaseRepository<T extends User> implements IBaseRepository<
             return null;
         }
 
-        // Clean Mongoose fields
         const { _id, __v, ...cleanResult } = result as any;
         console.log(`[BaseRepository] Cleaned result:`, JSON.stringify(cleanResult, null, 2));
 
         return cleanResult as T;
     }
-
-
 
     async create(user: T): Promise<T> {
         console.log(`[BaseRepository] Creating user:`, JSON.stringify(user, null, 2));
@@ -35,7 +32,6 @@ export abstract class BaseRepository<T extends User> implements IBaseRepository<
 
         console.log(`[BaseRepository] Created user (raw):`, JSON.stringify(obj, null, 2));
 
-        // Clean Mongoose fields
         const { _id, __v, ...cleanResult } = obj as any;
         console.log(`[BaseRepository] Created user (clean):`, JSON.stringify(cleanResult, null, 2));
 
@@ -56,7 +52,6 @@ export abstract class BaseRepository<T extends User> implements IBaseRepository<
             return null;
         }
 
-        // Clean Mongoose fields
         const { _id, __v, ...cleanResult } = result as any;
         console.log(`[BaseRepository] Cleaned result:`, JSON.stringify(cleanResult, null, 2));
 
@@ -64,7 +59,7 @@ export abstract class BaseRepository<T extends User> implements IBaseRepository<
     }
 
     async findAll(): Promise<T[]> {
-        console.log(`[BaseRepository] Finding all users `);
+        console.log(`[BaseRepository] Finding all users`);
         const clients = await this.model.find().lean().exec();
 
         return clients.map(doc => {
@@ -76,7 +71,7 @@ export abstract class BaseRepository<T extends User> implements IBaseRepository<
     async update(email: string, updateData: Partial<T>): Promise<T | null> {
         const updated = await this.model
             .findOneAndUpdate(
-                { email } as FilterQuery<T>,  
+                { email } as FilterQuery<T>,
                 updateData,
                 { new: true }
             )
@@ -88,5 +83,55 @@ export abstract class BaseRepository<T extends User> implements IBaseRepository<
         const { _id, __v, ...clean } = updated as any;
         return clean as T;
     }
+
+    async delete(email: string): Promise<boolean> {
+        console.log(`[BaseRepository] Deleting user by email: ${email}`);
+        const result = await this.model
+            .deleteOne({ email } as FilterQuery<T>)
+            .exec();
+
+        console.log(`[BaseRepository] Delete result:`, result);
+        return result.deletedCount > 0;
+    }
+
+
+    async deleteByUserId(userId: string): Promise<boolean> {
+        console.log(`[BaseRepository] Deleting user by userId: ${userId}`);
+        try {
+            const result = await this.model
+                .deleteOne({ userId } as FilterQuery<T>)
+                .exec();
+
+            console.log(`[BaseRepository] Delete result:`, result);
+            return result.deletedCount > 0;
+        } catch (error) {
+            console.error(`[BaseRepository] Error deleting user:`, error);
+            return false;
+        }
+    }
+
+    async updateById(userId: string, updateData: Partial<T>): Promise<T | null> {
+        console.log(`[BaseRepository] Updating user by ID: ${userId}`);
+        console.log(`[BaseRepository] Update data:`, JSON.stringify(updateData, null, 2));
+
+        const updated = await this.model
+            .findOneAndUpdate(
+                { userId } as FilterQuery<T>,
+                updateData,
+                { new: true }
+            )
+            .lean()
+            .exec();
+
+        if (!updated) {
+            console.log(`[BaseRepository] No user found to update`);
+            return null;
+        }
+
+        const { _id, __v, ...clean } = updated as any;
+        console.log(`[BaseRepository] Updated user:`, JSON.stringify(clean, null, 2));
+        return clean as T;
+    }
+
 
 }

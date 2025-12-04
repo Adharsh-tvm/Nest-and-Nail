@@ -15,17 +15,21 @@ import {
 import { logoutAction } from "@/app/actions/logout-actions";
 import { useUserStore } from "@/store/userStore";
 import Link from "next/link";
+import { updateUserMode } from "@/services/auth/user.api";
 
 const ClientHeader = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const [userMode, setUserMode] = useState<"client" | "worker">("client");
+  const [isTogglingRole, setIsTogglingRole] = useState(false);
 
   // start falsy; set after we read store to avoid mismatch/flicker
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const userMenuRef = useRef<HTMLDivElement>(null);
-  const currentUser = useUserStore((state) => state.user);
+  const { user: currentUser, setUser } = useUserStore();
+
+  // Get userMode from Zustand store
+  const userMode = (currentUser?.role as "client" | "worker") || "client";
 
   useEffect(() => {
     setIsLoggedIn(Boolean(currentUser && Object.keys(currentUser).length));
@@ -54,11 +58,31 @@ const ClientHeader = () => {
     }
   };
 
-  const toggleUserMode = () => {
-    setUserMode((prev) => (prev === "client" ? "worker" : "client"));
+  const toggleUserMode = async () => {
+    if (!currentUser || isTogglingRole) return;
+
+    const newMode: "client" | "worker" = userMode === "client" ? "worker" : "client";
+
+    setIsTogglingRole(true);
+    try {
+      // Call API to update role in database
+      const updatedUser = await updateUserMode(newMode);
+      
+      console.log("Role updated successfully:", updatedUser);
+
+      // Update Zustand store with new role
+      setUser({
+        ...currentUser,
+        role: updatedUser.role, // Use role from server response
+      });
+
+    } catch (err) {
+      console.error("Failed to toggle user mode:", err);
+      // Optionally show error toast to user
+    } finally {
+      setIsTogglingRole(false);
+    }
   };
-
-
 
   return (
     <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm transition-all duration-300">
@@ -84,7 +108,9 @@ const ClientHeader = () => {
             {/* Mode Toggle Switch */}
             <div 
               onClick={toggleUserMode}
-              className="relative flex items-center bg-gray-100 rounded-full p-1 cursor-pointer w-32 h-10 border border-gray-200 shadow-inner"
+              className={`relative flex items-center bg-gray-100 rounded-full p-1 w-32 h-10 border border-gray-200 shadow-inner ${
+                isTogglingRole ? 'opacity-50 cursor-wait' : 'cursor-pointer'
+              }`}
             >
                {/* Sliding Background */}
                <div 
@@ -134,7 +160,7 @@ const ClientHeader = () => {
                       <p className="text-sm font-bold text-gray-800">
                         {currentUser?.name}
                       </p>
-                      <p className="text-xs text-gray-500 truncate">
+                      <p className="text-xs text-gray-500 truncate capitalize">
                         {currentUser?.role}
                       </p>
                     </div>
@@ -186,15 +212,17 @@ const ClientHeader = () => {
             
             {/* Mobile Toggle Switch */}
             <div className="flex justify-center py-4 border-b border-gray-100 mb-2">
-              <div className="bg-gray-100 p-1 rounded-lg flex w-full">
+              <div className={`bg-gray-100 p-1 rounded-lg flex w-full ${isTogglingRole ? 'opacity-50' : ''}`}>
                 <button 
-                  onClick={() => setUserMode("client")}
+                  onClick={toggleUserMode}
+                  disabled={isTogglingRole || userMode === "client"}
                   className={`flex-1 py-2 rounded-md text-sm font-bold flex items-center justify-center gap-2 transition-all ${userMode === 'client' ? 'bg-white text-[#1B4332] shadow-sm' : 'text-gray-500'}`}
                 >
                   <Briefcase size={16} /> Client Mode
                 </button>
                 <button 
-                  onClick={() => setUserMode("worker")}
+                  onClick={toggleUserMode}
+                  disabled={isTogglingRole || userMode === "worker"}
                   className={`flex-1 py-2 rounded-md text-sm font-bold flex items-center justify-center gap-2 transition-all ${userMode === 'worker' ? 'bg-white text-[#DC2626] shadow-sm' : 'text-gray-500'}`}
                 >
                    <Hammer size={16} /> Worker Mode
@@ -202,38 +230,34 @@ const ClientHeader = () => {
               </div>
             </div>
 
-
-
             <div className="pt-4 mt-4 border-t border-gray-100">
-              (
-                <div className="space-y-2">
-                  <div className="px-4 py-2 flex items-center gap-3 mb-2 bg-gray-50 rounded-xl">
-                    <div className="w-10 h-10 rounded-full bg-[#1B4332] text-white flex items-center justify-center shadow-sm">
-                      <User size={20} />
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-[#1B4332]">
-                        {currentUser?.name}
-                      </p>
-                      <p className="text-xs text-gray-500 truncate">
-                        {currentUser?.role}
-                      </p>
-                    </div>
+              <div className="space-y-2">
+                <div className="px-4 py-2 flex items-center gap-3 mb-2 bg-gray-50 rounded-xl">
+                  <div className="w-10 h-10 rounded-full bg-[#1B4332] text-white flex items-center justify-center shadow-sm">
+                    <User size={20} />
                   </div>
-                  <button className="w-full flex items-center gap-3 px-4 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-xl transition-colors">
-                    <User size={18} /> Profile
-                  </button>
-                  <button className="w-full flex items-center gap-3 px-4 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-xl transition-colors">
-                    <Settings size={18} /> Settings
-                  </button>
-                  <button
-                    onClick={handleLogout}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-base font-bold text-[#DC2626] hover:bg-red-50 rounded-xl transition-colors"
-                  >
-                    <LogOut size={18} /> Log Out
-                  </button>
+                  <div>
+                    <p className="text-sm font-bold text-[#1B4332]">
+                      {currentUser?.name}
+                    </p>
+                    <p className="text-xs text-gray-500 truncate capitalize">
+                      {currentUser?.role}
+                    </p>
+                  </div>
                 </div>
-              ) 
+                <button className="w-full flex items-center gap-3 px-4 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-xl transition-colors">
+                  <User size={18} /> Profile
+                </button>
+                <button className="w-full flex items-center gap-3 px-4 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-xl transition-colors">
+                  <Settings size={18} /> Settings
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center gap-3 px-4 py-3 text-base font-bold text-[#DC2626] hover:bg-red-50 rounded-xl transition-colors"
+                >
+                  <LogOut size={18} /> Log Out
+                </button>
+              </div>
             </div>
           </div>
         </div>
