@@ -4,4 +4,7 @@ export interface IBaseRepository<T> {
     create(user: T): Promise<T>;
     findAll(): Promise<T[]>;
     update(email: string, updateData: Partial<T>): Promise<T | null>;
-}    
+    updateById(userId: string, updateData: Partial<T>): Promise<T | null>;
+    delete(email: string): Promise<boolean>;
+    deleteByUserId(userId: string): Promise<boolean>; 
+}

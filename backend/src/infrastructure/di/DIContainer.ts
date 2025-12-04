@@ -49,6 +49,10 @@ import { IForgotPasswordUseCase } from "../../application/interfaces/IForgotPass
 import { ForgotPasswordUseCase } from "../../application/use-cases/ForgotPasswordUseCase";
 import { IResetPasswordUseCase } from "../../application/interfaces/IResetPasswordUseCase";
 import { ResetPasswordUseCase } from "../../application/use-cases/ResetPasswordUseCase";
+import { IChangeUserRoleUseCase } from "../../application/interfaces/IChangeUserRoleUseCase";
+import { ChangeUserRoleUseCase } from "../../application/use-cases/ChangeUserRoleUseCase";
+import { IUserController } from "../../presentation/interfaces/IUserController";
+import { UserController } from "../../presentation/controllers/UserController";
 
 export class DIContainer {
   // -------------------------
@@ -86,6 +90,8 @@ export class DIContainer {
   private _forgotpasswordUseCase?: IForgotPasswordUseCase;
   private _resetPasswordUseCase?: IResetPasswordUseCase;
 
+  private _changeUserRoleuseCase?: IChangeUserRoleUseCase;
+
   // -------------------------
   // Presentation Layer
   // -------------------------
@@ -94,6 +100,7 @@ export class DIContainer {
 
   private _googleAuthController?: IGoogleAuthController;
   private _adminController?: IAdminController;
+  private _userController?: IUserController;
 
   // ==========================================
   // Infrastructure Lazy Getters
@@ -271,6 +278,16 @@ export class DIContainer {
     return this._resetPasswordUseCase;
   }
 
+  get changeUserRoleUseCase(): IChangeUserRoleUseCase {
+    if(!this._changeUserRoleuseCase) {
+      this._changeUserRoleuseCase = new ChangeUserRoleUseCase(
+        this.userRepositoryFactory,
+        this.logger
+      )
+    }
+    return this._changeUserRoleuseCase
+  }
+
   // ==========================================
   // Presentation Layer
   // ==========================================
@@ -307,6 +324,14 @@ export class DIContainer {
     return this._googleAuthController;
   }
 
+get userController(): IUserController {
+  if(!this._userController) {
+    this._userController = new UserController(
+      this.changeUserRoleUseCase
+    )
+  }
+  return this._userController;
+}
 
   get googleAuthService(): IGoogleAuthService {
     if (!this._googleAuthService) {
