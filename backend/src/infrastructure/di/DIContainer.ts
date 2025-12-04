@@ -53,6 +53,10 @@ import { IChangeUserRoleUseCase } from "../../application/interfaces/IChangeUser
 import { ChangeUserRoleUseCase } from "../../application/use-cases/ChangeUserRoleUseCase";
 import { IUserController } from "../../presentation/interfaces/IUserController";
 import { UserController } from "../../presentation/controllers/UserController";
+import { IGetCurrentUserUseCase } from "../../application/interfaces/IGetCurrentUserUseCase";
+import { GetCurrentUserUseCase } from "../../application/use-cases/GetCurrentUserUseCase";
+import { IBaseRepository } from "../../domain/repositories/IBaseRepository";
+import { User } from "../../domain/entities/User";
 
 export class DIContainer {
   // -------------------------
@@ -62,6 +66,8 @@ export class DIContainer {
   private _clientRepository?: IClientRepository;
   private _workerRepository?: IWorkerRepository;
   private _otpRepository?: OtpRepository;
+  private __baseRepository?: IBaseRepository<User>;
+
 
 
   private _passwordHasher?: IPasswordHasher;
@@ -91,6 +97,7 @@ export class DIContainer {
   private _resetPasswordUseCase?: IResetPasswordUseCase;
 
   private _changeUserRoleuseCase?: IChangeUserRoleUseCase;
+  private _getCurrentUserUseCase?: IGetCurrentUserUseCase;
 
   // -------------------------
   // Presentation Layer
@@ -279,7 +286,7 @@ export class DIContainer {
   }
 
   get changeUserRoleUseCase(): IChangeUserRoleUseCase {
-    if(!this._changeUserRoleuseCase) {
+    if (!this._changeUserRoleuseCase) {
       this._changeUserRoleuseCase = new ChangeUserRoleUseCase(
         this.userRepositoryFactory,
         this.logger,
@@ -288,6 +295,17 @@ export class DIContainer {
     }
     return this._changeUserRoleuseCase
   }
+
+  get getCurrentUserUseCase(): IGetCurrentUserUseCase {
+    if (!this._getCurrentUserUseCase) {
+      this._getCurrentUserUseCase = new GetCurrentUserUseCase(
+        this.userRepositoryFactory,
+        this.logger
+      );
+    }
+    return this._getCurrentUserUseCase;
+  }
+
 
   // ==========================================
   // Presentation Layer
@@ -325,14 +343,15 @@ export class DIContainer {
     return this._googleAuthController;
   }
 
-get userController(): IUserController {
-  if(!this._userController) {
-    this._userController = new UserController(
-      this.changeUserRoleUseCase
-    )
+  get userController(): IUserController {
+    if (!this._userController) {
+      this._userController = new UserController(
+        this.changeUserRoleUseCase,
+        this.getCurrentUserUseCase
+      )
+    }
+    return this._userController;
   }
-  return this._userController;
-}
 
   get googleAuthService(): IGoogleAuthService {
     if (!this._googleAuthService) {

@@ -5,16 +5,22 @@ export type User = {
   name:string;
   email: string;
   role: string;
+  isVerified: boolean;
   iat?: number;
   exp?: number;
 };
 
 type UserStore = {
   user: User | null;
-  setUser: (user: User | null) => void;
+  setUser: (user: User | null | ((prev: User | null) => User | null)) => void;
 };
+
 
 export const useUserStore = create<UserStore>((set) => ({
   user: null,
-  setUser: (user) => set({ user }),
+  setUser: (updater) =>
+    set((state) => ({
+      user: typeof updater === "function" ? updater(state.user) : updater,
+    })),
 }));
+

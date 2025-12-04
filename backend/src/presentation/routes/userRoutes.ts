@@ -12,5 +12,11 @@ export function createUserRoutes(
         authMiddleware.verify.bind(authMiddleware),
         (req, res) => userController.changeRole(req, res)
     );
+
+    // user.routes.ts
+    router.get("/current/:email", (req, res) =>
+        userController.getCurrentUser(req, res)
+    );
+
     return router;
 }
