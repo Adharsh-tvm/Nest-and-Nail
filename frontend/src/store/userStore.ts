@@ -2,7 +2,7 @@ import { create } from "zustand";
 
 export type User = {
   id: string;
-  name:string;
+  name: string;
   email: string;
   role: string;
   isVerified: boolean;
@@ -15,7 +15,6 @@ type UserStore = {
   setUser: (user: User | null | ((prev: User | null) => User | null)) => void;
 };
 
-
 export const useUserStore = create<UserStore>((set) => ({
   user: null,
   setUser: (updater) =>
@@ -23,4 +22,3 @@ export const useUserStore = create<UserStore>((set) => ({
       user: typeof updater === "function" ? updater(state.user) : updater,
     })),
 }));
-

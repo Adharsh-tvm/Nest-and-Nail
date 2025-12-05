@@ -1,15 +1,15 @@
 import React from "react";
 import "./globals.css";
 import { GoogleOAuthProvider } from "@react-oauth/google";
-import { getUserFromServer } from "@/services/auth";
-import UserHydration from "@/components/containers/UserHydration";
+import UserHydration from "@/app/components/containers/UserHydration";
+import { getCurrentUser } from "./actions/user-actions";
 
 export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const user = await getUserFromServer();
+  const user = await getCurrentUser()
   return (
     <html lang="en">
       <body className="min-h-screen flex flex-col">

@@ -11,7 +11,7 @@ const userSchema = new Schema<User>({
     passwordhash: { type: String, default: null },
 
     isBlocked: { type: Boolean, default: false },
-    isVerfied: { type: Boolean, default: false },
+    isVerified: { type: Boolean, default: false },
 
     profilePictureUrl: { type: String, default: "" },
 

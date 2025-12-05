@@ -25,13 +25,17 @@ const ClientHeader = () => {
   // start falsy; set after we read store to avoid mismatch/flicker
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  
+
   const userMenuRef = useRef<HTMLDivElement>(null);
   const { user: currentUser, setUser } = useUserStore();
+
+ console.log("currentUser:", currentUser)
 
   // Get userMode from Zustand store
   const userMode = (currentUser?.role as "client" | "worker") || "client";
   const isVerified = currentUser?.isVerified ?? false;
-
+  console.log("isVerifieddddddddddddddddddddddddddddddd:", currentUser )
   
 
   useEffect(() => {
@@ -62,7 +66,7 @@ const ClientHeader = () => {
   };
 
   function handlwButton() {
-    console.log("current:",currentUser)
+    console.log("current:", currentUser);
   }
 
   const toggleUserMode = async () => {
