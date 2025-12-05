@@ -20,7 +20,7 @@ export class WorkerRepository extends BaseRepository<Worker> implements IWorkerR
             createdAt: worker.createdAt,
             updatedAt: worker.updatedAt,
             isBlocked: worker.isBlocked,
-            isVerfied: worker.isVerfied,
+            isVerified: worker.isVerified,
             profilePictureUrl: worker.profilePictureUrl,
             role: worker.role,
             skills: worker.skills,

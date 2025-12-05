@@ -1,12 +1,13 @@
-
 import { getCurrentUser } from "@/app/actions/user-actions";
-import UserHydration from "@/components/containers/UserHydration";
+import UserHydration from "@/app/components/containers/UserHydration";
 import { cookies } from "next/headers";
 
 export default async function DebugUserPage() {
   const cookieStore = await cookies();
   const allCookies = cookieStore.getAll();
   const user = await getCurrentUser();
+
+  console.log("Heyyyyyyyyyyyyyyyyy",user)
 
   return (
     <div className="p-10 space-y-6">

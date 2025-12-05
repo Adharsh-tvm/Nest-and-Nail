@@ -10,9 +10,9 @@ export class UserMapper {
             email: userData.email_address,
             passwordhash: hashedPassword,
             phone: userData.phone_number,
-            role: userData.user_role, 
+            role: userData.user_role,
             isBlocked: false,
-            isVerfied: false,
+            isVerified: false,
             loginMethod: LoginMethod.EMAIL_PASSWORD,
             profilePictureUrl: '',
             createdAt: new Date(),
@@ -30,7 +30,7 @@ export class UserMapper {
             user_role: userData.role,
             profileImageUrl: userData.profilePictureUrl,
             isBlocked: userData.isBlocked ?? false,
-            isVerified: userData.isVerfied ?? false,
+            isVerified: userData.isVerified ?? false,
         };
     }
 }
