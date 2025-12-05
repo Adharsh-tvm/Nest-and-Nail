@@ -39,12 +39,9 @@ const userApi = {
    * @param email user's email
    * @param token Bearer token (required)
    */
-  getCurrentUserByEmail: async (email: string, token: string) => {
+  getCurrentUserByEmail: async (email: string) => {
     try {
       const response = await axiosInstance.get(`/api/auth/current/${encodeURIComponent(email)}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
         withCredentials: true,
       });
       return response.data;
