@@ -72,6 +72,8 @@ export async function handleGoogleSignIn(
         path: "/"
       });
 
+
+
       cookieStore.set("userRole", user.user_role, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
@@ -80,7 +82,13 @@ export async function handleGoogleSignIn(
         path: "/"
       });
 
-
+      cookieStore.set("user_email", user.email_address, {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 7 * 24 * 60 * 60,
+        path: "/"
+      });
 
 
       return {

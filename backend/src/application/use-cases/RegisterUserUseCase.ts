@@ -36,9 +36,9 @@ export class RegisterUserUseCase implements IRegisterUserUseCase {
 
     this._logger.info(`[RegisterUserUseCase] Hashing password`);
     console.log(`[RegisterUserUseCase] DEBUG - About to hash password`);
-    
+
     const hashedPassword = await this._passwordHasher.hash(userData.password);
-    
+
     console.log(`[RegisterUserUseCase] DEBUG - Password hashed successfully`);
     console.log(`[RegisterUserUseCase] DEBUG - Hashed password: "${hashedPassword}"`);
     console.log(`[RegisterUserUseCase] DEBUG - Hashed password length: ${hashedPassword.length}`);
@@ -72,14 +72,17 @@ export class RegisterUserUseCase implements IRegisterUserUseCase {
 
     const accessToken = this._tokenService.generateAccessToken({
       id: userResponse.user_id,
-      email: userResponse.email_address,
-      role: userResponse.user_role,
+      name: userResponse.user_name,           
+      email: userResponse.email_address,      
+      role: userResponse.user_role,           
     });
     const refreshToken = this._tokenService.generateRefreshToken({
       id: userResponse.user_id,
+      name: userResponse.user_name,
       email: userResponse.email_address,
       role: userResponse.user_role,
     });
+
 
     this._logger.info(`[RegisterUserUseCase] Tokens generated successfully`);
 

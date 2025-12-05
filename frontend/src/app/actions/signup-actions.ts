@@ -149,8 +149,8 @@ export async function completeSignup(
       user_role: signupPayload.user_role,
       password_exists: !!signupPayload.password,
       password_length: signupPayload.password?.length,
-      password_preview: signupPayload.password 
-        ? signupPayload.password.substring(0, 3) + "..." 
+      password_preview: signupPayload.password
+        ? signupPayload.password.substring(0, 3) + "..."
         : "[EMPTY]",
       // 🚨 Let's see the ACTUAL password for debugging (REMOVE THIS IN PRODUCTION!)
       ACTUAL_PASSWORD_DEBUG: signupPayload.password
@@ -211,6 +211,14 @@ export async function completeSignup(
       sameSite: "lax",
       maxAge: 7 * 24 * 60 * 60,
       path: "/",
+    });
+
+    cookieStore.set("user_email", user.email_address, {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60,
+      path: "/"
     });
 
     console.log("[completeSignup SERVER] Success, cookies set");
