@@ -1,6 +1,7 @@
-"use server"
+"use server";
 
 import { cookies } from "next/headers";
+import userApi from "@/services/auth/user.api";
 import "server-only";
 
 export async function getCurrentUser() {
@@ -11,21 +12,9 @@ export async function getCurrentUser() {
 
     if (!token || !email) return null;
 
-    const res = await fetch(
-      `${process.env.BACKEND_URL}/api/auth/current/${email}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        cache: "no-store",
-      }
-    );
+    const data = await userApi.getCurrentUserByEmail(email, token);
 
-    if (!res.ok) return null;
-
-    const data = await res.json();
-    return data.user;
-
+    return data?.user ?? null;
   } catch (err) {
     console.error("Failed to fetch current user:", err);
     return null;
