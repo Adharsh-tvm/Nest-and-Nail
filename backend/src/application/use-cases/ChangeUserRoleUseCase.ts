@@ -65,7 +65,7 @@ export class ChangeUserRoleUseCase implements IChangeUserRoleUseCase {
                 ...raw,
                 role: Role.WORKER,
                 skills: raw.skills ?? [],
-                isVerified: raw.isVerified ?? false
+                // isVerified: raw.isVerified ?? false
             };
 
             newUser = await workerRepo.create(workerData);
@@ -80,7 +80,6 @@ export class ChangeUserRoleUseCase implements IChangeUserRoleUseCase {
             };
 
             delete clientData.skills;
-            delete clientData.isVerified;
 
             newUser = await clientRepo.create(clientData);
         }

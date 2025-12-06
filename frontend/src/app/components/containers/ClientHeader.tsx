@@ -30,12 +30,10 @@ const ClientHeader = () => {
   const userMenuRef = useRef<HTMLDivElement>(null);
   const { user: currentUser, setUser } = useUserStore();
 
- console.log("currentUser:", currentUser)
 
   // Get userMode from Zustand store
   const userMode = (currentUser?.role as "client" | "worker") || "client";
   const isVerified = currentUser?.isVerified ?? false;
-  console.log("isVerifieddddddddddddddddddddddddddddddd:", currentUser )
   
 
   useEffect(() => {

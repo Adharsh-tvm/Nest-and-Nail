@@ -11,20 +11,14 @@ const userApi = {
   /**
    * Update user role/mode
    * @param role "client" | "worker"
-   * @param token optional Bearer token; if provided it will be sent in Authorization header
    */
-  updateUserMode: async (role: "client" | "worker", token?: string) => {
+  updateUserMode: async (role: "client" | "worker") => {
     try {
       const response = await axiosInstance.patch(
         "/api/auth/mode",
         { role },
         {
-          headers: token
-            ? {
-                Authorization: `Bearer ${token}`,
-              }
-            : undefined,
-          withCredentials: true,
+          withCredentials: true, // This sends cookies automatically
         }
       );
       return response.data as UpdateRoleResponse;
@@ -37,13 +31,15 @@ const userApi = {
   /**
    * Get current user by email
    * @param email user's email
-   * @param token Bearer token (required)
    */
   getCurrentUserByEmail: async (email: string) => {
     try {
-      const response = await axiosInstance.get(`/api/auth/current/${encodeURIComponent(email)}`, {
-        withCredentials: true,
-      });
+      const response = await axiosInstance.get(
+        `/api/auth/current/${encodeURIComponent(email)}`,
+        {
+          withCredentials: true,
+        }
+      );
       return response.data;
     } catch (error: any) {
       console.error("Error fetching current user:", error);
