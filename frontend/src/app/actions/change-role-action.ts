@@ -13,6 +13,9 @@ export async function changeRoleAction(role: "client" | "worker") {
     // Get cookie store
     const cookieStore = await cookies();
 
+    const ACCESS_MAX_AGE = Number(process.env.MAX_AGE_ACCESS_TOKEN);
+    const REFRESH_MAX_AGE = Number(process.env.MAX_AGE_REFRESH_TOKEN);
+
     // Update cookies if new tokens are provided
     if (newAccess) {
       cookieStore.set("accessToken", newAccess, {
@@ -20,7 +23,7 @@ export async function changeRoleAction(role: "client" | "worker") {
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
         path: "/",
-        maxAge: 15 * 60, // 15 minutes
+        maxAge: ACCESS_MAX_AGE, // 30 minutes
       });
     }
 
@@ -30,7 +33,7 @@ export async function changeRoleAction(role: "client" | "worker") {
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
         path: "/",
-        maxAge: 7 * 24 * 60 * 60, // 7 days
+        maxAge: REFRESH_MAX_AGE, // 7 days
       });
     }
 
