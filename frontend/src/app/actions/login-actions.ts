@@ -60,12 +60,15 @@ export async function login(
   // Step 3: Set cookies (only if verification passed)
   const cookieStore = await cookies();
 
+  const ACCESS_MAX_AGE = Number(process.env.MAX_AGE_ACCESS_TOKEN);
+  const REFRESH_MAX_AGE = Number(process.env.MAX_AGE_REFRESH_TOKEN);
+
   if (data.accessToken) {
     cookieStore.set("accessToken", data.accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 15 * 60,
+      maxAge: ACCESS_MAX_AGE,
       path: "/"
     });
   }
@@ -75,7 +78,7 @@ export async function login(
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 7 * 24 * 60 * 60,
+      maxAge: REFRESH_MAX_AGE,
       path: "/"
     });
   }
@@ -85,7 +88,7 @@ export async function login(
       httpOnly: false, // IMPORTANT: must NOT be httpOnly, otherwise server action can't read it
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 7 * 24 * 60 * 60,
+      maxAge: ACCESS_MAX_AGE,
       path: "/"
     });
   }
@@ -97,7 +100,7 @@ export async function login(
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 7 * 24 * 60 * 60,
+      maxAge: ACCESS_MAX_AGE,
       path: "/"
     });
   }
