@@ -1,25 +1,25 @@
-"use client";
-
 import React from "react";
 import "./globals.css";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import UserHydration from "@/app/components/containers/UserHydration";
+import { getCurrentUser } from "./actions/user-actions";
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const user = await getCurrentUser()
   return (
-    <div>
-      <html lang="en">
-        <body>
-          <GoogleOAuthProvider
-            clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}
-          >
-            {children}
-          </GoogleOAuthProvider>
-        </body>
-      </html>
-    </div>
+    <html lang="en">
+      <body className="min-h-screen flex flex-col">
+        <GoogleOAuthProvider
+          clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}
+        >
+          <UserHydration user={user} />
+          {children}
+        </GoogleOAuthProvider>
+      </body>
+    </html>
   );
 }

@@ -6,4 +6,5 @@ const clientSchema = new mongoose.Schema<Client>({
   address: String,
 });
 
+
 export const ClientModel = UserModel.discriminator<Client>('client', clientSchema);

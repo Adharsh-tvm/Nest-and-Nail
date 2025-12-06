@@ -1,13 +1,21 @@
+import ClientHeader from "@/app/components/containers/ClientHeader";
+import Footer from "@/app/components/containers/ClientFooter";
 
-export default async function AdminLayout({
+export const metadata = {
+  title: "Nest & Nail",
+  description: "The most trusted marketplace for home services",
+};
+
+export default function WorkerRootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-
   return (
     <>
-      {children}
+      <ClientHeader />
+      <main className="flex-1">{children}</main>
+      <Footer />
     </>
   );
 }

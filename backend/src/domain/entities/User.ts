@@ -7,11 +7,14 @@ export interface User {
     phone?: number,
     passwordhash: string,
     isBlocked?: boolean,
-    isVerfied?:boolean,
+    isVerified?: boolean,
     profilePictureUrl?: string,
     role: Role,
     loginMethod: LoginMethod,
     lastLoginAt: Date,
     createdAt: Date,
     updatedAt: Date,
+
+    skills?: string[];
+    address?: string;
 }

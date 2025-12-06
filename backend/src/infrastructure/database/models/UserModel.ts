@@ -7,20 +7,29 @@ const userSchema = new Schema<User>({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     phone: { type: Number },
-    passwordhash: { type: String, required: false, default: null },
+
+    passwordhash: { type: String, default: null },
+
     isBlocked: { type: Boolean, default: false },
-    isVerfied: {type: Boolean, default: false},
+    isVerified: { type: Boolean, default: false },
+
     profilePictureUrl: { type: String, default: "" },
-    role: { 
-        type: String, 
+
+    role: {
+        type: String,
         enum: Object.values(Role),
-        required: true 
+        required: true
     },
+
     loginMethod: {
         type: String,
         enum: Object.values(LoginMethod),
         default: LoginMethod.EMAIL_PASSWORD
     },
+
+    skills: { type: [String], default: [] },
+    address: { type: String, default: "" },
+
     lastLoginAt: { type: Date, default: Date.now },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
@@ -28,5 +37,6 @@ const userSchema = new Schema<User>({
     timestamps: true,
     discriminatorKey: 'role'
 });
+
 
 export const UserModel: Model<User> = mongoose.model<User>('User', userSchema);
