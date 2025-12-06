@@ -1,35 +1,36 @@
-// place this where you previously had your server action
 "use server";
 
 import { cookies } from "next/headers";
 import userApi from "@/services/auth/user.api";
 
 export async function changeRoleAction(role: "client" | "worker") {
-  const cookieStore = await cookies();
-  const accessToken = cookieStore.get("accessToken")?.value;
-
   try {
-    // call userApi (pass token so backend can validate)
-    const data = await userApi.updateUserMode(role, accessToken);
+    // Call userApi - cookies are sent automatically via withCredentials
+    const data = await userApi.updateUserMode(role);
 
     const { user, accessToken: newAccess, refreshToken: newRefresh } = data;
 
-    // Clear old cookies
-    cookieStore.set("accessToken", "", { maxAge: 0 });
-    cookieStore.set("refreshToken", "", { maxAge: 0 });
+    // Get cookie store
+    const cookieStore = await cookies();
 
-    // Set new cookies if provided
+    // Update cookies if new tokens are provided
     if (newAccess) {
       cookieStore.set("accessToken", newAccess, {
         httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
         path: "/",
+        maxAge: 15 * 60, // 15 minutes
       });
     }
 
     if (newRefresh) {
       cookieStore.set("refreshToken", newRefresh, {
         httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
         path: "/",
+        maxAge: 7 * 24 * 60 * 60, // 7 days
       });
     }
 

@@ -12,7 +12,7 @@ export async function getUserFromServer(): Promise<User | null> {
 
   try {
     const decoded = jwt.decode(cookie.value) as User | null;
-    console.log(decoded)
+    // console.log(decoded)
     return decoded;
   } catch {
     return null;

@@ -349,7 +349,7 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
                     Sending OTP...
                   </span>
                 ) : (
-                  `Sign Up as ${roleName}`
+                  `Sign Up`
                 )}
               </button>
             </form>
