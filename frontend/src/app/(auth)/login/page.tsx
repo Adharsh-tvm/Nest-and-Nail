@@ -33,15 +33,15 @@ const LoginPage = async () => {
             <p className="text-zinc-500 mb-2">Don't have an account?</p>
 
             <div className="flex justify-center items-center gap-2">
-              <a href="/signup/client" className={`font-medium ${linkClass}`}>
-                Sign up as Client
+              <a href="/signup" className={`font-medium ${linkClass}`}>
+                Sign up here
               </a>
 
-              <span className="text-zinc-500">or</span>
+              
 
-              <a href="/signup/worker" className={`font-medium ${linkClass}`}>
+              {/* <a href="/signup/worker" className={`font-medium ${linkClass}`}>
                 Sign up as Worker
-              </a>
+              </a> */}
             </div>
           </div>
         </div>

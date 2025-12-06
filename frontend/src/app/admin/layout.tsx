@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import Sidebar from "@/components/containers/AdminSidebar"; 
-import Navbar from "@/components/containers/AdminNavbar"; 
+import Sidebar from "@/app/components/containers/AdminSidebar";
+import Navbar from "@/app/components/containers/AdminNavbar";
 
 export default function AdminLayout({
   children,

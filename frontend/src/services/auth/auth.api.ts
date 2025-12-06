@@ -50,6 +50,12 @@ export const authApi = {
 
   googleAuth: (payload: GoogleAuthPayload) =>
     axiosInstance.post<googleAuthResponse>("/api/auth/google", payload),
+
+  forgotPassword: (payload: { email_address: string }) =>
+    axiosInstance.post("/api/auth/forgot-password", payload),
+
+  resetPassword: (payload: { email_address: string; newPassword: string; confirmPassword: string }) =>
+    axiosInstance.post("/api/auth/reset-password", payload),
 };
 
 export default authApi;

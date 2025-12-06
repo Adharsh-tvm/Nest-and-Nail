@@ -51,6 +51,8 @@ export async function handleGoogleSignIn(
 
       const { user, refreshToken, accessToken } = response.data.payload;
 
+      const ACCESS_MAX_AGE = Number(process.env.MAX_AGE_ACCESS_TOKEN);
+      const REFRESH_MAX_AGE = Number(process.env.MAX_AGE_REFRESH_TOKEN);
 
       // create cookies
       const cookieStore = await cookies();
@@ -59,7 +61,7 @@ export async function handleGoogleSignIn(
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
-        maxAge: 7 * 24 * 60 * 60,
+        maxAge: REFRESH_MAX_AGE,
         path: "/"
       });
 
@@ -68,19 +70,27 @@ export async function handleGoogleSignIn(
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
-        maxAge: 15 * 60,
+        maxAge: ACCESS_MAX_AGE,
         path: "/"
       });
+
+
 
       cookieStore.set("userRole", user.user_role, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
-        maxAge: 7 * 24 * 60 * 60,
+        maxAge: ACCESS_MAX_AGE,
         path: "/"
       });
 
-
+      cookieStore.set("user_email", user.email_address, {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: ACCESS_MAX_AGE,
+        path: "/"
+      });
 
 
       return {

@@ -45,15 +45,30 @@ import { IGetAllWorkersUseCase } from "../../application/interfaces/IGetAllWorke
 import { IWorkerRepository } from "../../domain/repositories/IWorkerRepository";
 import { WorkerRepository } from "../repo/WorkerRepository";
 import { GetAllWorkersUseCase } from "../../application/use-cases/GetAllWorkersUseCase";
+import { IForgotPasswordUseCase } from "../../application/interfaces/IForgotPasswordUseCase";
+import { ForgotPasswordUseCase } from "../../application/use-cases/ForgotPasswordUseCase";
+import { IResetPasswordUseCase } from "../../application/interfaces/IResetPasswordUseCase";
+import { ResetPasswordUseCase } from "../../application/use-cases/ResetPasswordUseCase";
+import { IChangeUserRoleUseCase } from "../../application/interfaces/IChangeUserRoleUseCase";
+import { ChangeUserRoleUseCase } from "../../application/use-cases/ChangeUserRoleUseCase";
+import { IUserController } from "../../presentation/interfaces/IUserController";
+import { UserController } from "../../presentation/controllers/UserController";
+import { IGetCurrentUserUseCase } from "../../application/interfaces/IGetCurrentUserUseCase";
+import { GetCurrentUserUseCase } from "../../application/use-cases/GetCurrentUserUseCase";
+import { IBaseRepository } from "../../domain/repositories/IBaseRepository";
+import { User } from "../../domain/entities/User";
 
 export class DIContainer {
   // -------------------------
   // Infrastructure Layer
   // -------------------------
-  private _repositoryFactory?: UserRepositoryFactory;
+  private _userRepositoryFactory?: UserRepositoryFactory;
   private _clientRepository?: IClientRepository;
   private _workerRepository?: IWorkerRepository;
   private _otpRepository?: OtpRepository;
+  private __baseRepository?: IBaseRepository<User>;
+
+
 
   private _passwordHasher?: IPasswordHasher;
   private _idGenerator?: IGenerateUserID;
@@ -77,6 +92,13 @@ export class DIContainer {
 
   private _getAllClientsUseCase?: IGetAllClientsUseCase;
   private _getAllWorkersUseCase?: IGetAllWorkersUseCase;
+
+  private _forgotpasswordUseCase?: IForgotPasswordUseCase;
+  private _resetPasswordUseCase?: IResetPasswordUseCase;
+
+  private _changeUserRoleuseCase?: IChangeUserRoleUseCase;
+  private _getCurrentUserUseCase?: IGetCurrentUserUseCase;
+
   // -------------------------
   // Presentation Layer
   // -------------------------
@@ -85,16 +107,17 @@ export class DIContainer {
 
   private _googleAuthController?: IGoogleAuthController;
   private _adminController?: IAdminController;
+  private _userController?: IUserController;
 
   // ==========================================
   // Infrastructure Lazy Getters
   // ==========================================
 
-  get repositoryFactory(): UserRepositoryFactory {
-    if (!this._repositoryFactory) {
-      this._repositoryFactory = new UserRepositoryFactory();
+  get userRepositoryFactory(): UserRepositoryFactory {
+    if (!this._userRepositoryFactory) {
+      this._userRepositoryFactory = new UserRepositoryFactory();
     }
-    return this._repositoryFactory;
+    return this._userRepositoryFactory;
   }
 
   get clientRepository(): IClientRepository {
@@ -168,7 +191,7 @@ export class DIContainer {
   get registerUserUseCase(): IRegisterUserUseCase {
     if (!this._registerUserUseCase) {
       this._registerUserUseCase = new RegisterUserUseCase(
-        this.repositoryFactory,
+        this.userRepositoryFactory,
         this.passwordHasher,
         this.idGenerator,
         this.tokenService,
@@ -181,7 +204,7 @@ export class DIContainer {
   get loginUserUseCase(): ILoginUserUseCase {
     if (!this._loginUserUseCase) {
       this._loginUserUseCase = new LoginUserUseCase(
-        this.repositoryFactory,
+        this.userRepositoryFactory,
         this.passwordHasher,
         this.tokenService,
         this.logger
@@ -207,7 +230,7 @@ export class DIContainer {
   get googleLoginUseCase(): IGoogleSignUpUseCase {
     if (!this._googleLoginUseCase) {
       this._googleLoginUseCase = new GoogleSignUpUseCase(
-        this.repositoryFactory,
+        this.userRepositoryFactory,
         this.passwordHasher,
         this.tokenService,
         this.googleAuthService,
@@ -223,7 +246,7 @@ export class DIContainer {
         this.emailService,
         this.otpService,
         this.otpRepository,
-        this.repositoryFactory,
+        this.userRepositoryFactory,
         this.logger
       );
     }
@@ -240,6 +263,50 @@ export class DIContainer {
     return this._verifyOtpUseCase;
   }
 
+  get forgotPasswordUseCase(): IForgotPasswordUseCase {
+    if (!this._forgotpasswordUseCase) {
+      this._forgotpasswordUseCase = new ForgotPasswordUseCase(
+        this.emailService,
+        this.otpService,
+        this.otpRepository,
+        this.userRepositoryFactory);
+    }
+    return this._forgotpasswordUseCase;
+  }
+
+  get resetPasswordUseCase(): IResetPasswordUseCase {
+    if (!this._resetPasswordUseCase) {
+      this._resetPasswordUseCase = new ResetPasswordUseCase(
+        this.userRepositoryFactory,
+        this.passwordHasher,
+        this.otpRepository,
+        this.logger);
+    }
+    return this._resetPasswordUseCase;
+  }
+
+  get changeUserRoleUseCase(): IChangeUserRoleUseCase {
+    if (!this._changeUserRoleuseCase) {
+      this._changeUserRoleuseCase = new ChangeUserRoleUseCase(
+        this.userRepositoryFactory,
+        this.logger,
+        this.tokenService
+      )
+    }
+    return this._changeUserRoleuseCase
+  }
+
+  get getCurrentUserUseCase(): IGetCurrentUserUseCase {
+    if (!this._getCurrentUserUseCase) {
+      this._getCurrentUserUseCase = new GetCurrentUserUseCase(
+        this.userRepositoryFactory,
+        this.logger
+      );
+    }
+    return this._getCurrentUserUseCase;
+  }
+
+
   // ==========================================
   // Presentation Layer
   // ==========================================
@@ -250,15 +317,15 @@ export class DIContainer {
         this.registerUserUseCase,
         this.loginUserUseCase,
         this.sendOtpUseCase,
-        this.verifyOtpUseCase
-      );
+        this.verifyOtpUseCase,
+        this.forgotPasswordUseCase,
+        this.resetPasswordUseCase);
     }
     return this._authController;
   }
 
   get adminController(): IAdminController {
     if (!this._adminController) {
-      // pass the interface instance (not the function)
       this._adminController = new AdminController(
         this.getAllClientsUseCase,
         this.getAllWorkersUseCase
@@ -276,6 +343,15 @@ export class DIContainer {
     return this._googleAuthController;
   }
 
+  get userController(): IUserController {
+    if (!this._userController) {
+      this._userController = new UserController(
+        this.changeUserRoleUseCase,
+        this.getCurrentUserUseCase
+      )
+    }
+    return this._userController;
+  }
 
   get googleAuthService(): IGoogleAuthService {
     if (!this._googleAuthService) {

@@ -2,292 +2,308 @@
 
 import React, { useState } from "react";
 import {
+  Search,
   MapPin,
-  Phone,
-  Navigation,
-  CheckCircle,
-  Clock,
+  Hammer,
+  Wrench,
+  Zap,
+  Droplets,
+  PaintBucket,
+  Truck,
+  Star,
+  CheckCircle2,
+  ArrowRight,
   Menu,
-  Bell,
+  X,
+  ShieldCheck,
+  Clock,
+  Wallet,
+  GalleryVerticalEnd,
   User,
-  MoreVertical,
-  Calendar,
-  DollarSign,
-  ChevronRight,
-  Power,
+  Phone,
+  Mail,
+  Instagram,
+  Twitter,
+  Linkedin,
+  Briefcase,
+  TrendingUp,
+  DollarSign
 } from "lucide-react";
-import WorkerHeader from "@/components/containers/WorkerHeader";
 
-// --- Shared UI Components (Consistent Theme) ---
+// --- Theme Constants ---
+// Forest Green: #1B4332 (Primary Brand)
+// Red Accent:   #DC2626 (Buttons, Highlights)
 
-const Button = ({
-  children,
-  variant = "primary",
-  className = "",
-  size = "default",
-  ...props
-}: any) => {
-  const baseStyle =
-    "inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-500 disabled:pointer-events-none disabled:opacity-50";
+// --- Types ---
+interface ServiceCardProps {
+  icon: React.ElementType;
+  title: string;
+  count: string;
+}
 
-  const sizes = {
-    default: "h-10 px-4 py-2 text-sm",
-    sm: "h-9 rounded-md px-3 text-xs",
-    lg: "h-11 rounded-md px-8 text-base",
-    icon: "h-10 w-10",
-  };
+// --- Components ---
 
-  const variants = {
-    primary: "bg-emerald-600 text-white shadow hover:bg-emerald-700",
-    secondary:
-      "bg-zinc-800 text-zinc-100 shadow-sm hover:bg-zinc-700 border border-zinc-700",
-    ghost: "hover:bg-zinc-800 text-zinc-300 hover:text-white",
-    destructive:
-      "bg-red-900/50 text-red-200 hover:bg-red-900/70 border border-red-900",
-    outline:
-      "border border-zinc-700 bg-transparent shadow-sm hover:bg-zinc-800 text-zinc-100",
-  };
+const HeroSection = () => (
+  <div className="relative bg-[#0f291e] overflow-hidden">
+    {/* Pattern Overlay */}
+    <div
+      className="absolute inset-0 opacity-5"
+      style={{
+        backgroundImage: "linear-gradient(45deg, #ffffff 1px, transparent 1px)",
+        backgroundSize: "32px 32px",
+      }}
+    ></div>
 
-  return (
-    <button
-      className={`${baseStyle} ${variants[variant as keyof typeof variants]} ${
-        sizes[size as keyof typeof sizes]
-      } ${className}`}
-      {...props}
-    >
-      {/* {children} */}
-    </button>
-  );
-};
+    {/* Abstract Shapes */}
+    <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-[#1B4332] opacity-50 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2"></div>
+    <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-[#DC2626] opacity-10 rounded-full blur-[100px] translate-y-1/3 -translate-x-1/4"></div>
 
-const Card = ({ children, className = "" }: any) => (
-  <div
-    className={`rounded-xl border border-zinc-800 bg-zinc-900/50 text-zinc-100 shadow-sm backdrop-blur-xl ${className}`}
-  >
-    {/* {children} */}
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32 relative z-10">
+      <div className="text-center max-w-4xl mx-auto">
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 backdrop-blur-md text-green-100 text-sm font-medium mb-8 border border-white/10">
+          <span className="w-2 h-2 rounded-full bg-[#4ADE80] animate-pulse"></span>
+          Now recruiting in your area
+        </div>
+
+        <h1 className="text-5xl md:text-7xl font-extrabold text-white mb-8 leading-tight tracking-tight">
+          Work on your terms. <br className="hidden md:block" />
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#4ADE80] to-[#22c55e] drop-shadow-sm">
+            Get paid faster.
+          </span>
+        </h1>
+
+        <p className="text-lg md:text-xl text-gray-300 mb-12 max-w-2xl mx-auto font-light leading-relaxed">
+          Stop chasing leads. We connect you with homeowners who are ready to hire. 
+          Set your schedule, pick your price, and build your reputation.
+        </p>
+
+        {/* Enhanced Search Bar for Jobs */}
+        <div className="bg-white p-2.5 rounded-2xl shadow-2xl shadow-black/20 max-w-3xl mx-auto flex flex-col md:flex-row gap-2 transition-transform hover:scale-[1.01] duration-300">
+          <div className="flex-1 flex items-center px-4 h-14 bg-gray-50 rounded-xl md:rounded-r-none md:bg-transparent border-2 border-transparent focus-within:border-[#1B4332]/10 focus-within:bg-white transition-colors">
+            <Briefcase className="text-gray-400 mr-3" size={22} />
+            <select
+              className="w-full bg-transparent outline-none text-gray-800 font-medium text-lg appearance-none cursor-pointer"
+              defaultValue=""
+            >
+              <option value="" disabled>Select your trade...</option>
+              <option value="plumbing">Plumbing</option>
+              <option value="electrical">Electrical</option>
+              <option value="cleaning">Cleaning</option>
+              <option value="carpentry">Carpentry</option>
+            </select>
+          </div>
+          <div className="w-px bg-gray-200 hidden md:block h-8 self-center"></div>
+          <div className="flex-[0.6] flex items-center px-4 h-14 bg-gray-50 rounded-xl md:rounded-none md:bg-transparent border-2 border-transparent focus-within:border-[#1B4332]/10 focus-within:bg-white transition-colors">
+            <MapPin className="text-[#DC2626] mr-3" size={22} />
+            <input
+              type="text"
+              placeholder="Zip Code"
+              className="w-full bg-transparent outline-none text-gray-800 placeholder-gray-400 font-medium text-lg"
+            />
+          </div>
+          <button className="bg-[#1B4332] hover:bg-[#143225] text-white font-bold h-14 px-8 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 group whitespace-nowrap">
+            Find Jobs
+            <ArrowRight
+              size={20}
+              className="group-hover:translate-x-1 transition-transform"
+            />
+          </button>
+        </div>
+
+        {/* Stats Bar */}
+        <div className="mt-16 pt-8 border-t border-white/10 flex flex-wrap justify-center gap-8 md:gap-16">
+          {[
+            { icon: TrendingUp, label: "Jobs Posted Daily", value: "2,500+" },
+            { icon: Wallet, label: "Avg. Pro Earnings", value: "$85/hr" },
+            { icon: CheckCircle2, label: "Payment Guarantee", value: "100%" },
+          ].map((stat, idx) => (
+            <div key={idx} className="flex flex-col items-center gap-1 group">
+              <div className="flex items-center gap-2 text-white font-bold text-2xl group-hover:text-[#4ADE80] transition-colors">
+                <stat.icon
+                  className="text-[#DC2626] group-hover:scale-110 transition-transform"
+                  size={24}
+                />
+                {stat.value}
+              </div>
+              <span className="text-gray-400 text-sm font-medium uppercase tracking-wide">
+                {stat.label}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   </div>
 );
 
-const Badge = ({ children, variant = "default" }: any) => {
-  const styles = {
-    // default: "bg-zinc-800 text-zinc-300 border-zinc-700",
-    // success: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
-    // warning: "bg-amber-500/10 text-amber-500 border-amber-500/20",
-    // blue: "bg-blue-500/10 text-blue-500 border-blue-500/20",
-  };
+const ServiceCard = ({ icon: Icon, title, count }: ServiceCardProps) => (
+  <div className="bg-white border border-gray-100 p-6 rounded-2xl shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_40px_-15px_rgba(27,67,50,0.1)] hover:border-green-100 transition-all duration-300 group cursor-pointer h-full flex flex-col items-center text-center">
+    <div className="w-16 h-16 bg-[#F3F4F6] rounded-2xl flex items-center justify-center mb-5 group-hover:bg-[#1B4332] group-hover:rotate-3 transition-all duration-300 ease-out">
+      <Icon
+        size={32}
+        className="text-[#DC2626] group-hover:text-white transition-colors duration-300"
+      />
+    </div>
+    <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-[#1B4332] transition-colors">
+      {title}
+    </h3>
+    <p className="text-sm text-gray-500 font-medium bg-gray-50 px-3 py-1 rounded-full group-hover:bg-green-50 group-hover:text-green-700 transition-colors">
+      {count} Active Jobs
+    </p>
+  </div>
+);
 
+const HighDemandJobs = () => (
+  <section className="py-24 bg-[#F9FAFB]">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="text-center mb-16">
+        <span className="text-[#DC2626] font-bold text-sm uppercase tracking-wider mb-2 block">
+          Market Insights
+        </span>
+        <h2 className="text-3xl md:text-5xl font-extrabold text-[#1B4332] mb-6">
+          High Demand Categories
+        </h2>
+        <p className="text-gray-600 max-w-2xl mx-auto text-lg">
+          We have homeowners looking for these skills right now. Sign up today and start bidding.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+        <ServiceCard icon={Droplets} title="Plumbing" count="120+" />
+        <ServiceCard icon={Zap} title="Electrical" count="85+" />
+        <ServiceCard icon={PaintBucket} title="Painting" count="64+" />
+        <ServiceCard icon={Hammer} title="Carpentry" count="50+" />
+        <ServiceCard icon={Truck} title="Moving" count="42+" />
+        <ServiceCard icon={Wrench} title="HVAC" count="95+" />
+      </div>
+    </div>
+  </section>
+);
+
+const HowItWorksWorker = () => (
+  <section className="py-24 bg-white relative">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="grid lg:grid-cols-2 gap-20 items-center">
+        
+        <div className="relative">
+          {/* Decorative Background for Card */}
+          <div className="absolute inset-0 bg-[#DC2626] rounded-[2.5rem] -rotate-3 opacity-5 scale-105"></div>
+
+          {/* Main App-like Card */}
+          <div className="bg-white border border-gray-100 shadow-2xl rounded-[2rem] p-8 relative z-10 overflow-hidden">
+            <div className="flex items-center justify-between mb-8">
+              <h3 className="font-bold text-[#1B4332] text-xl">My Dashboard</h3>
+              <span className="text-xs font-bold bg-green-100 text-green-700 px-2 py-1 rounded flex items-center gap-1">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                Live
+              </span>
+            </div>
+
+            {/* Mock Dashboard Earnings */}
+            <div className="bg-[#1B4332] rounded-xl p-6 text-white mb-6">
+                <div className="text-sm opacity-80 mb-1">This Week's Earnings</div>
+                <div className="text-3xl font-bold flex items-center gap-2">
+                    $1,240.50 <TrendingUp size={20} className="text-[#4ADE80]" />
+                </div>
+            </div>
+
+            {/* Mock Job Leads */}
+            <div className="space-y-4">
+              <div className="text-sm font-bold text-gray-400 uppercase">New Leads Near You</div>
+              {[
+                {
+                  title: "Leaky Faucet Repair",
+                  loc: "Downtown • 2.5mi",
+                  budget: "Est. $150",
+                  urgent: true
+                },
+                {
+                  title: "Full Bath Remodel",
+                  loc: "Westside • 5.0mi",
+                  budget: "Est. $4,000",
+                  urgent: false
+                },
+              ].map((job, i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-4 p-4 rounded-xl border border-gray-100 hover:border-green-200 hover:bg-green-50/30 transition-all cursor-pointer group"
+                >
+                  <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 group-hover:bg-[#1B4332] group-hover:text-white transition-colors">
+                    <Wrench size={18} />
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-bold text-gray-900 group-hover:text-[#1B4332] transition-colors">
+                      {job.title}
+                    </div>
+                    <div className="text-xs text-gray-500">{job.loc}</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-bold text-[#DC2626] text-sm">{job.budget}</div>
+                    {job.urgent && <div className="text-[10px] font-bold text-[#DC2626] bg-red-50 inline-block px-1 rounded">URGENT</div>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="">
+          <h2 className="text-3xl md:text-5xl font-extrabold text-[#1B4332] mb-8 leading-tight">
+            Focus on the work, <br />
+            <span className="text-[#DC2626] decoration-4 underline underline-offset-4 decoration-gray-200">
+              we handle the rest.
+            </span>
+          </h2>
+
+          <div className="space-y-10">
+            {[
+              {
+                title: "Create your Pro Profile",
+                desc: "Showcase your skills, upload photos of past work, and set your service area. It's free to join.",
+                step: "01",
+              },
+              {
+                title: "Get Matched with Leads",
+                desc: "We send you jobs that match your expertise. You choose which ones to accept.",
+                step: "02",
+              },
+              {
+                title: "Get Paid Instantly",
+                desc: "Complete the job and get paid directly to your bank account. No chasing invoices.",
+                step: "03",
+              },
+            ].map((item, idx) => (
+              <div key={idx} className="flex gap-6 group">
+                <div className="flex-shrink-0 w-14 h-14 bg-white border-2 border-[#E5E7EB] text-[#1B4332] rounded-2xl flex items-center justify-center font-black text-xl shadow-sm group-hover:bg-[#1B4332] group-hover:text-white group-hover:border-[#1B4332] transition-all duration-300">
+                  {item.step}
+                </div>
+                <div className="pt-2">
+                  <h4 className="text-xl font-bold text-[#1B4332] mb-2">
+                    {item.title}
+                  </h4>
+                  <p className="text-gray-600 leading-relaxed max-w-sm">
+                    {item.desc}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+);
+
+
+
+const WorkerHomePage = () => {
   return (
-    <div
-      className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors ${
-        styles[variant as keyof typeof styles]
-      }`}
-    >
-      {children}
+    <div className="min-h-screen font-sans bg-white text-gray-900 selection:bg-[#DC2626] selection:text-white">
+      <HeroSection />
+      <HighDemandJobs />
+      <HowItWorksWorker />
     </div>
   );
 };
 
-// --- Mock Map Component ---
-
-const MapView = () => (
-  <div></div>
-  // <div className="relative w-full h-64 bg-zinc-800 rounded-lg overflow-hidden border border-zinc-700 group">
-  //   {/* Mock Map Background Pattern */}
-  //   <div
-  //     className="absolute inset-0 opacity-20"
-  //     style={{
-  //       backgroundImage: "radial-gradient(#4b5563 1px, transparent 1px)",
-  //       backgroundSize: "20px 20px",
-  //     }}
-  //   />
-
-  //   {/* Mock Streets */}
-  //   <div className="absolute top-0 left-1/3 w-4 h-full bg-zinc-700/50 transform -skew-x-12" />
-  //   <div className="absolute top-1/2 left-0 w-full h-3 bg-zinc-700/50 transform rotate-3" />
-
-  //   {/* Destination Pin */}
-  //   <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
-  //     <div className="relative">
-  //       <div className="w-4 h-4 bg-emerald-500 rounded-full animate-ping absolute opacity-75" />
-  //       <div className="w-4 h-4 bg-emerald-600 rounded-full border-2 border-zinc-900 z-10 relative shadow-lg shadow-emerald-900/50" />
-  //     </div>
-  //     <div className="mt-1 bg-zinc-900/90 px-2 py-1 rounded text-xs font-medium text-white border border-zinc-700 shadow-xl">
-  //       Customer Location
-  //     </div>
-  //   </div>
-
-  //   {/* Map Controls Overlay */}
-  //   <div className="absolute bottom-4 right-4 flex gap-2">
-  //     <Button
-  //       size="sm"
-  //       variant="secondary"
-  //       className="shadow-lg bg-zinc-900/90"
-  //     >
-  //       <Navigation className="w-4 h-4 mr-2 text-emerald-500" />
-  //       Open Maps
-  //     </Button>
-  //   </div>
-  // </div>
-);
-
-// --- Main Page Component ---
-
-export default function WorkerHomePage() {
-  const [isOnline, setIsOnline] = useState(true);
-
-  return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans pb-20 md:pb-0">
-      {/* Header */}
-
-      <WorkerHeader />
-      <main className="container mx-auto max-w-2xl px-4 py-6 space-y-6">
-        {/* Welcome Section */}
-        <div className="flex justify-between items-end">
-          <div>
-            <p className="text-zinc-400 text-sm">Good Afternoon,</p>
-            <h1 className="text-2xl font-bold text-white">Alex Walker</h1>
-          </div>
-          <div className="text-right">
-            <p className="text-xs text-zinc-500 uppercase tracking-wider">
-              Today's Earnings
-            </p>
-            <p className="text-xl font-mono font-semibold text-emerald-400">
-              $145.00
-            </p>
-          </div>
-        </div>
-        {/* Current Active Job Card */}
-        <section>
-          <div className="flex items-center justify-between mb-3">
-            {/* <h2 className="text-lg font-semibold flex items-center gap-2">
-              <span className="relative flex h-3 w-3">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
-              </span>
-              Current Job
-            </h2> */}
-            <Badge variant="success">In Progress</Badge>
-          </div>
-
-          <Card className="overflow-hidden">
-            {/* Map Section */}
-            <MapView />
-
-            <div className="p-5 space-y-6">
-              {/* Job Header Details */}
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="text-xl font-bold text-white">
-                    Leaky Faucet Repair
-                  </h3>
-                  <p className="text-zinc-400 text-sm mt-1">
-                    Job ID #8923 • Residential
-                  </p>
-                </div>
-                <div className="text-right">
-                  <div className="inline-flex items-center text-emerald-400 bg-emerald-950/30 px-2 py-1 rounded border border-emerald-900">
-                    <Clock className="w-3 h-3 mr-1.5" />
-                    <span className="text-xs font-mono">00:45:20</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Address & Contact */}
-              <div className="space-y-4">
-                <div className="flex items-start gap-3 p-3 rounded-lg bg-zinc-900/50 border border-zinc-800">
-                  <MapPin className="w-5 h-5 text-zinc-400 mt-0.5 shrink-0" />
-                  <div>
-                    <p className="text-sm text-zinc-200 font-medium">
-                      1245 Maple Avenue, Apt 4B
-                    </p>
-                    <p className="text-xs text-zinc-500">
-                      Greenwood District, NY 10012
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex gap-3">
-                  <Button className="flex-1 gap-2" variant="secondary">
-                    <Navigation className="w-4 h-4" />
-                    Navigate
-                  </Button>
-                  <Button className="flex-1 gap-2" variant="secondary">
-                    <Phone className="w-4 h-4" />
-                    Call
-                  </Button>
-                </div>
-              </div>
-
-              <div className="h-px bg-zinc-800" />
-
-              {/* Job Actions */}
-              <div className="space-y-3">
-                <h4 className="text-sm font-medium text-zinc-400 uppercase tracking-wider ">
-                  Job Actions
-                </h4>
-                <div className="grid grid-cols-2 gap-3">
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start text-zinc-300 hover:text-white hover:border-zinc-600"
-                  >
-                    <MoreVertical className="w-4 h-4 mr-2" />
-                    Add Notes
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start text-zinc-300 hover:text-white hover:border-zinc-600"
-                  >
-                    <DollarSign className="w-4 h-4 mr-2" />
-                    Add Extra Cost
-                  </Button>
-                </div>
-                <Button className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-6 text-lg shadow-lg shadow-emerald-900/20">
-                  <CheckCircle className="w-5 h-5 mr-2" />
-                  Complete Job
-                </Button>
-              </div>
-            </div>
-          </Card>
-        </section>
-        {/* Upcoming Queue (Simple List) */}
-        <section>
-          <h3 className="text-sm font-medium text-zinc-400 mb-3 uppercase tracking-wider">
-            Up Next
-          </h3>
-          <Card className="divide-y divide-zinc-800">
-            <div className="p-4 flex items-center justify-between hover:bg-zinc-900/80 transition-colors cursor-pointer group">
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-500 group-hover:bg-zinc-800 group-hover:text-zinc-300 transition-colors">
-                  <Calendar className="w-5 h-5" />
-                </div>
-                <div>
-                  <p className="font-medium text-zinc-200">
-                    Ceiling Fan Installation
-                  </p>
-                  <p className="text-xs text-zinc-500">3:30 PM • 5.2km away</p>
-                </div>
-              </div>
-              <ChevronRight className="w-5 h-5 text-zinc-600 group-hover:text-zinc-400" />
-            </div>
-            <div className="p-4 flex items-center justify-between hover:bg-zinc-900/80 transition-colors cursor-pointer group">
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-500 group-hover:bg-zinc-800 group-hover:text-zinc-300 transition-colors">
-                  <Calendar className="w-5 h-5" />
-                </div>
-                <div>
-                  <p className="font-medium text-zinc-200">
-                    Switchboard Repair
-                  </p>
-                  <p className="text-xs text-zinc-500">5:00 PM • 1.8km away</p>
-                </div>
-              </div>
-              <ChevronRight className="w-5 h-5 text-zinc-600 group-hover:text-zinc-400" />
-            </div>
-          </Card>
-        </section>
-        <div className="h-12 md:h-0" />{" "}
-        {/* Spacer for mobile bottom nav if added later */}
-      </main>
-    </div>
-  );
-}
+export default WorkerHomePage;
