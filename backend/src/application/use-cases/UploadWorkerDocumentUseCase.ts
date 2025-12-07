@@ -13,32 +13,29 @@ export class UploadWorkerDocumentUseCase implements IUploadWorkerDocumentUseCase
     async execute(userId: string, filePath: string) {
         this._logger.info(`[UploadWorkerDocumentUseCase] Uploading document for user: ${userId}`);
 
-        // STEP 1 — Try all repositories
-        let user =
-            (await this._repositoryFactory.getRepository(Role.WORKER).findById(userId)) ||
-            (await this._repositoryFactory.getRepository(Role.CLIENT).findById(userId));
+        const workerRepo = this._repositoryFactory.getRepository(Role.WORKER);
+        const clientRepo = this._repositoryFactory.getRepository(Role.CLIENT);
+
+        let repo = workerRepo;
+        let user = await workerRepo.findById(userId);
+
+        if (!user) {
+            user = await clientRepo.findById(userId);
+            repo = clientRepo;
+        }
 
         if (!user) throw new Error("User not found");
 
-        // STEP 2 — Upload to Cloudinary
-        const url = await CloudinaryUploadService.upload(filePath, "workers/documents");
+        // Upload to Cloudinary
+        const url = await CloudinaryUploadService.upload(filePath, "users/documents");
 
-        // STEP 3 — Convert CLIENT → WORKER if needed
-        if (user.role !== Role.WORKER) {
-            this._logger.info(`[UploadWorkerDocumentUseCase] User was CLIENT → converting to WORKER`);
-
-            user.role = Role.WORKER;
-            user.documents = [];
-        }
-
-        // STEP 4 — Add document
+        // Always append
         user.documents = user.documents || [];
         user.documents.push(url);
 
-        // STEP 5 — Save using worker repository
-        const workerRepo = this._repositoryFactory.getRepository(Role.WORKER);
-        await workerRepo.updateById(userId, user);
+        await repo.updateById(userId, user);
 
         return { url };
     }
 }
+
