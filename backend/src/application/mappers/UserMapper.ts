@@ -33,4 +33,5 @@ export class UserMapper {
             isVerified: userData.isVerified ?? false,
         };
     }
+
 }

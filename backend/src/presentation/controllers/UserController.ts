@@ -42,7 +42,7 @@ export class UserController implements IUserController {
         try {
             const email = req.params.email;
 
-            const user = await this.getCurrentUserUseCase.execute(email);
+            const user = await this.getCurrentUserUseCase.execute(email);   
 
             return res.status(HttpStatusCode.OK).json({
                 success: true,

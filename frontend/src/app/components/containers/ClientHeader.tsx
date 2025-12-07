@@ -33,6 +33,9 @@ const ClientHeader: React.FC = () => {
   const userMode = (currentUser?.role as "client" | "worker") || "client";
   const isVerified = currentUser?.isVerified ?? false;
 
+   const profileHref =
+    userMode === "worker" ? "/worker/profile" : "/client/profile";
+
   useEffect(() => {
     setIsLoggedIn(Boolean(currentUser && Object.keys(currentUser).length));
   }, [currentUser]);
@@ -174,7 +177,7 @@ const ClientHeader: React.FC = () => {
                     </div>
 
                     <div className="p-1.5 space-y-0.5">
-                      <Link href="/client/profile" className="block">
+                      <Link href={profileHref} className="block">
                         <div className="w-full flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-[#1B4332] rounded-lg transition-colors text-left group cursor-pointer">
                           <User
                             size={16}
