@@ -63,6 +63,10 @@ import { UploadProfilePictureUseCase } from "../../application/use-cases/UploadP
 import { UploadWorkerDocumentUseCase } from "../../application/use-cases/UploadWorkerDocumentUseCase";
 import { IUploadController } from "../../presentation/interfaces/IUploadController";
 import { UploadController } from "../../presentation/controllers/UploadController";
+import { IUpdateUserProfileUseCase } from "../../application/interfaces/IUpdateUserProfileUseCase";
+import { UpdateUserProfileUseCase } from "../../application/use-cases/UpdateUserProfileUseCase";
+import { IUserProfileController } from "../../presentation/interfaces/IUserProfileController";
+import { UserProfileController } from "../../presentation/controllers/UserProfileController";
 
 export class DIContainer {
   // -------------------------
@@ -72,7 +76,6 @@ export class DIContainer {
   private _clientRepository?: IClientRepository;
   private _workerRepository?: IWorkerRepository;
   private _otpRepository?: OtpRepository;
-  private __baseRepository?: IBaseRepository<User>;
 
 
 
@@ -108,6 +111,8 @@ export class DIContainer {
   private _uploadProfilePictureUseCase?: IUploadProfilePictureUseCase;
   private _uploadWorkerDocumentUseCase?: IUploadWorkerDocumentUseCase;
 
+  private _updateUserProfileUseCase?: IUpdateUserProfileUseCase;
+
   // -------------------------
   // Presentation Layer
   // -------------------------
@@ -119,6 +124,7 @@ export class DIContainer {
   private _userController?: IUserController;
 
   private _uploadController?: IUploadController;
+  private _userProfileController?: IUserProfileController
 
 
   // ==========================================
@@ -338,6 +344,17 @@ export class DIContainer {
     return this._uploadWorkerDocumentUseCase;
   }
 
+  get updateUserProfileUseCase(): IUpdateUserProfileUseCase {
+    if (!this._updateUserProfileUseCase) {
+      this._updateUserProfileUseCase = new UpdateUserProfileUseCase(
+        this.userRepositoryFactory,
+        this.logger,
+        this.uploadProfilePictureUseCase
+      );
+    }
+    return this._updateUserProfileUseCase
+  }
+
 
   // ==========================================
   // Presentation Layer
@@ -408,5 +425,14 @@ export class DIContainer {
     }
     return this._uploadController;
   }
+
+get userProfileController(): IUserProfileController{
+  if(!this._userProfileController) {
+    this._userProfileController = new UserProfileController(
+      this.updateUserProfileUseCase
+    );
+  }
+  return this._userProfileController
+}
 
 }

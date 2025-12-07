@@ -10,19 +10,29 @@ export class UploadProfilePictureUseCase implements IUploadProfilePictureUseCase
         private readonly _logger: ILogger
     ) {}
 
-    async execute(workerId: string, filePath: string) {
-        this._logger.info(`[UploadProfilePictureUseCase] Uploading profile picture for worker: ${workerId}`);
+    async execute(userId: string, filePath: string) {
+        this._logger.info(`[UploadProfilePictureUseCase] Uploading profile picture for user: ${userId}`);
 
-        const repo = this._repositoryFactory.getRepository(Role.WORKER);
-        const worker = await repo.findById(workerId);
+        const workerRepo = this._repositoryFactory.getRepository(Role.WORKER);
+        const clientRepo = this._repositoryFactory.getRepository(Role.CLIENT);
 
-        if (!worker) throw new Error("Worker not found");
+        let repo = workerRepo;
+        let user = await workerRepo.findById(userId);
 
-        const url = await CloudinaryUploadService.upload(filePath, "workers/profile");
+        if (!user) {
+            user = await clientRepo.findById(userId);
+            repo = clientRepo;
+        }
 
-        worker.profilePictureUrl = url;
-        await repo.updateById(workerId, worker);
+        if (!user) throw new Error("User not found");
+
+        const url = await CloudinaryUploadService.upload(filePath, "users/profile");
+
+        user.profilePictureUrl = url;
+
+        await repo.updateById(userId, user);
 
         return { url };
     }
 }
+

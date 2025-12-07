@@ -45,7 +45,7 @@ async function bootstrap() {
 
   app.use("/api/auth", createGoogleAuthRoutes(container.googleAuthController));
 
-  app.use("/api/auth", createUserRoutes(container.userController, container.authMiddleware));
+  app.use("/api/auth", createUserRoutes(container.userController, container.userProfileController, container.authMiddleware ));
 
   app.use("/api/admin", createAdminRoutes(container.adminController));
 
