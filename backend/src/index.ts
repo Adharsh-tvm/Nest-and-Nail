@@ -10,6 +10,7 @@ import { DIContainer } from "./infrastructure/di/DIContainer";
 import { createGoogleAuthRoutes } from "./presentation/routes/GoogleAuthRoutes";
 import { createAdminRoutes } from "./presentation/routes/adminRoutes";
 import { createUserRoutes } from "./presentation/routes/userRoutes";
+import { createUploadRoutes } from "./presentation/routes/uploadRoutes";
 
 // Load environment variables
 dotenv.config();
@@ -18,14 +19,14 @@ async function bootstrap() {
   const app = express();
 
   // Middleware
-app.use(
-  cors({
-    origin: "http://localhost:3000",
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
+  app.use(
+    cors({
+      origin: "http://localhost:3000",
+      credentials: true,
+      methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+      allowedHeaders: ["Content-Type", "Authorization"],
+    })
+  );
 
 
   app.use(express.json());
@@ -43,10 +44,12 @@ app.use(
   app.use("/api/auth", createAuthRoutes(container.authController, container.authMiddleware));
 
   app.use("/api/auth", createGoogleAuthRoutes(container.googleAuthController));
-  
-  app.use("/api/auth", createUserRoutes(container.userController,container.authMiddleware ));
+
+  app.use("/api/auth", createUserRoutes(container.userController, container.authMiddleware));
 
   app.use("/api/admin", createAdminRoutes(container.adminController));
+
+  app.use("/api/upload", createUploadRoutes(container.uploadController, container.authMiddleware));
 
 
   // Error Handler

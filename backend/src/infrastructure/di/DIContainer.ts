@@ -57,6 +57,12 @@ import { IGetCurrentUserUseCase } from "../../application/interfaces/IGetCurrent
 import { GetCurrentUserUseCase } from "../../application/use-cases/GetCurrentUserUseCase";
 import { IBaseRepository } from "../../domain/repositories/IBaseRepository";
 import { User } from "../../domain/entities/User";
+import { IUploadProfilePictureUseCase } from "../../application/interfaces/IUploadProfilePictureUseCase";
+import { IUploadWorkerDocumentUseCase } from "../../application/interfaces/IUploadWorkerDocumentUseCase";
+import { UploadProfilePictureUseCase } from "../../application/use-cases/UploadProfilePictureUseCase";
+import { UploadWorkerDocumentUseCase } from "../../application/use-cases/UploadWorkerDocumentUseCase";
+import { IUploadController } from "../../presentation/interfaces/IUploadController";
+import { UploadController } from "../../presentation/controllers/UploadController";
 
 export class DIContainer {
   // -------------------------
@@ -99,6 +105,9 @@ export class DIContainer {
   private _changeUserRoleuseCase?: IChangeUserRoleUseCase;
   private _getCurrentUserUseCase?: IGetCurrentUserUseCase;
 
+  private _uploadProfilePictureUseCase?: IUploadProfilePictureUseCase;
+  private _uploadWorkerDocumentUseCase?: IUploadWorkerDocumentUseCase;
+
   // -------------------------
   // Presentation Layer
   // -------------------------
@@ -108,6 +117,9 @@ export class DIContainer {
   private _googleAuthController?: IGoogleAuthController;
   private _adminController?: IAdminController;
   private _userController?: IUserController;
+
+  private _uploadController?: IUploadController;
+
 
   // ==========================================
   // Infrastructure Lazy Getters
@@ -306,6 +318,26 @@ export class DIContainer {
     return this._getCurrentUserUseCase;
   }
 
+  get uploadProfilePictureUseCase(): IUploadProfilePictureUseCase {
+    if (!this._uploadProfilePictureUseCase) {
+      this._uploadProfilePictureUseCase = new UploadProfilePictureUseCase(
+        this.userRepositoryFactory,
+        this.logger
+      );
+    }
+    return this._uploadProfilePictureUseCase;
+  }
+
+  get uploadWorkerDocumentUseCase(): IUploadWorkerDocumentUseCase {
+    if (!this._uploadWorkerDocumentUseCase) {
+      this._uploadWorkerDocumentUseCase = new UploadWorkerDocumentUseCase(
+        this.userRepositoryFactory,
+        this.logger
+      );
+    }
+    return this._uploadWorkerDocumentUseCase;
+  }
+
 
   // ==========================================
   // Presentation Layer
@@ -366,4 +398,15 @@ export class DIContainer {
     }
     return this._authMiddleware;
   }
+
+  get uploadController(): IUploadController {
+    if (!this._uploadController) {
+      this._uploadController = new UploadController(
+        this.uploadProfilePictureUseCase,
+        this.uploadWorkerDocumentUseCase,
+      );
+    }
+    return this._uploadController;
+  }
+
 }
