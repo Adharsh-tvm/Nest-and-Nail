@@ -21,7 +21,6 @@ export async function handleGoogleSignIn(
 ): Promise<GoogleAuthState> {
   try {
 
-    // console.log(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID, "hiuoihuihsdlfihgolighu")
     const ticket = await googleClient.verifyIdToken({
       idToken: googleToken,
       audience: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
@@ -41,7 +40,6 @@ export async function handleGoogleSignIn(
       role
     });
 
-    console.log("Google action response: ccccccccccc : ", response.data)
 
     if (!response.data.success) {
       return { success: false, message: response.data.message };

@@ -32,7 +32,7 @@ export interface LoginResponseDTO {
         email_address: string;
         user_role: Role;
         phone_number?: number;
-        profileImageUrl?: string;
+        profileImageUrl?: string | undefined; 
         isBlocked: boolean;
         isVerified: boolean;
     };
