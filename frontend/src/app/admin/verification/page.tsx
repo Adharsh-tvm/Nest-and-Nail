@@ -20,6 +20,7 @@ import {
 import { PendingVerificationUser } from "@/types/types";
 import { useUsers } from "@/hooks/useUsers";
 import DataTable from "@/app/components/containers/DataTable";
+import { approveUserVerification, rejectUserVerification } from "@/services/api/admin.api";
 
 /* ---------------------------------------------------------------------------
  * TABLE TYPES
@@ -351,16 +352,40 @@ const VerificationsPendingView: React.FC = () => {
 
   console.log("pendingRequests", pendingRequests);
 
-  const handleApprove = (req: PendingVerificationUser) => {
-    alert(`Approved verification for ${req.name}`);
-    setSelectedRequest(null);
+  const handleApprove = async (req: PendingVerificationUser) => {
+    try {
+      const response = await approveUserVerification(req.userId);
+      console.log("Approved:", response);
+
+      alert(`Approved verification for ${req.name}`);
+
+      setSelectedRequest(null);
+
+      // optional: refresh list
+      window.location.reload();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to approve user.");
+    }
   };
 
-  const handleReject = (req: PendingVerificationUser) => {
-    const reason = window.prompt("Enter reason for rejection:");
-    if (reason) {
+  const handleReject = async (req: PendingVerificationUser) => {
+    try {
+      const reason = window.prompt("Enter reason for rejection:");
+      if (!reason) return;
+
+      const response = await rejectUserVerification(req.userId);
+      console.log("Rejected:", response);
+
       alert(`Rejected ${req.name} because: ${reason}`);
+
       setSelectedRequest(null);
+
+      // optional refresh
+      window.location.reload();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to reject user.");
     }
   };
 

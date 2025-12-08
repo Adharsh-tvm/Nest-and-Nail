@@ -3,11 +3,15 @@ import { IAdminController } from "../interfaces/IAdminController";
 import { IGetAllClientsUseCase } from "../../application/interfaces/IGetAllClientsUseCase";
 import { IGetAllWorkersUseCase } from "../../application/interfaces/IGetAllWorkersUseCase";
 import { HttpStatusCode } from "../enums/httpCodes";
+import { IUpdateVerificationStatusUseCase } from "../../application/interfaces/IUpdateVerificationStatusUseCase";
+import { VerificationStatus } from "../../domain/enums/enums";
 
 export class AdminController implements IAdminController {
     constructor(
         private readonly _getAllClientsUseCase: IGetAllClientsUseCase,
-        private readonly _getAllWorkersUseCase: IGetAllWorkersUseCase
+        private readonly _getAllWorkersUseCase: IGetAllWorkersUseCase,
+        private readonly _updateVerificationStatusUseCase: IUpdateVerificationStatusUseCase,
+
     ) { }
 
     async getAllClients(req: Request, res: Response): Promise<void> {
@@ -32,7 +36,6 @@ export class AdminController implements IAdminController {
                 error: message || "Unknown error"
             });
         }
-
     }
 
     async getAllWorkers(req: Request, res: Response): Promise<void> {
@@ -59,4 +62,53 @@ export class AdminController implements IAdminController {
             });
         }
     }
+
+    approveVerification = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const { userId } = req.params;
+
+            const result = await this._updateVerificationStatusUseCase.execute(
+                userId,
+                VerificationStatus.VERIFIED
+            );
+
+            res.status(HttpStatusCode.OK).json({
+                success: true,
+                message: "User approved successfully",
+                user: result
+            });
+
+        } catch (error: any) {
+            console.error(error);
+            res.status(HttpStatusCode.INTERNAL_SERVER).json({
+                success: false,
+                message: error.message || "Internal server error"
+            });
+        }
+    };
+
+
+    rejectVerification = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const { userId } = req.params;
+
+            const result = await this._updateVerificationStatusUseCase.execute(
+                userId,
+                VerificationStatus.NOT_VERIFIED
+            );
+
+            res.status(HttpStatusCode.OK).json({
+                success: true,
+                message: "User rejected successfully",
+                user: result
+            });
+
+        } catch (error: any) {
+            console.error(error);
+            res.status(HttpStatusCode.INTERNAL_SERVER).json({
+                success: false,
+                message: error.message || "Internal server error"
+            });
+        }
+    };
 }

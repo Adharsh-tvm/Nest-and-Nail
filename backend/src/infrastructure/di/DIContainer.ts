@@ -67,6 +67,8 @@ import { IUserProfileController } from "../../presentation/interfaces/IUserProfi
 import { UserProfileController } from "../../presentation/controllers/UserProfileController";
 import { IGetAllUsersUseCase } from "../../application/interfaces/IGetAllUsersUseCase";
 import { GetAllUsersUseCase } from "../../application/use-cases/GetAllUsersUseCase";
+import { IUpdateVerificationStatusUseCase } from "../../application/interfaces/IUpdateVerificationStatusUseCase";
+import { UpdateVerificationStatusUseCase } from "../../application/use-cases/UpdateVerificationStatusUseCase";
 
 export class DIContainer {
   // -------------------------
@@ -113,6 +115,7 @@ export class DIContainer {
   private _uploadWorkerDocumentUseCase?: IUploadWorkerDocumentUseCase;
 
   private _updateUserProfileUseCase?: IUpdateUserProfileUseCase;
+  private _updateVerificationStatusUseCase?: IUpdateVerificationStatusUseCase;
 
 
   // -------------------------
@@ -364,7 +367,17 @@ export class DIContainer {
         this.logger
       )
     }
-    return this._getAllUsersUseCase
+    return this._getAllUsersUseCase;
+  }
+
+  get updateVerificationStatusUseCase(): IUpdateVerificationStatusUseCase{
+    if(!this._updateVerificationStatusUseCase) {
+      this._updateVerificationStatusUseCase = new UpdateVerificationStatusUseCase(
+        this.userRepositoryFactory,
+        this.logger
+      );
+    }
+    return this._updateVerificationStatusUseCase;
   }
 
 
@@ -389,7 +402,8 @@ export class DIContainer {
     if (!this._adminController) {
       this._adminController = new AdminController(
         this.getAllClientsUseCase,
-        this.getAllWorkersUseCase
+        this.getAllWorkersUseCase,
+        this.updateVerificationStatusUseCase
       );
     }
     return this._adminController;
