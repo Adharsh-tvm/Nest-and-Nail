@@ -23,6 +23,7 @@ export class ClientRepository extends BaseRepository<Client> implements IClientR
             profilePictureUrl: client.profilePictureUrl,
             role: client.role,
             loginMethod: client.loginMethod,
+            isVerified: client.isVerified
         }));
     }
 }
