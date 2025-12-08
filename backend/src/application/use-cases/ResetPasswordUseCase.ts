@@ -2,7 +2,7 @@ import { UserRepositoryFactory } from "../../infrastructure/repo/UserRepositoryF
 import { IOtpRepository } from "../../domain/repositories/IOtpRepository";
 import { ILogger } from "../interfaces/ILogger";
 import { IPasswordHasher } from "../services/IPasswordHasher";
-import { Role } from "../../shared/enums/enums";
+import { Role } from "../../domain/enums/enums";
 import { IResetPasswordUseCase } from "../interfaces/IResetPasswordUseCase";
 
 export class ResetPasswordUseCase implements IResetPasswordUseCase {

@@ -16,7 +16,8 @@ import { logoutAction } from "@/app/actions/logout-actions";
 import { useUserStore } from "@/store/userStore";
 import Link from "next/link";
 import { changeRoleAction } from "@/app/actions/change-role-action";
-import WorkerVerificationFlow from "./DocumentsUpload"; 
+import WorkerVerificationFlow from "./DocumentsUpload";
+import { VerificationStatus } from "@/enums/enums";
 
 const ClientHeader: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -31,9 +32,15 @@ const ClientHeader: React.FC = () => {
   const { user: currentUser, setUser } = useUserStore();
 
   const userMode = (currentUser?.role as "client" | "worker") || "client";
-  const isVerified = currentUser?.isVerified ?? false;
 
-   const profileHref =
+  const verificationStatus: VerificationStatus =
+    currentUser?.isVerified ?? VerificationStatus.NOT_VERIFIED;
+
+  // convenience booleans
+  const isVerified = verificationStatus === VerificationStatus.VERIFIED;
+  const isPending = verificationStatus === VerificationStatus.PENDING;
+
+  const profileHref =
     userMode === "worker" ? "/worker/profile" : "/client/profile";
 
   useEffect(() => {
@@ -101,7 +108,7 @@ const ClientHeader: React.FC = () => {
             {/* RIGHT: Toggle + User Menu */}
             <div className="hidden md:flex items-center gap-4 flex-shrink-0">
               {/* If NOT verified -> show Become a Worker button */}
-              {!isVerified ? (
+              {!isVerified && !isPending && (
                 <button
                   type="button"
                   onClick={() => setIsWorkerFlowOpen(true)}
@@ -109,8 +116,22 @@ const ClientHeader: React.FC = () => {
                 >
                   Become a Worker
                 </button>
-              ) : (
-                // If verified -> toggle mode
+              )}
+
+              {/* If verification is PENDING -> show disabled status */}
+              {isPending && (
+                <button
+                  type="button"
+                  disabled
+                  className="flex items-center gap-2 bg-amber-50 text-amber-700 px-4 py-2 rounded-full text-xs font-semibold border border-amber-200 cursor-not-allowed"
+                >
+                  <Hammer size={14} />
+                  Verification Pending
+                </button>
+              )}
+
+              {/* If VERIFIED -> show client/worker toggle */}
+              {isVerified && (
                 <div
                   onClick={toggleUserMode}
                   className={`relative flex items-center bg-gray-100 rounded-full p-1 w-32 h-10 border border-gray-200 shadow-inner ${
@@ -124,7 +145,6 @@ const ClientHeader: React.FC = () => {
                         : "left-[calc(50%)] bg-[#DC2626]"
                     }`}
                   />
-
                   <div
                     className={`flex-1 z-10 text-center text-xs font-bold ${
                       userMode === "client" ? "text-white" : "text-gray-500"
@@ -132,7 +152,6 @@ const ClientHeader: React.FC = () => {
                   >
                     Client
                   </div>
-
                   <div
                     className={`flex-1 z-10 text-center text-xs font-bold ${
                       userMode === "worker" ? "text-white" : "text-gray-500"
@@ -142,7 +161,6 @@ const ClientHeader: React.FC = () => {
                   </div>
                 </div>
               )}
-
               <div className="h-6 w-px bg-gray-200 mx-2" />
 
               {/* User dropdown */}

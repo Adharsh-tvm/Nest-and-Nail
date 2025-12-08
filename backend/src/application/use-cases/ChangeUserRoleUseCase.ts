@@ -1,5 +1,5 @@
 import { UserRepositoryFactory } from "../../infrastructure/repo/UserRepositoryFactory";
-import { Role } from "../../shared/enums/enums";
+import { Role } from "../../domain/enums/enums";
 import { UserResponseDTO } from "../dtos/UserDTO";
 import { IChangeUserRoleUseCase } from "../interfaces/IChangeUserRoleUseCase";
 import { ILogger } from "../interfaces/ILogger";
@@ -26,7 +26,7 @@ export class ChangeUserRoleUseCase implements IChangeUserRoleUseCase {
         let user = await clientRepo.findById(userId);
         let currentRole: Role | null = user ? Role.CLIENT : null;
 
-        if (!user) { 
+        if (!user) {
             user = await workerRepo.findById(userId);
             currentRole = user ? Role.WORKER : null;
         }
@@ -65,7 +65,6 @@ export class ChangeUserRoleUseCase implements IChangeUserRoleUseCase {
                 ...raw,
                 role: Role.WORKER,
                 skills: raw.skills ?? [],
-                // isVerified: raw.isVerified ?? false
             };
 
             newUser = await workerRepo.create(workerData);

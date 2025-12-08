@@ -1,6 +1,6 @@
 import { UserRepositoryFactory } from "../../infrastructure/repo/UserRepositoryFactory";
 import { ILogger } from "../interfaces/ILogger";
-import { Role } from "../../shared/enums/enums";
+import { Role, VerificationStatus } from "../../domain/enums/enums";
 import { CloudinaryUploadService } from "../../infrastructure/services/CloudinaryUploadService";
 import { IUploadWorkerDocumentUseCase } from "../interfaces/IUploadWorkerDocumentUseCase";
 
@@ -29,13 +29,16 @@ export class UploadWorkerDocumentUseCase implements IUploadWorkerDocumentUseCase
         // Upload to Cloudinary
         const url = await CloudinaryUploadService.upload(filePath, "users/documents");
 
-        // Always append
+        // Always append documents
         user.documents = user.documents || [];
         user.documents.push(url);
 
+        // 🔥 Mark verification status as PENDING
+        user.isVerified = VerificationStatus.PENDING;
+
+        // Save changes
         await repo.updateById(userId, user);
 
         return { url };
     }
 }
-

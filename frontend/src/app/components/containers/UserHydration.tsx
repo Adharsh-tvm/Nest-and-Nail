@@ -3,16 +3,30 @@
 
 import { useEffect } from "react";
 import { useUserStore, User } from "@/store/userStore";
+import { VerificationStatus } from "@/enums/enums";
+// ⬅️ adjust path if needed
 
 type ServerUser = Record<string, any>;
 
-function normalizeIsVerified(v: any): boolean {
-  // handle boolean, "true"/"false", 1/0, "1"/"0"
-  if (v === true) return true;
-  if (v === false) return false;
-  if (typeof v === "string") return v.toLowerCase() === "true" || v === "1";
-  if (typeof v === "number") return v === 1;
-  return Boolean(v);
+function normalizeIsVerified(v: any): VerificationStatus {
+  // VERIFIED cases
+  if (
+    v === true ||
+    v === 1 ||
+    v === "1" ||
+    v === "VERIFIED" ||
+    v === "verified"
+  ) {
+    return VerificationStatus.VERIFIED;
+  }
+
+  // PENDING cases
+  if (v === "PENDING" || v === "pending") {
+    return VerificationStatus.PENDING;
+  }
+
+  // Default
+  return VerificationStatus.NOT_VERIFIED;
 }
 
 export default function UserHydration({ user }: { user: ServerUser | null }) {
@@ -26,33 +40,33 @@ export default function UserHydration({ user }: { user: ServerUser | null }) {
     }
 
     // Accept many shapes, pick canonical fields
-const mapped: User = {
-  id: user.id ?? user.user_id ?? user.userId ?? "",
-  name: user.name ?? user.user_name ?? user.userName ?? "",
-  email: user.email ?? user.email_address ?? "",
-  role: user.role ?? user.user_role ?? "client",
-  isVerified: normalizeIsVerified(
-    user.is_verified ?? user.isVerified ?? user.verified
-  ),
+    const mapped: User = {
+      id: user.id ?? user.user_id ?? user.userId ?? "",
+      name: user.name ?? user.user_name ?? user.userName ?? "",
+      email: user.email ?? user.email_address ?? "",
+      role: user.role ?? user.user_role ?? "client",
 
-  // ADD THIS LINE 👇
-  profileImageUrl:
-    user.profileImageUrl ??
-    user.profilePictureUrl ??
-    user.profile_picture ??
-    user.profilePicture ??
-    null,
+      isVerified: normalizeIsVerified(
+        user.is_verified ?? user.isVerified ?? user.verified
+      ),
 
-  iat: user.iat,
-  exp: user.exp,
-};
+      profileImageUrl:
+        user.profileImageUrl ??
+        user.profilePictureUrl ??
+        user.profile_picture ??
+        user.profilePicture ??
+        null,
 
+      iat: user.iat,
+      exp: user.exp,
+    };
 
-console.log("[UserHydration] raw isVerified fields:", {
-  isVerified: user.isVerified,
-  is_verified: user.is_verified,
-  verified: user.verified
-});
+    console.log("[UserHydration] raw isVerified fields:", {
+      isVerified: user.isVerified,
+      is_verified: user.is_verified,
+      verified: user.verified,
+    });
+    console.log("[UserHydration] mapped isVerified:", mapped.isVerified);
 
     setUser(mapped);
   }, [user, setUser]);

@@ -1,6 +1,6 @@
 import { UserAlreadyExistsError } from "../../domain/errors/DomainError";
 import { UserRepositoryFactory } from "../../infrastructure/repo/UserRepositoryFactory";
-import { LoginMethod } from "../../shared/enums/enums";
+import { LoginMethod } from "../../domain/enums/enums";
 import { UserRequestDTO, UserResponseDTO } from "../dtos/UserDTO";
 import { ILogger } from "../interfaces/ILogger";
 import { IRegisterUserUseCase } from "../interfaces/IRegisterUserUseCase";
@@ -72,9 +72,9 @@ export class RegisterUserUseCase implements IRegisterUserUseCase {
 
     const accessToken = this._tokenService.generateAccessToken({
       id: userResponse.user_id,
-      name: userResponse.user_name,           
-      email: userResponse.email_address,      
-      role: userResponse.user_role,           
+      name: userResponse.user_name,
+      email: userResponse.email_address,
+      role: userResponse.user_role,
     });
     const refreshToken = this._tokenService.generateRefreshToken({
       id: userResponse.user_id,

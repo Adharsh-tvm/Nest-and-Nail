@@ -2,7 +2,7 @@
 
 import { UserRepositoryFactory } from "../../infrastructure/repo/UserRepositoryFactory";
 import { ILogger } from "../interfaces/ILogger";
-import { Role } from "../../shared/enums/enums";
+import { Role } from "../../domain/enums/enums";
 import { IUpdateUserProfileUseCase } from "../interfaces/IUpdateUserProfileUseCase";
 import { UserResponseDTO } from "../dtos/UserDTO";
 import { UserMapper } from "../mappers/UserMapper";
@@ -15,7 +15,7 @@ export class UpdateUserProfileUseCase implements IUpdateUserProfileUseCase {
         private readonly _repositoryFactory: UserRepositoryFactory,
         private readonly _logger: ILogger,
         private readonly _uploadProfilePictureUseCase: IUploadProfilePictureUseCase,
-    ) {}
+    ) { }
 
     async execute(
         userId: string,

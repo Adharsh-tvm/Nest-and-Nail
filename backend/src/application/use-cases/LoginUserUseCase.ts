@@ -6,7 +6,7 @@ import { UserMapper } from "../mappers/UserMapper";
 import { IPasswordHasher } from "../services/IPasswordHasher";
 import { ITokenService } from "../services/ITokenService";
 import { UserRepositoryFactory } from "../../infrastructure/repo/UserRepositoryFactory";
-import { Role } from "../../shared/enums/enums";
+import { Role } from "../../domain/enums/enums";
 import { User } from "../../domain/entities/User";
 
 export class LoginUserUseCase implements ILoginUserUseCase {
@@ -98,13 +98,13 @@ export class LoginUserUseCase implements ILoginUserUseCase {
 
         const accessToken = this._tokenService.generateAccessToken({
             id: user.userId,
-            name:user.name,
+            name: user.name,
             email: user.email,
             role: user.role
         });
         const refreshToken = this._tokenService.generateRefreshToken({
             id: user.userId,
-            name:user.name,
+            name: user.name,
             email: user.email,
             role: user.role
         });

@@ -1,6 +1,6 @@
 import mongoose, { Model, Schema } from "mongoose";
 import { User } from "../../../domain/entities/User";
-import { LoginMethod, Role } from "../../../shared/enums/enums";
+import { LoginMethod, Role, VerificationStatus } from "../../../domain/enums/enums";
 
 const userSchema = new Schema<User>({
     userId: { type: String, required: true, unique: true },
@@ -11,7 +11,9 @@ const userSchema = new Schema<User>({
     passwordhash: { type: String, default: null },
 
     isBlocked: { type: Boolean, default: false },
-    isVerified: { type: Boolean, default: false },
+    isVerified: { type: String,
+        enum: Object.values(VerificationStatus), 
+        default: VerificationStatus.NOT_VERIFIED },
 
     profilePictureUrl: { type: String, default: "" },
 
