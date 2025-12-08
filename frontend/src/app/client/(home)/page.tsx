@@ -508,7 +508,7 @@ const Footer = () => (
       </div>
 
       <div className="pt-8 flex flex-col md:flex-row justify-between items-center text-sm">
-        <p>© 2024 Mendon Inc. All rights reserved.</p>
+        <p>© 2024 Nest & Nail Inc. All rights reserved.</p>
         <div className="flex gap-8 mt-4 md:mt-0">
           <a href="#" className="hover:text-white transition-colors">
             Privacy

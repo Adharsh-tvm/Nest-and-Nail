@@ -1,7 +1,7 @@
 // app/actions/get-current-user.ts (server)
 "use server";
 import { cookies } from "next/headers";
-import userApi from "@/services/auth/user.api";
+import userApi from "@/services/api/user.api";
 import "server-only";
 
 type CanonicalUser = {

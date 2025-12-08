@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
-import authApi from "@/services/auth/auth.api";
+import authApi from "@/services/api/auth.api";
 
 type LoginFormData = {
   email: string;

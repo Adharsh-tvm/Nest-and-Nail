@@ -1,7 +1,7 @@
 "use server";
 
 import { cookies } from "next/headers";
-import userApi from "@/services/auth/user.api";
+import userApi from "@/services/api/user.api";
 
 export async function changeRoleAction(role: "client" | "worker") {
   try {

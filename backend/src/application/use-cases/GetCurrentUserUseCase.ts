@@ -10,7 +10,7 @@ export class GetCurrentUserUseCase implements IGetCurrentUserUseCase {
     constructor(
         private readonly _repositoryFactory: UserRepositoryFactory,
         private readonly _logger: ILogger,
-    ) {}
+    ) { }
 
     async execute(email: string | null): Promise<UserResponseDTO> {
         if (!email) {
@@ -41,6 +41,18 @@ export class GetCurrentUserUseCase implements IGetCurrentUserUseCase {
                 user = await workerRepo.findByEmail(email);
                 if (user) {
                     this._logger.info(`[GetCurrentUserUseCase] User found as WORKER`);
+                }
+            } catch (error) {
+                // Continue
+            }
+        }
+
+        if (!user) {
+            try {
+                const adminRepo = this._repositoryFactory.getRepository(Role.ADMIN);
+                user = await adminRepo.findByEmail(email);
+                if (user) {
+                    this._logger.info(`[GetCurrentUserUseCase] User found as ADMIN`);
                 }
             } catch (error) {
                 // Continue
