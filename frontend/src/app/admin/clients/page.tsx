@@ -9,8 +9,8 @@ const formatDate = (iso?: string | undefined) => {
   if (!iso) return "—";
   try {
     const d = new Date(iso);
-    if (isNaN(d.getTime())) return iso; 
-    return d.toLocaleDateString(); 
+    if (isNaN(d.getTime())) return iso;
+    return d.toLocaleDateString();
   } catch {
     return iso;
   }
@@ -115,8 +115,6 @@ const ClientsView = () => {
                         </span>
                       )}
                     </td>
-
-                  
 
                     <td className="p-5 text-right">
                       <button className="p-2 hover:bg-slate-200 rounded-full text-slate-400 hover:text-slate-600">

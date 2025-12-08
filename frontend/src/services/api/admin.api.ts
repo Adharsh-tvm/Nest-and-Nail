@@ -5,10 +5,10 @@ import { cookies } from "next/headers";
 
 export type Client = {
   user_id: string;
-  user_name: string; 
+  user_name: string;
   email_address: string;
   phone?: string;
-  user_role: string;  
+  user_role: string;
   profileImageUrl?: string;
   isBlocked: boolean;
   isVerified: boolean;
@@ -16,15 +16,27 @@ export type Client = {
 
 export type Worker = {
   user_id: string;
-  user_name: string; 
+  user_name: string;
   email_address: string;
   phone?: string;
-  user_role: string;  
+  user_role: string;
   skills: string[];
   profileImageUrl?: string;
   isBlocked: boolean;
   isVerified: boolean;
 };
+
+export interface User {
+  user_id: string;
+  user_name: string;
+  email_address: string;
+  phone_number?: number;
+  skills: string[];
+  user_role: string;
+  profileImageUrl?: string;
+  isBlocked: boolean;
+  isVerified: boolean;
+}
 
 type ApiListResponse<T> = {
   success: boolean;
@@ -45,11 +57,11 @@ async function createAuthAxios() {
   try {
     const cookieStore = await cookies();
     const accessToken = cookieStore.get("accessToken")?.value;
-    
+
     if (accessToken) {
       axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
     }
-    
+
     const allCookies = cookieStore.getAll();
     if (allCookies.length > 0) {
       const cookieString = allCookies
