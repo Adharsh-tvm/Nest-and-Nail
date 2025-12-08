@@ -1,0 +1,34 @@
+import { IUpdateVerificationStatusUseCase } from "../interfaces/IUpdateVerificationStatusUseCase";
+import { UserRepositoryFactory } from "../../infrastructure/repo/UserRepositoryFactory";
+import { VerificationStatus } from "../../domain/enums/enums";
+import { UserMapper } from "../mappers/UserMapper";
+import { ILogger } from "../interfaces/ILogger";
+import { Role } from "../../domain/enums/enums";
+
+export class UpdateVerificationStatusUseCase implements IUpdateVerificationStatusUseCase {
+    constructor(
+        private readonly repoFactory: UserRepositoryFactory,
+        private readonly logger: ILogger
+    ) {}
+
+    async execute(userId: string, status: VerificationStatus) {
+        this.logger.info(`Updating verification status for user ${userId} → ${status}`);
+
+        // We do NOT know whether user is worker or client → guess both
+        const clientRepo = this.repoFactory.getRepository(Role.CLIENT);
+        const workerRepo = this.repoFactory.getRepository(Role.WORKER);
+
+        let user = await clientRepo.findById(userId);
+        if (!user) user = await workerRepo.findById(userId);
+
+        if (!user) throw new Error("User not found");
+
+        const repo = user.role === Role.WORKER ? workerRepo : clientRepo;
+
+        const updated = await repo.updateById(userId, { isVerified: status });
+
+        if (!updated) throw new Error("Failed to update verification status");
+
+        return UserMapper.toResponseDTO(updated);
+    }
+}

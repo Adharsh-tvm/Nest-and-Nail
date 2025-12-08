@@ -158,3 +158,19 @@ export async function getAllWorkers(): Promise<Worker[]> {
     ),
   }));
 }
+
+export async function approveUserVerification(userId: string) {
+  const axiosInstance = await createAuthAxios();
+
+  const res = await axiosInstance.patch(`/api/admin/verify/${userId}`);
+
+  return res.data;  
+}
+
+export async function rejectUserVerification(userId: string) {
+  const axiosInstance = await createAuthAxios();
+
+  const res = await axiosInstance.patch(`/api/admin/reject/${userId}`);
+
+  return res.data; 
+}
