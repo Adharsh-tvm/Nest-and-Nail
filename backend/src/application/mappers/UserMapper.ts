@@ -31,8 +31,22 @@ export class UserMapper {
             profileImageUrl: userData.profilePictureUrl,
             isBlocked: userData.isBlocked ?? false,
             isVerified: userData.isVerified ?? VerificationStatus.NOT_VERIFIED,
+
+            // ⭐ ADD THE MISSING ARRAYS ⭐
+            skills: userData.skills ?? [],
+            address: userData.address ?? "",
+
+            documents: userData.documents ?? [],
+            certificates: userData.certificates ?? [],
+            workPhotos: userData.workPhotos ?? [],
+
+            // ⭐ Include these too
+            createdAt: userData.createdAt?.toISOString?.() ?? "",
+            updatedAt: userData.updatedAt?.toISOString?.() ?? "",
         };
     }
+
+
 
 
 }

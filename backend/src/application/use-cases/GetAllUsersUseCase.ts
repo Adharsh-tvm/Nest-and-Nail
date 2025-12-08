@@ -24,6 +24,8 @@ export class GetAllUsersUseCase implements IGetAllUsersUseCase {
 
         const allUsers = [...clients, ...workers];
 
+        console.log("Aaaaalllllllllllllllll", allUsers)
+
         return allUsers.map(user => UserMapper.toResponseDTO(user));
     }
 }

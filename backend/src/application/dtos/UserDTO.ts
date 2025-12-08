@@ -17,7 +17,16 @@ export interface UserResponseDTO {
     profileImageUrl?: string;
     isBlocked: boolean;
     isVerified: VerificationStatus;
+
+    skills?: string[];
+    address?: string;
+    documents?: string[];
+    certificates?: string[];
+    workPhotos?: string[];
+    createdAt?: string;
+    updatedAt?: string;
 }
+
 
 export interface LoginUserDTO {
     email_address: string;

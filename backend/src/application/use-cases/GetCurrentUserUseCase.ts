@@ -27,6 +27,7 @@ export class GetCurrentUserUseCase implements IGetCurrentUserUseCase {
         try {
             const clientRepo = this._repositoryFactory.getRepository(Role.CLIENT);
             user = await clientRepo.findByEmail(email);
+            
             if (user) {
                 this._logger.info(`[GetCurrentUserUseCase] User found as CLIENT`);
             }
