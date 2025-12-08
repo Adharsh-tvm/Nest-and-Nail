@@ -1,6 +1,6 @@
 "use server";
 
-import authApi from "@/services/auth/auth.api";
+import authApi from "@/services/api/auth.api";
 import { AxiosError } from "axios";
 
 type OtpResponse = {

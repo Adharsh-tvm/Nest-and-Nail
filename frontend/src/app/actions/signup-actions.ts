@@ -3,7 +3,7 @@
 
 import { cookies } from "next/headers";
 import { AxiosError } from "axios";
-import authApi from "@/services/auth/auth.api";
+import authApi from "@/services/api/auth.api";
 
 // ---------------- Types ----------------
 
