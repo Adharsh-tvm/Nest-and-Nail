@@ -1,6 +1,6 @@
 "use server";
 
-import authApi from "@/services/auth/auth.api";
+import authApi from "@/services/api/auth.api";
 import { AxiosError } from "axios";
 
 type OtpResponse = {
@@ -102,7 +102,6 @@ export async function forgotPasswordAction(email_address: string) {
 export async function verifyResetOtpAction(email_address: string, otp: string) {
   try {
     const response = await authApi.verifyOtp({ email_address, otp });
-    console.log(email_address ,"This is the email passing from the frontend");
     return { success: true };
   } catch (error: any) {
     return {

@@ -26,7 +26,7 @@ export class ChangeUserRoleUseCase implements IChangeUserRoleUseCase {
         let user = await clientRepo.findById(userId);
         let currentRole: Role | null = user ? Role.CLIENT : null;
 
-        if (!user) {
+        if (!user) { 
             user = await workerRepo.findById(userId);
             currentRole = user ? Role.WORKER : null;
         }

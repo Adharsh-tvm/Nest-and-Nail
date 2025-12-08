@@ -25,6 +25,9 @@ export class WorkerRepository extends BaseRepository<Worker> implements IWorkerR
             role: worker.role,
             skills: worker.skills,
             loginMethod: worker.loginMethod,
+            documents: worker.documents || [],
+            certificates: worker.certificates || [],
+            workPhotos: worker.workPhotos || []
         }));
     }
 }
