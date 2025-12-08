@@ -16,15 +16,13 @@ export class GetAllUsersUseCase implements IGetAllUsersUseCase {
 
         const clientRepo = this.repoFactory.getRepository(Role.CLIENT);
         const workerRepo = this.repoFactory.getRepository(Role.WORKER);
-        const adminRepo = this.repoFactory.getRepository(Role.ADMIN);
 
-        const [clients, workers, admins] = await Promise.all([
+        const [clients, workers] = await Promise.all([
             clientRepo.findAll(),
             workerRepo.findAll(),
-            adminRepo.findAll()
         ]);
 
-        const allUsers = [...clients, ...workers, ...admins];
+        const allUsers = [...clients, ...workers];
 
         return allUsers.map(user => UserMapper.toResponseDTO(user));
     }
