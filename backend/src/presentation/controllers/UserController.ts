@@ -8,13 +8,15 @@ import {
     UserBlockedError,
     UserNotFoundError
 } from "../../domain/errors/DomainError";
+import { IGetAllUsersUseCase } from "../../application/interfaces/IGetAllUsersUseCase";
 
 export class UserController implements IUserController {
 
     constructor(
         private readonly changeUserRoleUseCase: IChangeUserRoleUseCase,
-        private readonly getCurrentUserUseCase: IGetCurrentUserUseCase
-    ) {}
+        private readonly getCurrentUserUseCase: IGetCurrentUserUseCase,
+        private readonly getAllUsersUseCase: IGetAllUsersUseCase
+    ) { }
 
     changeRole = async (req: Request, res: Response) => {
         try {
@@ -42,7 +44,7 @@ export class UserController implements IUserController {
         try {
             const email = req.params.email;
 
-            const user = await this.getCurrentUserUseCase.execute(email);   
+            const user = await this.getCurrentUserUseCase.execute(email);
 
             return res.status(HttpStatusCode.OK).json({
                 success: true,
@@ -77,4 +79,14 @@ export class UserController implements IUserController {
                 .json({ success: false, message: "Internal server error" });
         }
     };
+
+    getAllUsers = async (req: Request, res: Response): Promise<Response> => {
+        try {
+            const users = await this.getAllUsersUseCase.execute();
+            return res.status(HttpStatusCode.OK).json({ users });
+        } catch (error) {
+            console.error("Error fetching all users: ", error);
+            return res.status(HttpStatusCode.INTERNAL_SERVER).json({ message: "Internal server error" });
+        }
+    }
 }

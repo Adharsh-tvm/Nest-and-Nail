@@ -55,8 +55,6 @@ import { IUserController } from "../../presentation/interfaces/IUserController";
 import { UserController } from "../../presentation/controllers/UserController";
 import { IGetCurrentUserUseCase } from "../../application/interfaces/IGetCurrentUserUseCase";
 import { GetCurrentUserUseCase } from "../../application/use-cases/GetCurrentUserUseCase";
-import { IBaseRepository } from "../../domain/repositories/IBaseRepository";
-import { User } from "../../domain/entities/User";
 import { IUploadProfilePictureUseCase } from "../../application/interfaces/IUploadProfilePictureUseCase";
 import { IUploadWorkerDocumentUseCase } from "../../application/interfaces/IUploadWorkerDocumentUseCase";
 import { UploadProfilePictureUseCase } from "../../application/use-cases/UploadProfilePictureUseCase";
@@ -67,6 +65,8 @@ import { IUpdateUserProfileUseCase } from "../../application/interfaces/IUpdateU
 import { UpdateUserProfileUseCase } from "../../application/use-cases/UpdateUserProfileUseCase";
 import { IUserProfileController } from "../../presentation/interfaces/IUserProfileController";
 import { UserProfileController } from "../../presentation/controllers/UserProfileController";
+import { IGetAllUsersUseCase } from "../../application/interfaces/IGetAllUsersUseCase";
+import { GetAllUsersUseCase } from "../../application/use-cases/GetAllUsersUseCase";
 
 export class DIContainer {
   // -------------------------
@@ -101,17 +101,19 @@ export class DIContainer {
 
   private _getAllClientsUseCase?: IGetAllClientsUseCase;
   private _getAllWorkersUseCase?: IGetAllWorkersUseCase;
+  private _getAllUsersUseCase?: IGetAllUsersUseCase;
+  private _getCurrentUserUseCase?: IGetCurrentUserUseCase;
 
   private _forgotpasswordUseCase?: IForgotPasswordUseCase;
   private _resetPasswordUseCase?: IResetPasswordUseCase;
 
   private _changeUserRoleuseCase?: IChangeUserRoleUseCase;
-  private _getCurrentUserUseCase?: IGetCurrentUserUseCase;
 
   private _uploadProfilePictureUseCase?: IUploadProfilePictureUseCase;
   private _uploadWorkerDocumentUseCase?: IUploadWorkerDocumentUseCase;
 
   private _updateUserProfileUseCase?: IUpdateUserProfileUseCase;
+
 
   // -------------------------
   // Presentation Layer
@@ -355,6 +357,16 @@ export class DIContainer {
     return this._updateUserProfileUseCase
   }
 
+  get getAllUsersUseCase(): IGetAllUsersUseCase {
+    if (!this._getAllUsersUseCase) {
+      this._getAllUsersUseCase = new GetAllUsersUseCase(
+        this.userRepositoryFactory,
+        this.logger
+      )
+    }
+    return this._getAllUsersUseCase
+  }
+
 
   // ==========================================
   // Presentation Layer
@@ -396,7 +408,8 @@ export class DIContainer {
     if (!this._userController) {
       this._userController = new UserController(
         this.changeUserRoleUseCase,
-        this.getCurrentUserUseCase
+        this.getCurrentUserUseCase,
+        this.getAllUsersUseCase
       )
     }
     return this._userController;
@@ -426,13 +439,13 @@ export class DIContainer {
     return this._uploadController;
   }
 
-get userProfileController(): IUserProfileController{
-  if(!this._userProfileController) {
-    this._userProfileController = new UserProfileController(
-      this.updateUserProfileUseCase
-    );
+  get userProfileController(): IUserProfileController {
+    if (!this._userProfileController) {
+      this._userProfileController = new UserProfileController(
+        this.updateUserProfileUseCase
+      );
+    }
+    return this._userProfileController
   }
-  return this._userProfileController
-}
 
 }
