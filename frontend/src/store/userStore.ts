@@ -6,9 +6,11 @@ export type User = {
   email: string;
   role: string;
   isVerified: boolean;
+  profileImageUrl?: string | null;   
   iat?: number;
   exp?: number;
 };
+
 
 type UserStore = {
   user: User | null;

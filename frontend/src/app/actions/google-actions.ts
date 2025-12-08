@@ -1,6 +1,6 @@
 "use server";
 
-import authApi from "@/services/auth/auth.api";
+import authApi from "@/services/api/auth.api";
 import { OAuth2Client } from "google-auth-library";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -21,7 +21,6 @@ export async function handleGoogleSignIn(
 ): Promise<GoogleAuthState> {
   try {
 
-    // console.log(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID, "hiuoihuihsdlfihgolighu")
     const ticket = await googleClient.verifyIdToken({
       idToken: googleToken,
       audience: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
@@ -41,7 +40,6 @@ export async function handleGoogleSignIn(
       role
     });
 
-    console.log("Google action response: ccccccccccc : ", response.data)
 
     if (!response.data.success) {
       return { success: false, message: response.data.message };

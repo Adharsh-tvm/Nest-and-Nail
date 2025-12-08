@@ -1,7 +1,7 @@
-// app/actions/get-current-user.ts
+// app/actions/get-current-user.ts (server)
 "use server";
 import { cookies } from "next/headers";
-import userApi from "@/services/auth/user.api";
+import userApi from "@/services/api/user.api";
 import "server-only";
 
 type CanonicalUser = {
@@ -10,6 +10,7 @@ type CanonicalUser = {
   email: string;
   role: string;
   isVerified: boolean | string | number | undefined;
+  profilePicture?: string | null;
   [k: string]: any;
 };
 
@@ -18,20 +19,12 @@ export async function getCurrentUser(): Promise<CanonicalUser | null> {
     const cookieStore = await cookies();
     const email = cookieStore.get("user_email")?.value;
 
-    console.log("[getCurrentUser] All cookies:", cookieStore.getAll());
-    console.log("[getCurrentUser] Email from cookie:", email);
+    if (!email) return null;
 
-    if (!email) {
-      console.log("[getCurrentUser] No email found in cookies");
-      return null;
-    }
-
-    console.log("[getCurrentUser] Fetching user with email:", email);
     const data = await userApi.getCurrentUserByEmail(email);
-    console.log("[getCurrentUser] raw data:", data);
 
-    // Normalize / map to canonical shape
-    const rawUser = data?.user ?? data; // adapt if api returns { user: {...} } or {...}
+    console.log("uuuuuuuuuuuuuuuuuuuuuseeeeeeeeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrrrrrrrr", data.user)
+    const rawUser = data?.user ?? data;
     if (!rawUser) return null;
 
     const mapped = {
@@ -40,11 +33,16 @@ export async function getCurrentUser(): Promise<CanonicalUser | null> {
       email: rawUser.email ?? rawUser.email_address ?? "",
       role: rawUser.role ?? rawUser.user_role ?? "client",
       isVerified: rawUser.isVerified ?? rawUser.is_verified ?? rawUser.verified ?? false,
-      // keep any extra fields
+      profileImageUrl:
+        rawUser.profilePicture ??
+        rawUser.profilePictureUrl ??
+        rawUser.profileImageUrl ??
+        rawUser.profile_picture ??
+        rawUser.profile ?? null,
+      // keep the rest
       ...rawUser,
     };
 
-    console.log("[getCurrentUser] mapped user:", mapped);
     return mapped;
   } catch (err) {
     console.error("[getCurrentUser] Failed to fetch current user:", err);

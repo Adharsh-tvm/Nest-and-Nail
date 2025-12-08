@@ -32,11 +32,21 @@ const mapped: User = {
   email: user.email ?? user.email_address ?? "",
   role: user.role ?? user.user_role ?? "client",
   isVerified: normalizeIsVerified(
-    user.is_verified ?? user.isVerified ?? user.verified  
+    user.is_verified ?? user.isVerified ?? user.verified
   ),
+
+  // ADD THIS LINE 👇
+  profileImageUrl:
+    user.profileImageUrl ??
+    user.profilePictureUrl ??
+    user.profile_picture ??
+    user.profilePicture ??
+    null,
+
   iat: user.iat,
   exp: user.exp,
 };
+
 
 console.log("[UserHydration] raw isVerified fields:", {
   isVerified: user.isVerified,

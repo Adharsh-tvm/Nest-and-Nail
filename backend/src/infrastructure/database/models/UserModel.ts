@@ -33,6 +33,10 @@ const userSchema = new Schema<User>({
     lastLoginAt: { type: Date, default: Date.now },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
+
+    documents: [String],
+    certificates: [String],
+    workPhotos: [String],
 }, {
     timestamps: true,
     discriminatorKey: 'role'

@@ -54,7 +54,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
             </div>
             {isOpen && (
               <div>
-                <h1 className="text-white font-bold text-lg leading-none">Mend<span className="text-red-950">O</span>n</h1>
+                <h1 className="text-white font-bold text-lg leading-none">Nest<span className="text-lime-50"> & </span>Nail</h1>
                 <span className="text-xs text-slate-400">Admin Portal</span>
               </div>
             )}
