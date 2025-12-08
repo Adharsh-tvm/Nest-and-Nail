@@ -24,11 +24,6 @@ import {
   Image as ImageIcon,
   Lock,
 } from "lucide-react";
-import {
-  saveWorkerSkillsAction,
-  uploadCertDocumentAction,
-  uploadIdDocumentAction,
-} from "@/app/actions/upload-actions";
 import { useUserStore } from "@/store/userStore";
 import {
   updateUserProfileAction,

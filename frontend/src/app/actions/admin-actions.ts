@@ -11,3 +11,9 @@ export async function getAllWorkers() {
     const res = await axiosInstance.get("/api/admin/workers");
     return res.data;
 }
+
+export async function getAllUsers() {
+    const res = await axiosInstance.get("/api/auth/all");
+    return res.data.users;
+
+}
