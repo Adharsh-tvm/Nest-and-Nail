@@ -8,22 +8,27 @@ export class ClientRepository extends BaseRepository<Client> implements IClientR
         super(ClientModel);
     }
 
-    async findAll(): Promise<Client[]> {
-        const rawClients = await super.findAll();
+async findAll(): Promise<Client[]> {
+    const rawWorkers = await super.findAll();
 
-        return rawClients.map(client => ({
-            userId: client.userId,
-            name: client.name,
-            email: client.email,
-            passwordhash: client.passwordhash,
-            lastLoginAt: client.lastLoginAt,
-            createdAt: client.createdAt,
-            updatedAt: client.updatedAt,
-            isBlocked: client.isBlocked,
-            profilePictureUrl: client.profilePictureUrl,
-            role: client.role,
-            loginMethod: client.loginMethod,
-            isVerified: client.isVerified
-        }));
-    }
+    return rawWorkers.map(worker => ({
+        userId: worker.userId,
+        name: worker.name,
+        email: worker.email,
+        passwordhash: worker.passwordhash,
+        lastLoginAt: worker.lastLoginAt,
+        createdAt: worker.createdAt,
+        updatedAt: worker.updatedAt,
+        isBlocked: worker.isBlocked,
+        isVerified: worker.isVerified,
+        profilePictureUrl: worker.profilePictureUrl,
+        role: worker.role,
+        skills: worker.skills,
+        loginMethod: worker.loginMethod,
+        documents: worker.documents || [],
+        certificates: worker.certificates || [],
+        workPhotos: worker.workPhotos || []
+    }));
+}
+
 }

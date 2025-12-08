@@ -37,11 +37,19 @@ export interface User {
   user_name: string;
   email_address: string;
   phone_number?: number;
-  skills: string[];
   user_role: string;
   profileImageUrl?: string;
   isBlocked: boolean;
-  isVerified: VerificationStatus;
+  isVerified: "PENDING" | "NOT_VERIFIED" | "VERIFIED";
+
+  // ⭐ ADD
+  skills: string[];
+  address?: string;
+  documents: string[];
+  certificates: string[];
+  workPhotos: string[];
+  createdAt: string;
+  updatedAt: string;
 }
 
 // Raw API list wrapper
