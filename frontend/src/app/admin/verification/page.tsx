@@ -357,7 +357,6 @@ const VerificationsPendingView: React.FC = () => {
       const response = await approveUserVerification(req.userId);
       console.log("Approved:", response);
 
-      alert(`Approved verification for ${req.name}`);
 
       setSelectedRequest(null);
 
@@ -371,13 +370,10 @@ const VerificationsPendingView: React.FC = () => {
 
   const handleReject = async (req: PendingVerificationUser) => {
     try {
-      const reason = window.prompt("Enter reason for rejection:");
-      if (!reason) return;
 
       const response = await rejectUserVerification(req.userId);
       console.log("Rejected:", response);
 
-      alert(`Rejected ${req.name} because: ${reason}`);
 
       setSelectedRequest(null);
 

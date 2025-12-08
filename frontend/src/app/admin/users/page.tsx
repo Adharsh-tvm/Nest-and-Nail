@@ -206,7 +206,7 @@ const UsersView = () => {
 
         return (
           <span className="flex items-center gap-1.5 text-xs font-medium text-gray-400">
-            <Shield size={14} /> Unverified
+            <Shield size={14} /> Not verified
           </span>
         );
       },
