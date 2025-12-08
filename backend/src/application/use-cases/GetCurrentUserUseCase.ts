@@ -4,7 +4,7 @@ import { IGetCurrentUserUseCase } from "../interfaces/IGetCurrentUserUseCase";
 import { ILogger } from "../interfaces/ILogger";
 import { UserMapper } from "../mappers/UserMapper";
 import { UserRepositoryFactory } from "../../infrastructure/repo/UserRepositoryFactory";
-import { Role } from "../../shared/enums/enums";
+import { Role } from "../../domain/enums/enums";
 
 export class GetCurrentUserUseCase implements IGetCurrentUserUseCase {
     constructor(

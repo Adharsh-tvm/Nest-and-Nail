@@ -18,6 +18,7 @@ import {
 import DataTable from "@/app/components/containers/DataTable";
 import type { Column } from "@/app/components/containers/DataTable";
 import { useUsers } from "@/hooks/useUsers";
+import { VerificationStatus } from "@/enums/enums";
 
 /**
  * ----------------------------------------------------------------------------
@@ -35,8 +36,7 @@ const ActionMenu = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
-  
-  
+
   // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -47,13 +47,13 @@ const ActionMenu = ({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-  
+
   return (
     <div className="relative inline-block text-left" ref={menuRef}>
       <button
         onClick={() => setIsOpen((prev) => !prev)}
         className="action-menu-trigger p-2 hover:bg-gray-100 rounded-lg text-gray-400 hover:text-[#1B4332] transition-colors"
-        >
+      >
         <MoreHorizontal size={16} />
       </button>
 
@@ -66,7 +66,7 @@ const ActionMenu = ({
                 onViewDetails(row);
               }}
               className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-              >
+            >
               <Eye size={14} className="text-gray-400" /> View Details
             </button>
             <button
@@ -76,8 +76,8 @@ const ActionMenu = ({
               }}
               className={`w-full text-left px-4 py-2.5 text-sm flex items-center gap-2 hover:bg-gray-50 ${
                 row.isBlocked ? "text-green-600" : "text-red-600"
-                }`}
-                >
+              }`}
+            >
               {row.isBlocked ? (
                 <>
                   <Unlock size={14} /> Unblock User
@@ -99,11 +99,11 @@ const ActionMenu = ({
  * ----------------------------------------------------------------------------
  * MAIN CLIENTS VIEW COMPONENT
  * ----------------------------------------------------------------------------
-*/
+ */
 const UsersView = () => {
   const { users, loading, error } = useUsers();
-  
-  console.log(users)
+
+  console.log(users);
 
   // Handlers for action menu
   const handleBlockToggle = (row: any) => {
@@ -142,7 +142,7 @@ const UsersView = () => {
             )}
 
             {/* Verified Badge Overlay */}
-            {row.isVerified && (
+            {row.isVerified === VerificationStatus.VERIFIED && (
               <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5">
                 <BadgeCheck size={14} className="text-blue-500 fill-blue-50" />
               </div>
@@ -187,17 +187,31 @@ const UsersView = () => {
     },
     {
       header: "Verification",
-      cell: (row) =>
-        row.isVerified ? (
-          <span className="flex items-center gap-1.5 text-xs font-bold text-blue-600">
-            <BadgeCheck size={14} /> Verified
-          </span>
-        ) : (
+      cell: (row) => {
+        if (row.isVerified === VerificationStatus.VERIFIED) {
+          return (
+            <span className="flex items-center gap-1.5 text-xs font-bold text-blue-600">
+              <BadgeCheck size={14} /> Verified
+            </span>
+          );
+        }
+
+        if (row.isVerified === VerificationStatus.PENDING) {
+          return (
+            <span className="flex items-center gap-1.5 text-xs font-medium text-amber-600">
+              <Shield size={14} /> Pending
+            </span>
+          );
+        }
+
+        return (
           <span className="flex items-center gap-1.5 text-xs font-medium text-gray-400">
             <Shield size={14} /> Unverified
           </span>
-        ),
+        );
+      },
     },
+
     {
       header: "Status",
       cell: (row) =>

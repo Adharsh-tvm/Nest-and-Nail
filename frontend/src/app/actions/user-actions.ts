@@ -1,15 +1,27 @@
-// app/actions/get-current-user.ts (server)
+// app/actions/get-current-user.ts
 "use server";
 import { cookies } from "next/headers";
 import userApi from "@/services/api/user.api";
-import "server-only";
+import { VerificationStatus } from "@/enums/enums";
+
+function normalizeVerification(value: any): VerificationStatus {
+  if (value === true || value === 1 || value === "1" || value === "VERIFIED" || value === "verified") {
+    return VerificationStatus.VERIFIED;
+  }
+
+  if (value === "PENDING" || value === "pending") {
+    return VerificationStatus.PENDING;
+  }
+
+  return VerificationStatus.NOT_VERIFIED;
+}
 
 type CanonicalUser = {
   id: string;
   name: string;
   email: string;
   role: string;
-  isVerified: boolean | string | number | undefined;
+  isVerified: VerificationStatus;
   profilePicture?: string | null;
   [k: string]: any;
 };
@@ -22,8 +34,6 @@ export async function getCurrentUser(): Promise<CanonicalUser | null> {
     if (!email) return null;
 
     const data = await userApi.getCurrentUserByEmail(email);
-
-    console.log("uuuuuuuuuuuuuuuuuuuuuseeeeeeeeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrrrrrrrr", data.user)
     const rawUser = data?.user ?? data;
     if (!rawUser) return null;
 
@@ -32,14 +42,22 @@ export async function getCurrentUser(): Promise<CanonicalUser | null> {
       name: rawUser.name ?? rawUser.user_name ?? rawUser.userName ?? "",
       email: rawUser.email ?? rawUser.email_address ?? "",
       role: rawUser.role ?? rawUser.user_role ?? "client",
-      isVerified: rawUser.isVerified ?? rawUser.is_verified ?? rawUser.verified ?? false,
+
+      isVerified: normalizeVerification(
+        rawUser.isVerified ??
+          rawUser.is_verified ??
+          rawUser.verified ??
+          false
+      ),
+
       profileImageUrl:
         rawUser.profilePicture ??
         rawUser.profilePictureUrl ??
         rawUser.profileImageUrl ??
         rawUser.profile_picture ??
-        rawUser.profile ?? null,
-      // keep the rest
+        rawUser.profile ??
+        null,
+
       ...rawUser,
     };
 

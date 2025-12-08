@@ -3,7 +3,7 @@ import { IOtpService } from "../services/IOtpService";
 import { OtpRepository } from "../../infrastructure/repo/OtpRepository";
 import { UserRepositoryFactory } from "../../infrastructure/repo/UserRepositoryFactory";
 import { ILogger } from "../interfaces/ILogger";
-import { Role } from "../../shared/enums/enums";
+import { Role } from "../../domain/enums/enums";
 import { IForgotPasswordUseCase } from "../interfaces/IForgotPasswordUseCase";
 
 export class ForgotPasswordUseCase implements IForgotPasswordUseCase {
@@ -17,7 +17,7 @@ export class ForgotPasswordUseCase implements IForgotPasswordUseCase {
 
     async execute(email: string) {
         // Try to find user in all roles
-        console.log("caleedddddddddddd use") 
+        console.log("caleedddddddddddd use")
         const roles = [Role.CLIENT, Role.WORKER, Role.ADMIN];
         let user = null;
         let foundRole: Role | null = null;

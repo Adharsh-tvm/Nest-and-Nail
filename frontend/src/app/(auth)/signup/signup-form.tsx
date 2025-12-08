@@ -159,7 +159,7 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
 
       if (result.success) {
         if (signupData.role === "worker") {
-          if (result.isVerified) {
+          if (result.isVerified === "VERIFIED") {
             router.push("/worker");
           } else {
             router.push("/worker/documents");

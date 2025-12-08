@@ -4,7 +4,7 @@ import { IOtpService } from "../services/IOtpService";
 import { OtpRepository } from "../../infrastructure/repo/OtpRepository";
 import { ILogger } from "../interfaces/ILogger";
 import { UserRepositoryFactory } from "../../infrastructure/repo/UserRepositoryFactory";
-import { Role } from "../../shared/enums/enums";
+import { Role } from "../../domain/enums/enums";
 
 export class SendOtpUseCase implements ISendOtpUseCase {
     constructor(

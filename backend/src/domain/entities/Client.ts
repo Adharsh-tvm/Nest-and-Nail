@@ -1,4 +1,4 @@
-import { Role } from "../../shared/enums/enums";
+import { Role } from "../enums/enums";
 import { User } from "./User";
 
 export interface Client extends User {

@@ -32,8 +32,16 @@ type CompleteSignupData = {
 export type CompleteSignupResponse = {
   success: boolean;
   error: string | null;
-  isVerified?: boolean;
+  isVerified?: VerificationStatus;
 };
+
+enum VerificationStatus {
+  NOT_VERIFIED = "NOT_VERIFIED",
+  PENDING = "PENDING",
+  VERIFIED = "VERIFIED"
+}
+
+
 
 // ----------------------
 // STEP 1: START SIGNUP (SEND OTP)
@@ -226,10 +234,15 @@ export async function completeSignup(
 
     console.log("[completeSignup SERVER] Success, cookies set");
 
+    const verificationStatus: VerificationStatus =
+      user?.isVerified
+        ? VerificationStatus.VERIFIED
+        : VerificationStatus.NOT_VERIFIED;
+
     return {
       success: true,
       error: null,
-      isVerified: !!user?.isVerified,
+      isVerified: verificationStatus,
     };
   } catch (error) {
     if (error instanceof AxiosError) {

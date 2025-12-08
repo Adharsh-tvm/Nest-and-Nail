@@ -1,6 +1,6 @@
 import { User } from "../../domain/entities/User";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
-import { LoginMethod, Role } from "../../shared/enums/enums";
+import { LoginMethod, Role } from "../../domain/enums/enums";
 import { IGoogleSignUpUseCase } from "../interfaces/IGoogleSignUpUseCase";
 import { UserMapper } from "../mappers/UserMapper";
 import { IGenerateUserID } from "../services/IGenerateUserID";

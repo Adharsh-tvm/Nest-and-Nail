@@ -1,6 +1,6 @@
 import { UserRepositoryFactory } from "../../infrastructure/repo/UserRepositoryFactory";
 import { ILogger } from "../interfaces/ILogger";
-import { Role } from "../../shared/enums/enums";
+import { Role } from "../../domain/enums/enums";
 import { CloudinaryUploadService } from "../../infrastructure/services/CloudinaryUploadService";
 import { IUploadProfilePictureUseCase } from "../interfaces/IUploadProfilePictureUseCase";
 
@@ -8,7 +8,7 @@ export class UploadProfilePictureUseCase implements IUploadProfilePictureUseCase
     constructor(
         private readonly _repositoryFactory: UserRepositoryFactory,
         private readonly _logger: ILogger
-    ) {}
+    ) { }
 
     async execute(userId: string, filePath: string) {
         this._logger.info(`[UploadProfilePictureUseCase] Uploading profile picture for user: ${userId}`);
