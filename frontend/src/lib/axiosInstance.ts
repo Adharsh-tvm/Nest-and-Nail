@@ -1,4 +1,3 @@
-
 import axios from "axios";
 import { cookies } from "next/headers";
 
@@ -10,24 +9,23 @@ const axiosInstance = axios.create({
   },
 });
 
-// Request interceptor to add cookies from Next.js server
+// REQUEST INTERCEPTOR
+
 axiosInstance.interceptors.request.use(
   async (config) => {
-    // Only add cookies on server-side (Next.js server actions)
     if (typeof window === "undefined") {
       try {
         const cookieStore = await cookies();
         const accessToken = cookieStore.get("accessToken")?.value;
-        
+
         if (accessToken) {
           config.headers.Authorization = `Bearer ${accessToken}`;
         }
-        
-        // Also send cookies as Cookie header for double support
+
         const allCookies = cookieStore.getAll();
         if (allCookies.length > 0) {
           const cookieString = allCookies
-            .map(cookie => `${cookie.name}=${cookie.value}`)
+            .map((c) => `${c.name}=${c.value}`)
             .join("; ");
           config.headers.Cookie = cookieString;
         }
@@ -35,10 +33,61 @@ axiosInstance.interceptors.request.use(
         console.error("Error reading cookies:", error);
       }
     }
-    
+
     return config;
   },
   (error) => Promise.reject(error)
+);
+
+// ERROR RESPONSE INTERCEPTOR
+
+axiosInstance.interceptors.response.use(
+  (response) => response,
+
+  async (error) => {
+    const status = error?.response?.status;
+    const message = error?.response?.data?.message;
+
+    console.error("🚨 API Error:", {
+      url: error.config?.url,
+      method: error.config?.method,
+      status,
+      message,
+    });
+
+    // 🌐 Handle specific errors
+    switch (status) {
+      case 400:
+        // toast.error(message || "Bad Request");
+        break;
+
+      case 401:
+        console.warn("Unauthorized — clearing session");
+
+        if (typeof window !== "undefined") {
+          window.location.href = "/login";
+        }
+        break;
+
+      case 403:
+        // toast.error("You don't have permission to perform this action.");
+        break;
+
+      case 404:
+        // toast.error("Resource not found.");
+        break;
+
+      case 500:
+        // toast.error("Server error. Please try again later.");
+        break;
+
+      default:
+        // toast.error(message || "Unexpected error occurred.");
+        break;
+    }
+
+    return Promise.reject(error);
+  }
 );
 
 export default axiosInstance;
