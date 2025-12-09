@@ -8,15 +8,15 @@ import { IUpdateUserAccessUseCase } from "../interfaces/IUpdateUserAccessUseCase
 
 export class UpdateUserAccessUseCase implements IUpdateUserAccessUseCase {
     constructor(
-        private readonly repoFactory: UserRepositoryFactory,
-        private readonly logger: ILogger
+        private readonly _repoFactory: UserRepositoryFactory,
+        private readonly _logger: ILogger
     ) { }
 
     async execute(userId: string) {
-        this.logger.info(`Updating verification status for user ${userId} `);
+        this._logger.info(`Updating verification status for user ${userId} `);
 
-        const clientRepo = this.repoFactory.getRepository(Role.CLIENT);
-        const workerRepo = this.repoFactory.getRepository(Role.WORKER);
+        const clientRepo = this._repoFactory.getRepository(Role.CLIENT);
+        const workerRepo = this._repoFactory.getRepository(Role.WORKER);
 
         let user = await clientRepo.findById(userId);
         if (!user) user = await workerRepo.findById(userId);
@@ -27,7 +27,7 @@ export class UpdateUserAccessUseCase implements IUpdateUserAccessUseCase {
 
         const newIsBlocked = !user.isBlocked;
 
-        this.logger.info(
+        this._logger.info(
             `User ${userId} access changed: isBlocked → ${newIsBlocked}`
         );
 

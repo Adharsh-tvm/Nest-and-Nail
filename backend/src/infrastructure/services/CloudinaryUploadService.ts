@@ -2,10 +2,10 @@ import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
 
 export class CloudinaryUploadService {
-  private static isConfigured = false;
+  private static _isConfigured = false;
 
-  private static ensureConfigured() {
-    if (!this.isConfigured) {
+  private static _ensureConfigured() {
+    if (!this._isConfigured) {
       console.log("🔧 Configuring Cloudinary...");
       
       cloudinary.config({
@@ -14,7 +14,7 @@ export class CloudinaryUploadService {
         api_secret: process.env.CLOUDINARY_API_SECRET,
       });
       
-      this.isConfigured = true;
+      this._isConfigured = true;
       
       // Verify configuration
       const config = cloudinary.config();
@@ -25,7 +25,7 @@ export class CloudinaryUploadService {
   }
 
   static async upload(filePath: string, folder: string): Promise<string> {
-    this.ensureConfigured(); // <-- Ensure config before upload
+    this._ensureConfigured(); // <-- Ensure config before upload
     
     try {
       console.log("📤 Uploading to Cloudinary:", filePath);

@@ -7,15 +7,15 @@ import { Role } from "../../domain/enums/enums";
 
 export class UpdateVerificationStatusUseCase implements IUpdateVerificationStatusUseCase {
     constructor(
-        private readonly repoFactory: UserRepositoryFactory,
-        private readonly logger: ILogger
+        private readonly _repoFactory: UserRepositoryFactory,
+        private readonly _logger: ILogger
     ) {}
 
     async execute(userId: string, status: VerificationStatus) {
-        this.logger.info(`Updating verification status for user ${userId} → ${status}`);
+        this._logger.info(`Updating verification status for user ${userId} → ${status}`);
 
-        const clientRepo = this.repoFactory.getRepository(Role.CLIENT);
-        const workerRepo = this.repoFactory.getRepository(Role.WORKER);
+        const clientRepo = this._repoFactory.getRepository(Role.CLIENT);
+        const workerRepo = this._repoFactory.getRepository(Role.WORKER);
 
         let user = await clientRepo.findById(userId);
         if (!user) user = await workerRepo.findById(userId);
