@@ -16,3 +16,22 @@ export type PendingVerificationUser = {
   createdAt: string;  
   updatedAt: string;
 };
+
+export interface WorkerUser {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+
+  isVerified: "VERIFIED" | "PENDING" | "REJECTED" | "NOT_VERIFIED";
+
+  profileImageUrl?: string | null;
+  phone_number?: string;
+  address?: string;
+  createdAt?: string;
+
+  skills?: string[];
+  workPhotos?: string[];
+  certificates?: string[];
+  documents?: string[];
+}

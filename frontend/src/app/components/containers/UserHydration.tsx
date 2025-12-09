@@ -42,7 +42,7 @@ export default function UserHydration({ user }: { user: ServerUser | null }) {
     // Accept many shapes, pick canonical fields
     const mapped: User = {
       id: user.id ?? user.user_id ?? user.userId ?? "",
-      name: user.name ?? user.user_name ?? user.userName ?? "",
+      name: user.name ?? user.user_name ?? "",
       email: user.email ?? user.email_address ?? "",
       role: user.role ?? user.user_role ?? "client",
 
@@ -54,8 +54,17 @@ export default function UserHydration({ user }: { user: ServerUser | null }) {
         user.profileImageUrl ??
         user.profilePictureUrl ??
         user.profile_picture ??
-        user.profilePicture ??
         null,
+
+      phone_number: user.phone_number ?? user.phone,
+      skills: user.skills ?? [],
+      address: user.address ?? "",
+      documents: user.documents ?? [],
+      certificates: user.certificates ?? [],
+      workPhotos: user.workPhotos ?? [],
+
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
 
       iat: user.iat,
       exp: user.exp,
