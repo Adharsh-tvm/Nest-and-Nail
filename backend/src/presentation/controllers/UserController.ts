@@ -13,9 +13,9 @@ import { IGetAllUsersUseCase } from "../../application/interfaces/IGetAllUsersUs
 export class UserController implements IUserController {
 
     constructor(
-        private readonly changeUserRoleUseCase: IChangeUserRoleUseCase,
-        private readonly getCurrentUserUseCase: IGetCurrentUserUseCase,
-        private readonly getAllUsersUseCase: IGetAllUsersUseCase
+        private readonly _changeUserRoleUseCase: IChangeUserRoleUseCase,
+        private readonly _getCurrentUserUseCase: IGetCurrentUserUseCase,
+        private readonly _getAllUsersUseCase: IGetAllUsersUseCase
     ) { }
 
     changeRole = async (req: Request, res: Response) => {
@@ -23,7 +23,7 @@ export class UserController implements IUserController {
             const userId = req.user.id;
             const { role } = req.body;
 
-            const result = await this.changeUserRoleUseCase.execute(userId, role);
+            const result = await this._changeUserRoleUseCase.execute(userId, role);
 
             return res.status(HttpStatusCode.OK).json({
                 user: result.user,
@@ -44,7 +44,7 @@ export class UserController implements IUserController {
         try {
             const email = req.params.email;
 
-            const user = await this.getCurrentUserUseCase.execute(email);
+            const user = await this._getCurrentUserUseCase.execute(email);
 
             return res.status(HttpStatusCode.OK).json({
                 success: true,
@@ -82,7 +82,7 @@ export class UserController implements IUserController {
 
     getAllUsers = async (req: Request, res: Response): Promise<Response> => {
         try {
-            const users = await this.getAllUsersUseCase.execute();
+            const users = await this._getAllUsersUseCase.execute();
             console.log("users", users)
             return res.status(HttpStatusCode.OK).json({ users });
         } catch (error) {

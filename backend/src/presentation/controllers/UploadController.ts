@@ -7,8 +7,8 @@ import { IUploadController } from "../interfaces/IUploadController";
 
 export class UploadController implements IUploadController {
   constructor(
-    private readonly uploadProfilePictureUseCase: IUploadProfilePictureUseCase,
-    private readonly uploadDocumentUseCase: IUploadWorkerDocumentUseCase,
+    private readonly _uploadProfilePictureUseCase: IUploadProfilePictureUseCase,
+    private readonly _uploadDocumentUseCase: IUploadWorkerDocumentUseCase,
   ) { }
 
   uploadProfile = async (req: Request, res: Response) => {
@@ -19,7 +19,7 @@ export class UploadController implements IUploadController {
       if (!filePath)
         return res.status(HttpStatusCode.BAD_REQUEST).json({ success: false, message: "File missing" });
 
-      const result = await this.uploadProfilePictureUseCase.execute(workerId, filePath);
+      const result = await this._uploadProfilePictureUseCase.execute(workerId, filePath);
 
       return res.status(HttpStatusCode.OK).json({
         success: true,
@@ -38,7 +38,7 @@ export class UploadController implements IUploadController {
       const workerId = req.params.workerId;
       const filePath = req.file?.path;
 
-      const result = await this.uploadDocumentUseCase.execute(workerId, filePath!);
+      const result = await this._uploadDocumentUseCase.execute(workerId, filePath!);
 
       return res.status(HttpStatusCode.OK).json({
         success: true,

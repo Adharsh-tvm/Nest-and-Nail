@@ -8,7 +8,7 @@ import { IUserProfileController } from "../interfaces/IUserProfileController";
 export class UserProfileController implements IUserProfileController {
 
     constructor(
-        private readonly updateUserProfileUseCase: IUpdateUserProfileUseCase
+        private readonly _updateUserProfileUseCase: IUpdateUserProfileUseCase
     ) { }
 
     /**
@@ -26,7 +26,7 @@ export class UserProfileController implements IUserProfileController {
             const updates = req.body;                // name, phone, etc.
             const profilePictureFilePath = req.file?.path; // from multer
 
-            const updatedUser = await this.updateUserProfileUseCase.execute(
+            const updatedUser = await this._updateUserProfileUseCase.execute(
                 userId,
                 updates,
                 profilePictureFilePath 
