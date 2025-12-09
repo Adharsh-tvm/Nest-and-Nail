@@ -9,7 +9,7 @@ export class UserProfileController implements IUserProfileController {
 
     constructor(
         private readonly updateUserProfileUseCase: IUpdateUserProfileUseCase
-    ) {}
+    ) { }
 
     /**
      * Supports:
@@ -29,7 +29,9 @@ export class UserProfileController implements IUserProfileController {
             const updatedUser = await this.updateUserProfileUseCase.execute(
                 userId,
                 updates,
+                profilePictureFilePath 
             );
+
 
             return res.status(HttpStatusCode.OK).json({
                 success: true,

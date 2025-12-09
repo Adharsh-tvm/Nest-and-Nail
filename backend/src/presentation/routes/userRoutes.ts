@@ -28,14 +28,10 @@ export function createUserRoutes(
     router.put(
         "/user/:userId/profile",
         authMiddleware.verify.bind(authMiddleware),
+        upload.single("profilePicture"),   
         (req, res) => userProfileController.updateProfile(req, res)
     );
 
-    router.put(
-        "/users/:userId/profile",
-        upload.single("profilePicture"),  
-        userProfileController.updateProfile
-    );
 
 
     return router;
