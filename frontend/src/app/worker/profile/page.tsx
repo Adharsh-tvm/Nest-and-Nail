@@ -52,7 +52,7 @@ const getVerificationBadge = (status: VerificationStatus | string) => {
       return {
         color: "bg-[#1B4332] text-white",
         icon: <ShieldCheck size={14} />,
-        label: "Verified Pro",
+        label: "Verified",
       };
     case "PENDING":
       return {
