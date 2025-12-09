@@ -69,6 +69,8 @@ import { IGetAllUsersUseCase } from "../../application/interfaces/IGetAllUsersUs
 import { GetAllUsersUseCase } from "../../application/use-cases/GetAllUsersUseCase";
 import { IUpdateVerificationStatusUseCase } from "../../application/interfaces/IUpdateVerificationStatusUseCase";
 import { UpdateVerificationStatusUseCase } from "../../application/use-cases/UpdateVerificationStatusUseCase";
+import { IUpdateUserAccessUseCase } from "../../application/interfaces/IUpdateUserAccessUseCase";
+import { UpdateUserAccessUseCase } from "../../application/use-cases/UpdateUserAccessUseCase";
 
 export class DIContainer {
   // -------------------------
@@ -110,6 +112,7 @@ export class DIContainer {
   private _resetPasswordUseCase?: IResetPasswordUseCase;
 
   private _changeUserRoleuseCase?: IChangeUserRoleUseCase;
+  private _updateUserAccessUseCase?: IUpdateUserAccessUseCase;
 
   private _uploadProfilePictureUseCase?: IUploadProfilePictureUseCase;
   private _uploadWorkerDocumentUseCase?: IUploadWorkerDocumentUseCase;
@@ -380,6 +383,15 @@ export class DIContainer {
     return this._updateVerificationStatusUseCase;
   }
 
+  get updateUserAccessUseCase(): IUpdateUserAccessUseCase {
+    if(!this._updateUserAccessUseCase) {
+      this._updateUserAccessUseCase = new UpdateUserAccessUseCase(
+        this.userRepositoryFactory,
+        this.logger
+      );
+    }
+    return this._updateUserAccessUseCase
+  }
 
   // ==========================================
   // Presentation Layer
@@ -403,7 +415,8 @@ export class DIContainer {
       this._adminController = new AdminController(
         this.getAllClientsUseCase,
         this.getAllWorkersUseCase,
-        this.updateVerificationStatusUseCase
+        this.updateVerificationStatusUseCase,
+        this.updateUserAccessUseCase
       );
     }
     return this._adminController;

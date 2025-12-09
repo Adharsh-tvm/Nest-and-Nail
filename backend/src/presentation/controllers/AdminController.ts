@@ -5,12 +5,15 @@ import { IGetAllWorkersUseCase } from "../../application/interfaces/IGetAllWorke
 import { HttpStatusCode } from "../enums/httpCodes";
 import { IUpdateVerificationStatusUseCase } from "../../application/interfaces/IUpdateVerificationStatusUseCase";
 import { VerificationStatus } from "../../domain/enums/enums";
+import { UserResponseDTO } from "../../application/dtos/UserDTO";
+import { IUpdateUserAccessUseCase } from "../../application/interfaces/IUpdateUserAccessUseCase";
 
 export class AdminController implements IAdminController {
     constructor(
         private readonly _getAllClientsUseCase: IGetAllClientsUseCase,
         private readonly _getAllWorkersUseCase: IGetAllWorkersUseCase,
         private readonly _updateVerificationStatusUseCase: IUpdateVerificationStatusUseCase,
+        private readonly _updateUserAccessUseCase: IUpdateUserAccessUseCase
 
     ) { }
 
@@ -87,7 +90,6 @@ export class AdminController implements IAdminController {
         }
     };
 
-
     rejectVerification = async (req: Request, res: Response): Promise<void> => {
         try {
             const { userId } = req.params;
@@ -111,4 +113,26 @@ export class AdminController implements IAdminController {
             });
         }
     };
+
+    updateUserAccess = async (req: Request, res: Response): Promise<void> => {
+        try {
+
+            const { userId } = req.params;
+            const result = await this._updateUserAccessUseCase.execute(userId);
+
+
+            res.status(HttpStatusCode.OK).json({
+                success: true,
+                message: "User updated sucessfully",
+                user: result
+            });
+
+        } catch (error: any) {
+            console.error(error);
+            res.status(HttpStatusCode.INTERNAL_SERVER).json({
+                success: false,
+                message: error.message || "Internal server error"
+            });
+        }
+    }
 }
