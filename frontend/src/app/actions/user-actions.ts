@@ -37,6 +37,8 @@ export async function getCurrentUser(): Promise<CanonicalUser | null> {
     const rawUser = data?.user ?? data;
     if (!rawUser) return null;
 
+    console.log("data of current user",data)
+
     const mapped = {
       id: rawUser.id ?? rawUser.user_id ?? rawUser.userId,
       name: rawUser.name ?? rawUser.user_name ?? rawUser.userName ?? "",

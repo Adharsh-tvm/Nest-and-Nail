@@ -7,11 +7,22 @@ export type User = {
   name: string;
   email: string;
   role: string;
-  isVerified: VerificationStatus;      // 👈 enum instead of boolean
+  isVerified: VerificationStatus;
   profileImageUrl?: string | null;
+
+  phone_number?: number;
+  skills?: string[];
+  address?: string;
+  documents?: string[];
+  certificates?: string[];
+  workPhotos?: string[];
+  createdAt?: string;
+  updatedAt?: string;
+
   iat?: number;
   exp?: number;
 };
+
 
 type UserStore = {
   user: User | null;
