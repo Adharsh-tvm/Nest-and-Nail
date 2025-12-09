@@ -5,19 +5,31 @@ import { cookies } from "next/headers";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
-// 🟢 MAIN UNIVERSAL ACTION
+
 export async function updateUserProfileAction(userId: string, updates: any) {
   const cookieStore = await cookies();
   const token = cookieStore.get("accessToken")?.value;
 
+  const fd = new FormData();
+
+  // Append only safe fields
+  if (updates.name) fd.append("name", updates.name);
+  if (updates.phone) fd.append("phone", updates.phone);
+  if (updates.address) fd.append("address", updates.address);
+
+  // Append file correctly
+  if (updates.profilePicture instanceof File) {
+    fd.append("profilePicture", updates.profilePicture);
+  }
+
   try {
     const res = await axios.put(
-      `${BASE_URL}/api/auth/user/${userId}/profile`, // ✅ FIXED ROUTE
-      updates,
+      `${BASE_URL}/api/auth/user/${userId}/profile`,
+      fd,
       {
         headers: {
           Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
+          "Content-Type": "multipart/form-data",
         },
       }
     );
@@ -29,6 +41,8 @@ export async function updateUserProfileAction(userId: string, updates: any) {
     throw new Error(err.response?.data?.message || "Profile update failed");
   }
 }
+
+
 
 
 export async function uploadDocumentAction(userId: string, file: File) {
