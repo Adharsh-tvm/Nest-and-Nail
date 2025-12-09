@@ -15,10 +15,8 @@ export class AuthMiddleware {
   constructor(private readonly _tokenService: ITokenService) {}
 
   public verify: RequestHandler = (req: Request, res: Response, next: NextFunction) => {
-    // Try to get token from cookie first
     let token = req.cookies?.accessToken;
     
-    // If not in cookie, try Authorization header
     if (!token) {
       const authHeader = req.headers.authorization;
       if (authHeader && authHeader.startsWith("Bearer ")) {
