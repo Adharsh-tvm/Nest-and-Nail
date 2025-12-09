@@ -19,6 +19,7 @@ import DataTable from "@/app/components/containers/DataTable";
 import type { Column } from "@/app/components/containers/DataTable";
 import { useUsers } from "@/hooks/useUsers";
 import { VerificationStatus } from "@/enums/enums";
+import { toggleUserAccess } from "@/app/actions/admin-actions";
 
 /**
  * ----------------------------------------------------------------------------
@@ -102,16 +103,31 @@ const ActionMenu = ({
  */
 const UsersView = () => {
   const { users, loading, error } = useUsers();
+  const [localUsers, setLocalUsers] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (users) setLocalUsers(users);
+  }, [users]);
 
   console.log(users);
 
-  // Handlers for action menu
-  const handleBlockToggle = (row: any) => {
-    alert(
-      `${row.isBlocked ? "Unblocking" : "Blocking"} user: ${row.user_name}`
-    );
-    // Implement actual logic here
-  };
+  async function handleBlockToggle(row: any) {
+    try {
+      const response = await toggleUserAccess(row.user_id);
+
+      const updatedUser = response.user;
+
+      setLocalUsers((prev) =>
+        prev.map((u) =>
+          u.user_id === row.user_id
+            ? { ...u, isBlocked: updatedUser.isBlocked }
+            : u
+        )
+      );
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
   const handleViewDetails = (row: any) => {
     alert(`Viewing details for: ${row.user_name}`);
@@ -214,17 +230,35 @@ const UsersView = () => {
 
     {
       header: "Status",
-      cell: (row) =>
-        row.isBlocked ? (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-50 text-red-700 border border-red-100 text-xs font-bold">
-            <ShieldAlert size={12} /> Blocked
+      cell: (row) => {
+        const isBlocked = row.isBlocked;
+
+        return (
+          <span
+            className={`
+          inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-bold 
+          min-w-[90px] justify-center
+          ${
+            isBlocked
+              ? "text-red-700 bg-red-50 border-red-100"
+              : "text-green-700 bg-green-50 border-green-100"
+          }
+        `}
+          >
+            {isBlocked ? (
+              <>
+                <ShieldAlert size={12} /> Blocked
+              </>
+            ) : (
+              <>
+                <CheckCircle2 size={12} /> Active
+              </>
+            )}
           </span>
-        ) : (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-50 text-green-700 border border-green-100 text-xs font-bold">
-            <CheckCircle2 size={12} /> Active
-          </span>
-        ),
+        );
+      },
     },
+
     {
       header: "",
       className: "text-right",
@@ -273,7 +307,7 @@ const UsersView = () => {
         <DataTable<ClientRow>
           title="Customer List"
           columns={columns}
-          data={users || []}
+          data={localUsers}
           isLoading={loading}
           searchPlaceholder="Search users by name or email..."
         />

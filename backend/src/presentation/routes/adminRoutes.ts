@@ -9,6 +9,7 @@ export function createAdminRoutes(adminController: IAdminController) {
     router.get("/workers", (req, res) => adminController.getAllWorkers(req, res));
     router.patch("/verify/:userId", adminController.approveVerification);
     router.patch("/reject/:userId", adminController.rejectVerification);
+    router.patch("/access/:userId", adminController.updateUserAccess);
     
     return router;
 }

@@ -4,15 +4,16 @@ import { VerificationStatus } from "../../domain/enums/enums";
 import { UserMapper } from "../mappers/UserMapper";
 import { ILogger } from "../interfaces/ILogger";
 import { Role } from "../../domain/enums/enums";
+import { IUpdateUserAccessUseCase } from "../interfaces/IUpdateUserAccessUseCase";
 
-export class UpdateVerificationStatusUseCase implements IUpdateVerificationStatusUseCase {
+export class UpdateUserAccessUseCase implements IUpdateUserAccessUseCase {
     constructor(
         private readonly repoFactory: UserRepositoryFactory,
         private readonly logger: ILogger
-    ) {}
+    ) { }
 
-    async execute(userId: string, status: VerificationStatus) {
-        this.logger.info(`Updating verification status for user ${userId} → ${status}`);
+    async execute(userId: string) {
+        this.logger.info(`Updating verification status for user ${userId} `);
 
         const clientRepo = this.repoFactory.getRepository(Role.CLIENT);
         const workerRepo = this.repoFactory.getRepository(Role.WORKER);
@@ -24,7 +25,13 @@ export class UpdateVerificationStatusUseCase implements IUpdateVerificationStatu
 
         const repo = user.role === Role.WORKER ? workerRepo : clientRepo;
 
-        const updated = await repo.updateById(userId, { isVerified: status });
+        const newIsBlocked = !user.isBlocked;
+
+        this.logger.info(
+            `User ${userId} access changed: isBlocked → ${newIsBlocked}`
+        );
+
+        const updated = await repo.updateById(userId, { isBlocked: newIsBlocked });;
 
         if (!updated) throw new Error("Failed to update verification status");
 
