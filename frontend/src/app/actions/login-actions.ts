@@ -1,32 +1,32 @@
+// app/actions/login-actions.ts
 "use server";
 
-import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import authApi from "@/services/api/auth.api";
 
-type LoginFormData = {
-  email: string;
-  password: string;
-};
-
-type LoginResponse = {
-  error: string | null;
-  fields?: Partial<LoginFormData>;
+export type LoginState = {
+  error?: string | null;
+  fields?: { email?: string };
+  errorId?: number;
+  success?: boolean;
+  userRole?: string | null;
 };
 
 export async function login(
-  prevState: LoginResponse,
+  prevState: LoginState,
   formData: FormData
-): Promise<LoginResponse> {
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
+): Promise<LoginState> {
+  const email = (formData.get("email") as string) ?? "";
+  const password = (formData.get("password") as string) ?? "";
   const fields = { email };
 
   // Basic validation
   if (!email || !password) {
     return {
       error: "All fields are required",
-      fields
+      fields,
+      errorId: Date.now(),
+      success: false,
     };
   }
 
@@ -34,34 +34,43 @@ export async function login(
   if (!emailRegex.test(email)) {
     return {
       error: "Please enter a valid email address",
-      fields
+      fields,
+      errorId: Date.now(),
+      success: false,
     };
   }
 
+  // Call auth API
+  let response;
+  try {
+    response = await authApi.login({
+      email_address: email,
+      password,
+    });
+  } catch (e: any) {
+    return {
+      error: e?.message ?? "Failed to call auth service",
+      fields,
+      errorId: Date.now(),
+      success: false,
+    };
+  }
 
-  // Step 1: Call login endpoint
-  const response = await authApi.login({
-    email_address: email,
-    password
-  })
+  const data = response?.data;
 
-  const data = response.data;
-
-  // Step 2: Validate we got tokens
-  if (!data.accessToken) {
+  if (!data?.accessToken) {
     return {
       error: "Login failed: No access token received",
-      fields
+      fields,
+      errorId: Date.now(),
+      success: false,
     };
   }
 
-  // ===== END NEW CODE =====
-
-  // Step 3: Set cookies (only if verification passed)
+  // Set cookies
   const cookieStore = await cookies();
-
-  const ACCESS_MAX_AGE = Number(process.env.MAX_AGE_ACCESS_TOKEN);
-  const REFRESH_MAX_AGE = Number(process.env.MAX_AGE_REFRESH_TOKEN);
+  const ACCESS_MAX_AGE = Number(process.env.MAX_AGE_ACCESS_TOKEN) || 60 * 60 * 24;
+  const REFRESH_MAX_AGE = Number(process.env.MAX_AGE_REFRESH_TOKEN) || 60 * 60 * 24 * 30;
 
   if (data.accessToken) {
     cookieStore.set("accessToken", data.accessToken, {
@@ -69,7 +78,7 @@ export async function login(
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       maxAge: ACCESS_MAX_AGE,
-      path: "/"
+      path: "/",
     });
   }
 
@@ -79,39 +88,36 @@ export async function login(
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       maxAge: REFRESH_MAX_AGE,
-      path: "/"
+      path: "/",
     });
   }
 
   if (data.user?.email_address) {
     cookieStore.set("user_email", data.user.email_address, {
-      httpOnly: false, // IMPORTANT: must NOT be httpOnly, otherwise server action can't read it
+      httpOnly: false,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       maxAge: ACCESS_MAX_AGE,
-      path: "/"
+      path: "/",
     });
   }
 
-
-  const userRole = data.user?.user_role?.toLowerCase();
+  const userRole = data.user?.user_role?.toLowerCase() ?? null;
   if (userRole) {
     cookieStore.set("userRole", userRole, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       maxAge: ACCESS_MAX_AGE,
-      path: "/"
+      path: "/",
     });
   }
 
-  // Step 4: Redirect based on role
-  if (userRole === "worker") {
-    redirect("/worker");
-  } else if (userRole === "admin") {
-    redirect("/admin");
-  } else {
-    redirect("/client");
-  }
-
+  // Return success payload (do NOT redirect on server)
+  return {
+    error: null,
+    fields,
+    success: true,
+    userRole,
+  };
 }
