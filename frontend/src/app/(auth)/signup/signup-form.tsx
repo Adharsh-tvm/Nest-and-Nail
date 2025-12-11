@@ -20,6 +20,7 @@ import OtpVerificationForm from "../otp/page";
 import { redirect, useRouter } from "next/navigation";
 import { GoogleLogin } from "@react-oauth/google";
 import { handleGoogleSignIn } from "@/app/actions/google-actions";
+import { Toaster, toast } from "react-hot-toast";
 
 type Role = "client" | "worker" | "admin";
 
@@ -68,16 +69,13 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
   const [otpError, setOtpError] = useState<string | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
 
-  // ✅ Store password in a ref that persists across renders
   const passwordCaptureRef = useRef<string>("");
   const formRef = useRef<HTMLFormElement>(null);
 
   const currentRoleConfig = roleConfig[role];
   const roleName = role.charAt(0).toUpperCase() + role.slice(1);
 
-  // ✅ Handle form submission to capture password BEFORE it's cleared
   const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    // Capture password immediately before form processing
     const formData = new FormData(event.currentTarget);
     const password = formData.get("password") as string;
 
@@ -90,13 +88,25 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
     passwordCaptureRef.current = password;
   };
 
-  // When OTP is sent successfully, use the captured password
+useEffect(() => {
+  if (state.errorId && state.error) {
+    toast.error(state.error);
+  }
+}, [state.errorId]);
+
+
+  useEffect(() => {
+    if (state.otpSent) {
+      toast.success("OTP sent to your email!");
+    }
+  }, [state.otpSent]);
+
   useEffect(() => {
     if (state.otpSent && state.fields) {
       const capturedData = {
         name: state.fields.name || "",
         email: state.fields.email || "",
-        password: passwordCaptureRef.current, // Use the captured password
+        password: passwordCaptureRef.current, 
         role: role,
       };
 
@@ -168,11 +178,11 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
           router.push("/client");
         }
       } else {
-        setOtpError(result.error || "Verification failed");
+        toast.error(result.error || "Verification failed");
       }
     } catch (err) {
       console.error("[SignUpComponent] Verification error:", err);
-      setOtpError("An unexpected error occurred");
+      toast.error("An unexpected error occurred");
     } finally {
       setIsVerifying(false);
     }
@@ -216,6 +226,7 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
 
   return (
     <>
+      {/* <Toaster /> */}
       <div className="w-full max-w-sm">
         <div className="bg-black border border-zinc-800 rounded-xl shadow-2xl">
           <div className="p-6 text-center">
@@ -331,12 +342,6 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
                   />
                 </div>
               </div>
-
-              {state?.error && (
-                <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-                  <p className="text-sm text-red-400">{state.error}</p>
-                </div>
-              )}
 
               <button
                 type="submit"

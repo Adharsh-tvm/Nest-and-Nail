@@ -8,6 +8,7 @@ import { UserMapper } from "../mappers/UserMapper";
 import { IGenerateUserID } from "../services/IGenerateUserID";
 import { IPasswordHasher } from "../services/IPasswordHasher";
 import { ITokenService } from "../services/ITokenService";
+import { AuthValidator } from "../validators/AuthValidator";
 
 export class RegisterUserUseCase implements IRegisterUserUseCase {
   constructor(
@@ -21,8 +22,10 @@ export class RegisterUserUseCase implements IRegisterUserUseCase {
   async execute(
     userData: UserRequestDTO
   ): Promise<{ user: UserResponseDTO; accessToken: string; refreshToken: string }> {
-    console.log(`[RegisterUserUseCase] DEBUG - Received password: "${userData.password}"`);
-    console.log(`[RegisterUserUseCase] DEBUG - Password length: ${userData.password.length}`);
+
+    console.log(userData)
+
+    AuthValidator.validateRegistration(userData);
 
     this._logger.info(`[RegisterUserUseCase] Registration attempt for ${userData.email_address} as ${userData.user_role}`);
 

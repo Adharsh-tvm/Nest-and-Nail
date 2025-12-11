@@ -5,6 +5,9 @@ import { cookies } from "next/headers";
 import { AxiosError } from "axios";
 import authApi from "@/services/api/auth.api";
 
+import { SignupStartSchema } from "@/lib/validation/signup.schema";
+import { CompleteSignupSchema } from "@/lib/validation/complete-signup.schema";
+
 // ---------------- Types ----------------
 
 type SignupFormData = {
@@ -17,9 +20,11 @@ type SignupFormData = {
 
 export type SignupResponse = {
   error: string | null;
+  errorId?: number;
   fields?: Partial<SignupFormData>;
   otpSent?: boolean;
 };
+
 
 type CompleteSignupData = {
   name: string;
@@ -41,8 +46,6 @@ enum VerificationStatus {
   VERIFIED = "VERIFIED"
 }
 
-
-
 // ----------------------
 // STEP 1: START SIGNUP (SEND OTP)
 // ----------------------
@@ -51,67 +54,76 @@ export async function signup(
   prevState: SignupResponse,
   formData: FormData
 ): Promise<SignupResponse> {
-  const name = (formData.get("name") as string) || "";
-  const email = (formData.get("email") as string) || "";
-  const password = (formData.get("password") as string) || "";
-  const confirmPassword = (formData.get("confirmPassword") as string) || "";
-  const role = (formData.get("role") as "client" | "worker") || "client";
 
-  const fields = { name, email, role };
+  const input = {
+    name: formData.get("name") as string,
+    email: formData.get("email") as string,
+    password: formData.get("password") as string,
+    confirmPassword: formData.get("confirmPassword") as string,
+    role: (formData.get("role") as "client" | "worker") || "client"
+  };
 
-  // Validation
-  if (!name || !email || !password || !confirmPassword) {
-    return { error: "All fields are required", fields };
+  // ZOD VALIDATION
+  const parsed = SignupStartSchema.safeParse(input);
+
+  if (!parsed.success) {
+    return {
+      error: parsed.error.issues[0]?.message || "Invalid input",
+      errorId: Date.now(),
+      fields: {
+        name: input.name,
+        email: input.email,
+        role: input.role,
+      },
+    };
   }
 
-  if (password !== confirmPassword) {
-    return { error: "Passwords do not match", fields };
-  }
-
-  if (password.length < 8) {
-    return { error: "Password must be at least 8 characters long", fields };
-  }
-
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    return { error: "Please enter a valid email address", fields };
-  }
+  const data = parsed.data;
 
   try {
     await authApi.sendOtp({
-      email_address: email,
-      role,
+      email_address: data.email,
+      role: data.role,
     });
 
     return {
       error: null,
       otpSent: true,
-      fields,
+      fields: {
+        name: data.name,
+        email: data.email,
+        role: data.role,
+      },
     };
   } catch (error) {
     if (error instanceof AxiosError) {
-      console.error("signup -> sendOtp failed:", {
-        status: error.response?.status,
-        data: error.response?.data,
-        message: error.message,
-      });
-
       return {
         error:
           error.response?.data?.message ||
           error.response?.data?.error ||
-          "Failed to send OTP. Please try again.",
-        fields,
+          "Failed to send OTP",
+        errorId: Date.now(),
+        fields: {
+          name: data.name,
+          email: data.email,
+          role: data.role
+        },
       };
     }
 
-    console.error("signup -> unknown error:", error);
     return {
-      error: "Network error. Please check your connection and try again.",
-      fields,
+      error: "Network error",
+      errorId: Date.now(),
+      fields: {
+        name: data.name,
+        email: data.email,
+        role: data.role
+      },
     };
   }
 }
+
+
 
 // ----------------------
 // STEP 2: COMPLETE SIGNUP AFTER OTP
@@ -120,55 +132,40 @@ export async function signup(
 export async function completeSignup(
   data: CompleteSignupData
 ): Promise<CompleteSignupResponse> {
+
+  // ZOD VALIDATION
+  const parsed = CompleteSignupSchema.safeParse(data);
+
+  if (!parsed.success) {
+    return {
+      success: false,
+      error: parsed.error.issues[0]?.message || "Invalid input",
+    };
+  }
+
+  const validated = parsed.data;
+
   try {
-    // 🔍 CRITICAL DEBUG: Log what we received
-    console.log("[completeSignup SERVER] Received data:", {
-      name: data.name,
-      email: data.email,
-      role: data.role,
-      hasPassword: !!data.password,
-      passwordLength: data.password?.length,
-      passwordPreview: data.password ? data.password.substring(0, 3) + "..." : "[EMPTY]"
-    });
-
-    // Verify OTP via authApi
+    // Verify OTP
     const otpResponse = await authApi.verifyOtp({
-      email_address: data.email,
-      otp: data.otp,
+      email_address: validated.email,
+      otp: validated.otp,
     });
-
-    console.log("[completeSignup SERVER] OTP verified successfully");
 
     if (!otpResponse?.data) {
       return { success: false, error: "Invalid or expired OTP" };
     }
 
-    // 🔍 CRITICAL: Log the exact payload being sent to backend
+    // Prepare backend payload
     const signupPayload = {
-      user_name: data.name,
-      email_address: data.email,
-      password: data.password,
-      user_role: data.role,
+      user_name: validated.name,
+      email_address: validated.email,
+      password: validated.password,
+      user_role: validated.role,
     };
 
-    console.log("[completeSignup SERVER] Payload to be sent:", {
-      user_name: signupPayload.user_name,
-      email_address: signupPayload.email_address,
-      user_role: signupPayload.user_role,
-      password_exists: !!signupPayload.password,
-      password_length: signupPayload.password?.length,
-      password_preview: signupPayload.password
-        ? signupPayload.password.substring(0, 3) + "..."
-        : "[EMPTY]",
-      // 🚨 Let's see the ACTUAL password for debugging (REMOVE THIS IN PRODUCTION!)
-      ACTUAL_PASSWORD_DEBUG: signupPayload.password
-    });
-
     // Register user
-    console.log("[completeSignup SERVER] Calling authApi.signup...");
     const registerResponse = await authApi.signup(signupPayload);
-    console.log("[completeSignup SERVER] Registration response received");
-
     const registerData = registerResponse?.data;
 
     if (!registerData) {
@@ -178,24 +175,19 @@ export async function completeSignup(
     const { accessToken, refreshToken, user } = registerData;
 
     if (!accessToken || !refreshToken) {
-      console.error("completeSignup -> missing tokens:", registerData);
       return {
         success: false,
         error: "Signup failed: No tokens received",
       };
     }
 
-    // Persist tokens & role in cookies (server-side)
+    // Set cookies
     const cookieStore = await cookies();
-
-    const ACCESS_MAX_AGE = Number(process.env.MAX_AGE_ACCESS_TOKEN);
-    const REFRESH_MAX_AGE = Number(process.env.MAX_AGE_REFRESH_TOKEN);
 
     cookieStore.set("accessToken", accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: ACCESS_MAX_AGE, // 15 minutes
       path: "/",
     });
 
@@ -203,71 +195,48 @@ export async function completeSignup(
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: REFRESH_MAX_AGE, // 7 days
       path: "/",
     });
 
-    const userRole = (user?.user_role || user?.role || "").toString().toLowerCase();
-    if (!userRole) {
-      console.error("completeSignup -> invalid user role in response:", user);
-      return {
-        success: false,
-        error: "Signup failed: Invalid user data",
-      };
-    }
-
-    cookieStore.set("userRole", userRole, {
+    cookieStore.set("userRole", validated.role, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: ACCESS_MAX_AGE,
       path: "/",
     });
 
-    cookieStore.set("user_email", user.email_address, {
+    cookieStore.set("user_email", validated.email, {
       httpOnly: false,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: ACCESS_MAX_AGE,
-      path: "/"
+      path: "/",
     });
-
-    console.log("[completeSignup SERVER] Success, cookies set");
-
-    const verificationStatus: VerificationStatus =
-      user?.isVerified
-        ? VerificationStatus.VERIFIED
-        : VerificationStatus.NOT_VERIFIED;
 
     return {
       success: true,
       error: null,
-      isVerified: verificationStatus,
+      isVerified: user?.isVerified ? VerificationStatus.VERIFIED : VerificationStatus.NOT_VERIFIED,
     };
+
   } catch (error) {
     if (error instanceof AxiosError) {
-      console.error("completeSignup -> error:", {
-        status: error.response?.status,
-        data: error.response?.data,
-        message: error.message,
-      });
-
       return {
         success: false,
         error:
           error.response?.data?.message ||
           error.response?.data?.error ||
-          "Verification or registration failed. Please try again.",
+          "Verification or registration failed",
       };
     }
 
-    console.error("completeSignup -> unknown error:", error);
     return {
       success: false,
-      error: "Network error. Please check your connection and try again.",
+      error: "Network error",
     };
   }
 }
+
+
 
 // ----------------------
 // RESEND OTP
@@ -283,25 +252,15 @@ export async function resendOtp(
       role,
     });
 
-    return {
-      success: true,
-      error: null,
-    };
+    return { success: true, error: null };
   } catch (error) {
     if (error instanceof AxiosError) {
-      console.error("resendOtp -> error:", {
-        status: error.response?.status,
-        data: error.response?.data,
-        message: error.message,
-      });
-
       return {
         success: false,
         error: error.response?.data?.message || "Failed to resend OTP",
       };
     }
 
-    console.error("resendOtp -> unknown error:", error);
     return { success: false, error: "Network error occurred" };
   }
 }
