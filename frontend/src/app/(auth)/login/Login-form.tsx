@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   KeyRound,
   AtSign,
@@ -24,21 +24,29 @@ import {
   verifyResetOtpAction,
   resetPasswordAction,
 } from "@/app/actions/otp-actions";
+import toast from "react-hot-toast";
 
 // --- Types ---
 type State = {
-  error: string | null;
+  error?: string | null;
   fields?: {
     email?: string;
   };
+  errorId?: number;       
+  success?: boolean;
+  userRole?: string | null;
 };
-
-type Step = "EMAIL" | "OTP" | "NEW_PASSWORD" | "SUCCESS";
 
 const initialState: State = {
   error: null,
   fields: {},
+  errorId: undefined,
+  success: false,
+  userRole: null,
 };
+
+
+type Step = "EMAIL" | "OTP" | "NEW_PASSWORD" | "SUCCESS";
 
 // --- Multi-Step Forgot Password Dialog ---
 const ForgotPasswordDialog = ({
@@ -115,7 +123,11 @@ const ForgotPasswordDialog = ({
 
     setIsLoading(true);
 
-    const result = await resetPasswordAction(email, newPassword, confirmPassword);
+    const result = await resetPasswordAction(
+      email,
+      newPassword,
+      confirmPassword
+    );
     setIsLoading(false);
 
     if (result?.error) {
@@ -182,14 +194,18 @@ const ForgotPasswordDialog = ({
         {step === "EMAIL" && (
           <div className="space-y-4">
             <div className="text-center space-y-2">
-              <h2 className="text-xl font-semibold text-white">Reset Password</h2>
+              <h2 className="text-xl font-semibold text-white">
+                Reset Password
+              </h2>
               <p className="text-sm text-zinc-400">
                 Enter your email to receive a verification code.
               </p>
             </div>
             <form onSubmit={handleSendOtp} className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-zinc-400">Email</label>
+                <label className="text-sm font-medium text-zinc-400">
+                  Email
+                </label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
                   <input
@@ -207,7 +223,11 @@ const ForgotPasswordDialog = ({
                 disabled={isLoading || !email}
                 className="w-full py-2.5 px-4 bg-zinc-100 text-zinc-900 hover:bg-zinc-200 font-semibold rounded-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Send Code"}
+                {isLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  "Send Code"
+                )}
               </button>
             </form>
           </div>
@@ -224,7 +244,9 @@ const ForgotPasswordDialog = ({
             </div>
             <form onSubmit={handleVerifyOtp} className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-zinc-400">Verification Code</label>
+                <label className="text-sm font-medium text-zinc-400">
+                  Verification Code
+                </label>
                 <div className="relative">
                   <MessageSquare className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
                   <input
@@ -244,7 +266,11 @@ const ForgotPasswordDialog = ({
                   disabled={isLoading}
                   className="flex-1 py-2.5 px-4 bg-zinc-100 text-zinc-900 hover:bg-zinc-200 font-semibold rounded-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Verify Code"}
+                  {isLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    "Verify Code"
+                  )}
                 </button>
 
                 <button
@@ -253,7 +279,9 @@ const ForgotPasswordDialog = ({
                   disabled={isLoading || resendCooldown > 0}
                   className="px-3 py-2 text-sm rounded-lg border border-zinc-800 text-zinc-400 hover:text-zinc-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {resendCooldown > 0 ? `Resend (${resendCooldown}s)` : "Resend"}
+                  {resendCooldown > 0
+                    ? `Resend (${resendCooldown}s)`
+                    : "Resend"}
                 </button>
               </div>
             </form>
@@ -265,11 +293,15 @@ const ForgotPasswordDialog = ({
           <div className="space-y-4">
             <div className="text-center space-y-2">
               <h2 className="text-xl font-semibold text-white">New Password</h2>
-              <p className="text-sm text-zinc-400">Create a strong password for your account.</p>
+              <p className="text-sm text-zinc-400">
+                Create a strong password for your account.
+              </p>
             </div>
             <form onSubmit={handleResetPassword} className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-zinc-400">New Password</label>
+                <label className="text-sm font-medium text-zinc-400">
+                  New Password
+                </label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
                   <input
@@ -283,7 +315,9 @@ const ForgotPasswordDialog = ({
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-zinc-400">Confirm Password</label>
+                <label className="text-sm font-medium text-zinc-400">
+                  Confirm Password
+                </label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
                   <input
@@ -320,9 +354,12 @@ const ForgotPasswordDialog = ({
             <div className="h-16 w-16 rounded-full bg-green-500/10 flex items-center justify-center text-green-500">
               <CheckCircle2 className="h-8 w-8" />
             </div>
-            <h2 className="text-xl font-semibold text-white">Password Changed</h2>
+            <h2 className="text-xl font-semibold text-white">
+              Password Changed
+            </h2>
             <p className="text-sm text-zinc-400 text-center max-w-[260px]">
-              Your password has been updated successfully. You can now login with your new credentials.
+              Your password has been updated successfully. You can now login
+              with your new credentials.
             </p>
             <button
               onClick={handleClose}
@@ -359,12 +396,37 @@ export const LoginForm = () => {
     }
   }
 
+useEffect(() => {
+  if (state?.error) {
+    toast.error(state.error);
+  }
+}, [state?.errorId]);
+
+useEffect(() => {
+  if (state?.success) {
+    toast.success("Signed in successfully");
+
+    setTimeout(() => {
+      const role = state.userRole ?? "client";
+      if (role === "worker") router.push("/worker");
+      else if (role === "admin") router.push("/admin");
+      else router.push("/client");
+    }, 500);
+  }
+}, [state?.success]);
+
+
   return (
     <>
       <div className="px-6 pb-6">
         <form action={formAction} className="space-y-4">
           <div className="space-y-2">
-            <label htmlFor="email" className="text-sm font-medium text-zinc-400">Email</label>
+            <label
+              htmlFor="email"
+              className="text-sm font-medium text-zinc-400"
+            >
+              Email
+            </label>
             <div className="relative">
               <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
               <input
@@ -381,7 +443,12 @@ export const LoginForm = () => {
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="password" className="text-sm font-medium text-zinc-400">Password</label>
+            <label
+              htmlFor="password"
+              className="text-sm font-medium text-zinc-400"
+            >
+              Password
+            </label>
             <div className="relative">
               <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
               <input
@@ -407,12 +474,6 @@ export const LoginForm = () => {
               </button>
             </div>
           </div>
-
-          {state?.error && (
-            <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-              <p className="text-sm text-red-400">{state.error}</p>
-            </div>
-          )}
 
           <button
             type="submit"
