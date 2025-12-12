@@ -24,11 +24,9 @@ export class LoginUserUseCase implements ILoginUserUseCase {
 
         this._logger.info(`[LoginUserUseCase] Login attempt for ${email_address}`);
 
-        // Try to find user in all repositories
         let user: User | null = null;
         let userRole: Role | null = null;
 
-        // Search in Client repository
         try {
             const clientRepo = this._repositoryFactory.getRepository(Role.CLIENT);
             user = await clientRepo.findByEmail(email_address);
@@ -40,7 +38,6 @@ export class LoginUserUseCase implements ILoginUserUseCase {
             this._logger.info(`[LoginUserUseCase] User not found in CLIENT repository`);
         }
 
-        // If not found, search in Worker repository
         if (!user) {
             try {
                 const workerRepo = this._repositoryFactory.getRepository(Role.WORKER);
@@ -54,7 +51,6 @@ export class LoginUserUseCase implements ILoginUserUseCase {
             }
         }
 
-        // If not found, search in Admin repository (if you have one)
         if (!user) {
             try {
                 const adminRepo = this._repositoryFactory.getRepository(Role.ADMIN);
