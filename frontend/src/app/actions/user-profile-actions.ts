@@ -2,9 +2,9 @@
 
 import axios from "axios";
 import { cookies } from "next/headers";
+import { success } from "zod";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
-
 
 export async function updateUserProfileAction(userId: string, updates: any) {
   const cookieStore = await cookies();
@@ -12,12 +12,10 @@ export async function updateUserProfileAction(userId: string, updates: any) {
 
   const fd = new FormData();
 
-  // Append only safe fields
   if (updates.name) fd.append("name", updates.name);
   if (updates.phone) fd.append("phone", updates.phone);
   if (updates.address) fd.append("address", updates.address);
 
-  // Append file correctly
   if (updates.profilePicture instanceof File) {
     fd.append("profilePicture", updates.profilePicture);
   }
@@ -34,15 +32,22 @@ export async function updateUserProfileAction(userId: string, updates: any) {
       }
     );
 
-    return res.data;
+    return {
+      success: true,
+      message: "Profile Updated successfully",
+      user: res.data.user
+    }
 
   } catch (err: any) {
     console.error("Profile update failed", err.response?.data || err);
-    throw new Error(err.response?.data?.message || "Profile update failed");
+    // throw new Error(err.response?.data?.message || "Profile update failed");
+
+    return {
+      success: false,
+      message: err.response?.data?.message || "Profile update failed"
+    }
   }
 }
-
-
 
 
 export async function uploadDocumentAction(userId: string, file: File) {
@@ -52,7 +57,7 @@ export async function uploadDocumentAction(userId: string, file: File) {
   formData.append("file", file);
 
   const res = await axios.post(
-    `${BASE_URL}/api/upload/worker/${userId}/document`, // ✅ FIXED ROUTE
+    `${BASE_URL}/api/upload/worker/${userId}/document`,
     formData,
     {
       headers: {

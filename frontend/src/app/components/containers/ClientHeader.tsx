@@ -90,20 +90,29 @@ const ClientHeader: React.FC = () => {
     }
   };
 
+  const homeHref =
+    currentUser?.role === "worker"
+      ? "/worker"
+      : currentUser?.role === "client"
+      ? "/client"
+      : "/";
+
   return (
     <>
       <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm transition-all duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             {/* LEFT: Logo */}
-            <div className="flex-shrink-0 flex items-center gap-2 group cursor-pointer mr-4">
-              <div className="bg-[#1B4332] text-white flex size-9 items-center justify-center rounded-xl shadow-md group-hover:bg-[#DC2626] transition-colors duration-300">
-                <GalleryVerticalEnd size={20} />
+            <Link href={homeHref}>
+              <div className="flex-shrink-0 flex items-center gap-2 group cursor-pointer mr-4">
+                <div className="bg-[#1B4332] text-white flex size-9 items-center justify-center rounded-xl shadow-md group-hover:bg-[#DC2626] transition-colors duration-300">
+                  <GalleryVerticalEnd size={20} />
+                </div>
+                <span className="text-2xl font-bold text-[#1B4332] tracking-tight group-hover:text-[#DC2626] transition-colors duration-300">
+                  NEST & NAIL
+                </span>
               </div>
-              <span className="text-2xl font-bold text-[#1B4332] tracking-tight group-hover:text-[#DC2626] transition-colors duration-300">
-                NEST & NAIL
-              </span>
-            </div>
+            </Link>
 
             {/* RIGHT: Toggle + User Menu */}
             <div className="hidden md:flex items-center gap-4 flex-shrink-0">
