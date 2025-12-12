@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { useUserStore } from "@/store/userStore";
 import { updateUserProfileAction } from "@/app/actions/user-profile-actions";
+import toast from "react-hot-toast";
 
 // --- Types ---
 type User = {
@@ -67,41 +68,52 @@ const ClientProfile = () => {
     setPreviewImage(preview);
   };
 
-  const handleSave = async () => {
-    if (!currentUser) return;
+const handleSave = async () => {
+  if (!currentUser) return;
 
-    try {
-      const payload = {
-        name: formData.name,
-        phone: formData.phone_number,
-        address: formData.address,
-        profilePicture: formData.profilePicture, // File if provided
-      };
+  try {
+    const payload = {
+      name: formData.name,
+      phone: formData.phone_number,
+      address: formData.address,
+      profilePicture: formData.profilePicture,
+    };
 
-      const response = await updateUserProfileAction(currentUser.id, payload);
-      const updated = response.user;
+    const response = await updateUserProfileAction(currentUser.id, payload);
 
-      setUser((prev) =>
-        prev
-          ? {
-              ...prev,
-              id: updated.user_id ?? prev.id,
-              name: updated.user_name,
-              email: updated.email_address,
-              role: updated.user_role ?? prev.role,
-              profileImageUrl: updated.profilePictureUrl,
-              phone_number: updated.phone_number,
-              address: updated.address,
-            }
-          : prev
-      );
-
-      setIsEditing(false);
-    } catch (err: any) {
-      console.error("Error updating profile:", err);
-      alert(err.message);
+    if (!response.success) {
+      toast.error(response.message);
+      return;
     }
-  };
+
+    const updated = response.user;
+
+    toast.success(response.message);
+
+    setUser((prev) =>
+      prev
+        ? {
+            ...prev,
+            id: updated.id ?? prev.id,
+            name: updated.name ?? prev.name,
+            email: updated.email ?? prev.email,
+            role: updated.role ?? prev.role,
+            profileImageUrl: updated.profileImageUrl ?? prev.profileImageUrl,
+            phone_number: updated.phone_number ?? prev.phone_number,
+            address: updated.address ?? prev.address,
+          }
+        : prev
+    );
+
+    setPreviewImage(updated.profileImageUrl);
+
+    setIsEditing(false);
+
+  } catch (err: any) {
+    console.error("Error updating profile:", err);
+    toast.error(err.message || "Update failed");
+  }
+};
 
   const handleCancel = () => {
     if (currentUser) {
