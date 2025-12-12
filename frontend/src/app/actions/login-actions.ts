@@ -3,6 +3,7 @@
 
 import { cookies } from "next/headers";
 import authApi from "@/services/api/auth.api";
+import axios from "axios";
 
 export type LoginState = {
   error?: string | null;
@@ -41,21 +42,31 @@ export async function login(
   }
 
   // Call auth API
-  let response;
+   let response;
   try {
     response = await authApi.login({
       email_address: email,
       password,
     });
-  } catch (e: any) {
+  } catch (e: unknown) {
+    // Prefer axios.isAxiosError (works across bundlers) and normalizedMessage from interceptor
+    if (axios.isAxiosError(e)) {
+      const normalized = (e as any).normalizedMessage || (e as any).serverData?.message || (e as any).serverData?.error;
+      return {
+        error: normalized || (e as Error).message || "Failed to call auth service",
+        fields,
+        errorId: Date.now(),
+        success: false,
+      };
+    }
+
     return {
-      error: e?.message ?? "Failed to call auth service",
+      error: (e as Error)?.message || "Failed to call auth service",
       fields,
       errorId: Date.now(),
       success: false,
     };
   }
-
   const data = response?.data;
 
   if (!data?.accessToken) {
@@ -67,7 +78,6 @@ export async function login(
     };
   }
 
-  // Set cookies
   const cookieStore = await cookies();
   const ACCESS_MAX_AGE = Number(process.env.MAX_AGE_ACCESS_TOKEN) || 60 * 60 * 24;
   const REFRESH_MAX_AGE = Number(process.env.MAX_AGE_REFRESH_TOKEN) || 60 * 60 * 24 * 30;

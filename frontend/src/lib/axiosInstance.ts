@@ -1,3 +1,4 @@
+// services/lib/axiosInstance.ts (or wherever your axiosInstance file is)
 import axios from "axios";
 import { cookies } from "next/headers";
 
@@ -9,81 +10,55 @@ const axiosInstance = axios.create({
   },
 });
 
-// REQUEST INTERCEPTOR
-
 axiosInstance.interceptors.request.use(
   async (config) => {
     if (typeof window === "undefined") {
       try {
         const cookieStore = await cookies();
         const accessToken = cookieStore.get("accessToken")?.value;
-
         if (accessToken) {
-          config.headers.Authorization = `Bearer ${accessToken}`;
+          config.headers = config.headers || {};
+          (config.headers as any).Authorization = `Bearer ${accessToken}`;
         }
-
         const allCookies = cookieStore.getAll();
         if (allCookies.length > 0) {
-          const cookieString = allCookies
-            .map((c) => `${c.name}=${c.value}`)
-            .join("; ");
-          config.headers.Cookie = cookieString;
+          const cookieString = allCookies.map((c) => `${c.name}=${c.value}`).join("; ");
+          (config.headers as any).Cookie = cookieString;
         }
-      } catch (error) {
-        console.error("Error reading cookies:", error);
+      } catch (err) {
+        console.error("Error reading cookies in request interceptor:", err);
       }
     }
-
     return config;
   },
   (error) => Promise.reject(error)
 );
 
-// ERROR RESPONSE INTERCEPTOR
-
+// RESPONSE INTERCEPTOR — normalizes server message + data
 axiosInstance.interceptors.response.use(
   (response) => response,
-
   async (error) => {
     const status = error?.response?.status;
-    const message = error?.response?.data?.message;
+    const serverData = error?.response?.data;
+    const serverMsg = serverData?.message || serverData?.error || null;
+
+    try {
+      (error as any).normalizedMessage = serverMsg || error.message || `Request failed with status ${status}`;
+      (error as any).serverData = serverData || null;
+    } catch (attachErr) {
+    }
 
     console.error("🚨 API Error:", {
       url: error.config?.url,
       method: error.config?.method,
       status,
-      message,
+      message: serverMsg || error.message,
+      serverData,
     });
 
-    // 🌐 Handle specific errors
-    switch (status) {
-      case 400:
-        // toast.error(message || "Bad Request");
-        break;
-
-      case 401:
-        console.warn("Unauthorized — clearing session");
-
-        if (typeof window !== "undefined") {
-          window.location.href = "/login";
-        }
-        break;
-
-      case 403:
-        // toast.error("You don't have permission to perform this action.");
-        break;
-
-      case 404:
-        // toast.error("Resource not found.");
-        break;
-
-      case 500:
-        // toast.error("Server error. Please try again later.");
-        break;
-
-      default:
-        // toast.error(message || "Unexpected error occurred.");
-        break;
+    if (status === 401 && typeof window !== "undefined") {
+      console.warn("Unauthorized — clearing session and redirecting to /login");
+      window.location.href = "/login";
     }
 
     return Promise.reject(error);

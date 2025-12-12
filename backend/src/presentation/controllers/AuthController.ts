@@ -107,6 +107,7 @@ export class AuthController implements IAuthController {
       console.log("[AuthController] Response sent successfully");
 
     } catch (error: any) {
+      console.log("here", error.message)
       loggerInstance.error(`[AuthController] Login error: ${error.message}`);
       res.status(HttpStatusCode.UNAUTHORIZED).json({
         message: error.message || "Login failed"
