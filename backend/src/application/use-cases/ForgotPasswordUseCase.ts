@@ -5,6 +5,7 @@ import { UserRepositoryFactory } from "../../infrastructure/repo/UserRepositoryF
 import { ILogger } from "../interfaces/ILogger";
 import { Role } from "../../domain/enums/enums";
 import { IForgotPasswordUseCase } from "../interfaces/IForgotPasswordUseCase";
+import { UserNotFoundError } from "../../domain/errors/DomainError";
 
 export class ForgotPasswordUseCase implements IForgotPasswordUseCase {
     constructor(
@@ -33,7 +34,7 @@ export class ForgotPasswordUseCase implements IForgotPasswordUseCase {
         }
 
         if (!user || !foundRole) {
-            throw new Error("No user found with this email");
+            throw new UserNotFoundError()
         }
 
         // Generate OTP
