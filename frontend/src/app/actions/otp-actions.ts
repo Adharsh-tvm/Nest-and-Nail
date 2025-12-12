@@ -88,16 +88,19 @@ export async function forgotPasswordAction(email_address: string) {
     const res = await authApi.forgotPassword({ email_address });
 
     return {
-      success: res.data.message || "OTP sent successfully",
+      success: true,
+      message: res.data.message || "OTP sent successfully",
     };
+
   } catch (error: any) {
     return {
+      success: false,
       error:
-        error.response?.data?.message ||
-        "Something went wrong while sending OTP",
+        error.response?.data?.message || "Something went wrong while sending OTP",
     };
   }
 }
+
 
 export async function verifyResetOtpAction(email_address: string, otp: string) {
   try {

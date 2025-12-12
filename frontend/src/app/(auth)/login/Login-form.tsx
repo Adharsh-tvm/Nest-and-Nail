@@ -32,7 +32,7 @@ type State = {
   fields?: {
     email?: string;
   };
-  errorId?: number;       
+  errorId?: number;
   success?: boolean;
   userRole?: string | null;
 };
@@ -44,7 +44,6 @@ const initialState: State = {
   success: false,
   userRole: null,
 };
-
 
 type Step = "EMAIL" | "OTP" | "NEW_PASSWORD" | "SUCCESS";
 
@@ -86,7 +85,7 @@ const ForgotPasswordDialog = ({
     setIsLoading(false);
 
     if (result?.error) {
-      setError(result.error);
+      toast.error(result.error);
       return;
     }
 
@@ -396,25 +395,24 @@ export const LoginForm = () => {
     }
   }
 
-useEffect(() => {
-  if (state?.error) {
-    toast.error(state.error);
-  }
-}, [state?.errorId]);
+  useEffect(() => {
+    if (state?.error) {
+      toast.error(state.error);
+    }
+  }, [state?.errorId]);
 
-useEffect(() => {
-  if (state?.success) {
-    toast.success("Signed in successfully");
+  useEffect(() => {
+    if (state?.success) {
+      toast.success("Signed in successfully");
 
-    setTimeout(() => {
-      const role = state.userRole ?? "client";
-      if (role === "worker") router.push("/worker");
-      else if (role === "admin") router.push("/admin");
-      else router.push("/client");
-    }, 500);
-  }
-}, [state?.success]);
-
+      setTimeout(() => {
+        const role = state.userRole ?? "client";
+        if (role === "worker") router.push("/worker");
+        else if (role === "admin") router.push("/admin");
+        else router.push("/client");
+      }, 500);
+    }
+  }, [state?.success]);
 
   return (
     <>
