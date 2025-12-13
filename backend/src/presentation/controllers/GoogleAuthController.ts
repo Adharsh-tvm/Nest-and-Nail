@@ -9,7 +9,6 @@ export class GoogleAuthController implements IGoogleAuthController {
   async googleLogin(req: Request, res: Response): Promise<void> {
     try {
       const { email, name, role } = req.body;
-      console.log('Da role itha nokku : ',role)
       const response = await this._googleSignUpUseCase.execute(email, name, role)
       res.status(HttpStatusCode.OK).json({ success: true, message: "Google user authenticated", payload: response })
     } catch (err: any) {

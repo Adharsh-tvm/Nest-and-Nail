@@ -1,14 +1,14 @@
-import { UserRepositoryFactory } from "../../infrastructure/repo/UserRepositoryFactory";
 import { Role } from "../../domain/enums/enums";
 import { UserResponseDTO } from "../dtos/UserDTO";
 import { IChangeUserRoleUseCase } from "../interfaces/IChangeUserRoleUseCase";
 import { ILogger } from "../interfaces/ILogger";
 import { UserMapper } from "../mappers/UserMapper";
 import { ITokenService } from "../services/ITokenService";
+import { IUserRepositoryFactory } from "../../domain/repositories/IUserRepositoryFactory";
 
 export class ChangeUserRoleUseCase implements IChangeUserRoleUseCase {
     constructor(
-        private readonly _repositoryFactory: UserRepositoryFactory,
+        private readonly _repositoryFactory: IUserRepositoryFactory,
         private readonly _logger: ILogger,
         private readonly _tokenService: ITokenService
     ) { }

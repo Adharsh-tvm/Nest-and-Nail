@@ -1,18 +1,18 @@
 import { IEmailService } from "../services/IEmailService";
 import { IOtpService } from "../services/IOtpService";
-import { OtpRepository } from "../../infrastructure/repo/OtpRepository";
-import { UserRepositoryFactory } from "../../infrastructure/repo/UserRepositoryFactory";
 import { ILogger } from "../interfaces/ILogger";
 import { Role } from "../../domain/enums/enums";
 import { IForgotPasswordUseCase } from "../interfaces/IForgotPasswordUseCase";
 import { UserNotFoundError } from "../../domain/errors/DomainError";
+import { IUserRepositoryFactory } from "../../domain/repositories/IUserRepositoryFactory";
+import { IOtpRepository } from "../../domain/repositories/IOtpRepository";
 
 export class ForgotPasswordUseCase implements IForgotPasswordUseCase {
     constructor(
         private readonly _emailService: IEmailService,
         private readonly _otpService: IOtpService,
-        private readonly _otpRepo: OtpRepository,
-        private readonly _userRepoFactory: UserRepositoryFactory,
+        private readonly _otpRepo: IOtpRepository,
+        private readonly _userRepoFactory: IUserRepositoryFactory,
         private readonly _logger?: ILogger
     ) { }
 

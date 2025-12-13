@@ -23,8 +23,8 @@ export class UserProfileController implements IUserProfileController {
     updateProfile = async (req: Request, res: Response) => {
         try {
             const userId = req.params.userId;
-            const updates = req.body;                // name, phone, etc.
-            const profilePictureFilePath = req.file?.path; // from multer
+            const updates = req.body;              
+            const profilePictureFilePath = req.file?.path;
 
             const updatedUser = await this._updateUserProfileUseCase.execute(
                 userId,

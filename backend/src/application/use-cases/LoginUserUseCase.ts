@@ -5,13 +5,13 @@ import { ILoginUserUseCase } from "../interfaces/ILoginUserUseCase";
 import { UserMapper } from "../mappers/UserMapper";
 import { IPasswordHasher } from "../services/IPasswordHasher";
 import { ITokenService } from "../services/ITokenService";
-import { UserRepositoryFactory } from "../../infrastructure/repo/UserRepositoryFactory";
 import { Role } from "../../domain/enums/enums";
 import { User } from "../../domain/entities/User";
+import { IUserRepositoryFactory } from "../../domain/repositories/IUserRepositoryFactory";
 
 export class LoginUserUseCase implements ILoginUserUseCase {
     constructor(
-        private readonly _repositoryFactory: UserRepositoryFactory,
+        private readonly _repositoryFactory: IUserRepositoryFactory,
         private readonly _passwordHasher: IPasswordHasher,
         private readonly _tokenService: ITokenService,
         private readonly _logger: ILogger

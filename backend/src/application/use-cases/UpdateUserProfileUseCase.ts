@@ -1,6 +1,3 @@
-// application/usecases/UpdateUserProfileUseCase.ts
-
-import { UserRepositoryFactory } from "../../infrastructure/repo/UserRepositoryFactory";
 import { ILogger } from "../interfaces/ILogger";
 import { Role } from "../../domain/enums/enums";
 import { IUpdateUserProfileUseCase } from "../interfaces/IUpdateUserProfileUseCase";
@@ -8,11 +5,12 @@ import { UserResponseDTO } from "../dtos/UserDTO";
 import { UserMapper } from "../mappers/UserMapper";
 import { User } from "../../domain/entities/User";
 import { IUploadProfilePictureUseCase } from "../interfaces/IUploadProfilePictureUseCase";
+import { IUserRepositoryFactory } from "../../domain/repositories/IUserRepositoryFactory";
 
 export class UpdateUserProfileUseCase implements IUpdateUserProfileUseCase {
 
     constructor(
-        private readonly _repositoryFactory: UserRepositoryFactory,
+        private readonly _repositoryFactory: IUserRepositoryFactory,
         private readonly _logger: ILogger,
         private readonly _uploadProfilePictureUseCase: IUploadProfilePictureUseCase,
     ) { }

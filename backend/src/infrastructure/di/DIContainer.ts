@@ -1,5 +1,3 @@
-// Adjust path to where you keep DIContainer; this path is example: src/infrastructure/di/DIContainer.ts
-
 import { IPasswordHasher } from "../../application/services/IPasswordHasher";
 import { IGenerateUserID } from "../../application/services/IGenerateUserID";
 import { ITokenService } from "../../application/services/ITokenService";
@@ -18,6 +16,7 @@ import { loggerInstance } from "../logger/Logger";
 import { UserRepositoryFactory } from "../repo/UserRepositoryFactory";
 import { OtpRepository } from "../repo/OtpRepository";
 
+
 import { RegisterUserUseCase } from "../../application/use-cases/RegisterUserUseCase";
 import { LoginUserUseCase } from "../../application/use-cases/LoginUserUseCase";
 import { SendOtpUseCase } from "../../application/use-cases/SendOtpUseCase";
@@ -30,8 +29,6 @@ import { AuthController } from "../../presentation/controllers/AuthController";
 import { AuthMiddleware } from "../../presentation/middlewares/AuthMiddleware";
 import { IGoogleSignUpUseCase } from "../../application/interfaces/IGoogleSignUpUseCase";
 import { GoogleAuthController } from "../../presentation/controllers/GoogleAuthController";
-import { IGoogleAuthService } from "../../application/services/IGoogleAuthService";
-import { GoogleAuthService } from "../services/GoogleAuthService";
 import { GoogleSignUpUseCase } from "../../application/use-cases/GoogleSignUpUseCase";
 import { IGetAllClientsUseCase } from "../../application/interfaces/IGetAllClientsUseCase";
 import { GetAllClientsUseCase } from "../../application/use-cases/GetAllClientsUseCase";
@@ -71,16 +68,22 @@ import { IUpdateVerificationStatusUseCase } from "../../application/interfaces/I
 import { UpdateVerificationStatusUseCase } from "../../application/use-cases/UpdateVerificationStatusUseCase";
 import { IUpdateUserAccessUseCase } from "../../application/interfaces/IUpdateUserAccessUseCase";
 import { UpdateUserAccessUseCase } from "../../application/use-cases/UpdateUserAccessUseCase";
+import { IUserRepositoryFactory } from "../../domain/repositories/IUserRepositoryFactory";
+import { IOtpRepository } from "../../domain/repositories/IOtpRepository";
+import { IOtpService } from "../../application/services/IOtpService";
+import { IEmailService } from "../../application/services/IEmailService";
+import { IAdminRepository } from "../../domain/repositories/IAdminRepository";
+import { AdminRepository } from "../repo/AdminRepository";
 
 export class DIContainer {
   // -------------------------
   // Infrastructure Layer
   // -------------------------
-  private _userRepositoryFactory?: UserRepositoryFactory;
+  private _userRepositoryFactory?: IUserRepositoryFactory;
   private _clientRepository?: IClientRepository;
   private _workerRepository?: IWorkerRepository;
-  private _otpRepository?: OtpRepository;
-
+  private _otpRepository?: IOtpRepository;
+  private _adminRepository?: IAdminRepository;
 
 
   private _passwordHasher?: IPasswordHasher;
@@ -88,9 +91,8 @@ export class DIContainer {
   private _tokenService?: ITokenService;
   private _logger?: ILogger;
 
-  private _otpService?: OtpService;
-  private _emailService?: NodemailerEmailService;
-  private _googleAuthService?: IGoogleAuthService;
+  private _otpService?: IOtpService;
+  private _emailService?: IEmailService;
 
   // -------------------------
   // Application Layer
@@ -139,9 +141,13 @@ export class DIContainer {
   // Infrastructure Lazy Getters
   // ==========================================
 
-  get userRepositoryFactory(): UserRepositoryFactory {
+  get userRepositoryFactory(): IUserRepositoryFactory {
     if (!this._userRepositoryFactory) {
-      this._userRepositoryFactory = new UserRepositoryFactory();
+      this._userRepositoryFactory = new UserRepositoryFactory(
+        this.clientRepository,
+        this.workerRepository,
+        this.adminRepository
+      );
     }
     return this._userRepositoryFactory;
   }
@@ -155,9 +161,16 @@ export class DIContainer {
 
   get workerRepository(): IWorkerRepository {
     if (!this._workerRepository) {
-      this._workerRepository = new WorkerRepository()
+      this._workerRepository = new WorkerRepository();
     }
     return this._workerRepository;
+  }
+
+  get adminRepository(): IAdminRepository {
+    if (!this._adminRepository) {
+      this._adminRepository = new AdminRepository();
+    }
+    return this._adminRepository
   }
 
   get otpRepository(): OtpRepository {
@@ -203,7 +216,7 @@ export class DIContainer {
     return this._otpService;
   }
 
-  get emailService(): NodemailerEmailService {
+  get emailService(): IEmailService {
     if (!this._emailService) {
       this._emailService = new NodemailerEmailService();
     }
@@ -259,7 +272,6 @@ export class DIContainer {
         this.userRepositoryFactory,
         this.passwordHasher,
         this.tokenService,
-        this.googleAuthService,
         this.idGenerator
       );
     }
@@ -373,8 +385,8 @@ export class DIContainer {
     return this._getAllUsersUseCase;
   }
 
-  get updateVerificationStatusUseCase(): IUpdateVerificationStatusUseCase{
-    if(!this._updateVerificationStatusUseCase) {
+  get updateVerificationStatusUseCase(): IUpdateVerificationStatusUseCase {
+    if (!this._updateVerificationStatusUseCase) {
       this._updateVerificationStatusUseCase = new UpdateVerificationStatusUseCase(
         this.userRepositoryFactory,
         this.logger
@@ -384,7 +396,7 @@ export class DIContainer {
   }
 
   get updateUserAccessUseCase(): IUpdateUserAccessUseCase {
-    if(!this._updateUserAccessUseCase) {
+    if (!this._updateUserAccessUseCase) {
       this._updateUserAccessUseCase = new UpdateUserAccessUseCase(
         this.userRepositoryFactory,
         this.logger
@@ -440,13 +452,6 @@ export class DIContainer {
       )
     }
     return this._userController;
-  }
-
-  get googleAuthService(): IGoogleAuthService {
-    if (!this._googleAuthService) {
-      this._googleAuthService = new GoogleAuthService();
-    }
-    return this._googleAuthService;
   }
 
   get authMiddleware(): AuthMiddleware {

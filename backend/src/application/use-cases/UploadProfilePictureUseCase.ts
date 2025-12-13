@@ -1,12 +1,12 @@
-import { UserRepositoryFactory } from "../../infrastructure/repo/UserRepositoryFactory";
 import { ILogger } from "../interfaces/ILogger";
 import { Role } from "../../domain/enums/enums";
 import { CloudinaryUploadService } from "../../infrastructure/services/CloudinaryUploadService";
 import { IUploadProfilePictureUseCase } from "../interfaces/IUploadProfilePictureUseCase";
+import { IUserRepositoryFactory } from "../../domain/repositories/IUserRepositoryFactory";
 
 export class UploadProfilePictureUseCase implements IUploadProfilePictureUseCase {
     constructor(
-        private readonly _repositoryFactory: UserRepositoryFactory,
+        private readonly _repositoryFactory: IUserRepositoryFactory,
         private readonly _logger: ILogger
     ) { }
 

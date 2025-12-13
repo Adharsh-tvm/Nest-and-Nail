@@ -1,11 +1,11 @@
-import { OtpRepository } from "../../infrastructure/repo/OtpRepository";
 import { IOtpService } from "../services/IOtpService";
 import { ILogger } from "../interfaces/ILogger";
+import { IOtpRepository } from "../../domain/repositories/IOtpRepository";
 
 export class VerifyOtpUseCase {
     constructor(
         private readonly _otpService: IOtpService,
-        private readonly _otpRepo: OtpRepository,
+        private readonly _otpRepo: IOtpRepository,
         private readonly _logger?: ILogger   
     ) { }
 

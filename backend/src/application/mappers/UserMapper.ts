@@ -32,7 +32,6 @@ export class UserMapper {
             isBlocked: userData.isBlocked ?? false,
             isVerified: userData.isVerified ?? VerificationStatus.NOT_VERIFIED,
 
-            // ⭐ ADD THE MISSING ARRAYS ⭐
             skills: userData.skills ?? [],
             address: userData.address ?? "",
 
@@ -40,7 +39,6 @@ export class UserMapper {
             certificates: userData.certificates ?? [],
             workPhotos: userData.workPhotos ?? [],
 
-            // ⭐ Include these too
             createdAt: userData.createdAt?.toISOString?.() ?? "",
             updatedAt: userData.updatedAt?.toISOString?.() ?? "",
         };

@@ -1,12 +1,12 @@
-import { UserRepositoryFactory } from "../../infrastructure/repo/UserRepositoryFactory";
 import { ILogger } from "../interfaces/ILogger";
 import { Role, VerificationStatus } from "../../domain/enums/enums";
 import { CloudinaryUploadService } from "../../infrastructure/services/CloudinaryUploadService";
 import { IUploadWorkerDocumentUseCase } from "../interfaces/IUploadWorkerDocumentUseCase";
+import { IUserRepositoryFactory } from "../../domain/repositories/IUserRepositoryFactory";
 
 export class UploadWorkerDocumentUseCase implements IUploadWorkerDocumentUseCase {
     constructor(
-        private readonly _repositoryFactory: UserRepositoryFactory,
+        private readonly _repositoryFactory: IUserRepositoryFactory,
         private readonly _logger: ILogger
     ) {}
 

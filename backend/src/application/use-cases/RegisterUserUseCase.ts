@@ -1,5 +1,4 @@
 import { UserAlreadyExistsError } from "../../domain/errors/DomainError";
-import { UserRepositoryFactory } from "../../infrastructure/repo/UserRepositoryFactory";
 import { LoginMethod } from "../../domain/enums/enums";
 import { UserRequestDTO, UserResponseDTO } from "../dtos/UserDTO";
 import { ILogger } from "../interfaces/ILogger";
@@ -9,10 +8,11 @@ import { IGenerateUserID } from "../services/IGenerateUserID";
 import { IPasswordHasher } from "../services/IPasswordHasher";
 import { ITokenService } from "../services/ITokenService";
 import { AuthValidator } from "../validators/AuthValidator";
+import { IUserRepositoryFactory } from "../../domain/repositories/IUserRepositoryFactory";
 
 export class RegisterUserUseCase implements IRegisterUserUseCase {
   constructor(
-    private readonly _repositoryFactory: UserRepositoryFactory,
+    private readonly _repositoryFactory: IUserRepositoryFactory,
     private readonly _passwordHasher: IPasswordHasher,
     private readonly _userIdGenerator: IGenerateUserID,
     private readonly _tokenService: ITokenService,

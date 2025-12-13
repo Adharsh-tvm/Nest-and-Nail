@@ -1,13 +1,13 @@
 import { IGetAllUsersUseCase } from "../interfaces/IGetAllUsersUseCase";
-import { UserRepositoryFactory } from "../../infrastructure/repo/UserRepositoryFactory";
 import { Role } from "../../domain/enums/enums";
 import { UserMapper } from "../mappers/UserMapper";
 import { UserResponseDTO } from "../dtos/UserDTO";
 import { ILogger } from "../interfaces/ILogger";
+import { IUserRepositoryFactory } from "../../domain/repositories/IUserRepositoryFactory";
 
 export class GetAllUsersUseCase implements IGetAllUsersUseCase {
     constructor(
-        private readonly _repoFactory: UserRepositoryFactory,
+        private readonly _repoFactory: IUserRepositoryFactory,
         private readonly _logger: ILogger
     ) { }
 

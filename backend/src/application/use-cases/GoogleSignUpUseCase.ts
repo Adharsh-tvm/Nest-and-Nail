@@ -1,19 +1,17 @@
 import { User } from "../../domain/entities/User";
-import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { LoginMethod, Role } from "../../domain/enums/enums";
 import { IGoogleSignUpUseCase } from "../interfaces/IGoogleSignUpUseCase";
 import { UserMapper } from "../mappers/UserMapper";
 import { IGenerateUserID } from "../services/IGenerateUserID";
-import { IGoogleAuthService } from "../services/IGoogleAuthService";
 import { IPasswordHasher } from "../services/IPasswordHasher";
 import { ITokenService } from "../services/ITokenService";
+import { IUserRepositoryFactory } from "../../domain/repositories/IUserRepositoryFactory";
 
 export class GoogleSignUpUseCase implements IGoogleSignUpUseCase {
     constructor(
-        private readonly _userRepositoryFactory: IUserRepository,
+        private readonly _userRepositoryFactory: IUserRepositoryFactory,
         private readonly _passwordHasher: IPasswordHasher,
         private readonly _tokenService: ITokenService,
-        private readonly _googleAuthService: IGoogleAuthService,
         private readonly _userIdGenerator: IGenerateUserID,
     ) { }
 

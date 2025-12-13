@@ -1,4 +1,3 @@
-// src/infrastructure/config/cloudinaryConfig.ts (or wherever it is)
 import { v2 as cloudinary } from "cloudinary";
 
 console.log("🚀 Initializing Cloudinary Config");
