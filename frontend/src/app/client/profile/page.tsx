@@ -71,6 +71,21 @@ const ClientProfile = () => {
 const handleSave = async () => {
   if (!currentUser) return;
 
+  // 1️⃣ Optimistic update
+  setUser((prev) =>
+    prev
+      ? {
+          ...prev,
+          name: formData.name ?? prev.name,
+          phone_number: formData.phone_number ?? prev.phone_number,
+          address: formData.address ?? prev.address,
+          profileImageUrl: previewImage ?? prev.profileImageUrl,
+        }
+      : prev
+  );
+
+  setIsEditing(false);
+
   try {
     const payload = {
       name: formData.name,
@@ -86,34 +101,17 @@ const handleSave = async () => {
       return;
     }
 
-    const updated = response.user;
-
     toast.success(response.message);
 
-    setUser((prev) =>
-      prev
-        ? {
-            ...prev,
-            id: updated.id ?? prev.id,
-            name: updated.name ?? prev.name,
-            email: updated.email ?? prev.email,
-            role: updated.role ?? prev.role,
-            profileImageUrl: updated.profileImageUrl ?? prev.profileImageUrl,
-            phone_number: updated.phone_number ?? prev.phone_number,
-            address: updated.address ?? prev.address,
-          }
-        : prev
-    );
-
-    setPreviewImage(updated.profileImageUrl);
-
-    setIsEditing(false);
-
   } catch (err: any) {
-    console.error("Error updating profile:", err);
     toast.error(err.message || "Update failed");
   }
 };
+
+
+useEffect(()=>{
+
+},[handleSave])
 
   const handleCancel = () => {
     if (currentUser) {
