@@ -70,6 +70,14 @@ const ClientHeader: React.FC = () => {
     }
   };
 
+  let buttonPlaceHolder = "";
+
+  if(currentUser?.documents?.length !== 0 && currentUser?.isVerified !== "VERIFIED"){
+    buttonPlaceHolder =  "Re-apply";
+  }else {
+    buttonPlaceHolder = "Become a worker"
+  }
+
   const toggleUserMode = async () => {
     if (!currentUser || isTogglingRole) return;
 
@@ -123,7 +131,7 @@ const ClientHeader: React.FC = () => {
                   onClick={() => setIsWorkerFlowOpen(true)}
                   className="flex items-center gap-2 bg-[#1B4332] text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-[#153426] transition-colors shadow-sm"
                 >
-                  Become a Worker
+                  {buttonPlaceHolder}
                 </button>
               )}
 
