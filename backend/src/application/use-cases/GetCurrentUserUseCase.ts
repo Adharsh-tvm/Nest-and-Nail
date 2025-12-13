@@ -3,12 +3,12 @@ import { UserResponseDTO } from "../dtos/UserDTO";
 import { IGetCurrentUserUseCase } from "../interfaces/IGetCurrentUserUseCase";
 import { ILogger } from "../interfaces/ILogger";
 import { UserMapper } from "../mappers/UserMapper";
-import { UserRepositoryFactory } from "../../infrastructure/repo/UserRepositoryFactory";
 import { Role } from "../../domain/enums/enums";
+import { IUserRepositoryFactory } from "../../domain/repositories/IUserRepositoryFactory";
 
 export class GetCurrentUserUseCase implements IGetCurrentUserUseCase {
     constructor(
-        private readonly _repositoryFactory: UserRepositoryFactory,
+        private readonly _repositoryFactory: IUserRepositoryFactory,
         private readonly _logger: ILogger,
     ) { }
 

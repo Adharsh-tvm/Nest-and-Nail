@@ -1,13 +1,13 @@
 import { IUpdateVerificationStatusUseCase } from "../interfaces/IUpdateVerificationStatusUseCase";
-import { UserRepositoryFactory } from "../../infrastructure/repo/UserRepositoryFactory";
 import { VerificationStatus } from "../../domain/enums/enums";
 import { UserMapper } from "../mappers/UserMapper";
 import { ILogger } from "../interfaces/ILogger";
 import { Role } from "../../domain/enums/enums";
+import { IUserRepositoryFactory } from "../../domain/repositories/IUserRepositoryFactory";
 
 export class UpdateVerificationStatusUseCase implements IUpdateVerificationStatusUseCase {
     constructor(
-        private readonly _repoFactory: UserRepositoryFactory,
+        private readonly _repoFactory: IUserRepositoryFactory,
         private readonly _logger: ILogger
     ) {}
 

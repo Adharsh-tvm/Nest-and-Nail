@@ -1,13 +1,13 @@
-import { UserRepositoryFactory } from "../../infrastructure/repo/UserRepositoryFactory";
 import { IOtpRepository } from "../../domain/repositories/IOtpRepository";
 import { ILogger } from "../interfaces/ILogger";
 import { IPasswordHasher } from "../services/IPasswordHasher";
 import { Role } from "../../domain/enums/enums";
 import { IResetPasswordUseCase } from "../interfaces/IResetPasswordUseCase";
+import { IUserRepositoryFactory } from "../../domain/repositories/IUserRepositoryFactory";
 
 export class ResetPasswordUseCase implements IResetPasswordUseCase {
     constructor(
-        private readonly _repositoryFactory: UserRepositoryFactory,
+        private readonly _repositoryFactory: IUserRepositoryFactory,
         private readonly _passwordHasher: IPasswordHasher,
         private readonly _otpRepo: IOtpRepository,
         private readonly _logger: ILogger

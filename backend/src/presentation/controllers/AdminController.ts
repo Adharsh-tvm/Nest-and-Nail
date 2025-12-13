@@ -5,7 +5,6 @@ import { IGetAllWorkersUseCase } from "../../application/interfaces/IGetAllWorke
 import { HttpStatusCode } from "../enums/httpCodes";
 import { IUpdateVerificationStatusUseCase } from "../../application/interfaces/IUpdateVerificationStatusUseCase";
 import { VerificationStatus } from "../../domain/enums/enums";
-import { UserResponseDTO } from "../../application/dtos/UserDTO";
 import { IUpdateUserAccessUseCase } from "../../application/interfaces/IUpdateUserAccessUseCase";
 
 export class AdminController implements IAdminController {
