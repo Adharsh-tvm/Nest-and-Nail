@@ -20,7 +20,7 @@ import {
 import { PendingVerificationUser } from "@/types/types";
 import { useUsers } from "@/hooks/useUsers";
 import DataTable from "@/app/components/containers/DataTable";
-import { approveUserVerification, rejectUserVerification } from "@/services/api/admin.api";
+import { approveUserAction, rejectUserAction } from "@/app/actions/admin-actions";
 
 /* ---------------------------------------------------------------------------
  * TABLE TYPES
@@ -354,7 +354,7 @@ const VerificationsPendingView: React.FC = () => {
 
   const handleApprove = async (req: PendingVerificationUser) => {
     try {
-      const response = await approveUserVerification(req.userId);
+      const response = await approveUserAction(req.userId);
       console.log("Approved:", response);
 
 
@@ -371,7 +371,7 @@ const VerificationsPendingView: React.FC = () => {
   const handleReject = async (req: PendingVerificationUser) => {
     try {
 
-      const response = await rejectUserVerification(req.userId);
+      const response = await rejectUserAction(req.userId);
       console.log("Rejected:", response);
 
 

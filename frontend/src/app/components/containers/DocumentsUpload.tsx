@@ -29,6 +29,7 @@ import {
   updateUserProfileAction,
   uploadDocumentAction,
 } from "@/app/actions/user-profile-actions";
+import { VerificationStatus } from "@/enums/enums";
 
 type ErrorState = {
   skills?: string;
@@ -372,22 +373,23 @@ const WorkerVerificationFlow: React.FC<WorkerVerificationFlowProps> = ({
     const userId = currentUser.id;
 
     try {
-      // 1️⃣ Update skills
       await updateUserProfileAction(userId, { skills });
 
-      // 2️⃣ Upload ID → then push into profile update
       if (idDocument) {
         const idUrl = await uploadDocumentAction(userId, idDocument);
         await updateUserProfileAction(userId, { documents: [idUrl] });
       }
 
-      // 3️⃣ Upload cert (optional)
       if (certDocument) {
         const certUrl = await uploadDocumentAction(userId, certDocument);
         await updateUserProfileAction(userId, { certificates: [certUrl] });
       }
 
-      // 4️⃣ Done
+      setUser({
+        ...currentUser,
+        isVerified: VerificationStatus.PENDING,
+      });
+
       setStep(4);
     } catch (err) {
       console.error("Profile update failed", err);

@@ -1,4 +1,3 @@
-// services/auth/auth.api.ts
 import axiosInstance from "@/lib/axiosInstance";
 
 export type LoginPayload = {

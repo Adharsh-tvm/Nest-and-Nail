@@ -1,10 +1,8 @@
-// UserHydration.tsx (client)
 "use client";
 
 import { useEffect } from "react";
 import { useUserStore, User } from "@/store/userStore";
 import { VerificationStatus } from "@/enums/enums";
-// ⬅️ adjust path if needed
 
 type ServerUser = Record<string, any>;
 
