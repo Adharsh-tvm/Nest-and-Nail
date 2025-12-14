@@ -1,23 +1,30 @@
-"use server"
+"use server";
 
-import axiosInstance from "@/lib/axiosInstance"
+import {
+  fetchAllClients,
+  fetchAllWorkers,
+  approveVerification,
+  rejectVerification,
+  toggleUserAccess,
+} from "@/services/api/admin.api";
 
-export async function getAllClients() {
-    const res = await axiosInstance.get("/api/admin/clients");
-    return res.data;
+
+export async function getAllClientsAction() {
+  return await fetchAllClients();
 }
 
-export async function getAllWorkers() {
-    const res = await axiosInstance.get("/api/admin/workers");
-    return res.data;
+export async function getAllWorkersAction() {
+  return await fetchAllWorkers();
 }
 
-export async function getAllUsers() {
-    const res = await axiosInstance.get("/api/auth/all");
-    return res.data.users;
+export async function approveUserAction(userId: string) {
+  return await approveVerification(userId);
 }
 
-export async function toggleUserAccess(userId: string) {
-    const res = await axiosInstance.patch(`/api/admin/access/${userId}`);
-    return res.data;
+export async function rejectUserAction(userId: string) {
+  return await rejectVerification(userId);
+}
+
+export async function toggleUserAccessAction(userId: string) {
+  return await toggleUserAccess(userId);
 }

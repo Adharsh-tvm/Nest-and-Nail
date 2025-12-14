@@ -50,21 +50,3 @@ export async function uploadCertDocumentAction(workerId: string, file: File) {
     return response.data;
 }
 
-// Save worker skills
-export async function saveWorkerSkillsAction(workerId: string, skills: string[]) {
-
-    const userCookies = await cookies()
-    const token = userCookies.get("accessToken")?.value;
-
-    const response = await axios.put(
-        `${BASE_URL}/worker/${workerId}/skills`,
-        { skills },
-        {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        }
-    );
-
-    return response.data;
-}

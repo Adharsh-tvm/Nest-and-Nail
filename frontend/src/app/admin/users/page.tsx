@@ -19,7 +19,7 @@ import DataTable from "@/app/components/containers/DataTable";
 import type { Column } from "@/app/components/containers/DataTable";
 import { useUsers } from "@/hooks/useUsers";
 import { VerificationStatus } from "@/enums/enums";
-import { toggleUserAccess } from "@/app/actions/admin-actions";
+import { toggleUserAccessAction } from "@/app/actions/admin-actions";
 
 /**
  * ----------------------------------------------------------------------------
@@ -113,7 +113,7 @@ const UsersView = () => {
 
   async function handleBlockToggle(row: any) {
     try {
-      const response = await toggleUserAccess(row.user_id);
+      const response = await toggleUserAccessAction(row.user_id);
 
       const updatedUser = response.user;
 

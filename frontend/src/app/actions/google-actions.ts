@@ -3,7 +3,6 @@
 import authApi from "@/services/api/auth.api";
 import { OAuth2Client } from "google-auth-library";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 
 const googleClient = new OAuth2Client(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID);
 
