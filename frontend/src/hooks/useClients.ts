@@ -1,6 +1,7 @@
 "use client";
 
-import { Client, getAllClients } from "@/services/api/admin.api";
+import { getAllClientsAction } from "@/app/actions/admin-actions";
+import { Client } from "@/services/api/admin.api";
 import { useEffect, useState } from "react";
 
 type UseClientsResult = {
@@ -21,7 +22,7 @@ export const useClients = (): UseClientsResult => {
       setLoading(true);
       setError(null);
       try {
-        const res = await getAllClients();
+        const res = await getAllClientsAction();
         console.log("[useClients] getAllClients result:", res);
 
         if (!Array.isArray(res)) {

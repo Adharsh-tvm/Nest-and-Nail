@@ -8,6 +8,7 @@ import { ISendOtpUseCase } from "../../application/interfaces/ISendOtpUseCase";
 import { IVerifyOtpUseCase } from "../../application/interfaces/IVerifyOtpUseCase";
 import { IForgotPasswordUseCase } from "../../application/interfaces/IForgotPasswordUseCase";
 import { IResetPasswordUseCase } from "../../application/interfaces/IResetPasswordUseCase";
+import { IRefreshTokenUseCase } from "../../application/interfaces/IRefreshTokenUseCase";
 
 export class AuthController implements IAuthController {
   constructor(
@@ -15,6 +16,7 @@ export class AuthController implements IAuthController {
     private readonly _loginUserUseCase: ILoginUserUseCase,
     private readonly _sendOtpUseCase: ISendOtpUseCase,
     private readonly _verifyOtpUseCase: IVerifyOtpUseCase,
+    private readonly _refreshTokenUseCase: IRefreshTokenUseCase,
 
     private readonly _forgotPasswordUseCase: IForgotPasswordUseCase,
     private readonly _resetPasswordUseCase: IResetPasswordUseCase
@@ -136,7 +138,6 @@ export class AuthController implements IAuthController {
   };
 
 
-
   verifyOtp = async (req: Request, res: Response) => {
     const email = req.body.email || req.body.email_address;
     const otp = req.body.otp;
@@ -206,5 +207,27 @@ export class AuthController implements IAuthController {
     }
   };
 
+
+  async refreshToken(req: Request, res: Response): Promise<void> {
+    try {
+      const refreshToken =
+        req.cookies.refreshToken || req.body.refreshToken;
+
+      if (!refreshToken) {
+        res.status(401).json({ message: "Refresh token missing" });
+        return;
+      }
+
+      const tokens = await this._refreshTokenUseCase.execute(refreshToken);
+
+      // ✅ SEND TOKENS (DO NOT SET COOKIES HERE)
+      res.status(200).json({
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
+      });
+    } catch {
+      res.status(401).json({ message: "Invalid refresh token" });
+    }
+  }
 
 }
