@@ -2,6 +2,7 @@
 
 import axiosInstance from "@/lib/axiosInstance";
 import { VerificationStatus } from "@/enums/enums";
+import { User } from "@/store/userStore";
 
 /* ---------------- TYPES ---------------- */
 
@@ -86,6 +87,18 @@ export async function fetchAllWorkers(): Promise<Worker[]> {
     }));
   } catch (error: any) {
     throw new Error(error.normalizedMessage || "Failed to fetch workers");
+  }
+}
+
+export async function fetchAllUsers(): Promise<User[]> {
+  try {
+    const res = await axiosInstance.get<ApiListResponse<any[]>>(
+      "api/auth/all"
+    );
+
+    return res.data.data;
+  } catch (error: any) {
+    throw new Error(error.normalizedMessage || "Failed to fetch users");
   }
 }
 

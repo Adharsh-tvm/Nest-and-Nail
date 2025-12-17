@@ -83,7 +83,7 @@ export class UserController implements IUserController {
     getAllUsers = async (req: Request, res: Response): Promise<Response> => {
         try {
             const users = await this._getAllUsersUseCase.execute();
-            console.log("users", users)
+            console.log("users -----------", users)
             return res.status(HttpStatusCode.OK).json({ users });
         } catch (error) {
             console.error("Error fetching all users: ", error);

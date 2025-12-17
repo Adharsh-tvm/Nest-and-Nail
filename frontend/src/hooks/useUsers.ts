@@ -1,7 +1,7 @@
 "use client";
 
 import { getAllUsers } from "@/app/actions/admin-actions";
-import { User } from "@/services/api/admin.api";
+import { User } from "@/store/userStore";
 import { useEffect, useState } from "react";
 
 export type UseUsersResult = {

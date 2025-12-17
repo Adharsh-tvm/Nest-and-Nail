@@ -148,12 +148,12 @@ const UsersView = () => {
             {row.profileImageUrl ? (
               <img
                 src={row.profileImageUrl}
-                alt={row.user_name}
+                alt={row.name}
                 className="w-10 h-10 rounded-full object-cover border border-gray-200"
               />
             ) : (
               <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-[#1B4332] font-bold text-sm">
-                {row.user_name?.charAt(0) || <User size={16} />}
+                {row.name?.charAt(0) || <User size={16} />}
               </div>
             )}
 
@@ -168,10 +168,10 @@ const UsersView = () => {
           <div>
             <div className="flex items-center gap-1.5">
               <span className="font-bold text-gray-900">
-                {row.user_name || "Unknown"}
+                {row.name || "Unknown"}
               </span>
             </div>
-            <div className="text-xs text-gray-400">ID: {row.user_id}</div>
+            <div className="text-xs text-gray-400">ID: {row.id}</div>
           </div>
         </div>
       ),
@@ -180,7 +180,7 @@ const UsersView = () => {
       header: "Role",
       cell: (row) => (
         <span className="px-2.5 py-1 rounded-lg bg-gray-100 text-gray-600 text-xs font-bold border border-gray-200">
-          {row.user_role}
+          {row.role}
         </span>
       ),
     },
@@ -191,7 +191,7 @@ const UsersView = () => {
           <div className="flex items-center gap-2 text-xs">
             <Mail size={12} className="text-gray-400" />
             <span className="truncate max-w-[180px] text-gray-600">
-              {row.email_address || "—"}
+              {row.email || "—"}
             </span>
           </div>
           <div className="flex items-center gap-2 text-xs">
@@ -228,36 +228,36 @@ const UsersView = () => {
       },
     },
 
-    {
-      header: "Status",
-      cell: (row) => {
-        const isBlocked = row.isBlocked;
+    // {
+    //   header: "Status",
+    //   cell: (row) => {
+    //     const isBlocked = row.;
 
-        return (
-          <span
-            className={`
-          inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-bold 
-          min-w-[90px] justify-center
-          ${
-            isBlocked
-              ? "text-red-700 bg-red-50 border-red-100"
-              : "text-green-700 bg-green-50 border-green-100"
-          }
-        `}
-          >
-            {isBlocked ? (
-              <>
-                <ShieldAlert size={12} /> Blocked
-              </>
-            ) : (
-              <>
-                <CheckCircle2 size={12} /> Active
-              </>
-            )}
-          </span>
-        );
-      },
-    },
+    //     return (
+    //       <span
+    //         className={`
+    //       inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-bold 
+    //       min-w-[90px] justify-center
+    //       ${
+    //         isBlocked
+    //           ? "text-red-700 bg-red-50 border-red-100"
+    //           : "text-green-700 bg-green-50 border-green-100"
+    //       }
+    //     `}
+    //       >
+    //         {isBlocked ? (
+    //           <>
+    //             <ShieldAlert size={12} /> Blocked
+    //           </>
+    //         ) : (
+    //           <>
+    //             <CheckCircle2 size={12} /> Active
+    //           </>
+    //         )}
+    //       </span>
+    //     );
+    //   },
+    // },
 
     {
       header: "",

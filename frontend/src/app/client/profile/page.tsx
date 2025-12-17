@@ -1,17 +1,34 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   User as UserIcon,
   Mail,
+  Phone,
   MapPin,
   Edit2,
   Calendar,
-  Camera,
   ShieldCheck,
-  Check,
+  Briefcase,
+  FileText,
+  Image as ImageIcon,
+  CheckCircle2,
+  Clock,
+  Eye,
+  Save,
   X,
-  Phone,
+  Plus,
+  Lock,
+  CreditCard,
+  Settings,
+  LogOut,
+  MoreVertical,
+  Wallet as WalletIcon,
+  Bell,
+  ChevronRight,
+  LayoutDashboard,
+  ExternalLink,
+  Camera,
   Upload,
 } from "lucide-react";
 import { useUserStore } from "@/store/userStore";
@@ -19,37 +36,93 @@ import { updateUserProfileAction } from "@/app/actions/user-profile-actions";
 import toast from "react-hot-toast";
 
 // --- Types ---
-type User = {
+
+export type VerificationStatus =
+  | "VERIFIED"
+  | "PENDING"
+  | "REJECTED"
+  | "UNVERIFIED";
+
+export type Tab = "profile" | "addresses" | "wallet" | "settings";
+
+export type Address = {
+  id: string;
+  label: string;
+  street: string;
+  city: string;
+  zip: string;
+  isDefault: boolean;
+};
+
+export type Transaction = {
+  id: string;
+  date: string;
+  description: string;
+  amount: number;
+  type: "credit" | "debit";
+  status: "completed" | "pending";
+};
+
+// Extended User type to match both Store and UI requirements
+export interface User {
   id: string;
   name: string;
   email: string;
   role: string;
+  isVerified: VerificationStatus;
   profileImageUrl?: string | null;
-  phone_number?: number;
-  address?: string;
-  joinedDate?: string;
+  phone_number?: string | number; // Handling both types based on old/new file
+  skills?: string[];
+  addresses?: Address[]; // Optional because store might not have it populated yet
+  documents?: string[];
+  certificates?: string[];
+  workPhotos?: string[];
+  createdAt: string;
+  walletBalance?: number;
+  transactions?: Transaction[];
+}
+
+// --- Sub-Components ---
+
+const StatusBadge = ({ status }: { status: VerificationStatus }) => {
+  switch (status) {
+    case "VERIFIED":
+      return (
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-[#1B4332]/10 text-[#1B4332] border border-[#1B4332]/20 uppercase tracking-wider">
+          <ShieldCheck size={12} /> Verified
+        </span>
+      );
+    case "PENDING":
+      return (
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-yellow-50 text-yellow-700 border border-yellow-200 uppercase tracking-wider">
+          <Clock size={12} /> Pending
+        </span>
+      );
+    default:
+      return (
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-600 border border-gray-200 uppercase tracking-wider">
+          Unverified
+        </span>
+      );
+  }
 };
 
-const ClientProfile = () => {
-  const { user: currentUser, setUser } = useUserStore();
+// --- View Components ---
+
+interface ViewProps {
+  user: User;
+  setUser: (user: User) => void; // Updated to match store setter signature
+}
+
+const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [formData, setFormData] = useState<User>(user);
+  const [newSkill, setNewSkill] = useState("");
 
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
-
-  const [formData, setFormData] = useState<{
-    name?: string;
-    phone_number?: number;
-    address?: string;
-    profilePicture?: File | null;
-    profileImageUrl?: string | null;
-  }>({});
-
+  // Sync formData when user prop updates (e.g. after image upload in parent)
   useEffect(() => {
-    if (!currentUser) return;
-
-    setPreviewImage(currentUser.profileImageUrl || null);
-  }, [currentUser]);
+    setFormData(user);
+  }, [user]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -58,74 +131,521 @@ const ClientProfile = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setFormData((prev) => ({ ...prev, profilePicture: file }));
-
-    const preview = URL.createObjectURL(file);
-    setPreviewImage(preview);
+  const handleAddSkill = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newSkill.trim() && !formData.skills?.includes(newSkill.trim())) {
+      setFormData((prev) => ({
+        ...prev,
+        skills: [...(prev.skills || []), newSkill.trim()],
+      }));
+      setNewSkill("");
+    }
   };
 
-const handleSave = async () => {
-  if (!currentUser) return;
+  const handleRemoveSkill = (skill: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      skills: prev.skills?.filter((s) => s !== skill),
+    }));
+  };
 
-  // 1️⃣ Optimistic update
-  setUser((prev) =>
-    prev
-      ? {
-          ...prev,
-          name: formData.name ?? prev.name,
-          phone_number: formData.phone_number ?? prev.phone_number,
-          address: formData.address ?? prev.address,
-          profileImageUrl: previewImage ?? prev.profileImageUrl,
-        }
-      : prev
-  );
+  const handleSaveProfile = async () => {
+    // 1. Optimistic Update
+    setUser(formData);
+    setIsEditing(false);
 
-  setIsEditing(false);
+    try {
+      // 2. Prepare Payload
+      const payload = {
+        name: formData.name,
+        phone: formData.phone_number,
+        // Assuming backend can accept skills, otherwise you might need a separate action
+        // For now, based on old file, we send name/phone/address/pic.
+        // We will include skills here if your backend supports it.
+      };
 
-  try {
-    const payload = {
-      name: formData.name,
-      phone: formData.phone_number,
-      address: formData.address,
-      profilePicture: formData.profilePicture,
-    };
+      // 3. API Call
+      const response = await updateUserProfileAction(user.id, payload);
 
-    const response = await updateUserProfileAction(currentUser.id, payload);
+      if (!response.success) {
+        toast.error(response.message);
+        // Revert on error could be implemented here
+        return;
+      }
 
-    if (!response.success) {
-      toast.error(response.message);
-      return;
+      toast.success("Profile updated successfully");
+    } catch (err: any) {
+      toast.error(err.message || "Update failed");
     }
+  };
 
-    toast.success(response.message);
+  return (
+    <div className="grid lg:grid-cols-3 gap-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
+      {/* Left Column - Main Info */}
+      <div className="lg:col-span-2 space-y-8">
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+          <div className="px-8 py-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+            <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2.5">
+              <UserIcon size={20} className="text-[#1B4332]" /> Personal Details
+            </h3>
+            {isEditing ? (
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    setFormData(user); // Reset to current user state
+                    setIsEditing(false);
+                  }}
+                  className="text-sm font-medium text-gray-500 hover:text-gray-900 px-4 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveProfile}
+                  className="text-sm font-medium bg-[#1B4332] text-white px-4 py-2 rounded-md hover:bg-[#143326] transition-colors flex items-center gap-2"
+                >
+                  <Save size={16} /> Save
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setIsEditing(true)}
+                className="text-sm font-medium text-gray-600 hover:text-[#1B4332] flex items-center gap-2 px-3 py-1.5 rounded hover:bg-gray-100 transition-colors"
+              >
+                <Edit2 size={16} /> Edit
+              </button>
+            )}
+          </div>
 
-  } catch (err: any) {
-    toast.error(err.message || "Update failed");
-  }
+          <div className="p-8 grid sm:grid-cols-2 gap-8">
+            <div>
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2 block">
+                Full Name
+              </label>
+              {isEditing ? (
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  className="w-full text-base p-2.5 border border-gray-200 rounded-lg focus:ring-1 focus:ring-[#1B4332] focus:border-[#1B4332] outline-none"
+                />
+              ) : (
+                <p className="text-base font-medium text-gray-900">
+                  {user.name}
+                </p>
+              )}
+            </div>
+            <div>
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2 block">
+                Phone Number
+              </label>
+              {isEditing ? (
+                <input
+                  type="tel"
+                  name="phone_number"
+                  value={formData.phone_number || ""}
+                  onChange={handleInputChange}
+                  className="w-full text-base p-2.5 border border-gray-200 rounded-lg focus:ring-1 focus:ring-[#1B4332] focus:border-[#1B4332] outline-none"
+                />
+              ) : (
+                <p className="text-base font-medium text-gray-900">
+                  {user.phone_number}
+                </p>
+              )}
+            </div>
+            <div className="sm:col-span-2">
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2 block">
+                Email Address
+              </label>
+              <div className="flex items-center justify-between p-2.5 bg-gray-50 rounded-lg border border-gray-100">
+                <span className="text-base text-gray-700">{user.email}</span>
+                <Lock size={16} className="text-gray-400" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+          <div className="px-8 py-5 border-b border-gray-100 bg-gray-50/50">
+            <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2.5">
+              <Briefcase size={20} className="text-[#1B4332]" /> Skills &
+              Expertise
+            </h3>
+          </div>
+          <div className="p-8">
+            <div className="flex flex-wrap gap-3 mb-6">
+              {(isEditing ? formData.skills : user.skills)?.map((skill, i) => (
+                <span
+                  key={i}
+                  className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium border ${
+                    isEditing
+                      ? "bg-white border-[#1B4332] text-[#1B4332]"
+                      : "bg-[#1B4332]/5 border-[#1B4332]/10 text-[#1B4332]"
+                  }`}
+                >
+                  {skill}
+                  {isEditing && (
+                    <button
+                      onClick={() => handleRemoveSkill(skill)}
+                      className="hover:text-red-500"
+                    >
+                      <X size={14} />
+                    </button>
+                  )}
+                </span>
+              ))}
+            </div>
+            {isEditing && (
+              <div className="flex gap-3">
+                <input
+                  type="text"
+                  value={newSkill}
+                  onChange={(e) => setNewSkill(e.target.value)}
+                  placeholder="Add a new skill..."
+                  className="flex-1 text-base p-2.5 border border-gray-200 rounded-lg focus:ring-1 focus:ring-[#1B4332] outline-none"
+                />
+                <button
+                  onClick={handleAddSkill}
+                  disabled={!newSkill.trim()}
+                  className="px-6 py-2.5 bg-gray-900 text-white rounded-lg text-sm font-bold hover:bg-black transition-colors disabled:opacity-50"
+                >
+                  Add
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Right Column - Media & Docs */}
+      <div className="space-y-8">
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+          <div className="px-8 py-5 border-b border-gray-100 bg-gray-50/50">
+            <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2.5">
+              <ImageIcon size={20} className="text-[#1B4332]" /> Portfolio
+            </h3>
+          </div>
+          <div className="p-6 grid grid-cols-2 gap-3">
+            {user.workPhotos?.map((photo, i) => (
+              <div
+                key={i}
+                className="aspect-square rounded-lg overflow-hidden border border-gray-100 relative group cursor-pointer"
+              >
+                <img
+                  src={photo}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+                  <Eye className="text-white" size={24} />
+                </div>
+              </div>
+            ))}
+            {isEditing && (
+              <button className="aspect-square rounded-lg border-2 border-dashed border-gray-200 flex flex-col items-center justify-center text-gray-400 hover:border-[#1B4332] hover:text-[#1B4332] hover:bg-[#1B4332]/5 transition-all">
+                <Plus size={24} />
+                <span className="text-xs font-bold mt-2">ADD</span>
+              </button>
+            )}
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+          <div className="px-8 py-5 border-b border-gray-100 bg-gray-50/50">
+            <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2.5">
+              <FileText size={20} className="text-[#1B4332]" /> Certifications
+            </h3>
+          </div>
+          <div className="divide-y divide-gray-50">
+            {user.certificates?.map((cert, i) => (
+              <div
+                key={i}
+                className="p-6 flex items-center gap-4 hover:bg-gray-50 transition-colors cursor-pointer group"
+              >
+                <div className="p-3 bg-red-50 text-red-500 rounded-lg group-hover:scale-110 transition-transform">
+                  <FileText size={20} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-bold text-gray-900 truncate">
+                    License #{1092 + i}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-0.5">PDF Document</p>
+                </div>
+                <ChevronRight
+                  size={18}
+                  className="text-gray-300 group-hover:text-gray-900"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
+const AddressesView: React.FC<ViewProps> = ({ user }) => {
+  return (
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+      <div className="flex justify-end">
+        <button className="text-sm font-bold bg-[#1B4332] text-white px-5 py-2.5 rounded-lg hover:bg-[#143326] transition-colors flex items-center gap-2 shadow-sm">
+          <Plus size={16} /> Add New Address
+        </button>
+      </div>
+      <div className="grid md:grid-cols-2 gap-6">
+        {user.addresses?.map((addr) => (
+          <div
+            key={addr.id}
+            className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:border-[#1B4332] transition-colors group"
+          >
+            <div className="flex justify-between items-start mb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-3 bg-gray-100 rounded-lg text-gray-600 group-hover:bg-[#1B4332]/10 group-hover:text-[#1B4332] transition-colors">
+                  <MapPin size={22} />
+                </div>
+                <div>
+                  <h4 className="text-base font-bold text-gray-900">
+                    {addr.label}
+                  </h4>
+                  {addr.isDefault && (
+                    <span className="text-[11px] font-bold text-green-600 bg-green-50 px-2.5 py-0.5 rounded-full">
+                      Default
+                    </span>
+                  )}
+                </div>
+              </div>
+              <MoreVertical
+                size={20}
+                className="text-gray-400 cursor-pointer hover:text-gray-600"
+              />
+            </div>
+            <p className="text-base text-gray-600 pl-14 leading-relaxed">
+              {addr.street}
+              <br />
+              {addr.city}, {addr.zip}
+            </p>
+          </div>
+        ))}
+        <button className="border-2 border-dashed border-gray-200 rounded-xl p-6 flex flex-col items-center justify-center text-gray-400 hover:border-[#1B4332] hover:text-[#1B4332] hover:bg-[#1B4332]/5 transition-all min-h-[160px]">
+          <Plus size={32} />
+          <span className="text-sm font-bold mt-3">Add New Location</span>
+        </button>
+      </div>
+    </div>
+  );
+};
 
-useEffect(()=>{
+const WalletView: React.FC<ViewProps> = ({ user }) => {
+  return (
+    <div className="grid lg:grid-cols-3 gap-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
+      <div className="lg:col-span-1">
+        <div className="bg-gradient-to-br from-[#1B4332] to-[#0D2E21] text-white p-8 rounded-2xl shadow-lg relative overflow-hidden">
+          <div className="relative z-10 flex flex-col h-full justify-between min-h-[220px]">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-xs font-bold text-emerald-100/80 uppercase tracking-widest">
+                  Total Balance
+                </p>
+                <h2 className="text-4xl font-bold mt-2 tracking-tight">
+                  ${user.walletBalance?.toLocaleString() || "0.00"}
+                </h2>
+              </div>
+              <WalletIcon className="text-emerald-400/20" size={40} />
+            </div>
+            <div className="grid grid-cols-2 gap-4 mt-8">
+              <button className="bg-white text-[#1B4332] py-3 rounded-lg text-sm font-bold hover:bg-emerald-50 transition-colors">
+                Add Funds
+              </button>
+              <button className="bg-[#1B4332] border border-white/20 text-white py-3 rounded-lg text-sm font-bold hover:bg-white/10 transition-colors">
+                Withdraw
+              </button>
+            </div>
+          </div>
+          {/* Decorative circles */}
+          <div className="absolute -top-12 -right-12 w-40 h-40 bg-emerald-500/20 rounded-full blur-3xl"></div>
+          <div className="absolute -bottom-12 -left-12 w-40 h-40 bg-black/20 rounded-full blur-3xl"></div>
+        </div>
+      </div>
 
-},[handleSave])
+      <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
+        <div className="px-8 py-5 border-b border-gray-100 flex justify-between items-center">
+          <h3 className="font-bold text-gray-900 text-lg">
+            Recent Transactions
+          </h3>
+          <button className="text-sm font-medium text-[#1B4332] hover:underline">
+            View All
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto max-h-[350px]">
+          {user.transactions?.map((tx) => (
+            <div
+              key={tx.id}
+              className="px-8 py-5 border-b border-gray-50 last:border-0 flex items-center justify-between hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-center gap-5">
+                <div
+                  className={`p-3 rounded-full ${
+                    tx.type === "credit"
+                      ? "bg-green-50 text-green-600"
+                      : "bg-red-50 text-red-600"
+                  }`}
+                >
+                  {tx.type === "credit" ? (
+                    <Plus size={20} />
+                  ) : (
+                    <LogOut size={20} />
+                  )}
+                </div>
+                <div>
+                  <p className="text-base font-bold text-gray-900">
+                    {tx.description}
+                  </p>
+                  <p className="text-sm text-gray-500 mt-1">
+                    {new Date(tx.date).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+              <div className="text-right">
+                <span
+                  className={`block text-base font-bold ${
+                    tx.type === "credit" ? "text-green-600" : "text-gray-900"
+                  }`}
+                >
+                  {tx.type === "credit" ? "+" : ""}$
+                  {Math.abs(tx.amount).toFixed(2)}
+                </span>
+                <span
+                  className={`inline-block text-[11px] font-bold px-2.5 py-0.5 rounded-full mt-1.5 ${
+                    tx.status === "completed"
+                      ? "bg-gray-100 text-gray-500"
+                      : "bg-yellow-50 text-yellow-600"
+                  }`}
+                >
+                  {tx.status}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
 
-  const handleCancel = () => {
-    if (currentUser) {
-      setFormData({
-        name: currentUser.name,
-        phone_number: currentUser.phone_number,
-        address: currentUser.address,
+const SettingsView: React.FC = () => {
+  const [isAvailable, setIsAvailable] = useState(true);
+  return (
+    <div className="max-w-3xl animate-in fade-in slide-in-from-bottom-2 duration-300">
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm divide-y divide-gray-100">
+        <div className="p-6 flex items-center justify-between">
+          <div className="flex items-center gap-5">
+            <div className="p-3 bg-green-50 text-green-700 rounded-lg">
+              <LayoutDashboard size={24} />
+            </div>
+            <div>
+              <p className="text-base font-bold text-gray-900">
+                Availability Status
+              </p>
+              <p className="text-sm text-gray-500 mt-1">
+                Toggle visibility in job search results
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => setIsAvailable(!isAvailable)}
+            className={`w-12 h-7 rounded-full relative transition-colors ${
+              isAvailable ? "bg-[#1B4332]" : "bg-gray-200"
+            }`}
+          >
+            <span
+              className={`absolute top-1 left-1 bg-white w-5 h-5 rounded-full transition-transform ${
+                isAvailable ? "translate-x-5" : "translate-x-0"
+              }`}
+            />
+          </button>
+        </div>
+        <div className="p-6 flex items-center justify-between">
+          <div className="flex items-center gap-5">
+            <div className="p-3 bg-blue-50 text-blue-600 rounded-lg">
+              <Bell size={24} />
+            </div>
+            <div>
+              <p className="text-base font-bold text-gray-900">Notifications</p>
+              <p className="text-sm text-gray-500 mt-1">
+                Job alerts and updates
+              </p>
+            </div>
+          </div>
+          <div className="w-12 h-7 rounded-full bg-[#1B4332] relative cursor-pointer">
+            <span className="absolute top-1 left-1 bg-white w-5 h-5 rounded-full translate-x-5" />
+          </div>
+        </div>
+        <button className="w-full p-6 flex items-center justify-between hover:bg-gray-50 transition-colors text-left group">
+          <div className="flex items-center gap-5">
+            <div className="p-3 bg-gray-100 text-gray-600 rounded-lg group-hover:bg-gray-200">
+              <Lock size={24} />
+            </div>
+            <div>
+              <p className="text-base font-bold text-gray-900">Security</p>
+              <p className="text-sm text-gray-500 mt-1">
+                Change password and security settings
+              </p>
+            </div>
+          </div>
+          <ChevronRight
+            size={20}
+            className="text-gray-400 group-hover:text-gray-600"
+          />
+        </button>
+      </div>
+      <div className="mt-8 flex justify-center">
+        <button className="text-red-600 hover:text-red-700 text-sm font-bold flex items-center gap-2.5 px-6 py-3 hover:bg-red-50 rounded-lg transition-colors">
+          <LogOut size={18} /> Sign Out
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// --- Main Layout ---
+
+const UserProfile = () => {
+  // Using global store instead of local Mock state
+  const { user: currentUser, setUser } = useUserStore();
+  const [activeTab, setActiveTab] = useState<Tab>("profile");
+
+  // File Input Ref for Header Image Upload
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !currentUser) return;
+
+    const preview = URL.createObjectURL(file);
+
+    // 1. Optimistic Update
+    const oldImage = currentUser.profileImageUrl;
+    setUser({ ...currentUser, profileImageUrl: preview });
+
+    try {
+      // 2. Server Action
+      const response = await updateUserProfileAction(currentUser.id, {
+        profilePicture: file,
       });
 
-      setPreviewImage(currentUser.profileImageUrl || null);
+      if (!response.success) {
+        // Revert on failure
+        setUser({ ...currentUser, profileImageUrl: oldImage });
+        toast.error(response.message);
+        return;
+      }
+      toast.success("Profile picture updated!");
+    } catch (err: any) {
+      setUser({ ...currentUser, profileImageUrl: oldImage });
+      toast.error(err.message || "Image upload failed");
     }
-    setIsEditing(false);
   };
 
+  // Loading State from Old File
   if (!currentUser) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -137,261 +657,129 @@ useEffect(()=>{
     );
   }
 
+  // Safe cast currentUser to User type for the rest of the app
+  const safeUser = currentUser as unknown as User;
+
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 font-sans">
-      <div className="max-w-4xl mx-auto space-y-6">
-        {/* Profile Card */}
-        <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 overflow-hidden border border-gray-100 relative group">
-          {/* Header Banner */}
-          <div className="h-48 bg-[#1B4332] relative overflow-hidden">
-            <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:24px_24px]"></div>
-            <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-[#DC2626] opacity-10 blur-[100px] rounded-full"></div>
-          </div>
-
-          <div className="px-8 pb-8 relative">
-            {/* Avatar & Main Info Row */}
-            <div className="flex flex-col sm:flex-row items-end -mt-20 mb-6 gap-6">
-              {/* Profile Picture */}
-              <div className="relative group/avatar">
-                <div className="w-40 h-40 rounded-full border-[6px] border-white shadow-lg overflow-hidden bg-gray-100 flex items-center justify-center relative">
-                  {previewImage ? (
-                    <img
-                      src={previewImage}
-                      alt="Profile"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <UserIcon size={64} className="text-gray-300" />
-                  )}
-
-                  {/* Image Edit Overlay (Visible when editing) */}
-                  {isEditing && (
-                    <div
-                      onClick={() => fileInputRef.current?.click()}
-                      className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center cursor-pointer transition-opacity opacity-100"
-                    >
-                      <Upload size={24} className="text-white mb-1" />
-                      <span className="text-white text-xs font-bold uppercase tracking-wide">
-                        Change
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Camera Icon Trigger (Visible when NOT editing, for quick access) */}
-                {!isEditing && (
-                  <button
-                    onClick={() => setIsEditing(true)}
-                    className="absolute bottom-2 right-2 bg-white p-2.5 rounded-full shadow-md text-gray-600 hover:text-[#DC2626] border border-gray-100 hover:scale-110 transition-all duration-200 z-10"
-                  >
-                    <Camera size={18} />
-                  </button>
+    <div className="min-h-screen bg-gray-50 font-sans">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        {/* Header Section */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-8 mb-10">
+          <div className="flex items-center gap-6">
+            <div className="relative shrink-0 group/avatar">
+              <div
+                onClick={() => fileInputRef.current?.click()}
+                className="w-20 h-20 rounded-full border-4 border-white shadow-lg overflow-hidden bg-gray-200 cursor-pointer relative"
+              >
+                {safeUser.profileImageUrl ? (
+                  <img
+                    src={safeUser.profileImageUrl}
+                    alt="Profile"
+                    className="w-full h-full object-cover group-hover/avatar:opacity-75 transition-opacity"
+                  />
+                ) : (
+                  <UserIcon className="p-5 text-gray-400 group-hover/avatar:opacity-75" />
                 )}
-
-                {/* Hidden File Input */}
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  className="hidden"
-                  accept="image/*"
-                  onChange={handleImageUpload}
+                {/* Overlay Icon for Upload */}
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/avatar:opacity-100 transition-opacity">
+                  <Camera size={24} className="text-[#1B4332]" />
+                </div>
+              </div>
+              <div className="absolute -bottom-1 -right-1 bg-white p-1 rounded-full shadow-sm border border-gray-100">
+                <CheckCircle2
+                  size={20}
+                  className="text-[#1B4332] fill-green-50"
                 />
               </div>
 
-              {/* Name & Role */}
-              <div className="flex-1 pb-2 text-center sm:text-left w-full">
-                {isEditing ? (
-                  <div className="mb-2">
-                    <label className="block text-xs font-bold text-gray-400 uppercase mb-1">
-                      Full Name
-                    </label>
-                    <input
-                      type="text"
-                      name="name"
-                      value={formData.name || ""}
-                      onChange={handleInputChange}
-                      className="text-3xl font-bold text-[#1B4332] w-full border-b-2 border-gray-200 focus:border-[#1B4332] outline-none bg-transparent py-1 placeholder-gray-300"
-                      placeholder="Enter your name"
-                    />
-                  </div>
-                ) : (
-                  <h1 className="text-3xl font-bold text-[#1B4332] mb-1">
-                    {currentUser.name}
-                  </h1>
-                )}
-
-                <div className="flex items-center justify-center sm:justify-start gap-3 mt-2">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-green-50 text-green-700 border border-green-100">
-                    <ShieldCheck size={14} />
-                    {currentUser.role}
-                  </span>
-                  <span className="text-sm text-gray-500 flex items-center gap-1">
-                    <Calendar size={14} /> Joined {currentUser.createdAt}
-                  </span>
-                </div>
-              </div>
-
-              {/* Edit/Save Actions */}
-              <div className="mb-2 w-full sm:w-auto flex gap-2">
-                {isEditing ? (
-                  <>
-                    <button
-                      onClick={handleCancel}
-                      className="px-4 py-2.5 bg-white text-gray-500 font-bold rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors shadow-sm flex items-center gap-2"
-                    >
-                      <X size={18} /> Cancel
-                    </button>
-                    <button
-                      onClick={handleSave}
-                      className="px-6 py-2.5 bg-[#1B4332] text-white font-bold rounded-xl hover:bg-[#143225] transition-colors shadow-lg shadow-green-900/20 flex items-center gap-2"
-                    >
-                      <Check size={18} /> Save
-                    </button>
-                  </>
-                ) : (
-                  <button
-                    onClick={() => {
-                      if (!currentUser) return;
-                      setFormData({
-                        name: currentUser.name,
-                        phone_number: currentUser.phone_number,
-                        address: currentUser.address,
-                        profileImageUrl: currentUser.profileImageUrl ?? null,
-                      });
-                      setPreviewImage(currentUser.profileImageUrl || null);
-                      setIsEditing(true);
-                    }}
-                    className="w-full sm:w-auto px-6 py-2.5 bg-gray-50 hover:bg-gray-100 text-[#1B4332] font-semibold rounded-xl border border-gray-200 shadow-sm transition-all flex items-center justify-center gap-2"
-                  >
-                    <Edit2 size={16} />
-                    Edit Profile
-                  </button>
-                )}
-              </div>
+              {/* Hidden File Input */}
+              <input
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
+                accept="image/*"
+                onChange={handleImageUpload}
+              />
             </div>
-
-            <div className="h-px bg-gray-100 w-full mb-8"></div>
-
-            {/* Details Grid */}
-            <div className="grid md:grid-cols-2 gap-8">
-              {/* Address Section */}
-              <div className="space-y-3">
-                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
-                  <MapPin size={14} /> Primary Address
-                </label>
-                <div
-                  className={`p-5 rounded-2xl border flex items-start gap-4 transition-colors group/card ${
-                    isEditing
-                      ? "bg-white border-[#1B4332] shadow-md ring-4 ring-[#1B4332]/5"
-                      : "bg-gray-50 border-gray-100 hover:border-green-200"
-                  }`}
-                >
-                  <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-[#DC2626] shadow-sm group-hover/card:scale-110 transition-transform flex-shrink-0">
-                    <MapPin size={20} />
-                  </div>
-                  <div className="flex-1">
-                    {isEditing ? (
-                      <textarea
-                        name="address"
-                        value={formData.address || ""}
-                        onChange={handleInputChange}
-                        rows={3}
-                        className="w-full font-semibold text-gray-900 bg-transparent outline-none resize-none placeholder-gray-400"
-                        placeholder="Enter your full address"
-                      />
-                    ) : (
-                      <>
-                        <p className="font-semibold text-gray-900 leading-relaxed">
-                          {currentUser.address}
-                        </p>
-                        <p className="text-xs text-gray-500 mt-1">
-                          Visible to workers only after you hire them.
-                        </p>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Email & Phone Section */}
-              <div className="space-y-4">
-                {/* Email (Read Only usually, but displayed nicely) */}
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
-                    <Mail size={14} /> Contact Email
-                  </label>
-                  <div
-                    className="p-4 bg-gray-50 rounded-2xl border border-gray-100 flex items-center gap-4 opacity-75 cursor-not-allowed"
-                    title="Email cannot be changed"
-                  >
-                    <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-[#1B4332] shadow-sm">
-                      <Mail size={20} />
-                    </div>
-                    <div className="overflow-hidden">
-                      <p className="font-semibold text-gray-900 truncate">
-                        {currentUser.email}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        Primary account email
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Phone (Editable) */}
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
-                    <Phone size={14} /> Phone Number
-                  </label>
-                  <div
-                    className={`p-4 rounded-2xl border flex items-center gap-4 transition-colors ${
-                      isEditing
-                        ? "bg-white border-[#1B4332] shadow-md ring-4 ring-[#1B4332]/5"
-                        : "bg-gray-50 border-gray-100"
-                    }`}
-                  >
-                    <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-[#1B4332] shadow-sm">
-                      <Phone size={20} />
-                    </div>
-                    <div className="flex-1">
-                      {isEditing ? (
-                        <input
-                          type="tel"
-                          name="phone_number"
-                          value={formData.phone_number || ""}
-                          onChange={handleInputChange}
-                          className="w-full font-semibold text-gray-900 bg-transparent outline-none placeholder-gray-400"
-                          placeholder="+1 (000) 000-0000"
-                        />
-                      ) : (
-                        <p className="font-semibold text-gray-900">
-                          {currentUser.phone_number}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </div>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
+                {safeUser.name}
+              </h1>
+              <div className="flex items-center gap-4 mt-2 text-sm font-medium text-gray-500">
+                <span className="flex items-center gap-1.5">
+                  <Briefcase size={16} /> {safeUser.role}
+                </span>
+                <span className="w-1.5 h-1.5 rounded-full bg-gray-300"></span>
+                <StatusBadge status={safeUser.isVerified} />
               </div>
             </div>
           </div>
         </div>
 
-        {/* Action Banner */}
-        <div className="bg-[#1B4332] rounded-2xl p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-lg text-white">
-          <div className="text-center md:text-left">
-            <h3 className="text-xl font-bold mb-2">Have a project in mind?</h3>
-            <p className="text-green-100 text-sm max-w-md">
-              Post a request today and get matched with top-rated professionals
-              in your area.
-            </p>
-          </div>
-          <button className="px-8 py-3 bg-[#DC2626] hover:bg-[#b91c1c] text-white rounded-xl font-bold transition-all shadow-lg shadow-red-900/20 whitespace-nowrap">
-            Post a Job Request
-          </button>
+        {/* Navigation Tabs */}
+        <div className="border-b border-gray-200 mb-10">
+          <nav className="flex space-x-10" aria-label="Tabs">
+            {[
+              { id: "profile", label: "Profile", icon: UserIcon },
+              { id: "addresses", label: "Addresses", icon: MapPin },
+              { id: "wallet", label: "Wallet", icon: WalletIcon },
+              { id: "settings", label: "Settings", icon: Settings },
+            ].map((tab) => {
+              const isActive = activeTab === tab.id;
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as Tab)}
+                  className={`
+                                group inline-flex items-center py-5 px-1 border-b-2 font-medium text-base transition-all
+                                ${
+                                  isActive
+                                    ? "border-[#1B4332] text-[#1B4332]"
+                                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                                }
+                            `}
+                >
+                  <Icon
+                    size={18}
+                    className={`mr-2.5 ${
+                      isActive
+                        ? "text-[#1B4332]"
+                        : "text-gray-400 group-hover:text-gray-500"
+                    }`}
+                  />
+                  {tab.label}
+                </button>
+              );
+            })}
+          </nav>
+        </div>
+
+        {/* Content Area */}
+        <div className="min-h-[600px]">
+          {activeTab === "profile" && (
+            <ProfileView
+              user={safeUser}
+              setUser={(updatedUser) => setUser(updatedUser as any)}
+            />
+          )}
+          {activeTab === "addresses" && (
+            <AddressesView
+              user={safeUser}
+              setUser={(updatedUser) => setUser(updatedUser as any)}
+            />
+          )}
+          {activeTab === "wallet" && (
+            <WalletView
+              user={safeUser}
+              setUser={(updatedUser) => setUser(updatedUser as any)}
+            />
+          )}
+          {activeTab === "settings" && <SettingsView />}
         </div>
       </div>
     </div>
   );
 };
 
-export default ClientProfile;
+export default UserProfile;
