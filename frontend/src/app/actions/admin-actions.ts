@@ -6,6 +6,7 @@ import {
   approveVerification,
   rejectVerification,
   toggleUserAccess,
+  fetchAllUsers,
 } from "@/services/api/admin.api";
 
 
@@ -27,4 +28,8 @@ export async function rejectUserAction(userId: string) {
 
 export async function toggleUserAccessAction(userId: string) {
   return await toggleUserAccess(userId);
+}
+
+export async function getAllUsers() {
+  return await fetchAllUsers();
 }
