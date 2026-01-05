@@ -1,4 +1,4 @@
-import { Role } from "../../domain/enums/enums";
+import { Role } from "../../shared/enums/authEnums";
 import { IBaseRepository } from "../../domain/repositories/IBaseRepository";
 import { User } from "../../domain/entities/User";
 import { IUserRepositoryFactory } from "../../domain/repositories/IUserRepositoryFactory";
@@ -12,7 +12,7 @@ export class UserRepositoryFactory implements IUserRepositoryFactory {
     private readonly _clientRepository: IBaseRepository<Client>,
     private readonly _workerRepository: IBaseRepository<Worker>,
     private readonly _adminRepository: IBaseRepository<Admin>
-  ) {}
+  ) { }
 
   getRepository<T extends User>(role: Role): IBaseRepository<T> {
     switch (role) {

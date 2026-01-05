@@ -1,7 +1,7 @@
 import { IEmailService } from "../services/IEmailService";
 import { IOtpService } from "../services/IOtpService";
 import { ILogger } from "../interfaces/ILogger";
-import { Role } from "../../domain/enums/enums";
+import { Role } from "../../shared/enums/authEnums";
 import { IForgotPasswordUseCase } from "../interfaces/IForgotPasswordUseCase";
 import { UserNotFoundError } from "../../domain/errors/DomainError";
 import { IUserRepositoryFactory } from "../../domain/repositories/IUserRepositoryFactory";

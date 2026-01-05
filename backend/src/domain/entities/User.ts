@@ -1,4 +1,4 @@
-import { LoginMethod, Role, VerificationStatus } from "../enums/enums";
+import { LoginMethod, Role, VerificationStatus } from "../../shared/enums/authEnums";
 
 export interface User {
     userId: string,

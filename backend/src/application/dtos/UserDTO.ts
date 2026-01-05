@@ -1,4 +1,4 @@
-import { Role, VerificationStatus } from "../../domain/enums/enums";
+import { Role, VerificationStatus } from "../../shared/enums/authEnums";
 
 export interface UserRequestDTO {
     user_name: string;

@@ -1,22 +1,22 @@
 // src/presentation/middlewares/AuthMiddleware.ts
 import { Request, Response, NextFunction, RequestHandler } from "express";
 import { ITokenService } from "../../application/services/ITokenService";
-import { HttpStatusCode } from "../enums/httpCodes";
+import { HttpStatusCode } from "../../shared/enums/httpCodes";
 
 declare global {
   namespace Express {
     interface Request {
-      user?: any; 
+      user?: any;
     }
   }
 }
 
 export class AuthMiddleware {
-  constructor(private readonly _tokenService: ITokenService) {}
+  constructor(private readonly _tokenService: ITokenService) { }
 
   public verify: RequestHandler = (req: Request, res: Response, next: NextFunction) => {
     let token = req.cookies?.accessToken;
-    
+
     if (!token) {
       const authHeader = req.headers.authorization;
       if (authHeader && authHeader.startsWith("Bearer ")) {

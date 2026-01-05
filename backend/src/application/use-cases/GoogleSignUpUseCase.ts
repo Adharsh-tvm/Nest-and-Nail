@@ -1,5 +1,5 @@
 import { User } from "../../domain/entities/User";
-import { LoginMethod, Role } from "../../domain/enums/enums";
+import { LoginMethod, Role } from "../../shared/enums/authEnums";
 import { IGoogleSignUpUseCase } from "../interfaces/IGoogleSignUpUseCase";
 import { UserMapper } from "../mappers/UserMapper";
 import { IGenerateUserID } from "../services/IGenerateUserID";

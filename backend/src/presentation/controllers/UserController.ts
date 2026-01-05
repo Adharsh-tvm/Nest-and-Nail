@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { HttpStatusCode } from "../enums/httpCodes";
+import { HttpStatusCode } from "../../shared/enums/httpCodes";
 import { IUserController } from "../interfaces/IUserController";
 import { IChangeUserRoleUseCase } from "../../application/interfaces/IChangeUserRoleUseCase";
 import { IGetCurrentUserUseCase } from "../../application/interfaces/IGetCurrentUserUseCase";

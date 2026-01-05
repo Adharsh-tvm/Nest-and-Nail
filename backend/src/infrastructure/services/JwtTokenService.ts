@@ -1,6 +1,6 @@
-import  jwt  from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import { ITokenService } from "../../application/services/ITokenService";
-import { JwtPayload } from "../../application/types/JwtPayload";
+import { JwtPayload } from "../../shared/types/JwtPayload";
 
 
 export class JwtTokenService implements ITokenService {

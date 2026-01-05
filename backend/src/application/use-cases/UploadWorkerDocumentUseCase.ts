@@ -1,5 +1,5 @@
 import { ILogger } from "../interfaces/ILogger";
-import { Role, VerificationStatus } from "../../domain/enums/enums";
+import { Role, VerificationStatus } from "../../shared/enums/authEnums";
 import { CloudinaryUploadService } from "../../infrastructure/services/CloudinaryUploadService";
 import { IUploadWorkerDocumentUseCase } from "../interfaces/IUploadWorkerDocumentUseCase";
 import { IUserRepositoryFactory } from "../../domain/repositories/IUserRepositoryFactory";
@@ -8,7 +8,7 @@ export class UploadWorkerDocumentUseCase implements IUploadWorkerDocumentUseCase
     constructor(
         private readonly _repositoryFactory: IUserRepositoryFactory,
         private readonly _logger: ILogger
-    ) {}
+    ) { }
 
     async execute(userId: string, filePath: string) {
         this._logger.info(`[UploadWorkerDocumentUseCase] Uploading document for user: ${userId}`);

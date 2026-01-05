@@ -1,4 +1,4 @@
-import { Role } from "../../domain/enums/enums";
+import { Role } from "../../shared/enums/authEnums";
 import { UserResponseDTO } from "../dtos/UserDTO";
 import { IChangeUserRoleUseCase } from "../interfaces/IChangeUserRoleUseCase";
 import { ILogger } from "../interfaces/ILogger";

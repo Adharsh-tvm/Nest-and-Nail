@@ -1,7 +1,7 @@
 // presentation/controllers/UserProfileController.ts
 
 import { Request, Response } from "express";
-import { HttpStatusCode } from "../enums/httpCodes";
+import { HttpStatusCode } from "../../shared/enums/httpCodes";
 import { IUpdateUserProfileUseCase } from "../../application/interfaces/IUpdateUserProfileUseCase";
 import { IUserProfileController } from "../interfaces/IUserProfileController";
 
@@ -23,13 +23,13 @@ export class UserProfileController implements IUserProfileController {
     updateProfile = async (req: Request, res: Response) => {
         try {
             const userId = req.params.userId;
-            const updates = req.body;              
+            const updates = req.body;
             const profilePictureFilePath = req.file?.path;
 
             const updatedUser = await this._updateUserProfileUseCase.execute(
                 userId,
                 updates,
-                profilePictureFilePath 
+                profilePictureFilePath
             );
 
 

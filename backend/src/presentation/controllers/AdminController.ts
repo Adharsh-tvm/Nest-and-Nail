@@ -2,9 +2,9 @@ import { Request, Response } from "express";
 import { IAdminController } from "../interfaces/IAdminController";
 import { IGetAllClientsUseCase } from "../../application/interfaces/IGetAllClientsUseCase";
 import { IGetAllWorkersUseCase } from "../../application/interfaces/IGetAllWorkersUseCase";
-import { HttpStatusCode } from "../enums/httpCodes";
+import { HttpStatusCode } from "../../shared/enums/httpCodes";
 import { IUpdateVerificationStatusUseCase } from "../../application/interfaces/IUpdateVerificationStatusUseCase";
-import { VerificationStatus } from "../../domain/enums/enums";
+import { VerificationStatus } from "../../shared/enums/authEnums";
 import { IUpdateUserAccessUseCase } from "../../application/interfaces/IUpdateUserAccessUseCase";
 
 export class AdminController implements IAdminController {

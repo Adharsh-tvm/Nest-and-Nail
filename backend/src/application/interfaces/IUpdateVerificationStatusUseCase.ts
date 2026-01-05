@@ -1,4 +1,4 @@
-import { VerificationStatus } from "../../domain/enums/enums";
+import { VerificationStatus } from "../../shared/enums/authEnums";
 import { UserResponseDTO } from "../dtos/UserDTO";
 
 export interface IUpdateVerificationStatusUseCase {

@@ -3,7 +3,7 @@ import { UserResponseDTO } from "../dtos/UserDTO";
 import { IGetCurrentUserUseCase } from "../interfaces/IGetCurrentUserUseCase";
 import { ILogger } from "../interfaces/ILogger";
 import { UserMapper } from "../mappers/UserMapper";
-import { Role } from "../../domain/enums/enums";
+import { Role } from "../../shared/enums/authEnums";
 import { IUserRepositoryFactory } from "../../domain/repositories/IUserRepositoryFactory";
 
 export class GetCurrentUserUseCase implements IGetCurrentUserUseCase {
@@ -27,7 +27,7 @@ export class GetCurrentUserUseCase implements IGetCurrentUserUseCase {
         try {
             const clientRepo = this._repositoryFactory.getRepository(Role.CLIENT);
             user = await clientRepo.findByEmail(email);
-            
+
             if (user) {
                 this._logger.info(`[GetCurrentUserUseCase] User found as CLIENT`);
             }
