@@ -1,6 +1,6 @@
 // store/userStore.ts
 import { create } from "zustand";
-import { VerificationStatus } from "@/enums/enums";
+import { VerificationStatus } from "@/shared/enums/authEnums";
 
 export type User = {
   id: string;

@@ -18,8 +18,8 @@ import {
 import DataTable from "@/app/components/containers/DataTable";
 import type { Column } from "@/app/components/containers/DataTable";
 import { useUsers } from "@/hooks/useUsers";
-import { VerificationStatus } from "@/enums/enums";
 import { toggleUserAccessAction } from "@/app/actions/admin-actions";
+import { VerificationStatus } from "@/shared/enums/authEnums";
 
 /**
  * ----------------------------------------------------------------------------

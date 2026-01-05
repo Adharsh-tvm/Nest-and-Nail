@@ -17,7 +17,7 @@ import { useUserStore } from "@/store/userStore";
 import Link from "next/link";
 import { changeRoleAction } from "@/app/actions/change-role-action";
 import WorkerVerificationFlow from "./DocumentsUpload";
-import { VerificationStatus } from "@/enums/enums";
+import { VerificationStatus } from "@/shared/enums/authEnums";
 
 const ClientHeader: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

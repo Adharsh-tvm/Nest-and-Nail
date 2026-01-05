@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useUserStore, User } from "@/store/userStore";
-import { VerificationStatus } from "@/enums/enums";
+import { VerificationStatus } from "@/shared/enums/authEnums"; 
 
 type ServerUser = Record<string, any>;
 
