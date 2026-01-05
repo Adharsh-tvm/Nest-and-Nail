@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect } from "react";
-import { useUserStore, User } from "@/store/userStore";
+import { useUserStore } from "@/store/userStore";
 import { VerificationStatus } from "@/shared/enums/authEnums"; 
+import { User } from "@/shared/types/userTypes";
 
 type ServerUser = Record<string, any>;
 

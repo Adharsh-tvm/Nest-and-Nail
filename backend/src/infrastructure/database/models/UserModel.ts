@@ -32,7 +32,7 @@ const userSchema = new Schema<User>({
     },
 
     skills: { type: [String], default: [] },
-    address: { type: String, default: "" },
+    address: { type: [String], default: [] },
 
     lastLoginAt: { type: Date, default: Date.now },
     createdAt: { type: Date, default: Date.now },

@@ -2,7 +2,7 @@
 
 import axiosInstance from "@/lib/axiosInstance";
 import { VerificationStatus } from "@/shared/enums/authEnums"; 
-import { User } from "@/store/userStore";
+import { User } from "@/shared/types/userTypes";
 
 /* ---------------- TYPES ---------------- */
 

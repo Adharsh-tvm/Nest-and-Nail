@@ -1,3 +1,5 @@
+import { VerificationStatus } from "@/shared/enums/authEnums";
+
 export type PendingVerificationUser = {
   _id: string;
   userId: string;
@@ -23,7 +25,7 @@ export interface WorkerUser {
   email: string;
   role: string;
 
-  isVerified: "VERIFIED" | "PENDING" | "REJECTED" | "NOT_VERIFIED";
+  isVerified: VerificationStatus
 
   profileImageUrl?: string | null;
   phone_number?: string;

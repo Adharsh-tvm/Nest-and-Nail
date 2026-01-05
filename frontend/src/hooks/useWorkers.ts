@@ -1,6 +1,6 @@
 "use client";
 
-import { getAllWorkers, Worker } from "@/services/api/admin.api";
+import { fetchAllWorkers, Worker } from "@/services/api/admin.api";
 import { useEffect, useState } from "react";
 
 
@@ -22,7 +22,7 @@ export const useWorkers = (): UseWorkersResult => {
             setLoading(true);
             setError(null);
             try {
-                const res = await getAllWorkers();
+                const res = await fetchAllWorkers();
                 console.log("[useWorkers] getAllWorkers result:", res);
 
                 if (!Array.isArray(res)) {
