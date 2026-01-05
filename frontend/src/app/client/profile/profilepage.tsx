@@ -17,19 +17,9 @@ import {
 import { useUserStore } from "@/store/userStore";
 import { updateUserProfileAction } from "@/app/actions/user-profile-actions";
 import toast from "react-hot-toast";
+import { Address } from "./page";
 
 // --- Types ---
-type User = {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  profileImageUrl?: string | null;
-  phone_number?: number;
-  address?: string;
-  joinedDate?: string;
-};
-
 const ClientProfile = () => {
   const { user: currentUser, setUser } = useUserStore();
   const [isEditing, setIsEditing] = useState(false);
@@ -40,9 +30,8 @@ const ClientProfile = () => {
   const [formData, setFormData] = useState<{
     name?: string;
     phone_number?: number;
-    address?: string;
-    profilePicture?: File | null;
-    profileImageUrl?: string | null;
+    address?: Address[];
+    profilePictureUrl?: string | null;
   }>({});
 
   useEffect(() => {
@@ -68,50 +57,46 @@ const ClientProfile = () => {
     setPreviewImage(preview);
   };
 
-const handleSave = async () => {
-  if (!currentUser) return;
+  const handleSave = async () => {
+    if (!currentUser) return;
 
-  // 1️⃣ Optimistic update
-  setUser((prev) =>
-    prev
-      ? {
-          ...prev,
-          name: formData.name ?? prev.name,
-          phone_number: formData.phone_number ?? prev.phone_number,
-          address: formData.address ?? prev.address,
-          profileImageUrl: previewImage ?? prev.profileImageUrl,
-        }
-      : prev
-  );
+    // 1️⃣ Optimistic update
+    setUser((prev) =>
+      prev
+        ? {
+            ...prev,
+            name: formData.name ?? prev.name,
+            phone_number: formData.phone_number ?? prev.phone_number,
+            address: formData.address ?? prev.address,
+            profileImageUrl: previewImage ?? prev.profileImageUrl,
+          }
+        : prev
+    );
 
-  setIsEditing(false);
+    setIsEditing(false);
 
-  try {
-    const payload = {
-      name: formData.name,
-      phone: formData.phone_number,
-      address: formData.address,
-      profilePicture: formData.profilePicture,
-    };
+    try {
+      const payload = {
+        name: formData.name,
+        phone: formData.phone_number,
+        address: formData.address,
+        profilePicture: formData.profilePictureUrl,
+      };
 
-    const response = await updateUserProfileAction(currentUser.id, payload);
+      const response = await updateUserProfileAction(currentUser.id, payload);
 
-    if (!response.success) {
-      toast.error(response.message);
-      return;
+      if (!response.success) {
+        toast.error(response.message);
+        return;
+      }
+
+      toast.success(response.message);
+    } catch (err: any) {
+      toast.error(err.message || "Update failed");
     }
+  };
 
-    toast.success(response.message);
-
-  } catch (err: any) {
-    toast.error(err.message || "Update failed");
-  }
-};
-
-
-useEffect(()=>{
-
-},[handleSave])
+  useEffect(() => {}, [handleSave]);
 
   const handleCancel = () => {
     if (currentUser) {
@@ -256,7 +241,7 @@ useEffect(()=>{
                         name: currentUser.name,
                         phone_number: currentUser.phone_number,
                         address: currentUser.address,
-                        profileImageUrl: currentUser.profileImageUrl ?? null,
+                        profilePictureUrl: currentUser.profileImageUrl ?? null,
                       });
                       setPreviewImage(currentUser.profileImageUrl || null);
                       setIsEditing(true);
@@ -292,17 +277,39 @@ useEffect(()=>{
                   <div className="flex-1">
                     {isEditing ? (
                       <textarea
-                        name="address"
-                        value={formData.address || ""}
-                        onChange={handleInputChange}
+                        value={formData.address?.[0]?.street ?? ""}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            address: [
+                              {
+                                id:
+                                  prev.address?.[0]?.id ?? crypto.randomUUID(),
+                                label: "Home",
+                                street: e.target.value,
+                                city: "",
+                                zip: "",
+                                isDefault: true,
+                              },
+                            ],
+                          }))
+                        }
                         rows={3}
-                        className="w-full font-semibold text-gray-900 bg-transparent outline-none resize-none placeholder-gray-400"
-                        placeholder="Enter your full address"
                       />
                     ) : (
                       <>
                         <p className="font-semibold text-gray-900 leading-relaxed">
-                          {currentUser.address}
+                          {currentUser.address &&
+                          currentUser.address.length > 0 ? (
+                            currentUser.address.map((addr) => (
+                              <p key={addr.id}>
+                                {addr.street}
+                                {addr.isDefault && " (Default)"}
+                              </p>
+                            ))
+                          ) : (
+                            <p>—</p>
+                          )}
                         </p>
                         <p className="text-xs text-gray-500 mt-1">
                           Visible to workers only after you hire them.

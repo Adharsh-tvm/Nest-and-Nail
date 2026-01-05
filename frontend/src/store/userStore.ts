@@ -1,27 +1,7 @@
 // store/userStore.ts
 import { create } from "zustand";
-import { VerificationStatus } from "@/shared/enums/authEnums";
+import { User } from "@/shared/types/userTypes";
 
-export type User = {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  isVerified: VerificationStatus;
-  profileImageUrl?: string | null;
-
-  phone_number?: number;
-  skills?: string[];
-  address?: string;
-  documents?: string[];
-  certificates?: string[];
-  workPhotos?: string[];
-  createdAt?: string;
-  updatedAt?: string;
-
-  iat?: number;
-  exp?: number;
-};
 
 
 type UserStore = {

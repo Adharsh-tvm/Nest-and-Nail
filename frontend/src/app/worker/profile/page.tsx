@@ -18,31 +18,7 @@ import {
   Eye,
 } from "lucide-react";
 import { useUserStore } from "@/store/userStore";
-
-// --- Types ---
-
-export type VerificationStatus = 'VERIFIED' | 'PENDING' | 'REJECTED' | 'UNVERIFIED';
-
-export type User = {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  isVerified: VerificationStatus;
-  profileImageUrl?: string | null;
-
-  phone_number?: number;
-  skills?: string[];
-  address?: string;
-  documents?: string[];
-  certificates?: string[];
-  workPhotos?: string[];
-  createdAt?: string;
-  updatedAt?: string;
-
-  iat?: number;
-  exp?: number;
-};
+import { VerificationStatus } from "@/shared/enums/authEnums";
 
 // --- Helper Functions ---
 
@@ -91,7 +67,11 @@ interface DocumentCardProps {
   type?: "document" | "certificate";
 }
 
-const DocumentCard: React.FC<DocumentCardProps> = ({ url, label, type = "document" }) => {
+const DocumentCard: React.FC<DocumentCardProps> = ({
+  url,
+  label,
+  type = "document",
+}) => {
   const isImage = isImageFile(url);
   const fileName = url.split("/").pop() || "Document";
 
@@ -274,7 +254,25 @@ const WorkerProfile = () => {
                       Address
                     </label>
                     <p className="text-sm font-medium text-gray-900">
-                      {currentUser.address || "—"}
+                      {currentUser.address && currentUser.address.length > 0 ? (
+                        <div className="space-y-1">
+                          {currentUser.address.map((addr) => (
+                            <p
+                              key={addr.id}
+                              className="text-sm font-medium text-gray-900 leading-relaxed"
+                            >
+                              {addr.street}, {addr.city} {addr.zip}
+                              {addr.isDefault && (
+                                <span className="ml-2 text-xs font-bold text-green-600">
+                                  (Default)
+                                </span>
+                              )}
+                            </p>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-sm font-medium text-gray-400">—</p>
+                      )}
                     </p>
                   </div>
                 </div>

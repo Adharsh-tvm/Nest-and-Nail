@@ -10,7 +10,7 @@ type GoogleAuthState =
   | {
     success: boolean;
     message: string;
-    user?: any; //need to check the right shape for user
+    user?: any; 
   }
   | undefined;
 

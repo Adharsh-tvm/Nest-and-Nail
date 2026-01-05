@@ -20,7 +20,10 @@ import {
 import { PendingVerificationUser } from "@/types/types";
 import { useUsers } from "@/hooks/useUsers";
 import DataTable from "@/app/components/containers/DataTable";
-import { approveUserAction, rejectUserAction } from "@/app/actions/admin-actions";
+import {
+  approveUserAction,
+  rejectUserAction,
+} from "@/app/actions/admin-actions";
 
 /* ---------------------------------------------------------------------------
  * TABLE TYPES
@@ -68,11 +71,15 @@ const VerificationModal: React.FC<VerificationModalProps> = ({
 }) => {
   if (!request) return null;
 
-  const submittedDate = new Date(request.createdAt).toLocaleString();
+  const submittedDate = request.createdAt
+    ? new Date(request.createdAt).toLocaleString()
+    : "—";
 
-  const idFront = request.documents[0];
-  const idBack = request.documents[1];
-  const extraDocs = request.documents.slice(2);
+const documents = request.documents ?? [];
+const idFront = documents[0];
+const idBack = documents[1];
+const extraDocs = documents.slice(2);
+
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
@@ -357,7 +364,6 @@ const VerificationsPendingView: React.FC = () => {
       const response = await approveUserAction(req.userId);
       console.log("Approved:", response);
 
-
       setSelectedRequest(null);
 
       // optional: refresh list
@@ -370,10 +376,8 @@ const VerificationsPendingView: React.FC = () => {
 
   const handleReject = async (req: PendingVerificationUser) => {
     try {
-
       const response = await rejectUserAction(req.userId);
       console.log("Rejected:", response);
-
 
       setSelectedRequest(null);
 

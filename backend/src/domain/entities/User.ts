@@ -16,7 +16,7 @@ export interface User {
     updatedAt: Date,
 
     skills?: string[];
-    address?: string;
+    address?: string[];
 
     documents?: string[];      // Aadhar, PAN, ID proof
     certificates?: string[];   // Skill certificates

@@ -22,7 +22,6 @@ import { GoogleLogin } from "@react-oauth/google";
 import { handleGoogleSignIn } from "@/app/actions/google-actions";
 import { Toaster, toast } from "react-hot-toast";
 
-type Role = "client" | "worker" | "admin";
 
 const roleConfig = {
   client: {
