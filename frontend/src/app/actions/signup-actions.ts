@@ -7,6 +7,7 @@ import authApi from "@/services/api/auth.api";
 
 import { SignupStartSchema } from "@/lib/validation/signup.schema";
 import { CompleteSignupSchema } from "@/lib/validation/complete-signup.schema";
+import { VerificationStatus } from "@/shared/enums/authEnums";
 
 // ---------------- Types ----------------
 
@@ -39,12 +40,6 @@ export type CompleteSignupResponse = {
   error: string | null;
   isVerified?: VerificationStatus;
 };
-
-enum VerificationStatus {
-  NOT_VERIFIED = "NOT_VERIFIED",
-  PENDING = "PENDING",
-  VERIFIED = "VERIFIED"
-}
 
 // ----------------------
 // STEP 1: START SIGNUP (SEND OTP)

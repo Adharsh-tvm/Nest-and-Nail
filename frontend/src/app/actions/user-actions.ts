@@ -2,7 +2,8 @@
 "use server";
 import { cookies } from "next/headers";
 import userApi from "@/services/api/user.api";
-import { VerificationStatus } from "@/enums/enums";
+import { VerificationStatus } from "@/shared/enums/authEnums";
+ 
 
 function normalizeVerification(value: any): VerificationStatus {
   if (value === true || value === 1 || value === "1" || value === "VERIFIED" || value === "verified") {

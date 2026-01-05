@@ -29,7 +29,7 @@ import {
   updateUserProfileAction,
   uploadDocumentAction,
 } from "@/app/actions/user-profile-actions";
-import { VerificationStatus } from "@/enums/enums";
+import { VerificationStatus } from "@/shared/enums/authEnums";
 
 type ErrorState = {
   skills?: string;

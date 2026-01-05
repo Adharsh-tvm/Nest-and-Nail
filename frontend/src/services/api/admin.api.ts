@@ -1,7 +1,7 @@
 "use server";
 
 import axiosInstance from "@/lib/axiosInstance";
-import { VerificationStatus } from "@/enums/enums";
+import { VerificationStatus } from "@/shared/enums/authEnums"; 
 import { User } from "@/store/userStore";
 
 /* ---------------- TYPES ---------------- */

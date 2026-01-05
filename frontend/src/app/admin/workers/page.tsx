@@ -27,7 +27,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { useWorkers } from "@/hooks/useWorkers";
-import { VerificationStatus } from "@/enums/enums";
+import { VerificationStatus } from "@/shared/enums/authEnums"; 
 
 // --- Types ---
 
