@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { HttpStatusCode } from "../enums/httpCodes";
+import { HttpStatusCode } from "../../shared/enums/httpCodes";
 import { IUploadProfilePictureUseCase } from "../../application/interfaces/IUploadProfilePictureUseCase";
 import { IUploadWorkerDocumentUseCase } from "../../application/interfaces/IUploadWorkerDocumentUseCase";
 import { IUploadController } from "../interfaces/IUploadController";

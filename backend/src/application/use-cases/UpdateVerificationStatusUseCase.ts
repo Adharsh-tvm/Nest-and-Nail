@@ -1,15 +1,15 @@
 import { IUpdateVerificationStatusUseCase } from "../interfaces/IUpdateVerificationStatusUseCase";
-import { VerificationStatus } from "../../domain/enums/enums";
+import { VerificationStatus } from "../../shared/enums/authEnums";
 import { UserMapper } from "../mappers/UserMapper";
 import { ILogger } from "../interfaces/ILogger";
-import { Role } from "../../domain/enums/enums";
+import { Role } from "../../shared/enums/authEnums";
 import { IUserRepositoryFactory } from "../../domain/repositories/IUserRepositoryFactory";
 
 export class UpdateVerificationStatusUseCase implements IUpdateVerificationStatusUseCase {
     constructor(
         private readonly _repoFactory: IUserRepositoryFactory,
         private readonly _logger: ILogger
-    ) {}
+    ) { }
 
     async execute(userId: string, status: VerificationStatus) {
         this._logger.info(`Updating verification status for user ${userId} → ${status}`);

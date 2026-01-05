@@ -1,5 +1,5 @@
 import { UserAlreadyExistsError } from "../../domain/errors/DomainError";
-import { LoginMethod } from "../../domain/enums/enums";
+import { LoginMethod } from "../../shared/enums/authEnums";
 import { UserRequestDTO, UserResponseDTO } from "../dtos/UserDTO";
 import { ILogger } from "../interfaces/ILogger";
 import { IRegisterUserUseCase } from "../interfaces/IRegisterUserUseCase";

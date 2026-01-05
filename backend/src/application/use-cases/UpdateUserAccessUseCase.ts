@@ -1,6 +1,6 @@
 import { UserMapper } from "../mappers/UserMapper";
 import { ILogger } from "../interfaces/ILogger";
-import { Role } from "../../domain/enums/enums";
+import { Role } from "../../shared/enums/authEnums";
 import { IUpdateUserAccessUseCase } from "../interfaces/IUpdateUserAccessUseCase";
 import { IUserRepositoryFactory } from "../../domain/repositories/IUserRepositoryFactory";
 

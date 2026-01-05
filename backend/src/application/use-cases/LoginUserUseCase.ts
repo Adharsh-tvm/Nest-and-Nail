@@ -5,7 +5,7 @@ import { ILoginUserUseCase } from "../interfaces/ILoginUserUseCase";
 import { UserMapper } from "../mappers/UserMapper";
 import { IPasswordHasher } from "../services/IPasswordHasher";
 import { ITokenService } from "../services/ITokenService";
-import { Role } from "../../domain/enums/enums";
+import { Role } from "../../shared/enums/authEnums";
 import { User } from "../../domain/entities/User";
 import { IUserRepositoryFactory } from "../../domain/repositories/IUserRepositoryFactory";
 

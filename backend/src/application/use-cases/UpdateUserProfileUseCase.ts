@@ -1,5 +1,5 @@
 import { ILogger } from "../interfaces/ILogger";
-import { Role } from "../../domain/enums/enums";
+import { Role } from "../../shared/enums/authEnums";
 import { IUpdateUserProfileUseCase } from "../interfaces/IUpdateUserProfileUseCase";
 import { UserResponseDTO } from "../dtos/UserDTO";
 import { UserMapper } from "../mappers/UserMapper";

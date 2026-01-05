@@ -1,4 +1,4 @@
-import { JwtPayload } from "../types/JwtPayload";
+import { JwtPayload } from "../../shared/types/JwtPayload";
 
 export interface ITokenService {
   generateAccessToken(payload: JwtPayload): string;

@@ -1,7 +1,7 @@
 import { IOtpRepository } from "../../domain/repositories/IOtpRepository";
 import { ILogger } from "../interfaces/ILogger";
 import { IPasswordHasher } from "../services/IPasswordHasher";
-import { Role } from "../../domain/enums/enums";
+import { Role } from "../../shared/enums/authEnums";
 import { IResetPasswordUseCase } from "../interfaces/IResetPasswordUseCase";
 import { IUserRepositoryFactory } from "../../domain/repositories/IUserRepositoryFactory";
 

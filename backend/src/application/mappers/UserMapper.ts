@@ -1,5 +1,5 @@
 import { User } from "../../domain/entities/User";
-import { LoginMethod, VerificationStatus } from "../../domain/enums/enums";
+import { LoginMethod, VerificationStatus } from "../../shared/enums/authEnums";
 import { UserRequestDTO, UserResponseDTO } from "../dtos/UserDTO";
 
 export class UserMapper {

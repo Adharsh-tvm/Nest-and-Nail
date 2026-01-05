@@ -1,4 +1,4 @@
-import { Role } from "../../domain/enums/enums";
+import { Role } from "../../shared/enums/authEnums";
 
 export interface IGoogleSignUpUseCase {
     execute(

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { IGoogleSignUpUseCase } from "../../application/interfaces/IGoogleSignUpUseCase";
-import { HttpStatusCode } from "../enums/httpCodes";
+import { HttpStatusCode } from "../../shared/enums/httpCodes";
 import { IGoogleAuthController } from "../interfaces/IGoogleAuthController";
 
 export class GoogleAuthController implements IGoogleAuthController {

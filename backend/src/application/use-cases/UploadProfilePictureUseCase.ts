@@ -1,5 +1,5 @@
 import { ILogger } from "../interfaces/ILogger";
-import { Role } from "../../domain/enums/enums";
+import { Role } from "../../shared/enums/authEnums";
 import { CloudinaryUploadService } from "../../infrastructure/services/CloudinaryUploadService";
 import { IUploadProfilePictureUseCase } from "../interfaces/IUploadProfilePictureUseCase";
 import { IUserRepositoryFactory } from "../../domain/repositories/IUserRepositoryFactory";

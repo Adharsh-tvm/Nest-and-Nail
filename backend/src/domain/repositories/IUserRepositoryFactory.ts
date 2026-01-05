@@ -1,4 +1,4 @@
-import { Role } from "../enums/enums";
+import { Role } from "../../shared/enums/authEnums";
 import { IBaseRepository } from "../repositories/IBaseRepository";
 import { User } from "../entities/User";
 
