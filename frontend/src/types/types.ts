@@ -7,7 +7,7 @@ export type PendingVerificationUser = {
   email: string;
   role: string;
   isBlocked: boolean;
-  isVerified: "NOT_VERIFIED" | "PENDING" | "VERIFIED"; 
+  isVerified: VerificationStatus;
   profilePictureUrl?: string;
   skills: string[];
   address?: string;
