@@ -13,7 +13,7 @@ import {
   Unlock,
   Shield,
   TrendingUp,
-  Users
+  Users,
 } from "lucide-react";
 
 import DataTable from "@/app/components/containers/DataTable";
@@ -80,8 +80,9 @@ const ActionMenu = ({
                 setIsOpen(false);
                 onBlockToggle(row);
               }}
-              className={`w-full text-left px-4 py-3 text-sm flex items-center gap-3 hover:bg-gray-50 transition-colors ${row.isBlocked ? "text-emerald-600" : "text-amber-600"
-                }`}
+              className={`w-full text-left px-4 py-3 text-sm flex items-center gap-3 hover:bg-gray-50 transition-colors ${
+                row.isBlocked ? "text-emerald-600" : "text-amber-600"
+              }`}
             >
               {row.isBlocked ? (
                 <>
@@ -115,8 +116,10 @@ const UsersView = () => {
 
   // Derive stats
   const totalUsers = localUsers.length;
-  const verifiedUsers = localUsers.filter(u => u.isVerified === VerificationStatus.VERIFIED).length;
-  const blockedUsers = localUsers.filter(u => u.isBlocked).length;
+  const verifiedUsers = localUsers.filter(
+    (u) => u.isVerified === VerificationStatus.VERIFIED
+  ).length;
+  const blockedUsers = localUsers.filter((u) => u.isBlocked).length;
 
   async function handleBlockToggle(row: any) {
     try {
@@ -153,7 +156,11 @@ const UsersView = () => {
           <div className="relative">
             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-50 to-emerald-100 flex items-center justify-center text-[#1B4332] font-bold text-lg shadow-sm border border-emerald-100/50 overflow-hidden">
               {row.profileImageUrl ? (
-                <img src={row.profileImageUrl} alt={row.name} className="w-full h-full object-cover" />
+                <img
+                  src={row.profileImageUrl}
+                  alt={row.name}
+                  className="w-full h-full object-cover"
+                />
               ) : (
                 row.name?.charAt(0) || <User size={20} />
               )}
@@ -165,8 +172,12 @@ const UsersView = () => {
             )}
           </div>
           <div>
-            <div className="font-bold text-gray-900 text-base">{row.name || "Unknown"}</div>
-            <div className="text-xs text-gray-400 font-mono mt-0.5">ID: {row.id?.toString().slice(0, 8)}...</div>
+            <div className="font-bold text-gray-900 text-base">
+              {row.name || "Unknown"}
+            </div>
+            <div className="text-xs text-gray-400 font-mono mt-0.5">
+              ID: {row.id?.toString().slice(0, 8)}...
+            </div>
           </div>
         </div>
       ),
@@ -260,13 +271,21 @@ const UsersView = () => {
   const StatCard = ({ title, value, icon: Icon, color, trend }: any) => (
     <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between group hover:shadow-md transition-all">
       <div>
-        <p className="text-gray-500 text-xs font-bold uppercase tracking-wider mb-1">{title}</p>
-        <h3 className="text-2xl font-black text-gray-900 group-hover:text-[#1B4332] transition-colors">{value}</h3>
-        {trend && <p className="text-green-600 text-xs font-bold flex items-center gap-1 mt-2">
-          <TrendingUp size={12} /> {trend}
-        </p>}
+        <p className="text-gray-500 text-xs font-bold uppercase tracking-wider mb-1">
+          {title}
+        </p>
+        <h3 className="text-2xl font-black text-gray-900 group-hover:text-[#1B4332] transition-colors">
+          {value}
+        </h3>
+        {trend && (
+          <p className="text-green-600 text-xs font-bold flex items-center gap-1 mt-2">
+            <TrendingUp size={12} /> {trend}
+          </p>
+        )}
       </div>
-      <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${color} group-hover:scale-110 transition-transform`}>
+      <div
+        className={`w-12 h-12 rounded-xl flex items-center justify-center ${color} group-hover:scale-110 transition-transform`}
+      >
         <Icon size={24} />
       </div>
     </div>
@@ -288,7 +307,6 @@ const UsersView = () => {
           value={verifiedUsers}
           icon={BadgeCheck}
           color="bg-blue-50 text-blue-600"
-
         />
         <StatCard
           title="Active Now"
@@ -312,12 +330,6 @@ const UsersView = () => {
           data={localUsers}
           isLoading={loading}
           searchPlaceholder="Search by name, email or role..."
-          actions={
-            <button className="px-4 py-2.5 bg-[#1B4332] text-white text-sm font-bold rounded-xl shadow-lg shadow-[#1B4332]/20 hover:bg-[#153426] transition-all flex items-center gap-2">
-              <Users size={16} />
-              <span>Add User</span>
-            </button>
-          }
         />
       </div>
     </div>
