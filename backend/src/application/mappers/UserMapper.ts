@@ -33,7 +33,7 @@ export class UserMapper {
             isVerified: userData.isVerified ?? VerificationStatus.NOT_VERIFIED,
 
             skills: userData.skills ?? [],
-            address: userData.address ?? "",
+            address: userData.address ?? [],
 
             documents: userData.documents ?? [],
             certificates: userData.certificates ?? [],

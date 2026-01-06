@@ -19,7 +19,7 @@ export interface UserResponseDTO {
     isVerified: VerificationStatus;
 
     skills?: string[];
-    address?: string;
+    address?: string[];
     documents?: string[];
     certificates?: string[];
     workPhotos?: string[];

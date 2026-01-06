@@ -74,6 +74,8 @@ import { IOtpService } from "../../application/services/IOtpService";
 import { IEmailService } from "../../application/services/IEmailService";
 import { IAdminRepository } from "../../domain/repositories/IAdminRepository";
 import { AdminRepository } from "../repo/AdminRepository";
+import { IRefreshTokenUseCase } from "../../application/interfaces/IRefreshTokenUseCase";
+import { RefreshTokenUseCase } from "../../application/use-cases/RefreshTokenUseCase";
 
 export class DIContainer {
   // -------------------------
@@ -112,6 +114,8 @@ export class DIContainer {
 
   private _forgotpasswordUseCase?: IForgotPasswordUseCase;
   private _resetPasswordUseCase?: IResetPasswordUseCase;
+
+  private _refreshTokenUseCase?: IRefreshTokenUseCase;
 
   private _changeUserRoleuseCase?: IChangeUserRoleUseCase;
   private _updateUserAccessUseCase?: IUpdateUserAccessUseCase;
@@ -301,6 +305,15 @@ export class DIContainer {
     return this._verifyOtpUseCase;
   }
 
+
+  get refreshTokenUseCase(): IRefreshTokenUseCase {
+    if(!this._refreshTokenUseCase) {
+      this._refreshTokenUseCase = new RefreshTokenUseCase(
+        this.tokenService);
+    }
+    return this._refreshTokenUseCase
+  }
+
   get forgotPasswordUseCase(): IForgotPasswordUseCase {
     if (!this._forgotpasswordUseCase) {
       this._forgotpasswordUseCase = new ForgotPasswordUseCase(
@@ -416,8 +429,10 @@ export class DIContainer {
         this.loginUserUseCase,
         this.sendOtpUseCase,
         this.verifyOtpUseCase,
+        this.refreshTokenUseCase,
         this.forgotPasswordUseCase,
-        this.resetPasswordUseCase);
+        this.resetPasswordUseCase
+      );
     }
     return this._authController;
   }
