@@ -369,9 +369,9 @@ const AddressesView: React.FC<ViewProps> = ({ user }) => {
         </button>
       </div>
       <div className="grid md:grid-cols-2 gap-6">
-        {user.address?.map((addr) => (
+        {user.address?.map((addr, index) => (
           <div
-            key={addr.id}
+            key={typeof addr === "string" ? `${addr}-${index}` : addr.id}
             className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:border-[#1B4332] transition-colors group"
           >
             <div className="flex justify-between items-start mb-4">
