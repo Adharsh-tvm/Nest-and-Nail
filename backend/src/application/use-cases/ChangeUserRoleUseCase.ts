@@ -35,7 +35,6 @@ export class ChangeUserRoleUseCase implements IChangeUserRoleUseCase {
 
         const raw = user as any;
 
-        // no-op if same role
         if (currentRole === newRole) {
             const response = UserMapper.toResponseDTO(user);
 

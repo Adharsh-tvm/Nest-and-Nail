@@ -24,6 +24,7 @@ import {
   approveUserAction,
   rejectUserAction,
 } from "@/app/actions/admin-actions";
+import { VerificationStatus } from "@/shared/enums/authEnums";
 
 /* ---------------------------------------------------------------------------
  * TABLE TYPES
@@ -75,11 +76,10 @@ const VerificationModal: React.FC<VerificationModalProps> = ({
     ? new Date(request.createdAt).toLocaleString()
     : "—";
 
-const documents = request.documents ?? [];
-const idFront = documents[0];
-const idBack = documents[1];
-const extraDocs = documents.slice(2);
-
+  const documents = request.documents ?? [];
+  const idFront = documents[0];
+  const idBack = documents[1];
+  const extraDocs = documents.slice(2);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
@@ -330,32 +330,42 @@ const VerificationsPendingView: React.FC = () => {
     PendingVerificationUser[]
   >([]);
 
-  useEffect(() => {
-    if (!loading && users && Array.isArray(users)) {
-      const pending = users
-        .filter((u) => u.isVerified === "PENDING")
-        .map((u) => ({
-          _id: u.user_id,
-          userId: u.user_id,
-          name: u.user_name,
-          email: u.email_address,
-          role: u.user_role,
-          isBlocked: u.isBlocked,
-          isVerified: u.isVerified,
-          profilePictureUrl: u.profileImageUrl,
-          skills: u.skills ?? [],
-          address: u.address ?? "",
-          phone: u.phone_number?.toString(),
-          documents: u.documents ?? [],
-          certificates: u.certificates ?? [],
-          workPhotos: u.workPhotos ?? [],
-          createdAt: u.createdAt,
-          updatedAt: u.updatedAt,
-        }));
+useEffect(() => {
+  if (!loading && Array.isArray(users)) {
+    const pending: PendingVerificationUser[] = users
+      .filter((u) => u.isVerified === VerificationStatus.PENDING)
+      .map((u) => ({
+        _id: u.id,
+        userId: u.id,
 
-      setPendingRequests(pending);
-    }
-  }, [users, loading]);
+        name: u.name,
+        email: u.email,
+        role: u.role,
+
+        isBlocked: u.isBlocked ?? false,
+        isVerified: u.isVerified,
+
+        profilePictureUrl: u.profileImageUrl ?? undefined,
+
+        skills: u.skills ?? [],
+        documents: u.documents ?? [],
+        certificates: u.certificates ?? [],
+        workPhotos: u.workPhotos ?? [],
+
+        address: Array.isArray(u.address)
+          ? u.address.map(a => a.street).join(", ")
+          : undefined,
+
+        phone: u.phone_number?.toString(),
+
+        createdAt: u.createdAt ?? "",
+        updatedAt: u.updatedAt ?? "",
+      }));
+
+    setPendingRequests(pending);
+  }
+}, [users, loading]);
+
 
   console.log("pendingRequests", pendingRequests);
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { getAllUsers } from "@/app/actions/admin-actions";
-import { User } from "@/store/userStore";
+import { User } from "@/shared/types/userTypes"; 
 import { useEffect, useState } from "react";
 
 export type UseUsersResult = {
