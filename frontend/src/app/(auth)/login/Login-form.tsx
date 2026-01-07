@@ -162,19 +162,22 @@ const ForgotPasswordDialog = ({
     onClose();
   };
 
+  const dialogInputClass = "w-full pl-9 pr-4 py-3 bg-gray-50 border border-gray-200 text-gray-900 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#DC2626] focus:ring-offset-2 focus:ring-offset-white transition-all";
+  const dialogButtonClass = "w-full py-3 px-4 bg-[#DC2626] text-white hover:bg-[#b91c1c] font-bold rounded-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-red-500/30 transition-all hover:-translate-y-0.5";
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
       onClick={handleClose}
     >
       <div
-        className="relative w-full max-w-md bg-zinc-950 border border-zinc-800 rounded-xl shadow-2xl p-6 space-y-6 animate-in zoom-in-95 duration-200"
+        className="relative w-full max-w-md bg-white border border-gray-100 rounded-2xl shadow-2xl p-8 space-y-6 animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
         <button
           onClick={handleClose}
-          className="absolute right-4 top-4 text-zinc-500 hover:text-zinc-200 transition-colors"
+          className="absolute right-4 top-4 text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-full hover:bg-gray-100"
         >
           <X className="h-5 w-5" />
         </button>
@@ -183,7 +186,7 @@ const ForgotPasswordDialog = ({
         {step !== "EMAIL" && step !== "SUCCESS" && (
           <button
             onClick={() => setStep(step === "NEW_PASSWORD" ? "OTP" : "EMAIL")}
-            className="absolute left-4 top-4 text-zinc-500 hover:text-zinc-200 transition-colors flex items-center text-xs uppercase font-bold tracking-wider"
+            className="absolute left-6 top-6 text-gray-500 hover:text-[#DC2626] transition-colors flex items-center text-xs uppercase font-bold tracking-wider"
           >
             <ChevronLeft className="h-4 w-4 mr-1" /> Back
           </button>
@@ -191,36 +194,39 @@ const ForgotPasswordDialog = ({
 
         {/* --- STEP 1: ENTER EMAIL --- */}
         {step === "EMAIL" && (
-          <div className="space-y-4">
+          <div className="space-y-6 pt-2">
             <div className="text-center space-y-2">
-              <h2 className="text-xl font-semibold text-white">
+              <div className="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4 text-[#DC2626]">
+                <KeyRound size={24} />
+              </div>
+              <h2 className="text-2xl font-bold text-[#0f291e]">
                 Reset Password
               </h2>
-              <p className="text-sm text-zinc-400">
+              <p className="text-sm text-gray-500">
                 Enter your email to receive a verification code.
               </p>
             </div>
             <form onSubmit={handleSendOtp} className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-zinc-400">
-                  Email
+                <label className="text-sm font-bold text-gray-700">
+                  Email Address
                 </label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <input
                     type="email"
                     // required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@example.com"
-                    className="w-full pl-9 pr-4 py-2.5 bg-zinc-900 border border-zinc-800 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-zinc-500 focus:ring-offset-2 focus:ring-offset-black"
+                    className={dialogInputClass}
                   />
                 </div>
               </div>
               <button
                 type="submit"
                 disabled={isLoading || !email}
-                className="w-full py-2.5 px-4 bg-zinc-100 text-zinc-900 hover:bg-zinc-200 font-semibold rounded-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className={dialogButtonClass}
               >
                 {isLoading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -234,36 +240,36 @@ const ForgotPasswordDialog = ({
 
         {/* --- STEP 2: ENTER OTP --- */}
         {step === "OTP" && (
-          <div className="space-y-4">
+          <div className="space-y-6 pt-2">
             <div className="text-center space-y-2">
-              <h2 className="text-xl font-semibold text-white">Enter Code</h2>
-              <p className="text-sm text-zinc-400">
-                We sent a code to <span className="text-zinc-200">{email}</span>
+              <h2 className="text-2xl font-bold text-[#0f291e]">Enter Code</h2>
+              <p className="text-sm text-gray-500">
+                We sent a code to <span className="text-gray-900 font-medium">{email}</span>
               </p>
             </div>
             <form onSubmit={handleVerifyOtp} className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-zinc-400">
+                <label className="text-sm font-bold text-gray-700">
                   Verification Code
                 </label>
                 <div className="relative">
-                  <MessageSquare className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                  <MessageSquare className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <input
                     type="text"
                     // required
                     value={otp}
                     onChange={(e) => setOtp(e.target.value)}
                     placeholder="123456"
-                    className="w-full pl-9 pr-4 py-2.5 bg-zinc-900 border border-zinc-800 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-zinc-500 focus:ring-offset-2 focus:ring-offset-black tracking-widest"
+                    className={`${dialogInputClass} tracking-widest font-mono`}
                   />
                 </div>
               </div>
-              {error && <p className="text-xs text-red-400">{error}</p>}
-              <div className="flex items-center gap-2">
+              {error && <p className="text-xs text-red-500 font-medium bg-red-50 p-2 rounded">{error}</p>}
+              <div className="flex gap-3">
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="flex-1 py-2.5 px-4 bg-zinc-100 text-zinc-900 hover:bg-zinc-200 font-semibold rounded-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className={`${dialogButtonClass} flex-1`}
                 >
                   {isLoading ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -271,16 +277,17 @@ const ForgotPasswordDialog = ({
                     "Verify Code"
                   )}
                 </button>
-
+              </div>
+              <div className="text-center">
                 <button
                   type="button"
                   onClick={handleResend}
                   disabled={isLoading || resendCooldown > 0}
-                  className="px-3 py-2 text-sm rounded-lg border border-zinc-800 text-zinc-400 hover:text-zinc-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="text-sm text-gray-500 hover:text-[#DC2626] font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {resendCooldown > 0
-                    ? `Resend (${resendCooldown}s)`
-                    : "Resend"}
+                    ? `Resend code in ${resendCooldown}s`
+                    : "Resend Code"}
                 </button>
               </div>
             </form>
@@ -289,51 +296,51 @@ const ForgotPasswordDialog = ({
 
         {/* --- STEP 3: NEW PASSWORD --- */}
         {step === "NEW_PASSWORD" && (
-          <div className="space-y-4">
+          <div className="space-y-6 pt-2">
             <div className="text-center space-y-2">
-              <h2 className="text-xl font-semibold text-white">New Password</h2>
-              <p className="text-sm text-zinc-400">
+              <h2 className="text-2xl font-bold text-[#0f291e]">New Password</h2>
+              <p className="text-sm text-gray-500">
                 Create a strong password for your account.
               </p>
             </div>
             <form onSubmit={handleResetPassword} className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-zinc-400">
+                <label className="text-sm font-bold text-gray-700">
                   New Password
                 </label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <input
                     type="password"
                     // required
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full pl-9 pr-4 py-2.5 bg-zinc-900 border border-zinc-800 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-zinc-500 focus:ring-offset-2 focus:ring-offset-black"
+                    className={dialogInputClass}
                   />
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-zinc-400">
+                <label className="text-sm font-bold text-gray-700">
                   Confirm Password
                 </label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <input
                     type="password"
                     // required
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full pl-9 pr-4 py-2.5 bg-zinc-900 border border-zinc-800 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-zinc-500 focus:ring-offset-2 focus:ring-offset-black"
+                    className={dialogInputClass}
                   />
                 </div>
               </div>
-              {error && <p className="text-xs text-red-400">{error}</p>}
+              {error && <p className="text-xs text-red-500 font-medium bg-red-50 p-2 rounded">{error}</p>}
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full py-2.5 px-4 bg-zinc-100 text-zinc-900 hover:bg-zinc-200 font-semibold rounded-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className={dialogButtonClass}
               >
                 {isLoading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -349,20 +356,20 @@ const ForgotPasswordDialog = ({
 
         {/* --- STEP 4: SUCCESS --- */}
         {step === "SUCCESS" && (
-          <div className="flex flex-col items-center justify-center space-y-4 py-4 animate-in fade-in zoom-in duration-300">
-            <div className="h-16 w-16 rounded-full bg-green-500/10 flex items-center justify-center text-green-500">
-              <CheckCircle2 className="h-8 w-8" />
+          <div className="flex flex-col items-center justify-center space-y-4 py-6 animate-in fade-in zoom-in duration-300">
+            <div className="h-20 w-20 rounded-full bg-green-50 flex items-center justify-center text-green-600 mb-2">
+              <CheckCircle2 className="h-10 w-10" />
             </div>
-            <h2 className="text-xl font-semibold text-white">
+            <h2 className="text-2xl font-bold text-[#0f291e]">
               Password Changed
             </h2>
-            <p className="text-sm text-zinc-400 text-center max-w-[260px]">
+            <p className="text-sm text-gray-500 text-center max-w-[260px]">
               Your password has been updated successfully. You can now login
               with your new credentials.
             </p>
             <button
               onClick={handleClose}
-              className="mt-4 w-full py-2.5 px-4 bg-zinc-100 text-zinc-900 hover:bg-zinc-200 font-semibold rounded-lg"
+              className="mt-6 w-full py-3 px-4 bg-gray-100 text-gray-900 hover:bg-gray-200 font-bold rounded-lg transition-colors border border-gray-200"
             >
               Back to Login
             </button>
@@ -373,15 +380,15 @@ const ForgotPasswordDialog = ({
   );
 };
 
-// --- Main Login Form Component (Unchanged mostly) ---
+// --- Main Login Form Component ---
 export const LoginForm = () => {
   const router = useRouter();
   const [state, formAction, pending] = useActionState(login, initialState);
   const [isForgotOpen, setIsForgotOpen] = useState(false);
 
-  const focusRingClass = "focus:ring-zinc-500";
-  const buttonClass = "bg-zinc-100 text-zinc-900 hover:bg-zinc-200";
-  const linkClass = "text-zinc-400 hover:text-zinc-200";
+  const focusRingClass = "focus:ring-[#DC2626]";
+  const buttonClass = "bg-[#DC2626] text-white hover:bg-[#b91c1c] shadow-lg shadow-red-500/20";
+  const linkClass = "text-gray-500 hover:text-[#DC2626]";
 
   async function onGoogleSuccess(credentialResponse: any) {
     const token = credentialResponse.credential;
@@ -416,17 +423,17 @@ export const LoginForm = () => {
 
   return (
     <>
-      <div className="px-6 pb-6">
-        <form action={formAction} className="space-y-4">
+      <div className="px-8 pb-8">
+        <form action={formAction} className="space-y-5">
           <div className="space-y-2">
             <label
               htmlFor="email"
-              className="text-sm font-medium text-zinc-400"
+              className="text-sm font-bold text-gray-700"
             >
-              Email
+              Email Address
             </label>
             <div className="relative">
-              <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+              <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
               <input
                 id="email"
                 name="email"
@@ -435,7 +442,7 @@ export const LoginForm = () => {
                 disabled={pending}
                 defaultValue={state.fields?.email ?? ""}
                 placeholder="you@example.com"
-                className={`w-full pl-9 pr-4 py-2 bg-zinc-900 border border-zinc-800 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black disabled:opacity-50 disabled:cursor-not-allowed ${focusRingClass}`}
+                className={`w-full pl-9 pr-4 py-3 bg-gray-50 border border-gray-200 text-gray-900 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white disabled:opacity-50 disabled:cursor-not-allowed transition-all ${focusRingClass}`}
               />
             </div>
           </div>
@@ -443,12 +450,12 @@ export const LoginForm = () => {
           <div className="space-y-2">
             <label
               htmlFor="password"
-              className="text-sm font-medium text-zinc-400"
+              className="text-sm font-bold text-gray-700"
             >
               Password
             </label>
             <div className="relative">
-              <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+              <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
               <input
                 id="password"
                 name="password"
@@ -456,27 +463,25 @@ export const LoginForm = () => {
                 // required
                 disabled={pending}
                 placeholder="••••••••"
-                className={`w-full pl-9 pr-4 py-2 bg-zinc-900 border border-zinc-800 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black disabled:opacity-50 disabled:cursor-not-allowed ${focusRingClass}`}
+                className={`w-full pl-9 pr-4 py-3 bg-gray-50 border border-gray-200 text-gray-900 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white disabled:opacity-50 disabled:cursor-not-allowed transition-all ${focusRingClass}`}
               />
             </div>
           </div>
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <button
-                type="button"
-                onClick={() => setIsForgotOpen(true)}
-                className={`text-sm font-medium ${linkClass} focus:outline-none hover:underline`}
-              >
-                Forgot password?
-              </button>
-            </div>
+          <div className="flex items-center justify-end">
+            <button
+              type="button"
+              onClick={() => setIsForgotOpen(true)}
+              className={`text-sm font-semibold ${linkClass} focus:outline-none hover:underline transition-colors`}
+            >
+              Forgot password?
+            </button>
           </div>
 
           <button
             type="submit"
             disabled={pending}
-            className={`w-full py-2.5 px-4 font-semibold rounded-lg transition-transform transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none ${buttonClass} ${focusRingClass}`}
+            className={`w-full py-3 px-4 font-bold rounded-lg transition-all transform hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none ${buttonClass} ${focusRingClass}`}
           >
             {pending ? (
               <span className="flex items-center justify-center gap-2">
@@ -489,16 +494,24 @@ export const LoginForm = () => {
           </button>
         </form>
 
-        <div className="relative my-6">
-          <div className="absolute inset-0 flex items-center"></div>
+        <div className="relative my-8">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-200"></div>
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="px-2 bg-white text-gray-400 font-medium">
+              Or continue with
+            </span>
+          </div>
         </div>
 
         <GoogleLogin
           onSuccess={onGoogleSuccess}
           useOneTap
-          theme="filled_black"
+          theme="outline"
           shape="circle"
           width="330"
+          locale="en"
         />
       </div>
 
