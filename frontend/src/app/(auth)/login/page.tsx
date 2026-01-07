@@ -1,26 +1,26 @@
-import { LogIn } from "lucide-react";
+import { GalleryVerticalEnd } from "lucide-react";
 import { LoginForm } from "./Login-form";
 
 const LoginPage = async () => {
 
 
 
-  const linkClass = "text-zinc-400 hover:text-zinc-200";
+  const linkClass = "text-gray-500 hover:text-[#DC2626] transition-colors";
 
   return (
-    <main className="flex items-center justify-center min-h-screen bg-black font-sans p-4">
+    <main className="flex items-center justify-center min-h-screen bg-gray-50 font-sans p-4">
       <div className="w-full max-w-sm">
         {/* Card Container */}
-        <div className="bg-zinc-950 border border-zinc-800 rounded-xl shadow-2xl">
+        <div className="bg-white border-t-4 border-t-[#DC2626] rounded-2xl shadow-xl overflow-hidden">
           {/* Card Header */}
-          <div className="p-6 text-center">
-            <div className="flex justify-center mb-4">
-              <div className="p-3 bg-zinc-900 border border-zinc-800 rounded-full">
-                <LogIn className="h-6 w-6 text-zinc-400" />
+          <div className="p-8 pb-0 text-center">
+            <div className="flex justify-center mb-6">
+              <div className="p-3 bg-[#0f291e] text-white rounded-xl shadow-md">
+                <GalleryVerticalEnd className="h-6 w-6" />
               </div>
             </div>
-            <h1 className="text-2xl font-bold text-white">Welcome Back</h1>
-            <p className="text-sm text-zinc-500 mt-1">
+            <h1 className="text-2xl font-bold text-[#0f291e]">Welcome Back</h1>
+            <p className="text-sm text-gray-500 mt-2">
               Sign in to your account to continue.
             </p>
           </div>
@@ -29,19 +29,13 @@ const LoginPage = async () => {
           <LoginForm />
 
           {/* Card Footer */}
-          <div className="p-6 border-t border-zinc-800 text-center text-sm">
-            <p className="text-zinc-500 mb-2">Don't have an account?</p>
+          <div className="p-6 pt-2 text-center text-sm bg-gray-50/50">
+            <p className="text-gray-500 mb-2">Don't have an account?</p>
 
             <div className="flex justify-center items-center gap-2">
-              <a href="/signup" className={`font-medium ${linkClass}`}>
+              <a href="/signup" className={`font-bold ${linkClass}`}>
                 Sign up here
               </a>
-
-              
-
-              {/* <a href="/signup/worker" className={`font-medium ${linkClass}`}>
-                Sign up as Worker
-              </a> */}
             </div>
           </div>
         </div>
