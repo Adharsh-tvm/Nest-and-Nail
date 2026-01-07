@@ -162,8 +162,8 @@ const ForgotPasswordDialog = ({
     onClose();
   };
 
-  const dialogInputClass = "w-full pl-9 pr-4 py-3 bg-gray-50 border border-gray-200 text-gray-900 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#DC2626] focus:ring-offset-2 focus:ring-offset-white transition-all";
-  const dialogButtonClass = "w-full py-3 px-4 bg-[#DC2626] text-white hover:bg-[#b91c1c] font-bold rounded-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-red-500/30 transition-all hover:-translate-y-0.5";
+  const dialogInputClass = "w-full pl-9 pr-4 py-3 bg-gray-50 border border-gray-200 text-gray-900 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0f291e] focus:ring-offset-2 focus:ring-offset-white transition-all";
+  const dialogButtonClass = "w-full py-3 px-4 bg-[#0f291e] text-white hover:bg-[#1B4332] font-bold rounded-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-green-900/20 transition-all hover:-translate-y-0.5";
 
   return (
     <div
@@ -386,8 +386,8 @@ export const LoginForm = () => {
   const [state, formAction, pending] = useActionState(login, initialState);
   const [isForgotOpen, setIsForgotOpen] = useState(false);
 
-  const focusRingClass = "focus:ring-[#DC2626]";
-  const buttonClass = "bg-[#DC2626] text-white hover:bg-[#b91c1c] shadow-lg shadow-red-500/20";
+  const focusRingClass = "focus:ring-[#0f291e]";
+  const buttonClass = "bg-[#0f291e] text-white hover:bg-[#1B4332] shadow-lg shadow-green-900/20";
   const linkClass = "text-gray-500 hover:text-[#DC2626]";
 
   async function onGoogleSuccess(credentialResponse: any) {
