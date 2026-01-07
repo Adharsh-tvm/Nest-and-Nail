@@ -226,42 +226,42 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
     passwordCaptureRef.current = "";
   };
 
-  const inputClass = `w-full pl-9 pr-4 py-3 bg-gray-50 border border-gray-200 text-gray-900 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white disabled:opacity-50 disabled:cursor-not-allowed transition-all ${currentRoleConfig.focusRingClass}`;
+  const inputClass = `w-full pl-9 pr-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white disabled:opacity-50 disabled:cursor-not-allowed transition-all ${currentRoleConfig.focusRingClass}`;
 
   return (
     <>
       {/* <Toaster /> */}
       <div className="w-full max-w-sm">
         <div className="bg-white border-t-4 border-[#DC2626] rounded-2xl shadow-xl overflow-hidden">
-          <div className="p-8 pb-0 text-center">
-            <div className="flex justify-center mb-6">
-              <div className={`p-3 rounded-xl shadow-md border ${currentRoleConfig.badgeClass}`}>
+          <div className="p-6 pb-0 text-center">
+            <div className="flex justify-center mb-4">
+              <div className={`p-2.5 rounded-xl shadow-md border ${currentRoleConfig.badgeClass}`}>
                 {currentRoleConfig.icon}
               </div>
             </div>
-            <h1 className="text-2xl font-bold text-[#0f291e]">
+            <h1 className="text-xl font-bold text-[#0f291e]">
               Create {roleName} Account
             </h1>
-            <p className="text-sm text-gray-500 mt-2">
+            <p className="text-xs text-gray-500 mt-1">
               Join us by filling out the form below.
             </p>
           </div>
 
-          <div className="px-8 pb-8 pt-6">
+          <div className="px-6 pb-6 pt-4">
             <form
               ref={formRef}
               action={formAction}
               onSubmit={handleFormSubmit}
               data-signup-form
-              className="space-y-4"
+              className="space-y-3"
             >
               {/* Hidden field for role */}
               <input type="hidden" name="role" value={role} />
 
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <label
                   htmlFor={`fullName-signup-${role}`}
-                  className="text-sm font-bold text-gray-700"
+                  className="text-xs font-bold text-gray-700"
                 >
                   Full Name
                 </label>
@@ -280,10 +280,10 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <label
                   htmlFor={`email-signup-${role}`}
-                  className="text-sm font-bold text-gray-700"
+                  className="text-xs font-bold text-gray-700"
                 >
                   Email
                 </label>
@@ -302,10 +302,10 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <label
                   htmlFor={`password-signup-${role}`}
-                  className="text-sm font-bold text-gray-700"
+                  className="text-xs font-bold text-gray-700"
                 >
                   Password
                 </label>
@@ -321,15 +321,12 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
                     className={inputClass}
                   />
                 </div>
-                <p className="text-xs text-gray-400 mt-1">
-                  Must be at least 8 characters
-                </p>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <label
                   htmlFor={`confirm-password-signup-${role}`}
-                  className="text-sm font-bold text-gray-700"
+                  className="text-xs font-bold text-gray-700"
                 >
                   Confirm Password
                 </label>
@@ -350,7 +347,7 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
               <button
                 type="submit"
                 disabled={pending}
-                className={`w-full py-3 px-4 font-bold rounded-lg transition-all transform hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none ${currentRoleConfig.buttonClass} ${currentRoleConfig.focusRingClass}`}
+                className={`w-full py-2.5 px-4 font-bold rounded-lg transition-all transform hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none ${currentRoleConfig.buttonClass} ${currentRoleConfig.focusRingClass}`}
               >
                 {pending ? (
                   <span className="flex items-center justify-center gap-2">
@@ -363,18 +360,18 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
               </button>
             </form>
 
-            <div className="relative my-8">
+            <div className="relative my-4">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-200"></div>
               </div>
-              <div className="relative flex justify-center text-sm">
+              <div className="relative flex justify-center text-xs">
                 <span className="px-2 bg-white text-gray-400 font-medium">
                   Or continue with
                 </span>
               </div>
             </div>
 
-            <div className="mt-4">
+            <div className="mt-2">
               <GoogleLogin
                 onSuccess={onGoogleSuccess}
                 useOneTap
@@ -385,7 +382,7 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
             </div>
           </div>
 
-          <div className="p-6 pt-0 pb-8 text-center text-sm bg-white">
+          <div className="p-4 pt-0 pb-6 text-center text-xs bg-white">
             <p className="text-gray-500">
               Already have an account?{" "}
               <a
