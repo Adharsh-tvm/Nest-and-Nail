@@ -1,5 +1,5 @@
 export const RESPONSE_MESSAGES = {
-    
+
   // Generic
   SUCCESS: "Success",
   INTERNAL_SERVER_ERROR: "Internal server error",
@@ -16,6 +16,9 @@ export const RESPONSE_MESSAGES = {
   OTP_VERIFIED: "OTP verified successfully",
   INVALID_CREDENTIALS: "Invalid email or password",
   TOKEN_REFRESH_SUCCESS: "Token refreshed successfully",
+  GOOGLE_AUTH_SUCCESS: "Google user authenticated successfully",
+  GOOGLE_AUTH_FAILED: "Google authentication failed",
+
 
   // Users
   USER_FETCHED: "User fetched successfully",
