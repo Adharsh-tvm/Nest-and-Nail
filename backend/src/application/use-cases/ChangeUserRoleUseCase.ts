@@ -19,6 +19,7 @@ export class ChangeUserRoleUseCase implements IChangeUserRoleUseCase {
         refreshToken: string;
     }> {
         this._logger.info(`[ChangeUserRoleUseCase] User ${userId} switching to ${newRole}`);
+        
 
         const clientRepo = this._repositoryFactory.getRepository(Role.CLIENT);
         const workerRepo = this._repositoryFactory.getRepository(Role.WORKER);

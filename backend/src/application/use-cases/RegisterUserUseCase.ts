@@ -23,8 +23,6 @@ export class RegisterUserUseCase implements IRegisterUserUseCase {
     userData: UserRequestDTO
   ): Promise<{ user: UserResponseDTO; accessToken: string; refreshToken: string }> {
 
-    console.log(userData)
-
     AuthValidator.validateRegistration(userData);
 
     this._logger.info(`[RegisterUserUseCase] Registration attempt for ${userData.email_address} as ${userData.user_role}`);
@@ -38,13 +36,8 @@ export class RegisterUserUseCase implements IRegisterUserUseCase {
     }
 
     this._logger.info(`[RegisterUserUseCase] Hashing password`);
-    console.log(`[RegisterUserUseCase] DEBUG - About to hash password`);
 
     const hashedPassword = await this._passwordHasher.hash(userData.password);
-
-    console.log(`[RegisterUserUseCase] DEBUG - Password hashed successfully`);
-    console.log(`[RegisterUserUseCase] DEBUG - Hashed password: "${hashedPassword}"`);
-    console.log(`[RegisterUserUseCase] DEBUG - Hashed password length: ${hashedPassword.length}`);
 
     const userId = await this._userIdGenerator.create();
 
@@ -64,10 +57,6 @@ export class RegisterUserUseCase implements IRegisterUserUseCase {
       updatedAt: new Date(),
       lastLoginAt: new Date(),
     } as any);
-
-    console.log(`[RegisterUserUseCase] DEBUG - User created in DB`);
-    console.log(`[RegisterUserUseCase] DEBUG - User ID: ${newUser.userId}`);
-    console.log(`[RegisterUserUseCase] DEBUG - Stored hash: "${newUser.passwordhash}"`);
 
     this._logger.info(`[RegisterUserUseCase] User created successfully`);
 

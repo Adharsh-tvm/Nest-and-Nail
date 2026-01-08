@@ -51,20 +51,11 @@ export class AuthController implements IAuthController {
 
       const { accessToken, refreshToken, user } = loginResult;
 
-      console.log("[AuthController] About to set cookies...");
-      console.log(`[AuthController] AccessToken exists: ${!!accessToken}, length: ${accessToken?.length}`);
-      console.log(`[AuthController] RefreshToken exists: ${!!refreshToken}, length: ${refreshToken?.length}`);
-
-
-      console.log("[AuthController] Cookies set, sending response...");
-
       res.status(HttpStatusCode.CREATED).json({
         user,
         accessToken,
         refreshToken
       });
-
-      console.log("[AuthController] Response sent successfully");
 
     } catch (error: any) {
       loggerInstance.error(`[AuthController] Registration error: ${error.message}`);
@@ -93,20 +84,12 @@ export class AuthController implements IAuthController {
 
       const { accessToken, refreshToken, user } = result;
 
-      console.log("[AuthController] About to set cookies...");
-      console.log(`[AuthController] AccessToken exists: ${!!accessToken}, length: ${accessToken?.length}`);
-      console.log(`[AuthController] RefreshToken exists: ${!!refreshToken}, length: ${refreshToken?.length}`);
-
-
-      console.log("[AuthController] Cookies set, sending response...");
 
       res.status(HttpStatusCode.OK).json({
         user,
         accessToken,
         refreshToken
       });
-
-      console.log("[AuthController] Response sent successfully");
 
     } catch (error: any) {
       console.log("here", error.message)
@@ -149,7 +132,6 @@ export class AuthController implements IAuthController {
   };
 
   async logout(req: Request, res: Response): Promise<void> {
-    console.log("[AuthController] Logout - clearing cookies");
     res.clearCookie("accessToken", { path: "/" });
     res.clearCookie("refreshToken", { path: "/" });
     res.status(HttpStatusCode.OK).json({ message: "Logged out successfully" });
@@ -158,7 +140,6 @@ export class AuthController implements IAuthController {
   forgotPassword = async (req: Request, res: Response) => {
     try {
       const email = req.body.email_address || req.body.email
-      console.log(email)
 
       if (!email) {
         return res.status(HttpStatusCode.BAD_REQUEST).json({
@@ -220,7 +201,6 @@ export class AuthController implements IAuthController {
 
       const tokens = await this._refreshTokenUseCase.execute(refreshToken);
 
-      // ✅ SEND TOKENS (DO NOT SET COOKIES HERE)
       res.status(200).json({
         accessToken: tokens.accessToken,
         refreshToken: tokens.refreshToken,
