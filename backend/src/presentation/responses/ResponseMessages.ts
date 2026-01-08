@@ -1,24 +1,25 @@
 export const RESPONSE_MESSAGES = {
-
   // Generic
   SUCCESS: "Success",
-  INTERNAL_SERVER_ERROR: "Internal server error",
   BAD_REQUEST: "Bad request",
   UNAUTHORIZED: "Unauthorized",
   FORBIDDEN: "Forbidden",
   NOT_FOUND: "Resource not found",
+  INTERNAL_SERVER_ERROR: "Internal server error",
 
   // Auth
   REGISTER_SUCCESS: "User registered successfully",
   LOGIN_SUCCESS: "Login successful",
   LOGOUT_SUCCESS: "Logged out successfully",
+
   OTP_SENT: "OTP sent successfully",
   OTP_VERIFIED: "OTP verified successfully",
+
   INVALID_CREDENTIALS: "Invalid email or password",
   TOKEN_REFRESH_SUCCESS: "Token refreshed successfully",
+
   GOOGLE_AUTH_SUCCESS: "Google user authenticated successfully",
   GOOGLE_AUTH_FAILED: "Google authentication failed",
-
 
   // Users
   USER_FETCHED: "User fetched successfully",
@@ -38,4 +39,10 @@ export const RESPONSE_MESSAGES = {
   PROFILE_UPLOADED: "Profile picture uploaded successfully",
   DOCUMENT_UPLOADED: "Document uploaded successfully",
   FILE_MISSING: "File is missing",
+
+  //
+  REFRESH_TOKEN_MISSING: "Refresh token missing",
+  INVALID_REFRESH_TOKEN: "Invalid refresh token",
+  PASSWORD_MISMATCH: "Passwords do not match",
+  INVALID_FILE_TYPE: "Invalid file type",
 };
