@@ -18,9 +18,6 @@ export class CloudinaryUploadService {
       
       // Verify configuration
       const config = cloudinary.config();
-      console.log("✅ Cloudinary configured:");
-      console.log("  Cloud Name:", config.cloud_name);
-      console.log("  API Key:", config.api_key);
     }
   }
 

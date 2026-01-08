@@ -18,7 +18,6 @@ export class AdminController implements IAdminController {
 
     async getAllClients(req: Request, res: Response): Promise<void> {
         try {
-            console.log('Admin controller called')
             const clients = await this._getAllClientsUseCase.execute();
 
             res.status(HttpStatusCode.OK).json({
@@ -43,7 +42,6 @@ export class AdminController implements IAdminController {
     async getAllWorkers(req: Request, res: Response): Promise<void> {
 
         try {
-            console.log('Admin controller called')
             const workers = await this._getAllWorkersUseCase.execute();
 
             res.status(HttpStatusCode.OK).json({

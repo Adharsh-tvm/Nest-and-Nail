@@ -10,7 +10,7 @@ export class UploadController implements IUploadController {
   constructor(
     private readonly _uploadProfilePictureUseCase: IUploadProfilePictureUseCase,
     private readonly _uploadDocumentUseCase: IUploadWorkerDocumentUseCase
-  ) {}
+  ) { }
 
   // ---------------- UPLOAD PROFILE ----------------
   uploadProfile = async (req: Request, res: Response): Promise<Response> => {
