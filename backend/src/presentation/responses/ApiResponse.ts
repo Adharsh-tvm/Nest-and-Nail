@@ -18,9 +18,11 @@ export class ResponseHandler {
         return res.status(statusCode).json({
             success: true,
             message,
-            data
-        } satisfies ApiResponse<T>);
+            data,
+            payload: data 
+        });
     }
+
 
 
     static error(
