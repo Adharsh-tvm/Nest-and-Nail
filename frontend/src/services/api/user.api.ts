@@ -1,5 +1,6 @@
 // services/user/user.api.ts
 import axiosInstance from "@/lib/axiosInstance";
+import { SuccessResponse } from "@/shared/types/responseTypes";
 
 export type UpdateRoleResponse = {
   user?: any;
@@ -7,12 +8,14 @@ export type UpdateRoleResponse = {
   refreshToken?: string;
 };
 
+
+
 const userApi = {
   /**
    * Update user role/mode
    * @param role "client" | "worker"
    */
-  updateUserMode: async (role: "client" | "worker") => {
+  updateUserMode: async (role: "client" | "worker"): Promise<SuccessResponse<UpdateRoleResponse>> => {
     try {
       const response = await axiosInstance.patch(
         "/api/auth/mode",
@@ -21,7 +24,7 @@ const userApi = {
           withCredentials: true, // This sends cookies automatically
         }
       );
-      return response.data as UpdateRoleResponse;
+      return response.data;
     } catch (error: any) {
       console.error("Error updating user role:", error);
       throw error.response?.data || { message: "Something went wrong" };

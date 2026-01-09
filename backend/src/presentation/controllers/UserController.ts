@@ -9,6 +9,9 @@ import {
     UserNotFoundError
 } from "../../domain/errors/DomainError";
 import { IGetAllUsersUseCase } from "../../application/interfaces/IGetAllUsersUseCase";
+import { ResponseHandler } from "../responses/ApiResponse";
+import { LoginResponseDTO } from "../../application/dtos/UserDTO";
+import { RESPONSE_MESSAGES } from "../responses/ResponseMessages";
 
 export class UserController implements IUserController {
 
@@ -25,16 +28,16 @@ export class UserController implements IUserController {
 
             const result = await this._changeUserRoleUseCase.execute(userId, role);
 
-            return res.status(HttpStatusCode.OK).json({
+            return res.status(HttpStatusCode.OK).json(ResponseHandler.success<LoginResponseDTO>({
                 user: result.user,
                 accessToken: result.accessToken,
                 refreshToken: result.refreshToken
-            });
+            }, RESPONSE_MESSAGES.SUCCESS));
 
         } catch (error: any) {
             return res
                 .status(HttpStatusCode.INTERNAL_SERVER)
-                .json({ message: error.message ?? "Internal server error" });
+                .json(ResponseHandler.error(RESPONSE_MESSAGES.FORBIDDEN, error));
         }
     };
 
