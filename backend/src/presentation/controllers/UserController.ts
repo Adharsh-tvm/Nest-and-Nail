@@ -21,76 +21,83 @@ export class UserController implements IUserController {
         private readonly _getAllUsersUseCase: IGetAllUsersUseCase
     ) { }
 
-    changeRole = async (req: Request, res: Response) => {
+    changeRole = async (req: Request, res: Response): Promise<Response> => {
         try {
             const userId = req.user.id;
             const { role } = req.body;
 
             const result = await this._changeUserRoleUseCase.execute(userId, role);
 
-            return res.status(HttpStatusCode.OK).json(ResponseHandler.success<LoginResponseDTO>({
-                user: result.user,
-                accessToken: result.accessToken,
-                refreshToken: result.refreshToken
-            }, RESPONSE_MESSAGES.SUCCESS));
+            return res.status(HttpStatusCode.OK).json(
+                ResponseHandler.success<LoginResponseDTO>(
+                    {
+                        user: result.user,
+                        accessToken: result.accessToken,
+                        refreshToken: result.refreshToken
+                    },
+                    RESPONSE_MESSAGES.SUCCESS
+                )
+            );
 
-        } catch (error: any) {
-            return res
-                .status(HttpStatusCode.INTERNAL_SERVER)
-                .json(ResponseHandler.error(RESPONSE_MESSAGES.FORBIDDEN, error));
+        } catch (error: unknown) {
+            return res.status(HttpStatusCode.FORBIDDEN).json(
+                ResponseHandler.error(RESPONSE_MESSAGES.FORBIDDEN, error)
+            );
         }
     };
 
 
 
-    getCurrentUser = async (req: Request, res: Response) => {
+    getCurrentUser = async (req: Request, res: Response): Promise<Response> => {
         try {
             const email = req.params.email;
 
             const user = await this._getCurrentUserUseCase.execute(email);
 
-            return res.status(HttpStatusCode.OK).json({
-                success: true,
-                user
-            });
+            return res.status(HttpStatusCode.OK).json(
+                ResponseHandler.success(user, RESPONSE_MESSAGES.USER_FETCHED)
+            );
 
-        } catch (error: any) {
+        } catch (error: unknown) {
 
             if (error instanceof AuthenticationError) {
-                return res.status(HttpStatusCode.UNAUTHORIZED).json({
-                    success: false,
-                    message: "Authentication failed"
-                });
+                return res.status(HttpStatusCode.UNAUTHORIZED).json(
+                    ResponseHandler.error(RESPONSE_MESSAGES.UNAUTHORIZED, error)
+                );
             }
 
             if (error instanceof UserNotFoundError) {
-                return res.status(HttpStatusCode.NOT_FOUND).json({
-                    success: false,
-                    message: "User not found"
-                });
+                return res.status(HttpStatusCode.NOT_FOUND).json(
+                    ResponseHandler.error(RESPONSE_MESSAGES.USER_NOT_FOUND, error)
+                );
             }
 
             if (error instanceof UserBlockedError) {
-                return res.status(HttpStatusCode.FORBIDDEN).json({
-                    success: false,
-                    message: "User is blocked"
-                });
+                return res.status(HttpStatusCode.FORBIDDEN).json(
+                    ResponseHandler.error(RESPONSE_MESSAGES.USER_BLOCKED, error)
+                );
             }
 
-            return res
-                .status(HttpStatusCode.INTERNAL_SERVER)
-                .json({ success: false, message: "Internal server error" });
+            return res.status(HttpStatusCode.INTERNAL_SERVER).json(
+                ResponseHandler.error(RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR, error)
+            );
         }
     };
 
     getAllUsers = async (req: Request, res: Response): Promise<Response> => {
         try {
             const users = await this._getAllUsersUseCase.execute();
-            console.log("users -----------", users)
-            return res.status(HttpStatusCode.OK).json({ users });
-        } catch (error) {
-            console.error("Error fetching all users: ", error);
-            return res.status(HttpStatusCode.INTERNAL_SERVER).json({ message: "Internal server error" });
+
+            return res.status(HttpStatusCode.OK).json(
+                ResponseHandler.success(users, RESPONSE_MESSAGES.USERS_FETCHED)
+            );
+
+        } catch (error: unknown) {
+            console.error("Error fetching all users:", error);
+
+            return res.status(HttpStatusCode.INTERNAL_SERVER).json(
+                ResponseHandler.error(RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR, error)
+            );
         }
     }
 }

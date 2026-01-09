@@ -1,9 +1,9 @@
-// presentation/controllers/UserProfileController.ts
-
 import { Request, Response } from "express";
 import { HttpStatusCode } from "../../shared/enums/httpCodes";
 import { IUpdateUserProfileUseCase } from "../../application/interfaces/IUpdateUserProfileUseCase";
 import { IUserProfileController } from "../interfaces/IUserProfileController";
+import { ResponseHandler } from "../responses/ApiResponse";
+import { RESPONSE_MESSAGES } from "../responses/ResponseMessages";
 
 export class UserProfileController implements IUserProfileController {
 
@@ -20,7 +20,7 @@ export class UserProfileController implements IUserProfileController {
      *  PUT /api/users/:userId/profile
      *  with multer.single("profilePicture")
      */
-    updateProfile = async (req: Request, res: Response) => {
+    updateProfile = async (req: Request, res: Response): Promise<Response> => {
         try {
             const userId = req.params.userId;
             const updates = req.body;
@@ -32,16 +32,22 @@ export class UserProfileController implements IUserProfileController {
                 profilePictureFilePath
             );
 
+            return res.status(HttpStatusCode.OK).json(
+                ResponseHandler.success(
+                    updatedUser,
+                    RESPONSE_MESSAGES.USER_UPDATED
+                )
+            );
 
-            return res.status(HttpStatusCode.OK).json({
-                success: true,
-                user: updatedUser
-            });
+        } catch (error: unknown) {
+            console.error("[UpdateUserProfileController] Error:", error);
 
-        } catch (error: any) {
-            return res
-                .status(HttpStatusCode.INTERNAL_SERVER)
-                .json({ success: false, message: error.message });
+            return res.status(HttpStatusCode.INTERNAL_SERVER).json(
+                ResponseHandler.error(
+                    RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR,
+                    error
+                )
+            );
         }
     };
 }
