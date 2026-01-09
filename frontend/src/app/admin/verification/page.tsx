@@ -146,22 +146,7 @@ const VerificationModal: React.FC<VerificationModalProps> = ({
                 </div>
               </div>
 
-              <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-                <h4 className="font-bold text-sm text-gray-900 mb-4">
-                  Skills & Trades
-                </h4>
-                <div className="flex flex-wrap gap-2">
-                  {request.skills.map((skill, i) => (
-                    <span
-                      key={i}
-                      className="px-3 py-1.5 bg-gray-50 border border-gray-100 text-gray-600 text-xs rounded-lg font-bold"
-                    >
-                      {skill}
-                    </span>
-                  ))}
-                  {request.skills.length === 0 && <span className="text-gray-400 text-xs italic">No skills listed</span>}
-                </div>
-              </div>
+
             </div>
 
             {/* RIGHT: Documents */}
@@ -419,26 +404,7 @@ const VerificationsPendingView: React.FC = () => {
         </span>
       ),
     },
-    {
-      header: "Skills",
-      cell: (row) => (
-        <div className="flex flex-wrap gap-1 max-w-[200px]">
-          {row.skills.slice(0, 2).map((skill, i) => (
-            <span
-              key={i}
-              className="px-2 py-1 bg-white text-gray-600 rounded-md text-[10px] font-bold border border-gray-200 shadow-sm"
-            >
-              {skill}
-            </span>
-          ))}
-          {row.skills.length > 2 && (
-            <span className="text-[10px] text-gray-400 pl-1 self-center font-medium">
-              +{row.skills.length - 2}
-            </span>
-          )}
-        </div>
-      ),
-    },
+
     {
       header: "Submitted",
       accessorKey: "createdAt",
