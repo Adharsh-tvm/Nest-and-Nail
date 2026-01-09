@@ -4,7 +4,6 @@ import React, {
   useState,
   useRef,
   useEffect,
-  KeyboardEvent,
   ChangeEvent,
   DragEvent,
   MouseEvent as ReactMouseEvent,
@@ -15,7 +14,6 @@ import {
   CheckCircle2,
   FileText,
   ShieldCheck,
-  Briefcase,
   User,
   ArrowRight,
   ArrowLeft,
@@ -32,7 +30,6 @@ import {
 import { VerificationStatus } from "@/shared/enums/authEnums";
 
 type ErrorState = {
-  skills?: string;
   idDocument?: string;
   certDocument?: string;
 };
@@ -43,12 +40,6 @@ type FileUploaderProps = {
   accept: string;
   onFileSelect: (file: File | null) => void;
   file: File | null;
-  error?: string;
-};
-
-type SkillInputProps = {
-  skills: string[];
-  setSkills: (skills: string[]) => void;
   error?: string;
 };
 
@@ -137,11 +128,10 @@ const FileUploader: React.FC<FileUploaderProps> = ({
       <div
         className={`relative border-2 border-dashed rounded-xl transition-all duration-200 cursor-pointer group
         ${error ? "border-red-300 bg-red-50" : ""}
-        ${
-          isDragging
+        ${isDragging
             ? "border-[#DC2626] bg-red-50/50"
             : "border-gray-200 hover:border-[#1B4332] hover:bg-gray-50"
-        }
+          }
         ${file ? "bg-green-50 border-green-200 border-solid" : "bg-white"}
         `}
         onDragEnter={handleDrag}
@@ -234,86 +224,6 @@ const FileUploader: React.FC<FileUploaderProps> = ({
   );
 };
 
-/** Skill tag input */
-const SkillInput: React.FC<SkillInputProps> = ({
-  skills,
-  setSkills,
-  error,
-}) => {
-  const [input, setInput] = useState("");
-
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" || e.key === ",") {
-      e.preventDefault();
-      const val = input.trim();
-      if (val && !skills.includes(val)) {
-        setSkills([...skills, val]);
-        setInput("");
-      }
-    } else if (e.key === "Backspace" && !input && skills.length > 0) {
-      setSkills(skills.slice(0, -1));
-    }
-  };
-
-  const removeSkill = (skillToRemove: string) => {
-    setSkills(skills.filter((skill) => skill !== skillToRemove));
-  };
-
-  return (
-    <div className="mb-6">
-      <label className="block text-sm font-bold text-[#1B4332] mb-2">
-        Your Skills & Trades <span className="text-red-500">*</span>
-      </label>
-      <div
-        className={`min-h-[56px] p-2 border-2 rounded-xl bg-white flex flex-wrap items-center gap-2 focus-within:border-[#1B4332] focus-within:ring-4 focus-within:ring-green-500/10 transition-all
-        ${error ? "border-red-300" : "border-gray-200"}
-      `}
-      >
-        {skills.map((skill, idx) => (
-          <span
-            key={idx}
-            className="bg-[#1B4332] text-white px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-1.5 animate-in zoom-in duration-200"
-          >
-            {skill}
-            <button
-              type="button"
-              onClick={() => removeSkill(skill)}
-              className="hover:text-red-300 transition-colors"
-            >
-              <X size={14} />
-            </button>
-          </span>
-        ))}
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder={
-            skills.length === 0
-              ? "Type a skill (e.g. Plumbing) and hit Enter..."
-              : "Add another..."
-          }
-          className="flex-1 bg-transparent outline-none text-gray-800 placeholder-gray-400 min-w-[150px] px-2 py-1"
-        />
-      </div>
-      {error ? (
-        <p className="text-red-500 text-xs mt-2 flex items-center gap-1 font-medium">
-          <AlertCircle size={12} /> {error}
-        </p>
-      ) : (
-        <p className="text-xs text-gray-500 mt-2">
-          Press{" "}
-          <kbd className="font-sans font-bold border rounded px-1 text-[10px]">
-            Enter
-          </kbd>{" "}
-          to add a tag.
-        </p>
-      )}
-    </div>
-  );
-};
-
 const WorkerVerificationFlow: React.FC<WorkerVerificationFlowProps> = ({
   isOpen,
   onClose,
@@ -321,7 +231,6 @@ const WorkerVerificationFlow: React.FC<WorkerVerificationFlowProps> = ({
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [skills, setSkills] = useState<string[]>([]);
   const [idDocument, setIdDocument] = useState<File | null>(null);
   const [certDocument, setCertDocument] = useState<File | null>(null);
   const [errors, setErrors] = useState<ErrorState>({});
@@ -330,7 +239,6 @@ const WorkerVerificationFlow: React.FC<WorkerVerificationFlowProps> = ({
 
   const resetForm = () => {
     setStep(1);
-    setSkills([]);
     setIdDocument(null);
     setCertDocument(null);
     setErrors({});
@@ -342,13 +250,6 @@ const WorkerVerificationFlow: React.FC<WorkerVerificationFlowProps> = ({
     let isValid = true;
 
     if (currentStep === 1) {
-      if (skills.length === 0) {
-        newErrors.skills = "Please add at least one skill to continue.";
-        isValid = false;
-      }
-    }
-
-    if (currentStep === 2) {
       if (!idDocument) {
         newErrors.idDocument = "Government ID is required for verification.";
         isValid = false;
@@ -366,15 +267,13 @@ const WorkerVerificationFlow: React.FC<WorkerVerificationFlowProps> = ({
   };
 
   const handleSubmit = async () => {
-    if (!validateStep(3)) return;
+    if (!validateStep(2)) return;
     if (!currentUser?.id) return;
 
     setIsSubmitting(true);
     const userId = currentUser.id;
 
     try {
-      await updateUserProfileAction(userId, { skills });
-
       if (idDocument) {
         const idUrl = await uploadDocumentAction(userId, idDocument);
         await updateUserProfileAction(userId, { documents: [idUrl] });
@@ -390,7 +289,7 @@ const WorkerVerificationFlow: React.FC<WorkerVerificationFlowProps> = ({
         isVerified: VerificationStatus.PENDING,
       });
 
-      setStep(4);
+      setStep(3);
     } catch (err) {
       console.error("Profile update failed", err);
     } finally {
@@ -407,51 +306,6 @@ const WorkerVerificationFlow: React.FC<WorkerVerificationFlowProps> = ({
   if (!isOpen) return null;
 
   const renderStep1 = () => (
-    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="text-center mb-8">
-        <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-[#1B4332]">
-          <Briefcase size={32} />
-        </div>
-        <h2 className="text-2xl font-extrabold text-[#1B4332]">
-          What do you do?
-        </h2>
-        <p className="text-gray-500 mt-2">
-          List your services so we can match you with the right jobs.
-        </p>
-      </div>
-
-      <SkillInput skills={skills} setSkills={setSkills} error={errors.skills} />
-
-      <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 mt-8">
-        <h4 className="font-bold text-gray-900 text-sm mb-2 flex items-center gap-2">
-          <CheckCircle2 size={16} className="text-[#DC2626]" /> Popular Tags
-        </h4>
-        <div className="flex flex-wrap gap-2">
-          {[
-            "Plumbing",
-            "Electrical",
-            "Cleaning",
-            "Carpentry",
-            "Painting",
-            "HVAC",
-          ].map((tag) => (
-            <button
-              key={tag}
-              type="button"
-              onClick={() =>
-                !skills.includes(tag) && setSkills((prev) => [...prev, tag])
-              }
-              className="px-3 py-1 bg-white border border-gray-200 rounded-full text-xs font-medium hover:border-[#DC2626] hover:text-[#DC2626] transition-colors"
-            >
-              + {tag}
-            </button>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderStep2 = () => (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="text-center mb-8">
         <div className="w-16 h-16 bg-green-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-[#1B4332]">
@@ -485,7 +339,7 @@ const WorkerVerificationFlow: React.FC<WorkerVerificationFlowProps> = ({
     </div>
   );
 
-  const renderStep3 = () => (
+  const renderStep2 = () => (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="text-center mb-8">
         <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-[#DC2626]">
@@ -554,11 +408,11 @@ const WorkerVerificationFlow: React.FC<WorkerVerificationFlowProps> = ({
         onClick={handleClose}
       />
       <div className="relative bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-        {step < 4 && (
+        {step < 3 && (
           <div className="bg-white px-8 pt-8 pb-4 border-b border-gray-100 flex-shrink-0 z-10">
             <div className="flex justify-between items-center mb-6">
               <h3 className="font-bold text-gray-400 text-xs uppercase tracking-widest">
-                Step {step} of 3
+                Step {step} of 2
               </h3>
               <button
                 type="button"
@@ -570,19 +424,12 @@ const WorkerVerificationFlow: React.FC<WorkerVerificationFlowProps> = ({
             </div>
             <div className="h-2 bg-gray-100 rounded-full overflow-hidden flex">
               <div
-                className={`h-full transition-all duration-500 ease-out ${
-                  step >= 1 ? "bg-[#DC2626] w-1/3" : "bg-transparent w-1/3"
-                }`}
+                className={`h-full transition-all duration-500 ease-out ${step >= 1 ? "bg-[#DC2626] w-1/2" : "bg-transparent w-1/2"
+                  }`}
               />
               <div
-                className={`h-full transition-all duration-500 ease-out ${
-                  step >= 2 ? "bg-[#DC2626] w-1/3" : "bg-transparent w-1/3"
-                }`}
-              />
-              <div
-                className={`h-full transition-all duration-500 ease-out ${
-                  step >= 3 ? "bg-[#DC2626] w-1/3" : "bg-transparent w-1/3"
-                }`}
+                className={`h-full transition-all duration-500 ease-out ${step >= 2 ? "bg-[#DC2626] w-1/2" : "bg-transparent w-1/2"
+                  }`}
               />
             </div>
           </div>
@@ -591,11 +438,10 @@ const WorkerVerificationFlow: React.FC<WorkerVerificationFlowProps> = ({
         <div className="flex-1 overflow-y-auto p-8 bg-white">
           {step === 1 && renderStep1()}
           {step === 2 && renderStep2()}
-          {step === 3 && renderStep3()}
-          {step === 4 && renderSuccess()}
+          {step === 3 && renderSuccess()}
         </div>
 
-        {step < 4 && (
+        {step < 3 && (
           <div className="p-6 border-t border-gray-100 bg-gray-50 flex justify-between items-center flex-shrink-0">
             {step > 1 ? (
               <button
@@ -612,14 +458,13 @@ const WorkerVerificationFlow: React.FC<WorkerVerificationFlowProps> = ({
 
             <button
               type="button"
-              onClick={step === 3 ? handleSubmit : handleNext}
+              onClick={step === 2 ? handleSubmit : handleNext}
               disabled={isSubmitting}
               className={`
                 font-bold py-3 px-8 rounded-xl transition-all shadow-md flex items-center gap-2
-                ${
-                  isSubmitting
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-[#1B4332] text-white hover:bg-[#143225] shadow-green-900/20 hover:shadow-lg"
+                ${isSubmitting
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  : "bg-[#1B4332] text-white hover:bg-[#143225] shadow-green-900/20 hover:shadow-lg"
                 }
               `}
             >
@@ -627,7 +472,7 @@ const WorkerVerificationFlow: React.FC<WorkerVerificationFlowProps> = ({
                 <>
                   <Loader2 size={20} className="animate-spin" /> Processing...
                 </>
-              ) : step === 3 ? (
+              ) : step === 2 ? (
                 <>
                   Submit Application <CheckCircle2 size={20} />
                 </>
