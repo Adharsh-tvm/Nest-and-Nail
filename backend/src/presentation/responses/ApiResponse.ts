@@ -1,36 +1,43 @@
 import { Response } from "express";
 import { HttpStatusCode } from "../../shared/enums/httpCodes";
 
+export type SuccessResponse<T = any> = {
+  success: true,
+  message: string,
+  payload: T,
+}
+
+export type FailedResponse = {
+  success: false,
+  message: string,
+  error: any
+}
+
 export class ResponseHandler {
   static success<T>(
-    res: Response,
     data: T,
-    message?: string,
-    statusCode: HttpStatusCode = HttpStatusCode.OK
-  ): Response {
-    return res.status(statusCode).json({
+    message: string,
+  ): SuccessResponse<T> {
+    return {
       success: true,
       message,
-      data,
-      payload: data, 
-    });
+      payload: data,
+    }
   }
 
   static error(
-    res: Response,
     message: string,
-    statusCode: HttpStatusCode,
     error?: unknown
-  ): Response {
-    return res.status(statusCode).json({
+  ): FailedResponse {
+    return {
       success: false,
       message,
       error:
         error instanceof Error
           ? error.message
           : typeof error === "string"
-          ? error
-          : undefined,
-    });
+            ? error
+            : undefined,
+    }
   }
 }

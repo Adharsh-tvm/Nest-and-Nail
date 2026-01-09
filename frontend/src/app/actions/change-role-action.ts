@@ -3,12 +3,15 @@
 import { cookies } from "next/headers";
 import userApi from "@/services/api/user.api";
 
+
+
+
 export async function changeRoleAction(role: "client" | "worker") {
   try {
     // Call userApi - cookies are sent automatically via withCredentials
     const data = await userApi.updateUserMode(role);
 
-    const { user, accessToken: newAccess, refreshToken: newRefresh } = data;
+    const { user, accessToken: newAccess, refreshToken: newRefresh } = data.payload;
 
     // Get cookie store
     const cookieStore = await cookies();
