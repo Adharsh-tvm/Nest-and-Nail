@@ -1,72 +1,55 @@
-// app/actions/get-current-user.ts
 "use server";
+
 import { cookies } from "next/headers";
 import userApi from "@/services/api/user.api";
 import { VerificationStatus } from "@/shared/enums/authEnums";
- 
+import { ApiResponse } from "@/shared/types/responseTypes";
+import { User } from "@/shared/types/userTypes";
 
-function normalizeVerification(value: any): VerificationStatus {
-  if (value === true || value === 1 || value === "1" || value === "VERIFIED" || value === "verified") {
+function normalizeIsVerified(v: any): VerificationStatus {
+  if (v === true || v === "VERIFIED" || v === "verified") {
     return VerificationStatus.VERIFIED;
   }
-
-  if (value === "PENDING" || value === "pending") {
+  if (v === "PENDING" || v === "pending") {
     return VerificationStatus.PENDING;
   }
-
   return VerificationStatus.NOT_VERIFIED;
 }
 
-type CanonicalUser = {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  isVerified: VerificationStatus;
-  profilePicture?: string | null;
-  [k: string]: any;
-};
-
-export async function getCurrentUser(): Promise<CanonicalUser | null> {
+export async function getCurrentUser(): Promise<User | null> {
   try {
     const cookieStore = await cookies();
     const email = cookieStore.get("user_email")?.value;
-
     if (!email) return null;
 
-    const data = await userApi.getCurrentUserByEmail(email);
-    const rawUser = data?.user ?? data;
-    if (!rawUser) return null;
+    const data = (await userApi.getCurrentUserByEmail(email)) as ApiResponse<any>;
+    if (!data.success || !data.payload) return null;
 
-    console.log("data of current user",data)
+    const u = data.payload;
 
-    const mapped = {
-      id: rawUser.id ?? rawUser.user_id ?? rawUser.userId,
-      name: rawUser.name ?? rawUser.user_name ?? rawUser.userName ?? "",
-      email: rawUser.email ?? rawUser.email_address ?? "",
-      role: rawUser.role ?? rawUser.user_role ?? "client",
+    const user: User = {
+      id: u.user_id,
+      name: u.user_name,
+      email: u.email_address,
+      role: u.user_role,
+      isBlocked: Boolean(u.isBlocked),
+      isVerified: normalizeIsVerified(u.isVerified),
 
-      isVerified: normalizeVerification(
-        rawUser.isVerified ??
-          rawUser.is_verified ??
-          rawUser.verified ??
-          false
-      ),
+      profileImageUrl: u.profilePictureUrl ?? null,
+      phone_number: u.phone_number,
+      skills: u.skills ?? [],
+      address: u.address ?? [],
+      documents: u.documents ?? [],
+      certificates: u.certificates ?? [],
+      workPhotos: u.workPhotos ?? [],
 
-      profileImageUrl:
-        rawUser.profilePicture ??
-        rawUser.profilePictureUrl ??
-        rawUser.profileImageUrl ??
-        rawUser.profile_picture ??
-        rawUser.profile ??
-        null,
-
-      ...rawUser,
+      createdAt: u.createdAt,
+      updatedAt: u.updatedAt,
     };
 
-    return mapped;
+    return user;
   } catch (err) {
-    console.error("[getCurrentUser] Failed to fetch current user:", err);
+    console.error("[getCurrentUser] failed:", err);
     return null;
   }
 }

@@ -9,3 +9,5 @@ export type FailedResponse = {
     message: string,
     error: any
 }
+
+export type ApiResponse<T> = SuccessResponse<T> | FailedResponse;

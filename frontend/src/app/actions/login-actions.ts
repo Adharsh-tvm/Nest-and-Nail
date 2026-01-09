@@ -4,6 +4,7 @@
 import { cookies } from "next/headers";
 import authApi from "@/services/api/auth.api";
 import axios from "axios";
+import { ApiResponse } from "@/shared/types/responseTypes";
 
 export type LoginState = {
   error?: string | null;
@@ -42,7 +43,7 @@ export async function login(
   }
 
   // Call auth API
-   let response;
+  let response;
   try {
     response = await authApi.login({
       email_address: email,
@@ -67,9 +68,29 @@ export async function login(
       success: false,
     };
   }
-  const data = response?.data;
+  const data = response.data as ApiResponse<{
+    user: any;
+    accessToken: string;
+    refreshToken: string;
+  }>;
 
-  if (!data?.accessToken) {
+  if (!data.success) {
+    return {
+      error: data.message || "Login failed",
+      fields,
+      errorId: Date.now(),
+      success: false,
+    };
+  }
+
+  const { user, accessToken, refreshToken } = data.payload;
+
+  const cookieStore = await cookies();
+
+  const ACCESS_MAX_AGE = Number(process.env.MAX_AGE_ACCESS_TOKEN) || 60 * 60 * 24;
+  const REFRESH_MAX_AGE = Number(process.env.MAX_AGE_REFRESH_TOKEN) || 60 * 60 * 24 * 30;
+
+  if (!accessToken) {
     return {
       error: "Login failed: No access token received",
       fields,
@@ -78,12 +99,9 @@ export async function login(
     };
   }
 
-  const cookieStore = await cookies();
-  const ACCESS_MAX_AGE = Number(process.env.MAX_AGE_ACCESS_TOKEN) || 60 * 60 * 24;
-  const REFRESH_MAX_AGE = Number(process.env.MAX_AGE_REFRESH_TOKEN) || 60 * 60 * 24 * 30;
 
-  if (data.accessToken) {
-    cookieStore.set("accessToken", data.accessToken, {
+  if (accessToken) {
+    cookieStore.set("accessToken", accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
@@ -92,8 +110,8 @@ export async function login(
     });
   }
 
-  if (data.refreshToken) {
-    cookieStore.set("refreshToken", data.refreshToken, {
+  if (refreshToken) {
+    cookieStore.set("refreshToken", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
@@ -102,8 +120,8 @@ export async function login(
     });
   }
 
-  if (data.user?.email_address) {
-    cookieStore.set("user_email", data.user.email_address, {
+  if (user?.email_address) {
+    cookieStore.set("user_email", user.email_address, {
       httpOnly: false,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
@@ -112,7 +130,7 @@ export async function login(
     });
   }
 
-  const userRole = data.user?.user_role?.toLowerCase() ?? null;
+  const userRole = user?.user_role?.toLowerCase() ?? null;
   if (userRole) {
     cookieStore.set("userRole", userRole, {
       httpOnly: true,
@@ -123,7 +141,6 @@ export async function login(
     });
   }
 
-  // Return success payload (do NOT redirect on server)
   return {
     error: null,
     fields,

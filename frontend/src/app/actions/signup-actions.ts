@@ -163,11 +163,15 @@ export async function completeSignup(
     const registerResponse = await authApi.signup(signupPayload);
     const registerData = registerResponse?.data;
 
-    if (!registerData) {
-      return { success: false, error: "Signup failed: empty response" };
+    if (!registerData?.success) {
+      return {
+        success: false,
+        error: registerData?.message || "Signup failed",
+      };
     }
 
-    const { accessToken, refreshToken, user } = registerData;
+    const { user, accessToken, refreshToken } = registerData.payload;
+
 
     if (!accessToken || !refreshToken) {
       return {

@@ -1,4 +1,5 @@
 import axiosInstance from "@/lib/axiosInstance";
+import { ApiResponse } from "@/shared/types/responseTypes";
 
 export type LoginPayload = {
   email_address: string;
@@ -27,9 +28,25 @@ export type AuthResponse<UserType = any> = {
   refreshToken?: string;
 };
 
+export type LoginPayloadResponse = {
+  user: {
+    user_id: string;
+    user_name: string;
+    email_address: string;
+    user_role: string;
+    isBlocked: boolean;
+    isVerified: string;
+  };
+  accessToken: string;
+  refreshToken: string;
+};
+
 export const authApi = {
   login: (payload: LoginPayload) =>
-    axiosInstance.post("/api/auth/login", payload),
+    axiosInstance.post<ApiResponse<LoginPayloadResponse>>(
+      "/api/auth/login",
+      payload
+    ),
 
   signup: (payload: any) =>
     axiosInstance.post("/api/auth/register", payload),
