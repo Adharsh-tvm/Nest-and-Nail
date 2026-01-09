@@ -1,83 +1,21 @@
 "use client";
 
-import { useEffect } from "react";
+import { ReactNode, useLayoutEffect } from "react";
 import { useUserStore } from "@/store/userStore";
-import { VerificationStatus } from "@/shared/enums/authEnums"; 
 import { User } from "@/shared/types/userTypes";
 
-type ServerUser = Record<string, any>;
-
-function normalizeIsVerified(v: any): VerificationStatus {
-  // VERIFIED cases
-  if (
-    v === true ||
-    v === 1 ||
-    v === "1" ||
-    v === "VERIFIED" ||
-    v === "verified"
-  ) {
-    return VerificationStatus.VERIFIED;
-  }
-
-  // PENDING cases
-  if (v === "PENDING" || v === "pending") {
-    return VerificationStatus.PENDING;
-  }
-
-  // Default
-  return VerificationStatus.NOT_VERIFIED;
-}
-
-export default function UserHydration({ user }: { user: ServerUser | null }) {
+export default function UserHydration({
+  user,
+  children,
+}: {
+  user: User | null;
+  children: ReactNode;
+}) {
   const setUser = useUserStore((s) => s.setUser);
 
-  useEffect(() => {
-    if (!user) {
-      setUser(null);
-      console.log("[UserHydration] no user provided -> set null");
-      return;
-    }
-
-    // Accept many shapes, pick canonical fields
-    const mapped: User = {
-      id: user.id ?? user.user_id ?? user.userId ?? "",
-      name: user.name ?? user.user_name ?? "",
-      email: user.email ?? user.email_address ?? "",
-      role: user.role ?? user.user_role ?? "client",
-
-      isVerified: normalizeIsVerified(
-        user.is_verified ?? user.isVerified ?? user.verified
-      ),
-
-      profileImageUrl:
-        user.profileImageUrl ??
-        user.profilePictureUrl ??
-        user.profile_picture ??
-        null,
-
-      phone_number: user.phone_number ?? user.phone,
-      skills: user.skills ?? [],
-      address: user.address ?? "",
-      documents: user.documents ?? [],
-      certificates: user.certificates ?? [],
-      workPhotos: user.workPhotos ?? [],
-
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
-
-      iat: user.iat,
-      exp: user.exp,
-    };
-
-    console.log("[UserHydration] raw isVerified fields:", {
-      isVerified: user.isVerified,
-      is_verified: user.is_verified,
-      verified: user.verified,
-    });
-    console.log("[UserHydration] mapped isVerified:", mapped.isVerified);
-
-    setUser(mapped);
+  useLayoutEffect(() => {
+    setUser(user);
   }, [user, setUser]);
 
-  return null;
+  return <>{children}</>;
 }

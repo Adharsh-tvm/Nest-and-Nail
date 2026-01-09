@@ -2,7 +2,7 @@
 
 import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
-import type { User } from "@/store/userStore";
+import type { User } from "@/shared/types/userTypes"; 
 
 export async function getUserFromServer(): Promise<User | null> {
   const cookieStore = await cookies();
