@@ -6,6 +6,8 @@ import { HttpStatusCode } from "../../shared/enums/httpCodes";
 import { IUpdateVerificationStatusUseCase } from "../../application/interfaces/IUpdateVerificationStatusUseCase";
 import { VerificationStatus } from "../../shared/enums/authEnums";
 import { IUpdateUserAccessUseCase } from "../../application/interfaces/IUpdateUserAccessUseCase";
+import { ResponseHandler } from "../responses/ApiResponse";
+import { RESPONSE_MESSAGES } from "../responses/ResponseMessages";
 
 export class AdminController implements IAdminController {
     constructor(
@@ -20,22 +22,14 @@ export class AdminController implements IAdminController {
         try {
             const clients = await this._getAllClientsUseCase.execute();
 
-            res.status(HttpStatusCode.OK).json({
-                success: true,
-                message: "Clients fetched successfully",
-                data: clients
-            });
+            res.status(HttpStatusCode.OK).json(ResponseHandler.success(clients, RESPONSE_MESSAGES.USERS_FETCHED));
         } catch (error: unknown) {
             console.error("[GetAllClientsController] Error:", error);
 
             const message =
                 error instanceof Error ? error.message : typeof error === "string" ? error : JSON.stringify(error);
 
-            res.status(HttpStatusCode.INTERNAL_SERVER).json({
-                success: false,
-                message: "Failed to fetch clients",
-                error: message || "Unknown error"
-            });
+            res.status(HttpStatusCode.INTERNAL_SERVER).json(ResponseHandler.error(RESPONSE_MESSAGES.BAD_REQUEST, message));
         }
     }
 
@@ -44,22 +38,13 @@ export class AdminController implements IAdminController {
         try {
             const workers = await this._getAllWorkersUseCase.execute();
 
-            res.status(HttpStatusCode.OK).json({
-                success: true,
-                message: "Workers fetched successfully",
-                data: workers
-            });
+            res.status(HttpStatusCode.OK).json(ResponseHandler.success(workers, RESPONSE_MESSAGES.USERS_FETCHED));
         } catch (error: unknown) {
-            console.error("[GetAllWorkersController] Error:", error);
 
             const message =
                 error instanceof Error ? error.message : typeof error === "string" ? error : JSON.stringify(error);
 
-            res.status(HttpStatusCode.INTERNAL_SERVER).json({
-                success: false,
-                message: "Failed to fetch workers",
-                error: message || "Unknown error"
-            });
+            res.status(HttpStatusCode.INTERNAL_SERVER).json(ResponseHandler.error(RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR, message));
         }
     }
 
@@ -72,18 +57,11 @@ export class AdminController implements IAdminController {
                 VerificationStatus.VERIFIED
             );
 
-            res.status(HttpStatusCode.OK).json({
-                success: true,
-                message: "User approved successfully",
-                user: result
-            });
+            res.status(HttpStatusCode.OK).json(ResponseHandler.success(result, RESPONSE_MESSAGES.SUCCESS));
 
         } catch (error: any) {
             console.error(error);
-            res.status(HttpStatusCode.INTERNAL_SERVER).json({
-                success: false,
-                message: error.message || "Internal server error"
-            });
+            res.status(HttpStatusCode.INTERNAL_SERVER).json(ResponseHandler.error(RESPONSE_MESSAGES.BAD_REQUEST, error));
         }
     };
 
@@ -96,18 +74,11 @@ export class AdminController implements IAdminController {
                 VerificationStatus.NOT_VERIFIED
             );
 
-            res.status(HttpStatusCode.OK).json({
-                success: true,
-                message: "User rejected successfully",
-                user: result
-            });
+            res.status(HttpStatusCode.OK).json(ResponseHandler.success(result, RESPONSE_MESSAGES.SUCCESS));
 
         } catch (error: any) {
             console.error(error);
-            res.status(HttpStatusCode.INTERNAL_SERVER).json({
-                success: false,
-                message: error.message || "Internal server error"
-            });
+            res.status(HttpStatusCode.INTERNAL_SERVER).json(ResponseHandler.error(RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR, error));
         }
     };
 
@@ -118,18 +89,11 @@ export class AdminController implements IAdminController {
             const result = await this._updateUserAccessUseCase.execute(userId);
 
 
-            res.status(HttpStatusCode.OK).json({
-                success: true,
-                message: "User updated sucessfully",
-                user: result
-            });
+            res.status(HttpStatusCode.OK).json(ResponseHandler.success(result, RESPONSE_MESSAGES.UPDATED));
 
         } catch (error: any) {
             console.error(error);
-            res.status(HttpStatusCode.INTERNAL_SERVER).json({
-                success: false,
-                message: error.message || "Internal server error"
-            });
+            res.status(HttpStatusCode.INTERNAL_SERVER).json(ResponseHandler.error(RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR, error));
         }
     }
 }

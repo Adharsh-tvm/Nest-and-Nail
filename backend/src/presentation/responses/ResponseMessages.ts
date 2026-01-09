@@ -37,8 +37,10 @@ export const RESPONSE_MESSAGES = {
 
   // Uploads
   PROFILE_UPLOADED: "Profile picture uploaded successfully",
+  PROFILE_UPDATED: "Profile picture updated successfully",
   DOCUMENT_UPLOADED: "Document uploaded successfully",
   FILE_MISSING: "File is missing",
+  UPDATED: "Updated Successfully",
 
   //
   REFRESH_TOKEN_MISSING: "Refresh token missing",

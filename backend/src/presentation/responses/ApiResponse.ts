@@ -1,5 +1,3 @@
-import { Response } from "express";
-import { HttpStatusCode } from "../../shared/enums/httpCodes";
 
 export type SuccessResponse<T = any> = {
   success: true,
