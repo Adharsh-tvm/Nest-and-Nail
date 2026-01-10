@@ -1,14 +1,6 @@
 "use server"
 
-import { saveWorkerSkills, uploadWorkerCertDocument, uploadWorkerIdDocument } from "@/services/api/worker.api";
-
-export async function saveWorkerSkillsAction(
-  workerId: string,
-  skills: string[]
-) {
-  return await saveWorkerSkills(workerId, skills);
-}
-
+import {  uploadWorkerCertDocument, uploadWorkerIdDocument } from "@/services/api/worker.api";
 
 export async function uploadIdDocumentAction(
   workerId: string,
