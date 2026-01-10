@@ -12,11 +12,11 @@ import {
   Briefcase,
   Hammer,
 } from "lucide-react";
-import { logoutAction } from "@/app/actions/logout-actions";
+import { logoutAction } from "@/app/actions/authentication/logout-actions";
 import { useUserStore } from "@/store/userStore";
 import Link from "next/link";
-import { changeRoleAction } from "@/app/actions/change-role-action";
-import WorkerVerificationFlow from "./DocumentsUpload";
+import { changeRoleAction } from "@/app/actions/users/change-role-action";
+import WorkerVerificationFlow from "../../../admin/verification/DocumentsUpload";
 import { VerificationStatus } from "@/shared/enums/authEnums";
 
 const ClientHeader: React.FC = () => {
@@ -72,10 +72,13 @@ const ClientHeader: React.FC = () => {
 
   let buttonPlaceHolder = "";
 
-  if(currentUser?.documents?.length !== 0 && currentUser?.isVerified !== "VERIFIED"){
-    buttonPlaceHolder =  "Re-apply";
-  }else {
-    buttonPlaceHolder = "Become a worker"
+  if (
+    currentUser?.documents?.length !== 0 &&
+    currentUser?.isVerified !== "VERIFIED"
+  ) {
+    buttonPlaceHolder = "Re-apply";
+  } else {
+    buttonPlaceHolder = "Become a worker";
   }
 
   const toggleUserMode = async () => {

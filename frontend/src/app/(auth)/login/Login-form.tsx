@@ -13,17 +13,17 @@ import {
   Lock,
   ChevronLeft,
 } from "lucide-react";
-import { login } from "../../actions/login-actions";
+import { login } from "../../actions/authentication/login-actions";
 import { useActionState } from "react";
 import { GoogleLogin } from "@react-oauth/google";
-import { handleGoogleSignIn } from "@/app/actions/google-actions";
+import { handleGoogleSignIn } from "@/app/actions/authentication/google-actions";
 import { redirect, useRouter } from "next/navigation";
 
 import {
   forgotPasswordAction,
   verifyResetOtpAction,
   resetPasswordAction,
-} from "@/app/actions/otp-actions";
+} from "@/app/actions/authentication/otp-actions";
 import toast from "react-hot-toast";
 
 // --- Types ---
@@ -162,8 +162,10 @@ const ForgotPasswordDialog = ({
     onClose();
   };
 
-  const dialogInputClass = "w-full pl-9 pr-4 py-3 bg-gray-50 border border-gray-200 text-gray-900 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0f291e] focus:ring-offset-2 focus:ring-offset-white transition-all";
-  const dialogButtonClass = "w-full py-3 px-4 bg-[#0f291e] text-white hover:bg-[#1B4332] font-bold rounded-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-green-900/20 transition-all hover:-translate-y-0.5";
+  const dialogInputClass =
+    "w-full pl-9 pr-4 py-3 bg-gray-50 border border-gray-200 text-gray-900 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0f291e] focus:ring-offset-2 focus:ring-offset-white transition-all";
+  const dialogButtonClass =
+    "w-full py-3 px-4 bg-[#0f291e] text-white hover:bg-[#1B4332] font-bold rounded-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-green-900/20 transition-all hover:-translate-y-0.5";
 
   return (
     <div
@@ -244,7 +246,8 @@ const ForgotPasswordDialog = ({
             <div className="text-center space-y-2">
               <h2 className="text-2xl font-bold text-[#0f291e]">Enter Code</h2>
               <p className="text-sm text-gray-500">
-                We sent a code to <span className="text-gray-900 font-medium">{email}</span>
+                We sent a code to{" "}
+                <span className="text-gray-900 font-medium">{email}</span>
               </p>
             </div>
             <form onSubmit={handleVerifyOtp} className="space-y-4">
@@ -264,7 +267,11 @@ const ForgotPasswordDialog = ({
                   />
                 </div>
               </div>
-              {error && <p className="text-xs text-red-500 font-medium bg-red-50 p-2 rounded">{error}</p>}
+              {error && (
+                <p className="text-xs text-red-500 font-medium bg-red-50 p-2 rounded">
+                  {error}
+                </p>
+              )}
               <div className="flex gap-3">
                 <button
                   type="submit"
@@ -298,7 +305,9 @@ const ForgotPasswordDialog = ({
         {step === "NEW_PASSWORD" && (
           <div className="space-y-6 pt-2">
             <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold text-[#0f291e]">New Password</h2>
+              <h2 className="text-2xl font-bold text-[#0f291e]">
+                New Password
+              </h2>
               <p className="text-sm text-gray-500">
                 Create a strong password for your account.
               </p>
@@ -336,7 +345,11 @@ const ForgotPasswordDialog = ({
                   />
                 </div>
               </div>
-              {error && <p className="text-xs text-red-500 font-medium bg-red-50 p-2 rounded">{error}</p>}
+              {error && (
+                <p className="text-xs text-red-500 font-medium bg-red-50 p-2 rounded">
+                  {error}
+                </p>
+              )}
               <button
                 type="submit"
                 disabled={isLoading}
@@ -387,7 +400,8 @@ export const LoginForm = () => {
   const [isForgotOpen, setIsForgotOpen] = useState(false);
 
   const focusRingClass = "focus:ring-[#0f291e]";
-  const buttonClass = "bg-[#0f291e] text-white hover:bg-[#1B4332] shadow-lg shadow-green-900/20";
+  const buttonClass =
+    "bg-[#0f291e] text-white hover:bg-[#1B4332] shadow-lg shadow-green-900/20";
   const linkClass = "text-gray-500 hover:text-[#DC2626]";
 
   async function onGoogleSuccess(credentialResponse: any) {
@@ -426,10 +440,7 @@ export const LoginForm = () => {
       <div className="px-8 pb-8">
         <form action={formAction} className="space-y-5">
           <div className="space-y-2">
-            <label
-              htmlFor="email"
-              className="text-sm font-bold text-gray-700"
-            >
+            <label htmlFor="email" className="text-sm font-bold text-gray-700">
               Email Address
             </label>
             <div className="relative">

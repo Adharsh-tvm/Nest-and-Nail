@@ -26,7 +26,7 @@ import { useUserStore } from "@/store/userStore";
 import {
   updateUserProfileAction,
   uploadDocumentAction,
-} from "@/app/actions/user-profile-actions";
+} from "@/app/actions/users/user-profile-actions";
 import { VerificationStatus } from "@/shared/enums/authEnums";
 
 type ErrorState = {
@@ -128,10 +128,11 @@ const FileUploader: React.FC<FileUploaderProps> = ({
       <div
         className={`relative border-2 border-dashed rounded-xl transition-all duration-200 cursor-pointer group
         ${error ? "border-red-300 bg-red-50" : ""}
-        ${isDragging
+        ${
+          isDragging
             ? "border-[#DC2626] bg-red-50/50"
             : "border-gray-200 hover:border-[#1B4332] hover:bg-gray-50"
-          }
+        }
         ${file ? "bg-green-50 border-green-200 border-solid" : "bg-white"}
         `}
         onDragEnter={handleDrag}
@@ -424,12 +425,14 @@ const WorkerVerificationFlow: React.FC<WorkerVerificationFlowProps> = ({
             </div>
             <div className="h-2 bg-gray-100 rounded-full overflow-hidden flex">
               <div
-                className={`h-full transition-all duration-500 ease-out ${step >= 1 ? "bg-[#DC2626] w-1/2" : "bg-transparent w-1/2"
-                  }`}
+                className={`h-full transition-all duration-500 ease-out ${
+                  step >= 1 ? "bg-[#DC2626] w-1/2" : "bg-transparent w-1/2"
+                }`}
               />
               <div
-                className={`h-full transition-all duration-500 ease-out ${step >= 2 ? "bg-[#DC2626] w-1/2" : "bg-transparent w-1/2"
-                  }`}
+                className={`h-full transition-all duration-500 ease-out ${
+                  step >= 2 ? "bg-[#DC2626] w-1/2" : "bg-transparent w-1/2"
+                }`}
               />
             </div>
           </div>
@@ -462,9 +465,10 @@ const WorkerVerificationFlow: React.FC<WorkerVerificationFlowProps> = ({
               disabled={isSubmitting}
               className={`
                 font-bold py-3 px-8 rounded-xl transition-all shadow-md flex items-center gap-2
-                ${isSubmitting
-                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  : "bg-[#1B4332] text-white hover:bg-[#143225] shadow-green-900/20 hover:shadow-lg"
+                ${
+                  isSubmitting
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-[#1B4332] text-white hover:bg-[#143225] shadow-green-900/20 hover:shadow-lg"
                 }
               `}
             >

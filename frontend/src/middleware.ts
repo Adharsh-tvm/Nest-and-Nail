@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { refreshTokens, verifyAccessToken, verifyRefreshToken } from "./app/actions/session-actions";
+import { refreshTokens, verifyAccessToken, verifyRefreshToken } from "./app/actions/authentication/session-actions";
 
 export async function middleware(req: NextRequest) {
     const { pathname } = req.nextUrl;
@@ -22,7 +22,7 @@ export async function middleware(req: NextRequest) {
         }
     }
 
-    const publicRoutes = ["/login", "/signup", ];
+    const publicRoutes = ["/login", "/signup",];
 
     const isPublicRoute = publicRoutes.some((path) => pathname.startsWith(path)) || pathname === "/";
 

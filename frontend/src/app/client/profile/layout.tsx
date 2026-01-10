@@ -1,4 +1,4 @@
-import Sidebar from "@/app/components/containers/ClientSidebar";
+import Sidebar from "@/app/components/containers/layout/ClientSidebar";
 
 export const metadata = {
   title: "Nest & Nail",
