@@ -101,32 +101,32 @@ export class AuthController implements IAuthController {
   }
 
   // ---------------- SEND OTP ----------------
-  sendOtp = async (req: Request, res: Response) => {
+  async sendOtp(req: Request, res: Response): Promise<void> {
     try {
       const email = req.body.email || req.body.email_address;
       const role = req.body.role || req.body.user_role;
 
       if (!email || !role) {
-        return res.status(HttpStatusCode.BAD_REQUEST).json(
+        res.status(HttpStatusCode.BAD_REQUEST).json(
           ResponseHandler.error(RESPONSE_MESSAGES.BAD_REQUEST, "Email and role are required")
         );
       }
 
       await this._sendOtpUseCase.execute(email, role);
 
-      return res.status(HttpStatusCode.OK).json(
+      res.status(HttpStatusCode.OK).json(
         ResponseHandler.success(null, RESPONSE_MESSAGES.OTP_SENT)
       );
 
     } catch (error: unknown) {
-      return res.status(HttpStatusCode.BAD_REQUEST).json(
+      res.status(HttpStatusCode.BAD_REQUEST).json(
         ResponseHandler.error(RESPONSE_MESSAGES.BAD_REQUEST, error)
       );
     }
   };
 
   // ---------------- VERIFY OTP ----------------
-  verifyOtp = async (req: Request, res: Response) => {
+  async verifyOtp(req: Request, res: Response): Promise<void> {
     try {
       const email = req.body.email || req.body.email_address;
       const otp = req.body.otp;
@@ -134,17 +134,17 @@ export class AuthController implements IAuthController {
       const result = await this._verifyOtpUseCase.execute(email, otp);
 
       if (!result) {
-        return res.status(HttpStatusCode.BAD_REQUEST).json(
+        res.status(HttpStatusCode.BAD_REQUEST).json(
           ResponseHandler.error(RESPONSE_MESSAGES.BAD_REQUEST, "Invalid OTP")
         );
       }
 
-      return res.status(HttpStatusCode.OK).json(
+      res.status(HttpStatusCode.OK).json(
         ResponseHandler.success(null, RESPONSE_MESSAGES.OTP_VERIFIED)
       );
 
     } catch (error: unknown) {
-      return res.status(HttpStatusCode.BAD_REQUEST).json(
+      res.status(HttpStatusCode.BAD_REQUEST).json(
         ResponseHandler.error(RESPONSE_MESSAGES.BAD_REQUEST, error)
       );
     }
@@ -161,55 +161,55 @@ export class AuthController implements IAuthController {
   }
 
   // ---------------- FORGOT PASSWORD ----------------
-  forgotPassword = async (req: Request, res: Response) => {
+  async forgotPassword(req: Request, res: Response): Promise<void> {
     try {
       const email = req.body.email_address || req.body.email;
 
       if (!email) {
-        return res.status(HttpStatusCode.BAD_REQUEST).json(
+        res.status(HttpStatusCode.BAD_REQUEST).json(
           ResponseHandler.error(RESPONSE_MESSAGES.BAD_REQUEST, "Email is required")
         );
       }
 
       const result = await this._forgotPasswordUseCase.execute(email);
 
-      return res.status(HttpStatusCode.OK).json(
+      res.status(HttpStatusCode.OK).json(
         ResponseHandler.success(result, RESPONSE_MESSAGES.OTP_SENT)
       );
 
     } catch (error: unknown) {
-      return res.status(HttpStatusCode.BAD_REQUEST).json(
+      res.status(HttpStatusCode.BAD_REQUEST).json(
         ResponseHandler.error(RESPONSE_MESSAGES.BAD_REQUEST, error)
       );
     }
   };
 
   // ---------------- RESET PASSWORD ----------------
-  resetPassword = async (req: Request, res: Response) => {
+  async resetPassword(req: Request, res: Response): Promise<void> {
     try {
       const email = req.body.email || req.body.email_address;
       const { newPassword, confirmPassword } = req.body;
 
       if (!email || !newPassword || !confirmPassword) {
-        return res.status(HttpStatusCode.BAD_REQUEST).json(
+        res.status(HttpStatusCode.BAD_REQUEST).json(
           ResponseHandler.error(RESPONSE_MESSAGES.BAD_REQUEST, "Missing required fields")
         );
       }
 
       if (newPassword !== confirmPassword) {
-        return res.status(HttpStatusCode.BAD_REQUEST).json(
+        res.status(HttpStatusCode.BAD_REQUEST).json(
           ResponseHandler.error(RESPONSE_MESSAGES.PASSWORD_MISMATCH)
         );
       }
 
       await this._resetPasswordUseCase.execute(email, newPassword);
 
-      return res.status(HttpStatusCode.OK).json(
+      res.status(HttpStatusCode.OK).json(
         ResponseHandler.success(null, RESPONSE_MESSAGES.SUCCESS)
       );
 
     } catch (error: unknown) {
-      return res.status(HttpStatusCode.BAD_REQUEST).json(
+      res.status(HttpStatusCode.BAD_REQUEST).json(
         ResponseHandler.error(RESPONSE_MESSAGES.BAD_REQUEST, error)
       );
     }
@@ -219,6 +219,8 @@ export class AuthController implements IAuthController {
   async refreshToken(req: Request, res: Response): Promise<void> {
     try {
       const refreshToken = req.cookies.refreshToken || req.body.refreshToken;
+
+      console.log("reeeeeeeeeeeeeeeefrrrrrrrreeeeessssssssh ")
 
       if (!refreshToken) {
         res.status(HttpStatusCode.UNAUTHORIZED).json(

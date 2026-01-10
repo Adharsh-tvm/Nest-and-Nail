@@ -1,5 +1,5 @@
 import axiosInstance from "@/lib/axiosInstance";
-import { ApiResponse } from "@/shared/types/responseTypes";
+import { ApiResponse, SuccessResponse } from "@/shared/types/responseTypes";
 
 export type LoginPayload = {
   email_address: string;
@@ -51,7 +51,15 @@ export const authApi = {
   signup: (payload: any) =>
     axiosInstance.post("/api/auth/register", payload),
 
-  refresh: () => axiosInstance.post("/api/auth/refresh"),
+ refresh: (refreshToken: string) =>
+    axiosInstance.post<
+      SuccessResponse<{
+        accessToken: string;
+        refreshToken: string;
+      }>
+    >("/api/auth/refresh", {
+      refreshToken,
+    }),
 
   verify: (payload: { token: string }) =>
     axiosInstance.post("/api/auth/verify", payload),
