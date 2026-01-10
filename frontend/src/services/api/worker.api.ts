@@ -1,22 +1,5 @@
 import axiosInstance from "@/lib/axiosInstance";
 
-export async function saveWorkerSkills(
-  workerId: string,
-  skills: string[]
-) {
-  try {
-    const res = await axiosInstance.put(
-      `/api/worker/${workerId}/skills`,
-      { skills }
-    );
-    return res.data;
-  } catch (error: any) {
-    throw new Error(
-      error.normalizedMessage || "Failed to save worker skills"
-    );
-  }
-}
-
 
 export async function uploadWorkerIdDocument(
   workerId: string,
