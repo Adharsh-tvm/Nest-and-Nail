@@ -16,10 +16,10 @@ import {
   Users,
 } from "lucide-react";
 
-import DataTable from "@/app/components/containers/DataTable";
-import type { Column } from "@/app/components/containers/DataTable";
+import DataTable from "@/app/components/containers/widgets/DataTable";
+import type { Column } from "@/app/components/containers/widgets/DataTable";
 import { useUsers } from "@/hooks/useUsers";
-import { toggleUserAccessAction } from "@/app/actions/admin-actions";
+import { toggleUserAccessAction } from "@/app/actions/admin/admin-actions";
 import { VerificationStatus } from "@/shared/enums/authEnums";
 
 /**

@@ -2,9 +2,9 @@
 import React from "react";
 import "./globals.css";
 import { GoogleOAuthProvider } from "@react-oauth/google";
-import UserHydration from "@/app/components/containers/UserHydration";
-import { ToastProvider } from "./components/containers/ToasterProvider";
-import { getCurrentUser } from "./actions/user-actions";
+import UserHydration from "@/app/components/containers/providers/UserHydration";
+import { ToastProvider } from "./components/containers/providers/ToasterProvider";
+import { getCurrentUser } from "./actions/users/user-actions";
 
 export default async function RootLayout({
   children,

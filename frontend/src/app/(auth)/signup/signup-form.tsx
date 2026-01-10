@@ -15,41 +15,43 @@ import {
   signup,
   completeSignup,
   resendOtp,
-} from "../../actions/signup-actions";
+} from "../../actions/authentication/signup-actions";
 import OtpVerificationForm from "../otp/page";
 import { redirect, useRouter } from "next/navigation";
 import { GoogleLogin } from "@react-oauth/google";
-import { handleGoogleSignIn } from "@/app/actions/google-actions";
+import { handleGoogleSignIn } from "@/app/actions/authentication/google-actions";
 import { Toaster, toast } from "react-hot-toast";
-
 
 const roleConfig = {
   client: {
     icon: <User className="h-6 w-6 text-yellow-600" />,
-    buttonClass: "bg-[#0f291e] text-white hover:bg-[#1B4332] shadow-lg shadow-green-900/20",
+    buttonClass:
+      "bg-[#0f291e] text-white hover:bg-[#1B4332] shadow-lg shadow-green-900/20",
     focusRingClass: "focus:ring-[#0f291e]",
     checkboxClass:
       "data-[state=checked]:bg-[#0f291e] data-[state=checked]:text-white",
     linkClass: "text-yellow-600 hover:text-yellow-700",
-    badgeClass: "bg-yellow-50 text-yellow-700 border-yellow-200"
+    badgeClass: "bg-yellow-50 text-yellow-700 border-yellow-200",
   },
   worker: {
     icon: <Wrench className="h-6 w-6 text-green-600" />,
-    buttonClass: "bg-[#0f291e] text-white hover:bg-[#1B4332] shadow-lg shadow-green-900/20",
+    buttonClass:
+      "bg-[#0f291e] text-white hover:bg-[#1B4332] shadow-lg shadow-green-900/20",
     focusRingClass: "focus:ring-[#0f291e]",
     checkboxClass:
       "data-[state=checked]:bg-[#0f291e] data-[state=checked]:text-white",
     linkClass: "text-green-600 hover:text-green-700",
-    badgeClass: "bg-green-50 text-green-700 border-green-200"
+    badgeClass: "bg-green-50 text-green-700 border-green-200",
   },
   admin: {
     icon: <Shield className="h-6 w-6 text-teal-600" />,
-    buttonClass: "bg-[#0f291e] text-white hover:bg-[#1B4332] shadow-lg shadow-green-900/20",
+    buttonClass:
+      "bg-[#0f291e] text-white hover:bg-[#1B4332] shadow-lg shadow-green-900/20",
     focusRingClass: "focus:ring-[#0f291e]",
     checkboxClass:
       "data-[state=checked]:bg-[#0f291e] data-[state=checked]:text-white",
     linkClass: "text-teal-600 hover:text-teal-700",
-    badgeClass: "bg-teal-50 text-teal-700 border-teal-200"
+    badgeClass: "bg-teal-50 text-teal-700 border-teal-200",
   },
 };
 
@@ -95,7 +97,6 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
       toast.error(state.error);
     }
   }, [state.errorId]);
-
 
   useEffect(() => {
     if (state.otpSent) {
@@ -235,7 +236,9 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
         <div className="bg-white border-t-4 border-[#DC2626] rounded-2xl shadow-xl overflow-hidden">
           <div className="p-6 pb-0 text-center">
             <div className="flex justify-center mb-4">
-              <div className={`p-2.5 rounded-xl shadow-md border ${currentRoleConfig.badgeClass}`}>
+              <div
+                className={`p-2.5 rounded-xl shadow-md border ${currentRoleConfig.badgeClass}`}
+              >
                 {currentRoleConfig.icon}
               </div>
             </div>
@@ -419,7 +422,9 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
 
             {otpError && (
               <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg shadow-sm">
-                <p className="text-sm text-red-600 text-center font-medium">{otpError}</p>
+                <p className="text-sm text-red-600 text-center font-medium">
+                  {otpError}
+                </p>
               </div>
             )}
 
@@ -427,7 +432,9 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
               <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center rounded-2xl">
                 <div className="bg-white border border-gray-200 p-6 rounded-xl shadow-xl flex flex-col items-center">
                   <Loader2 className="h-8 w-8 animate-spin text-[#DC2626] mx-auto" />
-                  <p className="text-gray-900 mt-4 text-sm font-medium">Verifying OTP...</p>
+                  <p className="text-gray-900 mt-4 text-sm font-medium">
+                    Verifying OTP...
+                  </p>
                 </div>
               </div>
             )}

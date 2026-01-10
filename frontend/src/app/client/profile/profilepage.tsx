@@ -15,7 +15,7 @@ import {
   Upload,
 } from "lucide-react";
 import { useUserStore } from "@/store/userStore";
-import { updateUserProfileAction } from "@/app/actions/user-profile-actions";
+import { updateUserProfileAction } from "@/app/actions/users/user-profile-actions";
 import toast from "react-hot-toast";
 import { Address } from "./page";
 

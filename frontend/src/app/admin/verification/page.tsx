@@ -14,15 +14,15 @@ import {
   Shield,
   TrendingUp,
   Clock,
-  Mail
+  Mail,
 } from "lucide-react";
 import { PendingVerificationUser } from "@/types/types";
 import { useUsers } from "@/hooks/useUsers";
-import DataTable from "@/app/components/containers/DataTable";
+import DataTable from "@/app/components/containers/widgets/DataTable";
 import {
   approveUserAction,
   rejectUserAction,
-} from "@/app/actions/admin-actions";
+} from "@/app/actions/admin/admin-actions";
 import { VerificationStatus } from "@/shared/enums/authEnums";
 
 /* ---------------------------------------------------------------------------
@@ -91,7 +91,10 @@ const VerificationModal: React.FC<VerificationModalProps> = ({
             onClick={onClose}
             className="p-2 hover:bg-gray-100 rounded-full transition-colors group"
           >
-            <X size={24} className="text-gray-400 group-hover:text-red-500 transition-colors" />
+            <X
+              size={24}
+              className="text-gray-400 group-hover:text-red-500 transition-colors"
+            />
           </button>
         </div>
 
@@ -125,28 +128,32 @@ const VerificationModal: React.FC<VerificationModalProps> = ({
               </div>
 
               <div className="space-y-4 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-                <h4 className="font-bold text-gray-900 text-sm">Contact Info</h4>
+                <h4 className="font-bold text-gray-900 text-sm">
+                  Contact Info
+                </h4>
                 <div className="space-y-3">
                   <div className="flex items-center gap-3 text-sm p-2 bg-gray-50 rounded-lg">
                     <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-gray-400 shadow-sm">
                       <Mail size={16} />
                     </div>
-                    <span className="truncate flex-1 text-gray-600" title={request.email}>
+                    <span
+                      className="truncate flex-1 text-gray-600"
+                      title={request.email}
+                    >
                       {request.email}
                     </span>
                   </div>
                   {request.phone && (
                     <div className="flex items-center gap-3 text-sm p-2 bg-gray-50 rounded-lg">
                       <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-gray-400 shadow-sm">
-                        <Briefcase size={16} /> {/* Using briefcase as placeholder for phone if phone icon not imported, but Phone is imported in standard lucide. Wait, I didn't import Phone here. Fixed imports. */}
+                        <Briefcase size={16} />{" "}
+                        {/* Using briefcase as placeholder for phone if phone icon not imported, but Phone is imported in standard lucide. Wait, I didn't import Phone here. Fixed imports. */}
                       </div>
                       <span className="text-gray-600">{request.phone}</span>
                     </div>
                   )}
                 </div>
               </div>
-
-
             </div>
 
             {/* RIGHT: Documents */}
@@ -166,7 +173,10 @@ const VerificationModal: React.FC<VerificationModalProps> = ({
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                         />
                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
-                          <Eye size={32} className="text-white opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-4 group-hover:translate-y-0 duration-300" />
+                          <Eye
+                            size={32}
+                            className="text-white opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-4 group-hover:translate-y-0 duration-300"
+                          />
                         </div>
                         <div className="absolute bottom-3 left-3 px-3 py-1 bg-white/90 text-gray-900 text-xs rounded-lg font-bold backdrop-blur-md shadow-sm">
                           Front Side
@@ -181,7 +191,10 @@ const VerificationModal: React.FC<VerificationModalProps> = ({
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                         />
                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
-                          <Eye size={32} className="text-white opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-4 group-hover:translate-y-0 duration-300" />
+                          <Eye
+                            size={32}
+                            className="text-white opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-4 group-hover:translate-y-0 duration-300"
+                          />
                         </div>
                         <div className="absolute bottom-3 left-3 px-3 py-1 bg-white/90 text-gray-900 text-xs rounded-lg font-bold backdrop-blur-md shadow-sm">
                           Back Side
@@ -199,11 +212,12 @@ const VerificationModal: React.FC<VerificationModalProps> = ({
                 </h4>
                 <div className="space-y-3">
                   {/* extra documents */}
-                  {extraDocs.length === 0 && request.certificates.length === 0 && (
-                    <div className="p-8 bg-gray-50 rounded-2xl border border-dashed border-gray-200 text-center text-gray-400 text-sm">
-                      No additional documents provided
-                    </div>
-                  )}
+                  {extraDocs.length === 0 &&
+                    request.certificates.length === 0 && (
+                      <div className="p-8 bg-gray-50 rounded-2xl border border-dashed border-gray-200 text-center text-gray-400 text-sm">
+                        No additional documents provided
+                      </div>
+                    )}
                   {extraDocs.map((docUrl, i) => (
                     <div
                       key={`doc-${i}`}
@@ -330,7 +344,7 @@ const VerificationsPendingView: React.FC = () => {
           workPhotos: u.workPhotos ?? [],
 
           address: Array.isArray(u.address)
-            ? u.address.map(a => a.street).join(", ")
+            ? u.address.map((a) => a.street).join(", ")
             : undefined,
 
           phone: u.phone_number?.toString(),
@@ -391,7 +405,9 @@ const VerificationsPendingView: React.FC = () => {
           </div>
           <div>
             <div className="font-bold text-gray-900">{row.name}</div>
-            <div className="text-xs text-gray-500 font-mono mt-0.5">{row.email}</div>
+            <div className="text-xs text-gray-500 font-mono mt-0.5">
+              {row.email}
+            </div>
           </div>
         </div>
       ),
@@ -418,7 +434,7 @@ const VerificationsPendingView: React.FC = () => {
             day: "numeric",
           })}
         </div>
-      )
+      ),
     },
     {
       header: "",
