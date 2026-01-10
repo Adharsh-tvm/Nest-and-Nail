@@ -1,8 +1,8 @@
-import { ILogger } from "../interfaces/ILogger";
-import { Role, VerificationStatus } from "../../shared/enums/authEnums";
-import { CloudinaryUploadService } from "../../infrastructure/services/CloudinaryUploadService";
-import { IUploadWorkerDocumentUseCase } from "../interfaces/IUploadWorkerDocumentUseCase";
-import { IUserRepositoryFactory } from "../../domain/repositories/IUserRepositoryFactory";
+import { ILogger } from "../../interfaces/ILogger";
+import { Role, VerificationStatus } from "../../../shared/enums/authEnums";
+import { CloudinaryUploadService } from "../../../infrastructure/services/CloudinaryUploadService";
+import { IUploadWorkerDocumentUseCase } from "../../interfaces/IUploadWorkerDocumentUseCase";
+import { IUserRepositoryFactory } from "../../../domain/repositories/IUserRepositoryFactory";
 
 export class UploadWorkerDocumentUseCase implements IUploadWorkerDocumentUseCase {
     constructor(

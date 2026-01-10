@@ -17,10 +17,10 @@ import { UserRepositoryFactory } from "../repo/UserRepositoryFactory";
 import { OtpRepository } from "../repo/OtpRepository";
 
 
-import { RegisterUserUseCase } from "../../application/use-cases/RegisterUserUseCase";
-import { LoginUserUseCase } from "../../application/use-cases/LoginUserUseCase";
-import { SendOtpUseCase } from "../../application/use-cases/SendOtpUseCase";
-import { VerifyOtpUseCase } from "../../application/use-cases/VerifyOtpUseCase";
+import { RegisterUserUseCase } from "../../application/use-cases/auth/RegisterUserUseCase";
+import { LoginUserUseCase } from "../../application/use-cases/auth/LoginUserUseCase";
+import { SendOtpUseCase } from "../../application/use-cases/auth/SendOtpUseCase";
+import { VerifyOtpUseCase } from "../../application/use-cases/auth/VerifyOtpUseCase";
 
 import { OtpService } from "../services/OtpService";
 import { NodemailerEmailService } from "../services/NodemailerEmailService";
@@ -29,9 +29,9 @@ import { AuthController } from "../../presentation/controllers/AuthController";
 import { AuthMiddleware } from "../../presentation/middlewares/AuthMiddleware";
 import { IGoogleSignUpUseCase } from "../../application/interfaces/IGoogleSignUpUseCase";
 import { GoogleAuthController } from "../../presentation/controllers/GoogleAuthController";
-import { GoogleSignUpUseCase } from "../../application/use-cases/GoogleSignUpUseCase";
+import { GoogleSignUpUseCase } from "../../application/use-cases/auth/GoogleSignUpUseCase";
 import { IGetAllClientsUseCase } from "../../application/interfaces/IGetAllClientsUseCase";
-import { GetAllClientsUseCase } from "../../application/use-cases/GetAllClientsUseCase";
+import { GetAllClientsUseCase } from "../../application/use-cases/admin/GetAllClientsUseCase";
 import { IClientRepository } from "../../domain/repositories/IClientRepository";
 import { ClientRepository } from "../repo/ClientRepository";
 import { IAuthController } from "../../presentation/interfaces/IAuthController";
@@ -41,33 +41,33 @@ import { AdminController } from "../../presentation/controllers/AdminController"
 import { IGetAllWorkersUseCase } from "../../application/interfaces/IGetAllWorkersUseCase";
 import { IWorkerRepository } from "../../domain/repositories/IWorkerRepository";
 import { WorkerRepository } from "../repo/WorkerRepository";
-import { GetAllWorkersUseCase } from "../../application/use-cases/GetAllWorkersUseCase";
+import { GetAllWorkersUseCase } from "../../application/use-cases/admin/GetAllWorkersUseCase";
 import { IForgotPasswordUseCase } from "../../application/interfaces/IForgotPasswordUseCase";
-import { ForgotPasswordUseCase } from "../../application/use-cases/ForgotPasswordUseCase";
+import { ForgotPasswordUseCase } from "../../application/use-cases/auth/ForgotPasswordUseCase";
 import { IResetPasswordUseCase } from "../../application/interfaces/IResetPasswordUseCase";
-import { ResetPasswordUseCase } from "../../application/use-cases/ResetPasswordUseCase";
+import { ResetPasswordUseCase } from "../../application/use-cases/auth/ResetPasswordUseCase";
 import { IChangeUserRoleUseCase } from "../../application/interfaces/IChangeUserRoleUseCase";
-import { ChangeUserRoleUseCase } from "../../application/use-cases/ChangeUserRoleUseCase";
+import { ChangeUserRoleUseCase } from "../../application/use-cases/user/ChangeUserRoleUseCase";
 import { IUserController } from "../../presentation/interfaces/IUserController";
 import { UserController } from "../../presentation/controllers/UserController";
 import { IGetCurrentUserUseCase } from "../../application/interfaces/IGetCurrentUserUseCase";
-import { GetCurrentUserUseCase } from "../../application/use-cases/GetCurrentUserUseCase";
+import { GetCurrentUserUseCase } from "../../application/use-cases/user/GetCurrentUserUseCase";
 import { IUploadProfilePictureUseCase } from "../../application/interfaces/IUploadProfilePictureUseCase";
 import { IUploadWorkerDocumentUseCase } from "../../application/interfaces/IUploadWorkerDocumentUseCase";
-import { UploadProfilePictureUseCase } from "../../application/use-cases/UploadProfilePictureUseCase";
-import { UploadWorkerDocumentUseCase } from "../../application/use-cases/UploadWorkerDocumentUseCase";
+import { UploadProfilePictureUseCase } from "../../application/use-cases/admin/UploadProfilePictureUseCase";
+import { UploadWorkerDocumentUseCase } from "../../application/use-cases/user/UploadWorkerDocumentUseCase";
 import { IUploadController } from "../../presentation/interfaces/IUploadController";
 import { UploadController } from "../../presentation/controllers/UploadController";
 import { IUpdateUserProfileUseCase } from "../../application/interfaces/IUpdateUserProfileUseCase";
-import { UpdateUserProfileUseCase } from "../../application/use-cases/UpdateUserProfileUseCase";
+import { UpdateUserProfileUseCase } from "../../application/use-cases/user/UpdateUserProfileUseCase";
 import { IUserProfileController } from "../../presentation/interfaces/IUserProfileController";
 import { UserProfileController } from "../../presentation/controllers/UserProfileController";
 import { IGetAllUsersUseCase } from "../../application/interfaces/IGetAllUsersUseCase";
-import { GetAllUsersUseCase } from "../../application/use-cases/GetAllUsersUseCase";
+import { GetAllUsersUseCase } from "../../application/use-cases/admin/GetAllUsersUseCase";
 import { IUpdateVerificationStatusUseCase } from "../../application/interfaces/IUpdateVerificationStatusUseCase";
-import { UpdateVerificationStatusUseCase } from "../../application/use-cases/UpdateVerificationStatusUseCase";
+import { UpdateVerificationStatusUseCase } from "../../application/use-cases/admin/UpdateVerificationStatusUseCase";
 import { IUpdateUserAccessUseCase } from "../../application/interfaces/IUpdateUserAccessUseCase";
-import { UpdateUserAccessUseCase } from "../../application/use-cases/UpdateUserAccessUseCase";
+import { UpdateUserAccessUseCase } from "../../application/use-cases/admin/UpdateUserAccessUseCase";
 import { IUserRepositoryFactory } from "../../domain/repositories/IUserRepositoryFactory";
 import { IOtpRepository } from "../../domain/repositories/IOtpRepository";
 import { IOtpService } from "../../application/services/IOtpService";
@@ -75,7 +75,7 @@ import { IEmailService } from "../../application/services/IEmailService";
 import { IAdminRepository } from "../../domain/repositories/IAdminRepository";
 import { AdminRepository } from "../repo/AdminRepository";
 import { IRefreshTokenUseCase } from "../../application/interfaces/IRefreshTokenUseCase";
-import { RefreshTokenUseCase } from "../../application/use-cases/RefreshTokenUseCase";
+import { RefreshTokenUseCase } from "../../application/use-cases/auth/RefreshTokenUseCase";
 
 export class DIContainer {
   // -------------------------
@@ -307,7 +307,7 @@ export class DIContainer {
 
 
   get refreshTokenUseCase(): IRefreshTokenUseCase {
-    if(!this._refreshTokenUseCase) {
+    if (!this._refreshTokenUseCase) {
       this._refreshTokenUseCase = new RefreshTokenUseCase(
         this.tokenService);
     }

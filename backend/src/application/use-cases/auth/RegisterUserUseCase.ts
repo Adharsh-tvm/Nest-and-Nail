@@ -1,14 +1,14 @@
-import { UserAlreadyExistsError } from "../../domain/errors/DomainError";
-import { LoginMethod } from "../../shared/enums/authEnums";
-import { UserRequestDTO, UserResponseDTO } from "../dtos/UserDTO";
-import { ILogger } from "../interfaces/ILogger";
-import { IRegisterUserUseCase } from "../interfaces/IRegisterUserUseCase";
-import { UserMapper } from "../mappers/UserMapper";
-import { IGenerateUserID } from "../services/IGenerateUserID";
-import { IPasswordHasher } from "../services/IPasswordHasher";
-import { ITokenService } from "../services/ITokenService";
-import { AuthValidator } from "../validators/AuthValidator";
-import { IUserRepositoryFactory } from "../../domain/repositories/IUserRepositoryFactory";
+import { UserAlreadyExistsError } from "../../../domain/errors/DomainError";
+import { LoginMethod } from "../../../shared/enums/authEnums";
+import { UserRequestDTO, UserResponseDTO } from "../../dtos/UserDTO";
+import { ILogger } from "../../interfaces/ILogger";
+import { IRegisterUserUseCase } from "../../interfaces/IRegisterUserUseCase";
+import { UserMapper } from "../../mappers/UserMapper";
+import { IGenerateUserID } from "../../services/IGenerateUserID";
+import { IPasswordHasher } from "../../services/IPasswordHasher";
+import { ITokenService } from "../../services/ITokenService";
+import { AuthValidator } from "../../validators/AuthValidator";
+import { IUserRepositoryFactory } from "../../../domain/repositories/IUserRepositoryFactory";
 
 export class RegisterUserUseCase implements IRegisterUserUseCase {
   constructor(

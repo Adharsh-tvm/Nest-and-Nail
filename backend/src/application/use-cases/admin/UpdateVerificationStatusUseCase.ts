@@ -1,9 +1,9 @@
-import { IUpdateVerificationStatusUseCase } from "../interfaces/IUpdateVerificationStatusUseCase";
-import { VerificationStatus } from "../../shared/enums/authEnums";
-import { UserMapper } from "../mappers/UserMapper";
-import { ILogger } from "../interfaces/ILogger";
-import { Role } from "../../shared/enums/authEnums";
-import { IUserRepositoryFactory } from "../../domain/repositories/IUserRepositoryFactory";
+import { IUpdateVerificationStatusUseCase } from "../../interfaces/IUpdateVerificationStatusUseCase";
+import { VerificationStatus } from "../../../shared/enums/authEnums";
+import { UserMapper } from "../../mappers/UserMapper";
+import { ILogger } from "../../interfaces/ILogger";
+import { Role } from "../../../shared/enums/authEnums";
+import { IUserRepositoryFactory } from "../../../domain/repositories/IUserRepositoryFactory";
 
 export class UpdateVerificationStatusUseCase implements IUpdateVerificationStatusUseCase {
     constructor(
