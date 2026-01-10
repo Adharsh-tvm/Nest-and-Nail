@@ -1,11 +1,11 @@
-import { User } from "../../domain/entities/User";
-import { LoginMethod, Role } from "../../shared/enums/authEnums";
-import { IGoogleSignUpUseCase } from "../interfaces/IGoogleSignUpUseCase";
-import { UserMapper } from "../mappers/UserMapper";
-import { IGenerateUserID } from "../services/IGenerateUserID";
-import { IPasswordHasher } from "../services/IPasswordHasher";
-import { ITokenService } from "../services/ITokenService";
-import { IUserRepositoryFactory } from "../../domain/repositories/IUserRepositoryFactory";
+import { User } from "../../../domain/entities/User";
+import { LoginMethod, Role } from "../../../shared/enums/authEnums";
+import { IGoogleSignUpUseCase } from "../../interfaces/IGoogleSignUpUseCase";
+import { UserMapper } from "../../mappers/UserMapper";
+import { IGenerateUserID } from "../../services/IGenerateUserID";
+import { IPasswordHasher } from "../../services/IPasswordHasher";
+import { ITokenService } from "../../services/ITokenService";
+import { IUserRepositoryFactory } from "../../../domain/repositories/IUserRepositoryFactory";
 
 export class GoogleSignUpUseCase implements IGoogleSignUpUseCase {
     constructor(

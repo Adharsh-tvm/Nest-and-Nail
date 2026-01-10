@@ -1,10 +1,10 @@
-import { IRefreshTokenUseCase } from "../interfaces/IRefreshTokenUseCase";
-import { ITokenService } from "../services/ITokenService";
+import { IRefreshTokenUseCase } from "../../interfaces/IRefreshTokenUseCase";
+import { ITokenService } from "../../services/ITokenService";
 
 export class RefreshTokenUseCase implements IRefreshTokenUseCase {
   constructor(
     private readonly _tokenService: ITokenService
-  ) {}
+  ) { }
 
   async execute(refreshToken: string) {
     // 1. Verify refresh token

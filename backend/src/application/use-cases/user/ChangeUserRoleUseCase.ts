@@ -1,10 +1,10 @@
-import { Role } from "../../shared/enums/authEnums";
-import { UserResponseDTO } from "../dtos/UserDTO";
-import { IChangeUserRoleUseCase } from "../interfaces/IChangeUserRoleUseCase";
-import { ILogger } from "../interfaces/ILogger";
-import { UserMapper } from "../mappers/UserMapper";
-import { ITokenService } from "../services/ITokenService";
-import { IUserRepositoryFactory } from "../../domain/repositories/IUserRepositoryFactory";
+import { Role } from "../../../shared/enums/authEnums";
+import { UserResponseDTO } from "../../dtos/UserDTO";
+import { IChangeUserRoleUseCase } from "../../interfaces/IChangeUserRoleUseCase";
+import { ILogger } from "../../interfaces/ILogger";
+import { UserMapper } from "../../mappers/UserMapper";
+import { ITokenService } from "../../services/ITokenService";
+import { IUserRepositoryFactory } from "../../../domain/repositories/IUserRepositoryFactory";
 
 export class ChangeUserRoleUseCase implements IChangeUserRoleUseCase {
     constructor(
@@ -19,7 +19,7 @@ export class ChangeUserRoleUseCase implements IChangeUserRoleUseCase {
         refreshToken: string;
     }> {
         this._logger.info(`[ChangeUserRoleUseCase] User ${userId} switching to ${newRole}`);
-        
+
 
         const clientRepo = this._repositoryFactory.getRepository(Role.CLIENT);
         const workerRepo = this._repositoryFactory.getRepository(Role.WORKER);
