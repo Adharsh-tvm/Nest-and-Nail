@@ -198,8 +198,10 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
 
     if (result?.success) {
       const redirectPath = result.user.user_role;
+      toast.success(result?.message)
       redirect(redirectPath);
     } else {
+      toast.error("Google login error")
       console.log("Google login error");
     }
   }
