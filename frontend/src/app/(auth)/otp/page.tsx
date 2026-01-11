@@ -1,4 +1,3 @@
-// app/components/OtpVerificationForm.tsx
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
