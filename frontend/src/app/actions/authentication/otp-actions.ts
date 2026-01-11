@@ -102,15 +102,28 @@ export async function forgotPasswordAction(email_address: string) {
 }
 
 
-export async function verifyResetOtpAction(email_address: string, otp: string) {
+export async function verifyResetOtpAction(
+  email_address: string,
+  otp: string
+) {
   try {
     const response = await authApi.verifyOtp({ email_address, otp });
+
+    const data = response.data;
+
+    if (!data.success) {
+      return {
+        error: data.error || data.message || "Invalid or expired OTP",
+      };
+    }
+
     return { success: true };
+
   } catch (error: any) {
     return {
       error:
         error.response?.data?.message ||
-        "Invalid or expired OTP",
+        "Unable to verify OTP. Please try again.",
     };
   }
 }
