@@ -137,18 +137,21 @@ export class AuthController implements IAuthController {
         res.status(HttpStatusCode.BAD_REQUEST).json(
           ResponseHandler.error(RESPONSE_MESSAGES.BAD_REQUEST, "Invalid OTP")
         );
+        return;
       }
 
       res.status(HttpStatusCode.OK).json(
         ResponseHandler.success(null, RESPONSE_MESSAGES.OTP_VERIFIED)
       );
+      return;
 
     } catch (error: unknown) {
       res.status(HttpStatusCode.BAD_REQUEST).json(
         ResponseHandler.error(RESPONSE_MESSAGES.BAD_REQUEST, error)
       );
     }
-  };
+  }
+
 
   // ---------------- LOGOUT ----------------
   async logout(req: Request, res: Response): Promise<void> {
