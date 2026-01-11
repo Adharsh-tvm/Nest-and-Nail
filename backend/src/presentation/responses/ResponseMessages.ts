@@ -14,6 +14,7 @@ export const RESPONSE_MESSAGES = {
 
   OTP_SENT: "OTP sent successfully",
   OTP_VERIFIED: "OTP verified successfully",
+  INVALID_OTP: "Invalid Otp",
 
   INVALID_CREDENTIALS: "Invalid email or password",
   TOKEN_REFRESH_SUCCESS: "Token refreshed successfully",
