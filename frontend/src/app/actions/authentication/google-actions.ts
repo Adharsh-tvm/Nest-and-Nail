@@ -71,8 +71,6 @@ export async function handleGoogleSignIn(
         path: "/"
       });
 
-
-
       cookieStore.set("userRole", user.user_role, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
@@ -88,7 +86,6 @@ export async function handleGoogleSignIn(
         maxAge: ACCESS_MAX_AGE,
         path: "/"
       });
-
 
       return {
         success: true,

@@ -1,5 +1,7 @@
 import axiosInstance from "@/lib/axiosInstance";
-import { ApiResponse, SuccessResponse } from "@/shared/types/responseTypes";
+import { ApiResponse } from "@/shared/types/responseTypes";
+
+/* ---------------- PAYLOADS ---------------- */
 
 export type LoginPayload = {
   email_address: string;
@@ -7,28 +9,14 @@ export type LoginPayload = {
 };
 
 export type GoogleAuthPayload = {
-  name: string,
-  email: string,
-  role?: string
+  name: string;
+  email: string;
+  role?: string;
 };
 
-type googleAuthResponse = {
-  success: boolean;
-  message: string;
-  payload?: {
-    user: any,
-    accessToken: string;
-    refreshToken: string
-  }
-}
+/* ---------------- RESPONSE PAYLOADS ---------------- */
 
-export type AuthResponse<UserType = any> = {
-  user?: UserType;
-  accessToken?: string;
-  refreshToken?: string;
-};
-
-export type LoginPayloadResponse = {
+export type AuthPayload = {
   user: {
     user_id: string;
     user_name: string;
@@ -41,46 +29,63 @@ export type LoginPayloadResponse = {
   refreshToken: string;
 };
 
+/* ---------------- API ---------------- */
+
 export const authApi = {
   login: (payload: LoginPayload) =>
-    axiosInstance.post<ApiResponse<LoginPayloadResponse>>(
+    axiosInstance.post<ApiResponse<AuthPayload>>(
       "/api/auth/login",
       payload
     ),
 
   signup: (payload: any) =>
-    axiosInstance.post("/api/auth/register", payload),
+    axiosInstance.post<ApiResponse<AuthPayload>>(
+      "/api/auth/register",
+      payload
+    ),
 
- refresh: (refreshToken: string) =>
-    axiosInstance.post<
-      SuccessResponse<{
-        accessToken: string;
-        refreshToken: string;
-      }>
-    >("/api/auth/refresh", {
-      refreshToken,
-    }),
+  refresh: (refreshToken: string) =>
+    axiosInstance.post<ApiResponse<{
+      accessToken: string;
+      refreshToken: string;
+    }>>("/api/auth/refresh", { refreshToken }),
 
-  verify: (payload: { token: string }) =>
-    axiosInstance.post("/api/auth/verify", payload),
-
-  logout: () => axiosInstance.post("/api/auth/logout"),
+  logout: () =>
+    axiosInstance.post<ApiResponse<null>>("/api/auth/logout"),
 
   sendOtp: (payload: { email_address: string; role?: string }) =>
-    axiosInstance.post("/api/auth/send-otp", payload),
+    axiosInstance.post<ApiResponse<null>>(
+      "/api/auth/send-otp",
+      payload
+    ),
 
   verifyOtp: (payload: { email_address: string; otp: string }) =>
-    axiosInstance.post("/api/auth/verify-otp", payload),
+    axiosInstance.post<ApiResponse<null>>(
+      "/api/auth/verify-otp",
+      payload
+    ),
 
   googleAuth: (payload: GoogleAuthPayload) =>
-    axiosInstance.post<googleAuthResponse>("/api/auth/google", payload),
+    axiosInstance.post<ApiResponse<AuthPayload>>(
+      "/api/auth/google",
+      payload
+    ),
 
   forgotPassword: (payload: { email_address: string }) =>
-    axiosInstance.post("/api/auth/forgot-password", payload),
+    axiosInstance.post<ApiResponse<null>>(
+      "/api/auth/forgot-password",
+      payload
+    ),
 
-  resetPassword: (payload: { email_address: string; newPassword: string; confirmPassword: string }) =>
-    axiosInstance.post("/api/auth/reset-password", payload),
+  resetPassword: (payload: {
+    email_address: string;
+    newPassword: string;
+    confirmPassword: string;
+  }) =>
+    axiosInstance.post<ApiResponse<null>>(
+      "/api/auth/reset-password",
+      payload
+    ),
 };
 
 export default authApi;
-

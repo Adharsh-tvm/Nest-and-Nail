@@ -1,7 +1,8 @@
 "use server";
 
 import axiosInstance from "@/lib/axiosInstance";
-import { VerificationStatus } from "@/shared/enums/authEnums"; 
+import { VerificationStatus } from "@/shared/enums/authEnums";
+import { ApiResponse } from "@/shared/types/responseTypes";
 import { User } from "@/shared/types/userTypes";
 
 /* ---------------- TYPES ---------------- */
@@ -29,11 +30,6 @@ export type Worker = {
   isVerified: VerificationStatus;
 };
 
-type ApiListResponse<T> = {
-  success: boolean;
-  message?: string;
-  data: T;
-};
 
 /* ---------------- HELPERS ---------------- */
 
@@ -58,11 +54,15 @@ function normalizeVerification(value: any): VerificationStatus {
 
 export async function fetchAllClients(): Promise<Client[]> {
   try {
-    const res = await axiosInstance.get<ApiListResponse<any[]>>(
+    const res = await axiosInstance.get<ApiResponse<any[]>>(
       "/api/admin/clients"
     );
 
-    return res.data.data.map((u) => ({
+    if (!res.data.success) {
+      throw new Error(res.data.message || "Failed to fetch clients");
+    }
+
+    return res.data.payload.map((u) => ({
       ...u,
       isVerified: normalizeVerification(
         u.isVerified ?? u.is_verified ?? u.verified
@@ -75,11 +75,15 @@ export async function fetchAllClients(): Promise<Client[]> {
 
 export async function fetchAllWorkers(): Promise<Worker[]> {
   try {
-    const res = await axiosInstance.get<ApiListResponse<any[]>>(
+    const res = await axiosInstance.get<ApiResponse<any[]>>(
       "/api/admin/workers"
     );
 
-    return res.data.data.map((u) => ({
+    if (!res.data.success) {
+      throw new Error(res.data.message || "Failed to fetch workers");
+    }
+
+    return res.data.payload.map((u) => ({
       ...u,
       isVerified: normalizeVerification(
         u.isVerified ?? u.is_verified ?? u.verified
@@ -91,49 +95,43 @@ export async function fetchAllWorkers(): Promise<Worker[]> {
 }
 
 export async function fetchAllUsers(): Promise<User[]> {
-  try {
-    const res = await axiosInstance.get<ApiListResponse<any[]>>(
-      "api/auth/all"
-    );
+  const res = await axiosInstance.get<ApiResponse<User[]>>(
+    "/api/auth/all"
+  );
 
-    return res.data.data;
-  } catch (error: any) {
-    throw new Error(error.normalizedMessage || "Failed to fetch users");
+  if (!res.data.success) {
+    throw new Error(res.data.message || "Failed to fetch users");
+  }
+
+  return res.data.payload;
+}
+
+export async function approveVerification(userId: string): Promise<void> {
+  const res = await axiosInstance.patch<ApiResponse<null>>(
+    `/api/admin/verify/${userId}`
+  );
+
+  if (!res.data.success) {
+    throw new Error(res.data.message || "Approval failed");
   }
 }
 
-export async function approveVerification(userId: string) {
-  try {
-    const res = await axiosInstance.patch(
-      `/api/admin/verify/${userId}`
-    );
-    return res.data;
-  } catch (error: any) {
-    throw new Error(error.normalizedMessage || "Approval failed");
+export async function rejectVerification(userId: string): Promise<void> {
+  const res = await axiosInstance.patch<ApiResponse<null>>(
+    `/api/admin/reject/${userId}`
+  );
+
+  if (!res.data.success) {
+    throw new Error(res.data.message || "Rejection failed");
   }
 }
 
-export async function rejectVerification(userId: string) {
-  try {
-    const res = await axiosInstance.patch(
-      `/api/admin/reject/${userId}`
-    );
-    return res.data;
-  } catch (error: any) {
-    throw new Error(error.normalizedMessage || "Rejection failed");
-  }
-}
+export async function toggleUserAccess(userId: string): Promise<void> {
+  const res = await axiosInstance.patch<ApiResponse<null>>(
+    `/api/admin/access/${userId}`
+  );
 
-// services/admin/admin.api.ts
-export async function toggleUserAccess(userId: string) {
-  try {
-    const res = await axiosInstance.patch(
-      `/api/admin/access/${userId}`
-    );
-    return res.data;
-  } catch (error: any) {
-    throw new Error(
-      error.normalizedMessage || "Failed to toggle user access"
-    );
+  if (!res.data.success) {
+    throw new Error(res.data.message || "Failed to toggle user access");
   }
 }

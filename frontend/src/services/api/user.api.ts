@@ -1,53 +1,44 @@
-// services/user/user.api.ts
 import axiosInstance from "@/lib/axiosInstance";
-import { SuccessResponse } from "@/shared/types/responseTypes";
+import { ApiResponse } from "@/shared/types/responseTypes";
 
-export type UpdateRoleResponse = {
-  user?: any;
-  accessToken?: string;
-  refreshToken?: string;
+/* ---------------- TYPES ---------------- */
+
+export type UpdateRolePayload = {
+  user: any;
+  accessToken: string;
+  refreshToken: string;
 };
 
-
+/* ---------------- API ---------------- */
 
 const userApi = {
   /**
    * Update user role/mode
-   * @param role "client" | "worker"
    */
-  updateUserMode: async (role: "client" | "worker"): Promise<SuccessResponse<UpdateRoleResponse>> => {
-    try {
-      const response = await axiosInstance.patch(
-        "/api/auth/mode",
-        { role },
-        {
-          withCredentials: true, // This sends cookies automatically
-        }
-      );
-      return response.data;
-    } catch (error: any) {
-      console.error("Error updating user role:", error);
-      throw error.response?.data || { message: "Something went wrong" };
-    }
+  updateUserMode: async (
+    role: "client" | "worker"
+  ): Promise<ApiResponse<UpdateRolePayload>> => {
+    const response = await axiosInstance.patch<ApiResponse<UpdateRolePayload>>(
+      "/api/auth/mode",
+      { role },
+      { withCredentials: true }
+    );
+
+    return response.data;
   },
 
   /**
    * Get current user by email
-   * @param email user's email
    */
-  getCurrentUserByEmail: async (email: string) => {
-    try {
-      const response = await axiosInstance.get(
-        `/api/auth/current/${encodeURIComponent(email)}`,
-        {
-          withCredentials: true,
-        }
-      );
-      return response.data;
-    } catch (error: any) {
-      console.error("Error fetching current user:", error);
-      throw error.response?.data || { message: "Something went wrong" };
-    }
+  getCurrentUserByEmail: async (
+    email: string
+  ): Promise<ApiResponse<any>> => {
+    const response = await axiosInstance.get<ApiResponse<any>>(
+      `/api/auth/current/${encodeURIComponent(email)}`,
+      { withCredentials: true }
+    );
+
+    return response.data;
   },
 };
 
