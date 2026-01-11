@@ -18,12 +18,16 @@ import Link from "next/link";
 import { changeRoleAction } from "@/app/actions/users/change-role-action";
 import WorkerVerificationFlow from "../../../admin/verification/DocumentsUpload";
 import { VerificationStatus } from "@/shared/enums/authEnums";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 const ClientHeader: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isTogglingRole, setIsTogglingRole] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const router = useRouter();
 
   // NEW: controls worker verification modal
   const [isWorkerFlowOpen, setIsWorkerFlowOpen] = useState(false);
@@ -62,10 +66,14 @@ const ClientHeader: React.FC = () => {
 
   const handleLogout = async () => {
     try {
+      toast.loading("Logging out...", { id: "logout" });
       await logoutAction();
+      toast.success("Logged out successfully", { id: "logout" });
       setIsLoggedIn(false);
       setIsUserMenuOpen(false);
+      router.push("/login");
     } catch (error) {
+      toast.error("Logout failed");
       console.error("Logout failed", error);
     }
   };

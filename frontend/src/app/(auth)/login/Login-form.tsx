@@ -410,8 +410,10 @@ export const LoginForm = () => {
 
     if (result?.success) {
       const redirectPath = result.user.user_role;
+      toast.success(result?.message)
       redirect(redirectPath);
     } else {
+      toast.error("Google login error")
       console.log("Google login error ", result?.message);
     }
   }
