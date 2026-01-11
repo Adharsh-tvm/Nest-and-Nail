@@ -120,19 +120,18 @@ const FileUploader: React.FC<FileUploaderProps> = ({
   };
 
   return (
-    <div className="mb-6">
-      <label className="block text-sm font-bold text-[#1B4332] mb-2">
+    <div className="mb-4">
+      <label className="block text-sm font-bold text-[#1B4332] mb-1">
         {label} <span className="text-red-500">*</span>
       </label>
 
       <div
         className={`relative border-2 border-dashed rounded-xl transition-all duration-200 cursor-pointer group
         ${error ? "border-red-300 bg-red-50" : ""}
-        ${
-          isDragging
+        ${isDragging
             ? "border-[#DC2626] bg-red-50/50"
             : "border-gray-200 hover:border-[#1B4332] hover:bg-gray-50"
-        }
+          }
         ${file ? "bg-green-50 border-green-200 border-solid" : "bg-white"}
         `}
         onDragEnter={handleDrag}
@@ -149,7 +148,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({
           onChange={handleChange}
         />
 
-        <div className="p-8 flex flex-col items-center justify-center text-center min-h-[160px]">
+        <div className="p-6 flex flex-col items-center justify-center text-center min-h-[120px]">
           {file ? (
             <div className="w-full animate-in zoom-in duration-300">
               <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow-sm border border-green-100">
@@ -183,7 +182,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({
             </div>
           ) : (
             <>
-              <div className="w-14 h-14 bg-gray-50 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+              <div className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
                 <UploadCloud size={24} className="text-[#1B4332]" />
               </div>
 
@@ -308,24 +307,23 @@ const WorkerVerificationFlow: React.FC<WorkerVerificationFlowProps> = ({
 
   const renderStep1 = () => (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="text-center mb-8">
-        <div className="w-16 h-16 bg-green-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-[#1B4332]">
-          <User size={32} />
+      <div className="text-center mb-4">
+        <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center mx-auto mb-2 text-[#1B4332]">
+          <User size={24} />
         </div>
-        <h2 className="text-2xl font-extrabold text-[#1B4332]">
+        <h2 className="text-xl font-extrabold text-[#1B4332]">
           Verify Identity
         </h2>
-        <p className="text-gray-500 mt-2">
+        <p className="text-gray-500 mt-1 text-sm">
           Upload a clear photo of your government-issued ID.
         </p>
       </div>
 
-      <div className="bg-yellow-50 border border-yellow-100 rounded-xl p-4 mb-6 flex gap-3">
-        <ShieldCheck className="text-yellow-600 flex-shrink-0" size={20} />
-        <div className="text-sm text-yellow-800">
-          <span className="font-bold block mb-1">Your data is encrypted</span>
-          We use bank-level security to protect your personal information. It is
-          only used for verification purposes.
+      <div className="bg-yellow-50 border border-yellow-100 rounded-xl p-3 mb-4 flex gap-3">
+        <ShieldCheck className="text-yellow-600 flex-shrink-0" size={18} />
+        <div className="text-xs text-yellow-800">
+          <span className="font-bold block mb-0.5">Your data is encrypted</span>
+          We use bank-level security to protect your personal information.
         </div>
       </div>
 
@@ -342,14 +340,14 @@ const WorkerVerificationFlow: React.FC<WorkerVerificationFlowProps> = ({
 
   const renderStep2 = () => (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="text-center mb-8">
-        <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-[#DC2626]">
-          <ShieldCheck size={32} />
+      <div className="text-center mb-4">
+        <div className="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center mx-auto mb-2 text-[#DC2626]">
+          <ShieldCheck size={24} />
         </div>
-        <h2 className="text-2xl font-extrabold text-[#1B4332]">
+        <h2 className="text-xl font-extrabold text-[#1B4332]">
           Certifications
         </h2>
-        <p className="text-gray-500 mt-2">
+        <p className="text-gray-500 mt-1 text-sm">
           Upload licenses or insurance to get the &quot;Verified Pro&quot;
           badge.
         </p>
@@ -363,15 +361,15 @@ const WorkerVerificationFlow: React.FC<WorkerVerificationFlowProps> = ({
         onFileSelect={setCertDocument}
       />
 
-      <div className="mt-8 p-4 rounded-xl border border-gray-100 bg-gray-50 flex items-start gap-4">
-        <div className="p-2 bg-white rounded-lg shadow-sm text-[#1B4332]">
-          <Lock size={20} />
+      <div className="mt-4 p-3 rounded-xl border border-gray-100 bg-gray-50 flex items-start gap-3">
+        <div className="p-1.5 bg-white rounded-lg shadow-sm text-[#1B4332]">
+          <Lock size={16} />
         </div>
         <div>
-          <h4 className="font-bold text-gray-900 text-sm">
+          <h4 className="font-bold text-gray-900 text-xs">
             Why do we need this?
           </h4>
-          <p className="text-xs text-gray-500 mt-1 leading-relaxed">
+          <p className="text-[10px] text-gray-500 mt-0.5 leading-relaxed">
             Homeowners trust verified professionals. Adding these documents
             helps you rank higher in search results.
           </p>
@@ -408,9 +406,9 @@ const WorkerVerificationFlow: React.FC<WorkerVerificationFlowProps> = ({
         className="absolute inset-0 bg-[#0f291e]/80 backdrop-blur-sm transition-opacity duration-300"
         onClick={handleClose}
       />
-      <div className="relative bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="relative bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[95vh]">
         {step < 3 && (
-          <div className="bg-white px-8 pt-8 pb-4 border-b border-gray-100 flex-shrink-0 z-10">
+          <div className="bg-white px-6 pt-6 pb-3 border-b border-gray-100 flex-shrink-0 z-10">
             <div className="flex justify-between items-center mb-6">
               <h3 className="font-bold text-gray-400 text-xs uppercase tracking-widest">
                 Step {step} of 2
@@ -425,27 +423,25 @@ const WorkerVerificationFlow: React.FC<WorkerVerificationFlowProps> = ({
             </div>
             <div className="h-2 bg-gray-100 rounded-full overflow-hidden flex">
               <div
-                className={`h-full transition-all duration-500 ease-out ${
-                  step >= 1 ? "bg-[#DC2626] w-1/2" : "bg-transparent w-1/2"
-                }`}
+                className={`h-full transition-all duration-500 ease-out ${step >= 1 ? "bg-[#DC2626] w-1/2" : "bg-transparent w-1/2"
+                  }`}
               />
               <div
-                className={`h-full transition-all duration-500 ease-out ${
-                  step >= 2 ? "bg-[#DC2626] w-1/2" : "bg-transparent w-1/2"
-                }`}
+                className={`h-full transition-all duration-500 ease-out ${step >= 2 ? "bg-[#DC2626] w-1/2" : "bg-transparent w-1/2"
+                  }`}
               />
             </div>
           </div>
         )}
 
-        <div className="flex-1 overflow-y-auto p-8 bg-white">
+        <div className="flex-1 overflow-y-auto p-6 bg-white">
           {step === 1 && renderStep1()}
           {step === 2 && renderStep2()}
           {step === 3 && renderSuccess()}
         </div>
 
         {step < 3 && (
-          <div className="p-6 border-t border-gray-100 bg-gray-50 flex justify-between items-center flex-shrink-0">
+          <div className="p-4 border-t border-gray-100 bg-gray-50 flex justify-between items-center flex-shrink-0">
             {step > 1 ? (
               <button
                 type="button"
@@ -465,10 +461,9 @@ const WorkerVerificationFlow: React.FC<WorkerVerificationFlowProps> = ({
               disabled={isSubmitting}
               className={`
                 font-bold py-3 px-8 rounded-xl transition-all shadow-md flex items-center gap-2
-                ${
-                  isSubmitting
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-[#1B4332] text-white hover:bg-[#143225] shadow-green-900/20 hover:shadow-lg"
+                ${isSubmitting
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  : "bg-[#1B4332] text-white hover:bg-[#143225] shadow-green-900/20 hover:shadow-lg"
                 }
               `}
             >

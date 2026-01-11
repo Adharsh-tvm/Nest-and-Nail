@@ -16,7 +16,7 @@ import { logoutAction } from "@/app/actions/authentication/logout-actions";
 import { useUserStore } from "@/store/userStore";
 import Link from "next/link";
 import { changeRoleAction } from "@/app/actions/users/change-role-action";
-import WorkerVerificationFlow from "../../../admin/verification/DocumentsUpload";
+import WorkerVerificationFlow from "../../../client/(home)/DocumentsUpload";
 import { VerificationStatus } from "@/shared/enums/authEnums";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
