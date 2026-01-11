@@ -182,7 +182,7 @@ export class AuthController implements IAuthController {
 
     } catch (error: unknown) {
       res.status(HttpStatusCode.BAD_REQUEST).json(
-        ResponseHandler.error(RESPONSE_MESSAGES.BAD_REQUEST, error)
+        ResponseHandler.error(RESPONSE_MESSAGES.INVALID_OTP, error)
       );
     }
   };
