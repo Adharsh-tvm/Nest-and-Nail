@@ -103,6 +103,7 @@ const ForgotPasswordDialog = ({
     setIsLoading(false);
 
     if (result?.error) {
+      toast.error(result.error)
       setError(result.error);
       return;
     }
@@ -267,11 +268,6 @@ const ForgotPasswordDialog = ({
                   />
                 </div>
               </div>
-              {error && (
-                <p className="text-xs text-red-500 font-medium bg-red-50 p-2 rounded">
-                  {error}
-                </p>
-              )}
               <div className="flex gap-3">
                 <button
                   type="submit"
