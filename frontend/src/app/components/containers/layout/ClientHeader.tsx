@@ -71,7 +71,7 @@ const ClientHeader: React.FC = () => {
       toast.success("Logged out successfully", { id: "logout" });
       setIsLoggedIn(false);
       setIsUserMenuOpen(false);
-      router.push("/login");
+      window.location.replace("/login");
     } catch (error) {
       toast.error("Logout failed");
       console.error("Logout failed", error);

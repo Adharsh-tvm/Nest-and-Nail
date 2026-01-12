@@ -1,7 +1,6 @@
 "use server"
 
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 
 export async function logoutAction() {
 
@@ -11,6 +10,4 @@ export async function logoutAction() {
     cookieStore.delete("refreshToken");
     cookieStore.delete("user_email");
     cookieStore.delete("userRole");
-
-    
 }

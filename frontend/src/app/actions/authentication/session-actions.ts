@@ -2,17 +2,34 @@
 
 import axiosInstance from "@/lib/axiosInstance";
 import authApi from "@/services/api/auth.api";
+import { JwtPayload } from "@/shared/types/JwtPayload";
 import { jwtVerify } from "jose";
 import { cookies } from "next/headers";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL!;
 
-export async function verifyAccessToken(token: string) {
+export async function verifyAccessToken(
+  token: string
+): Promise<JwtPayload | null> {
   try {
-    const key = new TextEncoder().encode(process.env.NEXT_PUBLIC_ACCESS_TOKEN_SECRET);
-    const verified = await jwtVerify(token, key);
-    return verified.payload;
-  } catch (error) {
+    const key = new TextEncoder().encode(
+      process.env.NEXT_PUBLIC_ACCESS_TOKEN_SECRET
+    );
+
+    const { payload } = await jwtVerify(token, key);
+
+    if (
+      typeof payload === "object" &&
+      payload !== null &&
+      "id" in payload &&
+      "email" in payload &&
+      "role" in payload
+    ) {
+      return payload as JwtPayload;
+    }
+
+    return null;
+  } catch {
     return null;
   }
 }
