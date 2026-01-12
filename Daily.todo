@@ -1,0 +1,125 @@
+    01-12-2025
+
+✔ Profile page UI @done (12/2/2025, 10:18:26 AM)
+✔ switch to role button @done (12/3/2025, 9:57:32 AM)
+✔ Current User Details Fetching Functionalities @done (12/2/2025, 10:18:55 AM)
+✔ User data should be displayed in frontend @done (12/2/2025, 10:18:57 AM)
+
+
+    02-12-2025
+
+✔ Seperate client and worker pages @done (12/3/2025, 9:39:27 AM)
+✔ switch role button @done (12/3/2025, 9:39:35 AM) 
+✔ Current User all details fetching functionalities @done (12/6/2025, 12:02:08 PM)
+✔ role switching functionalities @done (12/4/2025, 2:37:52 PM)
+
+
+
+    03-12-2025
+
+✔ role switching functionalities @done (12/4/2025, 2:37:55 PM)
+✔ Current User all details fetching functionalities @done (12/6/2025, 12:01:30 PM)
+✔ page switch along with role change @done (12/4/2025, 2:37:57 PM)
+✔ research s3 bucket and cloudinary @done (12/4/2025, 2:38:00 PM)
+
+
+    04-12-2025
+
+✔ Worker profile page route from header @done (12/8/2025, 9:36:11 AM)
+✔ s3 bucket implementation @done (12/8/2025, 9:36:06 AM)
+
+
+    05-12-2025
+
+✔ Current User all details fetching functionalities @done (12/6/2025, 12:01:15 PM)
+✔ Worker profile page route from header @done (12/8/2025, 9:36:24 AM)
+✔ s3 bucket implementation @done (12/8/2025, 9:36:26 AM)
+✔ admin user/worker management @done (12/10/2025, 4:47:03 PM)
+
+
+
+    06-12-2025
+
+✔ fix change role functionality error @done (12/8/2025, 9:36:30 AM)
+✔ Worker profile page route from header @done (12/8/2025, 9:36:33 AM)
+✔ s3 bucket implementation @done (12/8/2025, 9:36:35 AM)
+✔ admin user/worker management @done (12/10/2025, 4:47:06 PM)
+
+
+    08-12-2025
+
+✔ users listing in admin page @done (12/8/2025, 2:51:47 PM)
+☐ sort and filter functionalities
+✔ worker profile page set up @done (12/9/2025, 9:15:46 AM)
+✔ profile edit @done (12/10/2025, 4:46:55 PM)
+✔ admin user/worker management @done (12/9/2025, 6:29:34 AM)
+✔ worker verificartion in admin @done (12/8/2025, 10:42:44 PM)
+✔ Create more reusable components (table) @done (12/8/2025, 2:51:41 PM)
+
+
+
+    11-12-2025
+
+✔ add toast in every pages @done (1/11/2026, 4:30:52 PM)
+✔ check di in every layer @done (1/10/2026, 11:00:52 AM)
+✔ implement proper error displayed @done (12/12/2025, 7:04:08 PM)
+
+
+
+    12-12-2025
+
+✔ add toast in every pages @done (1/11/2026, 4:30:53 PM)
+✔ implement proper error displayed @done (12/12/2025, 7:04:03 PM)
+
+
+
+    16-12-2025
+
+✔ make a proper profile ui with sidebar @done (1/11/2026, 4:31:06 PM)
+☐ change the documents upload ui to a smaller one
+✔ change theme of login and signup page @done (1/8/2026, 12:21:14 PM)
+
+
+
+    08-01-2026
+
+✔ common response model in backend @done (1/10/2026, 5:16:03 PM)
+✔ common response model in frontend @done (1/11/2026, 4:30:46 PM)
+☐ admin side user listing
+✔ add toast in every pages @done (1/11/2026, 4:31:03 PM)
+☐ change the documents upload ui to a smaller one
+
+
+    09-01-2026  
+
+✔ remove skills upload during document upload @done (1/10/2026, 10:58:40 AM)
+✔ common response model in backend @done (1/10/2026, 10:58:38 AM)
+
+
+    10-01-2026
+
+☐ proper folder file-structure for each and every components in both frontend and backend
+✔ refresh token @done (1/10/2026, 3:17:48 PM)
+☐ analyse whole project 
+☐ understand flow of every actions in frontend
+☐ add toast in everywhere 
+
+
+    11-12-2026
+
+
+✔ frontend proper respo nse @done (1/11/2026, 4:31:18 PM)
+✔ toast in every pages @done (1/11/2026, 4:31:19 PM)
+☐ users listing in admin side
+✔ make document upload ui smaller @done (1/11/2026, 10:38:45 PM)
+✔ otp modal ui change @done (1/11/2026, 10:38:47 PM)
+✔ fix otp failure @done (1/11/2026, 10:38:48 PM)
+☐ remove unwanted comments
+☐ find out where the principles used in code
+☐ split up di container
+
+
+
+    12-01-2026
+
+
