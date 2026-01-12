@@ -49,7 +49,6 @@
     08-12-2025
 
 ✔ users listing in admin page @done (12/8/2025, 2:51:47 PM)
-☐ sort and filter functionalities
 ✔ worker profile page set up @done (12/9/2025, 9:15:46 AM)
 ✔ profile edit @done (12/10/2025, 4:46:55 PM)
 ✔ admin user/worker management @done (12/9/2025, 6:29:34 AM)
@@ -58,7 +57,7 @@
 
 
 
-    11-12-2025
+11-12-2025
 
 ✔ add toast in every pages @done (1/11/2026, 4:30:52 PM)
 ✔ check di in every layer @done (1/10/2026, 11:00:52 AM)
@@ -66,46 +65,46 @@
 
 
 
-    12-12-2025
+12-12-2025
 
 ✔ add toast in every pages @done (1/11/2026, 4:30:53 PM)
 ✔ implement proper error displayed @done (12/12/2025, 7:04:03 PM)
 
 
 
-    16-12-2025
+16-12-2025
 
 ✔ make a proper profile ui with sidebar @done (1/11/2026, 4:31:06 PM)
-☐ change the documents upload ui to a smaller one
+✔ change the documents upload ui to a smaller one @done (1/12/2026, 11:49:42 AM)
 ✔ change theme of login and signup page @done (1/8/2026, 12:21:14 PM)
 
 
 
-    08-01-2026
+08-01-2026
 
 ✔ common response model in backend @done (1/10/2026, 5:16:03 PM)
 ✔ common response model in frontend @done (1/11/2026, 4:30:46 PM)
 ☐ admin side user listing
 ✔ add toast in every pages @done (1/11/2026, 4:31:03 PM)
-☐ change the documents upload ui to a smaller one
+✔ change the documents upload ui to a smaller one @done (1/12/2026, 11:49:45 AM)
 
 
-    09-01-2026  
+09-01-2026  
 
 ✔ remove skills upload during document upload @done (1/10/2026, 10:58:40 AM)
 ✔ common response model in backend @done (1/10/2026, 10:58:38 AM)
 
 
-    10-01-2026
+10-01-2026
 
-☐ proper folder file-structure for each and every components in both frontend and backend
+✔ proper folder file-structure for each and every components in both frontend and backend @done (1/12/2026, 11:49:36 AM)
 ✔ refresh token @done (1/10/2026, 3:17:48 PM)
-☐ analyse whole project 
+✔ analyse whole project @done (1/12/2026, 11:49:39 AM)
 ☐ understand flow of every actions in frontend
-☐ add toast in everywhere 
+✔ add toast in everywhere @done (1/12/2026, 10:37:09 AM)
 
 
-    11-12-2026
+11-12-2026
 
 
 ✔ frontend proper respo nse @done (1/11/2026, 4:31:18 PM)
@@ -115,11 +114,16 @@
 ✔ otp modal ui change @done (1/11/2026, 10:38:47 PM)
 ✔ fix otp failure @done (1/11/2026, 10:38:48 PM)
 ☐ remove unwanted comments
-☐ find out where the principles used in code
+✔ find out where the principles used in code @done (1/12/2026, 10:36:44 AM)
 ☐ split up di container
 
 
 
-    12-01-2026
+12-01-2026
 
-
+☐ split up di container
+☐ user listing admin side
+☐ sort and filter functionalities
+☐ understand flow of every actions in frontend
+☐ remove unwanted comments
+☐ prevent blocked users from login
