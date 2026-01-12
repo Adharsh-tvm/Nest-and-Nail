@@ -22,28 +22,53 @@ export async function middleware(req: NextRequest) {
     publicRoutes.some((p) => pathname.startsWith(p)) ||
     pathname === "/";
 
-  // 1️⃣ Access token present → allow
+  let userRole: string | null = null;
+
+  // 1️⃣ Verify access token
   if (accessToken) {
     const payload = await verifyAccessToken(accessToken);
-    if (payload) {
-      return NextResponse.next();
+    if (payload?.role) {
+      userRole = payload.role;
     }
   }
 
-  // 2️⃣ No access token BUT refresh token exists → refresh & retry
-  if (!accessToken && refreshToken) {
+  // 2️⃣ No access token but refresh exists → refresh & retry
+  if (!userRole && !accessToken && refreshToken) {
     const refreshed = await refreshTokens(refreshToken);
-
     if (refreshed) {
-      // 🔁 IMPORTANT: redirect to SAME URL
-      // so next request has new access token
       return NextResponse.redirect(req.nextUrl);
     }
   }
 
-  // 3️⃣ No tokens → logout
-  if (!isPublicRoute) {
+  // 3️⃣ Logged-in user trying to access login/signup → block
+  if (userRole && isPublicRoute) {
+    return NextResponse.redirect(new URL(`/${userRole}`, req.url));
+  }
+
+  // 4️⃣ Not authenticated → logout
+  if (!userRole && !isPublicRoute) {
     return NextResponse.redirect(new URL("/login", req.url));
+  }
+
+  // 5️⃣ ROLE ENFORCEMENT (🔥 THIS FIXES YOUR ISSUE 🔥)
+  if (userRole) {
+    const allowedBase = `/${userRole}`;
+
+    // allow root dashboard and its subroutes
+    if (
+      pathname === allowedBase ||
+      pathname.startsWith(`${allowedBase}/`)
+    ) {
+      return NextResponse.next();
+    }
+
+    // allow homepage
+    if (pathname === "/") {
+      return NextResponse.next();
+    }
+
+    // ❌ trying to access another role
+    return NextResponse.redirect(new URL(allowedBase, req.url));
   }
 
   return NextResponse.next();
