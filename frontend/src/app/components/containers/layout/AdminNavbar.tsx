@@ -118,7 +118,7 @@ function LogoutModal({ onClose }: { onClose: () => void }) {
             onClick={async () => {
               await logoutAction();
               onClose();
-              
+              window.location.replace("/login")
             }}
             className="w-full py-3.5 bg-red-600 text-white font-bold text-base rounded-xl hover:bg-red-700 shadow-xl shadow-red-600/20 active:scale-[0.98] transition-all"
           >

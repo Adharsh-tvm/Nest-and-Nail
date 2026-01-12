@@ -6,6 +6,7 @@ import { IGenerateUserID } from "../../services/IGenerateUserID";
 import { IPasswordHasher } from "../../services/IPasswordHasher";
 import { ITokenService } from "../../services/ITokenService";
 import { IUserRepositoryFactory } from "../../../domain/repositories/IUserRepositoryFactory";
+import { UserBlockedError } from "../../../domain/errors/DomainError";
 
 export class GoogleSignUpUseCase implements IGoogleSignUpUseCase {
     constructor(
@@ -49,6 +50,9 @@ export class GoogleSignUpUseCase implements IGoogleSignUpUseCase {
                 });
                 user = newUser
             }
+            if(user.isBlocked){
+                throw new UserBlockedError()
+            }
 
 
             const userResponse = UserMapper.toResponseDTO(user);
@@ -65,15 +69,11 @@ export class GoogleSignUpUseCase implements IGoogleSignUpUseCase {
                 role: user.role
             });
 
-
-
             return {
                 user: userResponse,
                 accessToken,
                 refreshToken
             }
-
-
         } catch (error) {
             console.log("Reg GOog Use case error: ", error)
             return {
