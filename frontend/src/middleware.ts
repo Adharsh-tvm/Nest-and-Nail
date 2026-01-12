@@ -40,21 +40,17 @@ export async function middleware(req: NextRequest) {
     }
   }
 
-  // 3️⃣ Logged-in user trying to access login/signup → block
   if (userRole && isPublicRoute) {
     return NextResponse.redirect(new URL(`/${userRole}`, req.url));
   }
 
-  // 4️⃣ Not authenticated → logout
   if (!userRole && !isPublicRoute) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  // 5️⃣ ROLE ENFORCEMENT (🔥 THIS FIXES YOUR ISSUE 🔥)
   if (userRole) {
     const allowedBase = `/${userRole}`;
 
-    // allow root dashboard and its subroutes
     if (
       pathname === allowedBase ||
       pathname.startsWith(`${allowedBase}/`)
@@ -62,12 +58,10 @@ export async function middleware(req: NextRequest) {
       return NextResponse.next();
     }
 
-    // allow homepage
     if (pathname === "/") {
       return NextResponse.next();
     }
 
-    // ❌ trying to access another role
     return NextResponse.redirect(new URL(allowedBase, req.url));
   }
 
