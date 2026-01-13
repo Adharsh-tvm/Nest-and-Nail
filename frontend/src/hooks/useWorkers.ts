@@ -1,7 +1,8 @@
 "use client";
 
+import { fetchAllWorkers, Worker } from "@/services/api/admin.api";
 import { useEffect, useState } from "react";
-import { adminApi, Worker } from "@/services/auth/admin.api";
+
 
 type UseWorkersResult = {
     workers: Worker[]; 
@@ -21,7 +22,7 @@ export const useWorkers = (): UseWorkersResult => {
             setLoading(true);
             setError(null);
             try {
-                const res = await adminApi.getAllWorkers();
+                const res = await fetchAllWorkers();
                 console.log("[useWorkers] getAllWorkers result:", res);
 
                 if (!Array.isArray(res)) {
@@ -32,7 +33,7 @@ export const useWorkers = (): UseWorkersResult => {
                 }
             } catch (err: any) {
                 console.error("[useWorkers] error:", err);
-                const msg = err?.response?.data?.message ?? err.message ?? "Failed to load workers";
+                const msg = err?.message ?? "Failed to load workers";
                 if (!cancelled) setError(msg);
             } finally {
                 if (!cancelled) setLoading(false);

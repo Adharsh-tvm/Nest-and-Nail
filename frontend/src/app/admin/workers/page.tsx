@@ -27,6 +27,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { useWorkers } from "@/hooks/useWorkers";
+import { VerificationStatus } from "@/shared/enums/authEnums"; 
 
 // --- Types ---
 
@@ -302,7 +303,7 @@ const WorkersView = () => {
 
                   {/* Verification */}
 <td className="p-5 text-slate-600">
-                      {worker.isVerified ? (
+                      {worker.isVerified === VerificationStatus.VERIFIED ? (
                         <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 text-red-600 text-xs font-medium">
                           Not Verified
                         </span>

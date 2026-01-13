@@ -1,4 +1,4 @@
-import { LoginMethod, Role } from "../../shared/enums/enums";
+import { LoginMethod, Role, VerificationStatus } from "../../shared/enums/authEnums";
 
 export interface User {
     userId: string,
@@ -7,7 +7,7 @@ export interface User {
     phone?: number,
     passwordhash: string,
     isBlocked?: boolean,
-    isVerified?: boolean,
+    isVerified?: VerificationStatus,
     profilePictureUrl?: string,
     role: Role,
     loginMethod: LoginMethod,
@@ -16,5 +16,9 @@ export interface User {
     updatedAt: Date,
 
     skills?: string[];
-    address?: string;
+    address?: string[];
+
+    documents?: string[];      // Aadhar, PAN, ID proof
+    certificates?: string[];   // Skill certificates
+    workPhotos?: string[];
 }

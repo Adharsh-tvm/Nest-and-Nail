@@ -1,5 +1,5 @@
 import { User } from "../../domain/entities/User";
-import { LoginMethod } from "../../shared/enums/enums";
+import { LoginMethod, VerificationStatus } from "../../shared/enums/authEnums";
 import { UserRequestDTO, UserResponseDTO } from "../dtos/UserDTO";
 
 export class UserMapper {
@@ -12,7 +12,7 @@ export class UserMapper {
             phone: userData.phone_number,
             role: userData.user_role,
             isBlocked: false,
-            isVerified: false,
+            isVerified: VerificationStatus.NOT_VERIFIED,
             loginMethod: LoginMethod.EMAIL_PASSWORD,
             profilePictureUrl: '',
             createdAt: new Date(),
@@ -30,7 +30,21 @@ export class UserMapper {
             user_role: userData.role,
             profileImageUrl: userData.profilePictureUrl,
             isBlocked: userData.isBlocked ?? false,
-            isVerified: userData.isVerified ?? false,
+            isVerified: userData.isVerified ?? VerificationStatus.NOT_VERIFIED,
+
+            skills: userData.skills ?? [],
+            address: userData.address ?? [],
+
+            documents: userData.documents ?? [],
+            certificates: userData.certificates ?? [],
+            workPhotos: userData.workPhotos ?? [],
+
+            createdAt: userData.createdAt?.toISOString?.() ?? "",
+            updatedAt: userData.updatedAt?.toISOString?.() ?? "",
         };
     }
+
+
+
+
 }

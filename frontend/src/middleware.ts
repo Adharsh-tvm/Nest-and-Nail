@@ -1,63 +1,75 @@
 import { NextRequest, NextResponse } from "next/server";
-import { refreshTokens, verifyAccessToken, verifyRefreshToken } from "./app/actions/session-actions";
+import {
+  refreshTokens,
+  verifyAccessToken,
+} from "./app/actions/authentication/session-actions";
 
 export async function middleware(req: NextRequest) {
-    const { pathname } = req.nextUrl;
-    //remove unwanted executuion
-    if (pathname.includes("_next") || pathname.includes("favicon")) return NextResponse.next();
+  const { pathname } = req.nextUrl;
 
-    const accessToken = req.cookies.get("accessToken")?.value || "";
-
-    const accessTokenPayload = await verifyAccessToken(accessToken)
-    let user = null;
-
-    if (accessTokenPayload) {
-        user = accessTokenPayload;
-    } else {
-        const refreshToken = req.cookies.get("refreshToken")?.value || "";
-        const refreshTokenPayload = await verifyRefreshToken(refreshToken)
-        if (refreshTokenPayload) {
-            await refreshTokens(refreshToken);
-            user = refreshTokenPayload;
-        }
-    }
-
-    const publicRoutes = ["/login", "/signup", ];
-
-    const isPublicRoute = publicRoutes.some((path) => pathname.startsWith(path)) || pathname === "/";
-
-    if (!user) {
-        if (!isPublicRoute) {
-            return NextResponse.redirect(new URL("/login", req.url))
-        }
-        return NextResponse.next();
-    }
-
-    if (user) {
-        if (isPublicRoute) {
-            return NextResponse.redirect(new URL(`/${user.role}`, req.url));
-        }
-
-        if (pathname.startsWith(`/${user.role}`)) {
-            return NextResponse.next();
-        }
-
-        if (pathname === "/") {
-            return NextResponse.next();
-        }
-
-        if (!pathname.startsWith(`/${user.role}`)) {
-            return NextResponse.redirect(new URL(`/${user.role}`, req.url));
-        }
-    }
-
+  if (
+    pathname.includes("_next") ||
+    pathname.includes("favicon")
+  ) {
     return NextResponse.next();
+  }
+
+  const accessToken = req.cookies.get("accessToken")?.value;
+  const refreshToken = req.cookies.get("refreshToken")?.value;
+
+  const publicRoutes = ["/login", "/signup"];
+  const isPublicRoute =
+    publicRoutes.some((p) => pathname.startsWith(p)) ||
+    pathname === "/";
+
+  let userRole: string | null = null;
+
+  // 1️⃣ Verify access token
+  if (accessToken) {
+    const payload = await verifyAccessToken(accessToken);
+    if (payload?.role) {
+      userRole = payload.role;
+    }
+  }
+
+  // 2️⃣ No access token but refresh exists → refresh & retry
+  if (!userRole && !accessToken && refreshToken) {
+    const refreshed = await refreshTokens(refreshToken);
+    if (refreshed) {
+      return NextResponse.redirect(req.nextUrl);
+    }
+  }
+
+  if (userRole && isPublicRoute) {
+    return NextResponse.redirect(new URL(`/${userRole}`, req.url));
+  }
+
+  if (!userRole && !isPublicRoute) {
+    return NextResponse.redirect(new URL("/login", req.url));
+  }
+
+  if (userRole) {
+    const allowedBase = `/${userRole}`;
+
+    if (
+      pathname === allowedBase ||
+      pathname.startsWith(`${allowedBase}/`)
+    ) {
+      return NextResponse.next();
+    }
+
+    if (pathname === "/") {
+      return NextResponse.next();
+    }
+
+    return NextResponse.redirect(new URL(allowedBase, req.url));
+  }
+
+  return NextResponse.next();
 }
 
-
-
 export const config = {
-    matcher: [
-        "/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|_next/internal|BgVector.jpg).*)",
-    ],
+  matcher: [
+    "/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)",
+  ],
 };

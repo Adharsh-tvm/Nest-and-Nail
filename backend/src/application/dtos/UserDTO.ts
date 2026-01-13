@@ -1,4 +1,4 @@
-import { Role } from "../../shared/enums/enums";
+import { Role, VerificationStatus } from "../../shared/enums/authEnums";
 
 export interface UserRequestDTO {
     user_name: string;
@@ -10,20 +10,29 @@ export interface UserRequestDTO {
 
 export interface UserResponseDTO {
     user_id: string;
-    user_name : string;
+    user_name: string;
     email_address: string;
     phone_number?: number;
     user_role: Role;
     profileImageUrl?: string;
     isBlocked: boolean;
-    isVerified: boolean;
+    isVerified: VerificationStatus;
+
+    skills?: string[];
+    address?: string[];
+    documents?: string[];
+    certificates?: string[];
+    workPhotos?: string[];
+    createdAt?: string;
+    updatedAt?: string;
 }
+
 
 export interface LoginUserDTO {
     email_address: string;
     password: string;
-    user_role?: Role; 
-}    
+    user_role?: Role;
+}
 
 export interface LoginResponseDTO {
     user: {
@@ -32,9 +41,9 @@ export interface LoginResponseDTO {
         email_address: string;
         user_role: Role;
         phone_number?: number;
-        profileImageUrl?: string;
+        profileImageUrl?: string | undefined;
         isBlocked: boolean;
-        isVerified: boolean;
+        isVerified: VerificationStatus;
     };
     accessToken: string;
     refreshToken: string;

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { HttpStatusCode } from "../enums/httpCodes";
+import { HttpStatusCode } from "../../shared/enums/httpCodes";
 import { IUserController } from "../interfaces/IUserController";
 import { IChangeUserRoleUseCase } from "../../application/interfaces/IChangeUserRoleUseCase";
 import { IGetCurrentUserUseCase } from "../../application/interfaces/IGetCurrentUserUseCase";
@@ -8,73 +8,96 @@ import {
     UserBlockedError,
     UserNotFoundError
 } from "../../domain/errors/DomainError";
+import { IGetAllUsersUseCase } from "../../application/interfaces/IGetAllUsersUseCase";
+import { ResponseHandler } from "../responses/ApiResponse";
+import { LoginResponseDTO } from "../../application/dtos/UserDTO";
+import { RESPONSE_MESSAGES } from "../responses/ResponseMessages";
 
 export class UserController implements IUserController {
 
     constructor(
-        private readonly changeUserRoleUseCase: IChangeUserRoleUseCase,
-        private readonly getCurrentUserUseCase: IGetCurrentUserUseCase
-    ) {}
+        private readonly _changeUserRoleUseCase: IChangeUserRoleUseCase,
+        private readonly _getCurrentUserUseCase: IGetCurrentUserUseCase,
+        private readonly _getAllUsersUseCase: IGetAllUsersUseCase
+    ) { }
 
-    changeRole = async (req: Request, res: Response) => {
+    changeRole = async (req: Request, res: Response): Promise<Response> => {
         try {
             const userId = req.user.id;
             const { role } = req.body;
 
-            const result = await this.changeUserRoleUseCase.execute(userId, role);
+            const result = await this._changeUserRoleUseCase.execute(userId, role);
 
-            return res.status(HttpStatusCode.OK).json({
-                user: result.user,
-                accessToken: result.accessToken,
-                refreshToken: result.refreshToken
-            });
+            return res.status(HttpStatusCode.OK).json(
+                ResponseHandler.success<LoginResponseDTO>(
+                    {
+                        user: result.user,
+                        accessToken: result.accessToken,
+                        refreshToken: result.refreshToken
+                    },
+                    RESPONSE_MESSAGES.SUCCESS
+                )
+            );
 
-        } catch (error: any) {
-            return res
-                .status(HttpStatusCode.INTERNAL_SERVER)
-                .json({ message: error.message ?? "Internal server error" });
+        } catch (error: unknown) {
+            return res.status(HttpStatusCode.FORBIDDEN).json(
+                ResponseHandler.error(RESPONSE_MESSAGES.FORBIDDEN, error)
+            );
         }
     };
 
 
 
-    getCurrentUser = async (req: Request, res: Response) => {
+    getCurrentUser = async (req: Request, res: Response): Promise<Response> => {
         try {
             const email = req.params.email;
 
-            const user = await this.getCurrentUserUseCase.execute(email);
+            const user = await this._getCurrentUserUseCase.execute(email);
 
-            return res.status(HttpStatusCode.OK).json({
-                success: true,
-                user
-            });
+            return res.status(HttpStatusCode.OK).json(
+                ResponseHandler.success(user, RESPONSE_MESSAGES.USER_FETCHED)
+            );
 
-        } catch (error: any) {
+        } catch (error: unknown) {
 
             if (error instanceof AuthenticationError) {
-                return res.status(HttpStatusCode.UNAUTHORIZED).json({
-                    success: false,
-                    message: "Authentication failed"
-                });
+                return res.status(HttpStatusCode.UNAUTHORIZED).json(
+                    ResponseHandler.error(RESPONSE_MESSAGES.UNAUTHORIZED, error)
+                );
             }
 
             if (error instanceof UserNotFoundError) {
-                return res.status(HttpStatusCode.NOT_FOUND).json({
-                    success: false,
-                    message: "User not found"
-                });
+                return res.status(HttpStatusCode.NOT_FOUND).json(
+                    ResponseHandler.error(RESPONSE_MESSAGES.USER_NOT_FOUND, error)
+                );
             }
 
             if (error instanceof UserBlockedError) {
-                return res.status(HttpStatusCode.FORBIDDEN).json({
-                    success: false,
-                    message: "User is blocked"
-                });
+                return res.status(HttpStatusCode.FORBIDDEN).json(
+                    ResponseHandler.error(RESPONSE_MESSAGES.USER_BLOCKED, error)
+                );
             }
 
-            return res
-                .status(HttpStatusCode.INTERNAL_SERVER)
-                .json({ success: false, message: "Internal server error" });
+            return res.status(HttpStatusCode.INTERNAL_SERVER).json(
+                ResponseHandler.error(RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR, error)
+            );
         }
     };
+
+    getAllUsers = async (req: Request, res: Response): Promise<Response> => {
+        try {
+            const users = await this._getAllUsersUseCase.execute();
+
+            return res.status(HttpStatusCode.OK).json(
+                ResponseHandler.success(users, RESPONSE_MESSAGES.USERS_FETCHED)
+            );
+
+        } catch (error: unknown) {
+            console.error("Error fetching all users:", error);
+
+            return res.status(HttpStatusCode.INTERNAL_SERVER).json(
+                ResponseHandler.error(RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR, error)
+            );
+        }
+    }
 }

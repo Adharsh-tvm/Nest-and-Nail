@@ -1,22 +1,29 @@
 // src/presentation/middlewares/AuthMiddleware.ts
 import { Request, Response, NextFunction, RequestHandler } from "express";
 import { ITokenService } from "../../application/services/ITokenService";
-import { HttpStatusCode } from "../enums/httpCodes";
+import { HttpStatusCode } from "../../shared/enums/httpCodes";
 
 declare global {
-  // augment Express Request to carry user payload from JWT
   namespace Express {
     interface Request {
-      user?: any; 
+      user?: any;
     }
   }
 }
 
 export class AuthMiddleware {
-  constructor(private readonly _tokenService: ITokenService) {}
+  constructor(private readonly _tokenService: ITokenService) { }
 
   public verify: RequestHandler = (req: Request, res: Response, next: NextFunction) => {
-    const token = req.cookies?.accessToken;
+    let token = req.cookies?.accessToken;
+
+    if (!token) {
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith("Bearer ")) {
+        token = authHeader.split(" ")[1];
+      }
+    }
+
     if (!token) {
       return res
         .status(HttpStatusCode.UNAUTHORIZED)
@@ -27,7 +34,7 @@ export class AuthMiddleware {
       const payload = this._tokenService.verifyAccessToken(token);
       req.user = payload;
       next();
-    } catch {
+    } catch (error) {
       return res
         .status(HttpStatusCode.FORBIDDEN)
         .json({ message: "Invalid or expired token" });
