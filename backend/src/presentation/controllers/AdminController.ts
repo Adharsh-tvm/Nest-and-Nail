@@ -71,7 +71,7 @@ export class AdminController implements IAdminController {
 
             const result = await this._updateVerificationStatusUseCase.execute(
                 userId,
-                VerificationStatus.NOT_VERIFIED
+                VerificationStatus.REJECTED
             );
 
             res.status(HttpStatusCode.OK).json(ResponseHandler.success(result, RESPONSE_MESSAGES.SUCCESS));
