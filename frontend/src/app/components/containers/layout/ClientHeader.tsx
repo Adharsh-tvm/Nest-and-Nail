@@ -32,6 +32,7 @@ const ClientHeader: React.FC = () => {
   // NEW: controls worker verification modal
   const [isWorkerFlowOpen, setIsWorkerFlowOpen] = useState(false);
 
+
   const userMenuRef = useRef<HTMLDivElement>(null);
   const { user: currentUser, setUser } = useUserStore();
 
@@ -113,8 +114,8 @@ const ClientHeader: React.FC = () => {
     currentUser?.role === "worker"
       ? "/worker"
       : currentUser?.role === "client"
-      ? "/client"
-      : "/";
+        ? "/client"
+        : "/";
 
   return (
     <>
@@ -162,28 +163,24 @@ const ClientHeader: React.FC = () => {
               {isVerified && (
                 <div
                   onClick={toggleUserMode}
-                  className={`relative flex items-center bg-gray-100 rounded-full p-1 w-32 h-10 border border-gray-200 shadow-inner ${
-                    isTogglingRole ? "opacity-50 cursor-wait" : "cursor-pointer"
-                  }`}
+                  className={`relative flex items-center bg-gray-100 rounded-full p-1 w-32 h-10 border border-gray-200 shadow-inner ${isTogglingRole ? "opacity-50 cursor-wait" : "cursor-pointer"
+                    }`}
                 >
                   <div
-                    className={`absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-full shadow-sm transition-all duration-300 ease-out ${
-                      userMode === "client"
-                        ? "left-1 bg-[#1B4332]"
-                        : "left-[calc(50%)] bg-[#DC2626]"
-                    }`}
+                    className={`absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-full shadow-sm transition-all duration-300 ease-out ${userMode === "client"
+                      ? "left-1 bg-[#1B4332]"
+                      : "left-[calc(50%)] bg-[#DC2626]"
+                      }`}
                   />
                   <div
-                    className={`flex-1 z-10 text-center text-xs font-bold ${
-                      userMode === "client" ? "text-white" : "text-gray-500"
-                    }`}
+                    className={`flex-1 z-10 text-center text-xs font-bold ${userMode === "client" ? "text-white" : "text-gray-500"
+                      }`}
                   >
                     Client
                   </div>
                   <div
-                    className={`flex-1 z-10 text-center text-xs font-bold ${
-                      userMode === "worker" ? "text-white" : "text-gray-500"
-                    }`}
+                    className={`flex-1 z-10 text-center text-xs font-bold ${userMode === "worker" ? "text-white" : "text-gray-500"
+                      }`}
                   >
                     Worker
                   </div>
@@ -205,9 +202,8 @@ const ClientHeader: React.FC = () => {
                   </span>
                   <ChevronDown
                     size={16}
-                    className={`text-gray-400 transition-transform duration-200 ${
-                      isUserMenuOpen ? "rotate-180" : ""
-                    }`}
+                    className={`text-gray-400 transition-transform duration-200 ${isUserMenuOpen ? "rotate-180" : ""
+                      }`}
                   />
                 </button>
 

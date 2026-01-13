@@ -30,8 +30,10 @@ import {
 import { VerificationStatus } from "@/shared/enums/authEnums";
 
 type ErrorState = {
-  idDocument?: string;
-  certDocument?: string;
+  idFront?: string;
+  idBack?: string;
+  certFront?: string;
+  certBack?: string;
 };
 
 type FileUploaderProps = {
@@ -231,16 +233,20 @@ const WorkerVerificationFlow: React.FC<WorkerVerificationFlowProps> = ({
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [idDocument, setIdDocument] = useState<File | null>(null);
-  const [certDocument, setCertDocument] = useState<File | null>(null);
+  const [idFront, setIdFront] = useState<File | null>(null);
+  const [idBack, setIdBack] = useState<File | null>(null);
+  const [certFront, setCertFront] = useState<File | null>(null);
+  const [certBack, setCertBack] = useState<File | null>(null);
   const [errors, setErrors] = useState<ErrorState>({});
 
   const { user: currentUser, setUser } = useUserStore();
 
   const resetForm = () => {
     setStep(1);
-    setIdDocument(null);
-    setCertDocument(null);
+    setIdFront(null);
+    setIdBack(null);
+    setCertFront(null);
+    setCertBack(null);
     setErrors({});
     setIsSubmitting(false);
   };
@@ -250,8 +256,12 @@ const WorkerVerificationFlow: React.FC<WorkerVerificationFlowProps> = ({
     let isValid = true;
 
     if (currentStep === 1) {
-      if (!idDocument) {
-        newErrors.idDocument = "Government ID is required for verification.";
+      if (!idFront) {
+        newErrors.idFront = "Front side of ID is required.";
+        isValid = false;
+      }
+      if (!idBack) {
+        newErrors.idBack = "Back side of ID is required.";
         isValid = false;
       }
     }
@@ -274,14 +284,33 @@ const WorkerVerificationFlow: React.FC<WorkerVerificationFlowProps> = ({
     const userId = currentUser.id;
 
     try {
-      if (idDocument) {
-        const idUrl = await uploadDocumentAction(userId, idDocument);
-        await updateUserProfileAction(userId, { documents: [idUrl] });
+      const docUrls: string[] = [];
+      const certUrls: string[] = [];
+
+      if (idFront) {
+        const url = await uploadDocumentAction(userId, idFront);
+        docUrls.push(url);
+      }
+      if (idBack) {
+        const url = await uploadDocumentAction(userId, idBack);
+        docUrls.push(url);
       }
 
-      if (certDocument) {
-        const certUrl = await uploadDocumentAction(userId, certDocument);
-        await updateUserProfileAction(userId, { certificates: [certUrl] });
+      if (certFront) {
+        const url = await uploadDocumentAction(userId, certFront);
+        certUrls.push(url);
+      }
+      if (certBack) {
+        const url = await uploadDocumentAction(userId, certBack);
+        certUrls.push(url);
+      }
+
+      const updatePayload: any = {};
+      if (docUrls.length > 0) updatePayload.documents = docUrls;
+      if (certUrls.length > 0) updatePayload.certificates = certUrls;
+
+      if (Object.keys(updatePayload).length > 0) {
+        await updateUserProfileAction(userId, updatePayload);
       }
 
       setUser({
@@ -312,12 +341,33 @@ const WorkerVerificationFlow: React.FC<WorkerVerificationFlowProps> = ({
           <User size={24} />
         </div>
         <h2 className="text-xl font-extrabold text-[#1B4332]">
-          Verify Identity
+          {currentUser?.isVerified === VerificationStatus.REJECTED
+            ? "Re-submit Identity"
+            : "Verify Identity"}
         </h2>
         <p className="text-gray-500 mt-1 text-sm">
-          Upload a clear photo of your government-issued ID.
+          {currentUser?.isVerified === VerificationStatus.REJECTED
+            ? "Please upload valid documents to address the rejection reason."
+            : "Upload a clear photo of your government-issued ID."}
         </p>
       </div>
+
+      {currentUser?.isVerified === VerificationStatus.REJECTED && (
+        <div className="bg-red-50 border border-red-100 rounded-xl p-4 mb-6">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="text-red-600 flex-shrink-0 mt-0.5" size={18} />
+            <div>
+              <h4 className="text-sm font-bold text-red-700 mb-1">
+                Application Rejected
+              </h4>
+              <p className="text-xs text-red-600 leading-relaxed">
+                {currentUser?.rejectionReason ||
+                  "Your previous application was rejected. Please review your documents and try again."}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="bg-yellow-50 border border-yellow-100 rounded-xl p-3 mb-4 flex gap-3">
         <ShieldCheck className="text-yellow-600 flex-shrink-0" size={18} />
@@ -328,12 +378,20 @@ const WorkerVerificationFlow: React.FC<WorkerVerificationFlowProps> = ({
       </div>
 
       <FileUploader
-        label="Government ID / Driver's License"
-        subLabel="Front side only. clear, readable text."
+        label="Government ID - Front"
+        subLabel="Clear photo of the front side."
         accept="image/*,application/pdf"
-        file={idDocument}
-        onFileSelect={setIdDocument}
-        error={errors.idDocument}
+        file={idFront}
+        onFileSelect={setIdFront}
+        error={errors.idFront}
+      />
+      <FileUploader
+        label="Government ID - Back"
+        subLabel="Clear photo of the back side."
+        accept="image/*,application/pdf"
+        file={idBack}
+        onFileSelect={setIdBack}
+        error={errors.idBack}
       />
     </div>
   );
@@ -354,11 +412,20 @@ const WorkerVerificationFlow: React.FC<WorkerVerificationFlowProps> = ({
       </div>
 
       <FileUploader
-        label="Trade License / Insurance (Optional)"
-        subLabel="PDF or Image. Increases approval rate by 40%."
+        label="Certificate / License - Front (Optional)"
+        subLabel="Front side of your trade license."
         accept="image/*,application/pdf"
-        file={certDocument}
-        onFileSelect={setCertDocument}
+        file={certFront}
+        onFileSelect={setCertFront}
+        error={errors.certFront}
+      />
+      <FileUploader
+        label="Certificate / License - Back (Optional)"
+        subLabel="Back side of your trade license."
+        accept="image/*,application/pdf"
+        file={certBack}
+        onFileSelect={setCertBack}
+        error={errors.certBack}
       />
 
       <div className="mt-4 p-3 rounded-xl border border-gray-100 bg-gray-50 flex items-start gap-3">
