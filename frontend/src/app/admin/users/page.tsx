@@ -114,6 +114,10 @@ const UsersView = () => {
     if (users) setLocalUsers(users);
   }, [users]);
 
+  useEffect(() => {
+    console.log("These are the users", users);
+  });
+
   // Derive stats
   const totalUsers = localUsers.length;
   const verifiedUsers = localUsers.filter(
@@ -123,19 +127,17 @@ const UsersView = () => {
 
   async function handleBlockToggle(row: any) {
     try {
-      const response = await toggleUserAccessAction(row.user_id);
-      const updatedUser = response.user;
+      const updatedUser = await toggleUserAccessAction(row.id);
 
       setLocalUsers((prev) =>
         prev.map((u) =>
-          u.user_id === row.user_id
+          u.id === updatedUser.id
             ? { ...u, isBlocked: updatedUser.isBlocked }
             : u
         )
       );
     } catch (err) {
       console.error(err);
-      // Ideally show toast
     }
   }
 

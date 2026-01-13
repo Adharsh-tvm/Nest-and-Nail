@@ -2,6 +2,7 @@
 
 import axiosInstance from "@/lib/axiosInstance";
 import { VerificationStatus } from "@/shared/enums/authEnums";
+import { mapUserFromApi } from "@/shared/mappers/user.mapper";
 import { ApiResponse } from "@/shared/types/responseTypes";
 import { User } from "@/shared/types/userTypes";
 
@@ -95,7 +96,7 @@ export async function fetchAllWorkers(): Promise<Worker[]> {
 }
 
 export async function fetchAllUsers(): Promise<User[]> {
-  const res = await axiosInstance.get<ApiResponse<User[]>>(
+  const res = await axiosInstance.get<ApiResponse<any[]>>(
     "/api/auth/all"
   );
 
@@ -103,7 +104,7 @@ export async function fetchAllUsers(): Promise<User[]> {
     throw new Error(res.data.message || "Failed to fetch users");
   }
 
-  return res.data.payload;
+  return res.data.payload.map(mapUserFromApi);
 }
 
 export async function approveVerification(userId: string): Promise<void> {
@@ -126,7 +127,7 @@ export async function rejectVerification(userId: string): Promise<void> {
   }
 }
 
-export async function toggleUserAccess(userId: string): Promise<void> {
+export async function toggleUserAccess(userId: string): Promise<User> {
   const res = await axiosInstance.patch<ApiResponse<null>>(
     `/api/admin/access/${userId}`
   );
@@ -134,4 +135,5 @@ export async function toggleUserAccess(userId: string): Promise<void> {
   if (!res.data.success) {
     throw new Error(res.data.message || "Failed to toggle user access");
   }
+  return mapUserFromApi(res.data.payload);
 }
