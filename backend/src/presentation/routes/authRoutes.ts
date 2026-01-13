@@ -15,6 +15,7 @@ export function createAuthRoutes(
   router.post("/verify-otp", (req, res) => authController.verifyOtp(req, res));
   router.post("/forgot-password", (req, res) => authController.forgotPassword(req, res));
   router.post("/reset-password", (req, res) => authController.resetPassword(req, res));
+  router.post('/refresh', (req, res) => authController.refreshToken(req, res));
 
   return router;
 }

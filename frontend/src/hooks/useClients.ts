@@ -1,10 +1,11 @@
 "use client";
 
+import { getAllClientsAction } from "@/app/actions/admin/admin-actions";
+import { Client } from "@/services/api/admin.api";
 import { useEffect, useState } from "react";
-import { adminApi, Client } from "@/services/auth/admin.api";  
 
 type UseClientsResult = {
-  clients: Client[]; // default empty array for safe mapping
+  clients: Client[];
   loading: boolean;
   error: string | null;
 };
@@ -21,7 +22,7 @@ export const useClients = (): UseClientsResult => {
       setLoading(true);
       setError(null);
       try {
-        const res = await adminApi.getAllClients();
+        const res = await getAllClientsAction();
         console.log("[useClients] getAllClients result:", res);
 
         if (!Array.isArray(res)) {
@@ -32,7 +33,7 @@ export const useClients = (): UseClientsResult => {
         }
       } catch (err: any) {
         console.error("[useClients] error:", err);
-        const msg = err?.response?.data?.message ?? err.message ?? "Failed to load clients";
+        const msg = err?.message ?? "Failed to load clients";
         if (!cancelled) setError(msg);
       } finally {
         if (!cancelled) setLoading(false);

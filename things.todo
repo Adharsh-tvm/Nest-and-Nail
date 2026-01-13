@@ -1,0 +1,164 @@
+​‌‌‌⁡⁢⁣⁢FIRST WEEK​
+
+
+⁡⁢PAGES & FUNCTIONALITIES TO DO
+
+✔ login page @done (10/31/2025, 4:45:40 PM)
+✔ signup page user @done (10/31/2025, 4:44:48 PM)
+✔ user home page @done (10/31/2025, 4:44:50 PM)
+✔ signup page worker @done (10/31/2025, 4:44:55 PM)
+✔ worker document upload @done (12/8/2025, 9:38:36 AM)
+✔ worker home page @done (11/20/2025, 3:07:25 PM)
+✔ Role based authentication @done (11/20/2025, 3:07:27 PM)
+✔ protected route @done (11/20/2025, 3:07:29 PM)
+✔ jwt @done (10/31/2025, 4:45:56 PM)
+✔ access, refresh tokens @done (10/31/2025, 4:45:58 PM)
+✔ signup with otp verification @done (11/20/2025, 3:07:34 PM)
+✔ login page functionalities @done (11/20/2025, 3:07:37 PM)
+✔ role based authentication @done (11/20/2025, 3:07:38 PM)
+✔ forgot password @done (12/8/2025, 9:38:38 AM)
+✔ google authentication @done (11/20/2025, 3:07:55 PM)
+✔ Admin login @done (12/11/2025, 12:21:29 AM)
+✔ Worker verification in admin @done (12/11/2025, 12:21:31 AM)
+✔ Admin user/worker management @done (12/11/2025, 12:21:30 AM)
+✔ User/worker profile @done (12/8/2025, 9:38:44 AM)
+✔ Dockerise @done (11/10/2025, 3:06:50 PM)
+✔ logger @done (11/3/2025, 5:43:41 PM)
+✔ eslint @done (10/31/2025, 4:47:13 PM)
+Reusable components
+  	✔ Table @done (12/11/2025, 12:21:35 AM)
+  	✔ OTP @done (11/20/2025, 3:08:48 PM)
+  	✔ Reset password @done (12/11/2025, 12:21:36 AM)
+  	✔ Login @done (10/31/2025, 4:47:20 PM)
+
+
+WEEK FEEDBACK / PENDINGS TO DO
+
+✔ Private variable naming convention @done (10/31/2025, 4:47:31 PM)
+✔ Implement dependency injection in controller @done (11/10/2025, 6:45:14 PM)
+✔ Implement abstraction each layer @done (11/10/2025, 6:51:11 PM)
+✔ Usage of base repository @done (11/20/2025, 3:09:59 PM)
+✔ any vs unknown @done (11/25/2025, 4:21:42 AM)
+☐ Narrow down error type
+☐ Add proper comments for method-Low priority
+✔ Open closed principles and its implementation @done (11/10/2025, 6:46:12 PM)
+✔ Routed in constant @done (12/11/2025, 12:21:44 AM)
+✔ error interceptor @done (12/11/2025, 12:21:45 AM)
+✔ error handling middle ware @done (12/11/2025, 12:21:47 AM)
+☐ eslint errors in backend
+☐ lint errors in frontend
+✔ dl @done (11/13/2025, 1:16:50 PM)
+✔ maxAge in env @done (11/10/2025, 6:41:58 PM)
+✔ base repo @done (11/11/2025, 6:39:32 PM)
+☐ utc
+✔ incrementatl SSG @done (11/10/2025, 3:05:42 PM)
+✔ improving SEO techniques @done (11/13/2025, 1:16:57 PM)
+✔ implement Next Auth @done (11/10/2025, 3:05:39 PM)
+✔ avoid repository @done (11/13/2025, 1:14:33 PM)
+✔ di container @done (11/13/2025, 1:14:48 PM)
+✔ Architectural issue is still there @done (10/31/2025, 4:47:26 PM)
+✔ Dependency inversion principles not followed @done (11/13/2025, 1:15:17 PM)
+✔ Implement dependency injection in controller @done (11/13/2025, 1:15:33 PM)
+✔ abstraction @done (11/20/2025, 8:27:35 PM)
+✔ common response model @done (1/10/2026, 11:01:22 AM)
+
+
+TO LEARN 
+
+✔ SOLID principles @done (10/31/2025, 4:49:17 PM)
+✔ Dependency inversion principles @done (10/31/2025, 4:49:21 PM)
+✔ Abstraction and its implementation @done (10/31/2025, 4:49:19 PM)
+✔ Polymorphism and its type @done (12/11/2025, 12:22:06 AM)
+✔ incrementatl SSG @done (11/10/2025, 3:06:01 PM)
+✔ SEO @done (10/31/2025, 4:49:25 PM)
+✔ Next Auth @done (11/10/2025, 3:06:05 PM)
+☐ HOC
+✔ https://blog.logrocket.com/applying-solid-principles-typescript @done (12/11/2025, 12:22:02 AM)
+
+
+TO RECHECK
+
+✔ error handling middleware @done (11/25/2025, 7:31:52 AM)
+✔ error interceptor @done (11/25/2025, 7:31:53 AM)
+✔ base repository @done (11/25/2025, 7:31:54 AM)
+✔ actions.ts @done (11/25/2025, 7:31:55 AM)
+
+
+
+TO FIX
+
+✔ http to enum @done (11/25/2025, 7:32:00 AM)
+✔ private naming @done (11/25/2025, 7:32:00 AM)
+☐ refresh call
+✔ A details already submitted page for worker @done (12/8/2025, 9:39:15 AM)
+
+
+
+NEW PENDINGS...
+
+✔ Dependency inversion principle and its explanation @done (12/11/2025, 12:22:15 AM)
+✔ client page @done (12/4/2025, 2:56:38 PM)
+✔ worker page @done (12/4/2025, 2:56:38 PM)
+✔ worker user management in admin side @done (12/11/2025, 12:22:18 AM)
+✔ admin template references @done (1/10/2026, 11:01:31 AM)
+✔ Create more reusable components @done (12/11/2025, 12:22:23 AM)
+✔ constants file - messages and status codes @done (1/10/2026, 11:01:34 AM)
+✔ One signup form for worker and user @done (12/4/2025, 2:56:46 PM)
+✔ Become a worker button @done (12/8/2025, 9:37:55 AM)
+✔ Worker profile completion @done (12/8/2025, 9:37:54 AM)
+✔ if application is sent once, show already sent in Become a worker button @done (1/10/2026, 11:01:54 AM)
+☐ toast
+☐ validation
+☐ proper error handling
+☐ otp service tightly coulpled
+☐ repository factory is tightly coupled
+☐ make all roles same repo
+☐ check interface is given as type inside all private variables
+☐ loader for header and all other pages
+
+☐ add proper validations
+☐ show correct messages to users
+☐ fix the refresh issues
+☐ option for admin to add reason for rejection
+☐ option to re-apply
+☐ ask for confirmation
+☐ user block / unblock - bug
+☐ avoid using any/void
+☐ types of inheritance
+☐ make the ui smaller especially footer
+☐ make the profile pages perfect 
+☐ add taost for google login
+☐ prevent blocked user form google login
+☐ logout blocked user
+☐ add toast in profile update
+☐ profile name correction
+☐ axios call api services in one file
+☐ ui stability
+☐ toast for otp login
+☐ after applicatoin send for approval page immediate refresh to show pending button
+☐ worker profile ui along with sidebar 
+☐ client profile ui along with sidebar 
+☐ change landing page
+☐ text for all files creating code
+☐ make common types in root
+☐ type, interface, enums should be common
+☐ add skills update option in profile
+☐ arrange the controllers , usecases and actions in appropriate 
+☐ check upload actions
+☐ wrong OTP broken 
+
+
+⁡⁢⁣⁢​‌‌‌SECOND WEEK​⁡
+
+
+
+
+Next week:
+Complete the worker profile module with all required details
+Complete client and worker profile sections, including location information
+Implement online/offline mode functionality for workers.
+Add an issue-raising feature for clients.
+Show client-raised issues to workers based on their location.
+Build the issue detail page with full information about the required work.
+Implement location UI using a Street Map API.
+Add admin-side filters for workers and users.

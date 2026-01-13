@@ -1,4 +1,4 @@
-import { Role } from "../../shared/enums/enums";
+import { Role } from "../../shared/enums/authEnums";
 import { UserResponseDTO } from "../dtos/UserDTO";
 
 export interface IChangeUserRoleUseCase {

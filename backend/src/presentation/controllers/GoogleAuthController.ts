@@ -1,22 +1,35 @@
 import { Request, Response } from "express";
 import { IGoogleSignUpUseCase } from "../../application/interfaces/IGoogleSignUpUseCase";
-import { HttpStatusCode } from "../enums/httpCodes";
+import { HttpStatusCode } from "../../shared/enums/httpCodes";
 import { IGoogleAuthController } from "../interfaces/IGoogleAuthController";
+import { ResponseHandler } from "../responses/ApiResponse";
+import { RESPONSE_MESSAGES } from "../responses/ResponseMessages";
+import { LoginResponseDTO } from "../../application/dtos/UserDTO";
 
 export class GoogleAuthController implements IGoogleAuthController {
-  constructor(private readonly _googleSignUpUseCase: IGoogleSignUpUseCase) { }
+  constructor(
+    private readonly _googleSignUpUseCase: IGoogleSignUpUseCase
+  ) { }
 
   async googleLogin(req: Request, res: Response): Promise<void> {
     try {
       const { email, name, role } = req.body;
-      console.log('Da role itha nokku : ',role)
-      const response = await this._googleSignUpUseCase.execute(email, name, role)
-      res.status(HttpStatusCode.OK).json({ success: true, message: "Google user authenticated", payload: response })
-    } catch (err: any) {
-      console.error("[GoogleAuthController] Error:", err);
-      res.status(HttpStatusCode.INTERNAL_SERVER).json({
-        error: err.message || "Google authentication failed"
-      });
+
+      const result = await this._googleSignUpUseCase.execute(
+        email,
+        name,
+        role
+      );
+
+      res.status(HttpStatusCode.OK).json(ResponseHandler.success<LoginResponseDTO>(result, RESPONSE_MESSAGES.GOOGLE_AUTH_SUCCESS))
+
+    } catch (error) {
+      console.error("[GoogleAuthController] Error:", error);
+
+
+      res.status(HttpStatusCode.INTERNAL_SERVER).json(ResponseHandler.error(RESPONSE_MESSAGES.GOOGLE_AUTH_FAILED, error))
+
+
     }
   }
 }

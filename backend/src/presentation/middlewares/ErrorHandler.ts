@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { HttpStatusCode } from "../enums/httpCodes";
+import { HttpStatusCode } from "../../shared/enums/httpCodes";
 import {
   DomainError,
   AuthenticationError,

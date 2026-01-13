@@ -1,5 +1,5 @@
-import ClientHeader from "@/app/components/containers/ClientHeader";
-import Footer from "@/app/components/containers/ClientFooter";
+import ClientHeader from "@/app/components/containers/layout/ClientHeader";
+import Footer from "@/app/components/containers/layout/ClientFooter";
 
 export const metadata = {
   title: "Nest & Nail",

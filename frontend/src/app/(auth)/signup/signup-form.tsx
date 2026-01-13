@@ -15,38 +15,43 @@ import {
   signup,
   completeSignup,
   resendOtp,
-} from "../../actions/signup-actions";
+} from "../../actions/authentication/signup-actions";
 import OtpVerificationForm from "../otp/page";
 import { redirect, useRouter } from "next/navigation";
 import { GoogleLogin } from "@react-oauth/google";
-import { handleGoogleSignIn } from "@/app/actions/google-actions";
-
-type Role = "client" | "worker" | "admin";
+import { handleGoogleSignIn } from "@/app/actions/authentication/google-actions";
+import { Toaster, toast } from "react-hot-toast";
 
 const roleConfig = {
   client: {
-    icon: <User className="h-6 w-6 text-yellow-400" />,
-    buttonClass: "bg-yellow-500 text-gray-900 hover:bg-yellow-500/90",
-    focusRingClass: "focus:ring-yellow-500",
+    icon: <User className="h-6 w-6 text-yellow-600" />,
+    buttonClass:
+      "bg-[#0f291e] text-white hover:bg-[#1B4332] shadow-lg shadow-green-900/20",
+    focusRingClass: "focus:ring-[#0f291e]",
     checkboxClass:
-      "data-[state=checked]:bg-yellow-500 data-[state=checked]:text-gray-900",
-    linkClass: "text-yellow-500 hover:text-yellow-400",
+      "data-[state=checked]:bg-[#0f291e] data-[state=checked]:text-white",
+    linkClass: "text-yellow-600 hover:text-yellow-700",
+    badgeClass: "bg-yellow-50 text-yellow-700 border-yellow-200",
   },
   worker: {
-    icon: <Wrench className="h-6 w-6 text-green-400" />,
-    buttonClass: "bg-green-500 text-gray-900 hover:bg-green-500/90",
-    focusRingClass: "focus:ring-green-500",
+    icon: <Wrench className="h-6 w-6 text-green-600" />,
+    buttonClass:
+      "bg-[#0f291e] text-white hover:bg-[#1B4332] shadow-lg shadow-green-900/20",
+    focusRingClass: "focus:ring-[#0f291e]",
     checkboxClass:
-      "data-[state=checked]:bg-green-500 data-[state=checked]:text-gray-900",
-    linkClass: "text-green-500 hover:text-green-400",
+      "data-[state=checked]:bg-[#0f291e] data-[state=checked]:text-white",
+    linkClass: "text-green-600 hover:text-green-700",
+    badgeClass: "bg-green-50 text-green-700 border-green-200",
   },
   admin: {
-    icon: <Shield className="h-6 w-6 text-teal-400" />,
-    buttonClass: "bg-teal-500 text-gray-900 hover:bg-teal-500/90",
-    focusRingClass: "focus:ring-teal-500",
+    icon: <Shield className="h-6 w-6 text-teal-600" />,
+    buttonClass:
+      "bg-[#0f291e] text-white hover:bg-[#1B4332] shadow-lg shadow-green-900/20",
+    focusRingClass: "focus:ring-[#0f291e]",
     checkboxClass:
-      "data-[state=checked]:bg-teal-500 data-[state=checked]:text-gray-900",
-    linkClass: "text-teal-500 hover:text-teal-400",
+      "data-[state=checked]:bg-[#0f291e] data-[state=checked]:text-white",
+    linkClass: "text-teal-600 hover:text-teal-700",
+    badgeClass: "bg-teal-50 text-teal-700 border-teal-200",
   },
 };
 
@@ -68,16 +73,13 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
   const [otpError, setOtpError] = useState<string | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
 
-  // ✅ Store password in a ref that persists across renders
   const passwordCaptureRef = useRef<string>("");
   const formRef = useRef<HTMLFormElement>(null);
 
   const currentRoleConfig = roleConfig[role];
   const roleName = role.charAt(0).toUpperCase() + role.slice(1);
 
-  // ✅ Handle form submission to capture password BEFORE it's cleared
   const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    // Capture password immediately before form processing
     const formData = new FormData(event.currentTarget);
     const password = formData.get("password") as string;
 
@@ -90,13 +92,24 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
     passwordCaptureRef.current = password;
   };
 
-  // When OTP is sent successfully, use the captured password
+  useEffect(() => {
+    if (state.errorId && state.error) {
+      toast.error(state.error);
+    }
+  }, [state.errorId]);
+
+  useEffect(() => {
+    if (state.otpSent) {
+      toast.success("OTP sent to your email!");
+    }
+  }, [state.otpSent]);
+
   useEffect(() => {
     if (state.otpSent && state.fields) {
       const capturedData = {
         name: state.fields.name || "",
         email: state.fields.email || "",
-        password: passwordCaptureRef.current, // Use the captured password
+        password: passwordCaptureRef.current,
         role: role,
       };
 
@@ -159,7 +172,7 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
 
       if (result.success) {
         if (signupData.role === "worker") {
-          if (result.isVerified) {
+          if (result.isVerified === "VERIFIED") {
             router.push("/worker");
           } else {
             router.push("/worker/documents");
@@ -168,11 +181,11 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
           router.push("/client");
         }
       } else {
-        setOtpError(result.error || "Verification failed");
+        toast.error(result.error || "Verification failed");
       }
     } catch (err) {
       console.error("[SignUpComponent] Verification error:", err);
-      setOtpError("An unexpected error occurred");
+      toast.error("An unexpected error occurred");
     } finally {
       setIsVerifying(false);
     }
@@ -185,8 +198,10 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
 
     if (result?.success) {
       const redirectPath = result.user.user_role;
+      toast.success(result?.message)
       redirect(redirectPath);
     } else {
+      toast.error("Google login error")
       console.log("Google login error");
     }
   }
@@ -214,44 +229,49 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
     passwordCaptureRef.current = "";
   };
 
+  const inputClass = `w-full pl-9 pr-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white disabled:opacity-50 disabled:cursor-not-allowed transition-all ${currentRoleConfig.focusRingClass}`;
+
   return (
     <>
+      {/* <Toaster /> */}
       <div className="w-full max-w-sm">
-        <div className="bg-black border border-zinc-800 rounded-xl shadow-2xl">
-          <div className="p-6 text-center">
+        <div className="bg-white border-t-4 border-[#DC2626] rounded-2xl shadow-xl overflow-hidden">
+          <div className="p-6 pb-0 text-center">
             <div className="flex justify-center mb-4">
-              <div className="p-3 bg-zinc-900 border border-zinc-800 rounded-full">
+              <div
+                className={`p-2.5 rounded-xl shadow-md border ${currentRoleConfig.badgeClass}`}
+              >
                 {currentRoleConfig.icon}
               </div>
             </div>
-            <h1 className="text-2xl font-bold text-zinc-100">
+            <h1 className="text-xl font-bold text-[#0f291e]">
               Create {roleName} Account
             </h1>
-            <p className="text-sm text-zinc-500 mt-1">
+            <p className="text-xs text-gray-500 mt-1">
               Join us by filling out the form below.
             </p>
           </div>
 
-          <div className="px-6 pb-6">
+          <div className="px-6 pb-6 pt-4">
             <form
               ref={formRef}
               action={formAction}
               onSubmit={handleFormSubmit}
               data-signup-form
-              className="space-y-4"
+              className="space-y-3"
             >
               {/* Hidden field for role */}
               <input type="hidden" name="role" value={role} />
 
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <label
                   htmlFor={`fullName-signup-${role}`}
-                  className="text-sm font-medium text-zinc-400"
+                  className="text-xs font-bold text-gray-700"
                 >
                   Full Name
                 </label>
                 <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <input
                     id={`fullName-signup-${role}`}
                     name="name"
@@ -260,20 +280,20 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
                     disabled={pending}
                     defaultValue={state.fields?.name ?? ""}
                     placeholder="John Doe"
-                    className={`w-full pl-9 pr-4 py-2 bg-zinc-900 border border-zinc-800 text-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black disabled:opacity-50 disabled:cursor-not-allowed ${currentRoleConfig.focusRingClass}`}
+                    className={inputClass}
                   />
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <label
                   htmlFor={`email-signup-${role}`}
-                  className="text-sm font-medium text-zinc-400"
+                  className="text-xs font-bold text-gray-700"
                 >
                   Email
                 </label>
                 <div className="relative">
-                  <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                  <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <input
                     id={`email-signup-${role}`}
                     name="email"
@@ -282,20 +302,20 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
                     disabled={pending}
                     defaultValue={state.fields?.email ?? ""}
                     placeholder="you@example.com"
-                    className={`w-full pl-9 pr-4 py-2 bg-zinc-900 border border-zinc-800 text-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black disabled:opacity-50 disabled:cursor-not-allowed ${currentRoleConfig.focusRingClass}`}
+                    className={inputClass}
                   />
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <label
                   htmlFor={`password-signup-${role}`}
-                  className="text-sm font-medium text-zinc-400"
+                  className="text-xs font-bold text-gray-700"
                 >
                   Password
                 </label>
                 <div className="relative">
-                  <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                  <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <input
                     id={`password-signup-${role}`}
                     name="password"
@@ -303,23 +323,20 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
                     required
                     disabled={pending}
                     placeholder="••••••••"
-                    className={`w-full pl-9 pr-4 py-2 bg-zinc-900 border border-zinc-800 text-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black disabled:opacity-50 disabled:cursor-not-allowed ${currentRoleConfig.focusRingClass}`}
+                    className={inputClass}
                   />
                 </div>
-                <p className="text-xs text-zinc-500 mt-1">
-                  Must be at least 8 characters
-                </p>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <label
                   htmlFor={`confirm-password-signup-${role}`}
-                  className="text-sm font-medium text-zinc-400"
+                  className="text-xs font-bold text-gray-700"
                 >
                   Confirm Password
                 </label>
                 <div className="relative">
-                  <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                  <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <input
                     id={`confirm-password-signup-${role}`}
                     name="confirmPassword"
@@ -327,21 +344,15 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
                     required
                     disabled={pending}
                     placeholder="••••••••"
-                    className={`w-full pl-9 pr-4 py-2 bg-zinc-900 border border-zinc-800 text-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black disabled:opacity-50 disabled:cursor-not-allowed ${currentRoleConfig.focusRingClass}`}
+                    className={inputClass}
                   />
                 </div>
               </div>
 
-              {state?.error && (
-                <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-                  <p className="text-sm text-red-400">{state.error}</p>
-                </div>
-              )}
-
               <button
                 type="submit"
                 disabled={pending}
-                className={`w-full py-2.5 px-4 font-semibold rounded-lg transition-all transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none ${currentRoleConfig.buttonClass} ${currentRoleConfig.focusRingClass}`}
+                className={`w-full py-2.5 px-4 font-bold rounded-lg transition-all transform hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none ${currentRoleConfig.buttonClass} ${currentRoleConfig.focusRingClass}`}
               >
                 {pending ? (
                   <span className="flex items-center justify-center gap-2">
@@ -354,23 +365,34 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
               </button>
             </form>
 
-            <div className="mt-4">
+            <div className="relative my-4">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-200"></div>
+              </div>
+              <div className="relative flex justify-center text-xs">
+                <span className="px-2 bg-white text-gray-400 font-medium">
+                  Or continue with
+                </span>
+              </div>
+            </div>
+
+            <div className="mt-2">
               <GoogleLogin
                 onSuccess={onGoogleSuccess}
                 useOneTap
-                theme="filled_black"
+                theme="outline"
                 shape="circle"
                 width="330"
               />
             </div>
           </div>
 
-          <div className="p-6 border-t border-zinc-800 text-center text-sm">
-            <p className="text-zinc-500">
+          <div className="p-4 pt-0 pb-6 text-center text-xs bg-white">
+            <p className="text-gray-500">
               Already have an account?{" "}
               <a
                 href="/login"
-                className={`font-medium ${currentRoleConfig.linkClass} transition-colors`}
+                className={`font-bold ${currentRoleConfig.linkClass} transition-colors`}
               >
                 Sign in
               </a>
@@ -380,35 +402,41 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
       </div>
 
       {showOtpModal && signupData && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="relative w-full max-w-md">
-            <button
-              onClick={handleCloseModal}
-              className="absolute -top-12 right-0 text-zinc-400 hover:text-white transition-colors"
-              aria-label="Close modal"
-            >
-              <X className="h-8 w-8" />
-            </button>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+          <div className="relative w-full max-w-md animate-in zoom-in-95 duration-200">
+            <div className="bg-white border border-gray-100 rounded-2xl shadow-2xl overflow-hidden relative">
+              <button
+                onClick={handleCloseModal}
+                className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors z-10 p-1 rounded-full hover:bg-gray-100"
+                aria-label="Close modal"
+              >
+                <X className="h-5 w-5" />
+              </button>
 
-            <div className="bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl overflow-hidden">
-              <OtpVerificationForm
-                email={signupData.email}
-                onVerify={handleVerifyOtp}
-                onResend={handleResendOtp}
-              />
+              <div className="p-6">
+                <OtpVerificationForm
+                  email={signupData.email}
+                  onVerify={handleVerifyOtp}
+                  onResend={handleResendOtp}
+                />
+              </div>
             </div>
 
             {otpError && (
-              <div className="mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-                <p className="text-sm text-red-400 text-center">{otpError}</p>
+              <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg shadow-sm">
+                <p className="text-sm text-red-600 text-center font-medium">
+                  {otpError}
+                </p>
               </div>
             )}
 
             {isVerifying && (
-              <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center rounded-xl">
-                <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-lg">
-                  <Loader2 className="h-8 w-8 animate-spin text-white mx-auto" />
-                  <p className="text-white mt-4 text-sm">Verifying OTP...</p>
+              <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center rounded-2xl">
+                <div className="bg-white border border-gray-200 p-6 rounded-xl shadow-xl flex flex-col items-center">
+                  <Loader2 className="h-8 w-8 animate-spin text-[#DC2626] mx-auto" />
+                  <p className="text-gray-900 mt-4 text-sm font-medium">
+                    Verifying OTP...
+                  </p>
                 </div>
               </div>
             )}

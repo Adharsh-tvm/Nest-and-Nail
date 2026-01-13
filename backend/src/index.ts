@@ -10,22 +10,21 @@ import { DIContainer } from "./infrastructure/di/DIContainer";
 import { createGoogleAuthRoutes } from "./presentation/routes/GoogleAuthRoutes";
 import { createAdminRoutes } from "./presentation/routes/adminRoutes";
 import { createUserRoutes } from "./presentation/routes/userRoutes";
+import { createUploadRoutes } from "./presentation/routes/uploadRoutes";
 
-// Load environment variables
 dotenv.config();
 
 async function bootstrap() {
   const app = express();
 
-  // Middleware
-app.use(
-  cors({
-    origin: "http://localhost:3000",
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
+  app.use(
+    cors({
+      origin: "http://localhost:3000",
+      credentials: true,
+      methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+      allowedHeaders: ["Content-Type", "Authorization"],
+    })
+  );
 
 
   app.use(express.json());
@@ -40,13 +39,15 @@ app.use(
   const container = new DIContainer();
 
   // Routes
-  app.use("/api/auth", createAuthRoutes(container.authController, container.authMiddleware));
+  app.use("/api/auth", createAuthRoutes(container.controllers.authController, container.controllers.authMiddleware));
 
-  app.use("/api/auth", createGoogleAuthRoutes(container.googleAuthController));
-  
-  app.use("/api/auth", createUserRoutes(container.userController,container.authMiddleware ));
+  app.use("/api/auth", createGoogleAuthRoutes(container.controllers.googleAuthController));
 
-  app.use("/api/admin", createAdminRoutes(container.adminController));
+  app.use("/api/auth", createUserRoutes(container.controllers.userController, container.controllers.userProfileController, container.controllers.authMiddleware));
+
+  app.use("/api/admin", createAdminRoutes(container.controllers.adminController));
+
+  app.use("/api/upload", createUploadRoutes(container.controllers.uploadController, container.controllers.authMiddleware));
 
 
   // Error Handler
@@ -55,7 +56,7 @@ app.use(
   // Start server
   const PORT = process.env.PORT ?? 4000;
   app.listen(PORT, () => {
-    container.logger.info(`Server running on http://localhost:${PORT}`);
+    container.infra.logger.info(`Server running on http://localhost:${PORT}`);
   });
 }
 

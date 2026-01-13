@@ -1,4 +1,3 @@
-// app/components/OtpVerificationForm.tsx
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
@@ -108,16 +107,15 @@ const OtpVerificationForm: React.FC<OtpVerificationFormProps> = ({
   return (
     <div className="w-full p-6 md:p-8">
       <form onSubmit={handleSubmit} className="flex flex-col items-center">
-        <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-zinc-800 border border-zinc-700">
-          {/* Changed icon to white */}
-          <ShieldCheck className="h-8 w-8 text-white" />
+        <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 border border-gray-200">
+          <ShieldCheck className="h-8 w-8 text-gray-900" />
         </div>
-        <h1 className="text-2xl font-semibold text-zinc-100">
+        <h1 className="text-2xl font-semibold text-gray-900">
           Verify Your Email
         </h1>
-        <p className="mt-2 text-center text-sm text-zinc-400">
+        <p className="mt-2 text-center text-sm text-gray-500">
           Enter the 6-digit code sent to <br />
-          <span className="font-medium text-zinc-200">{email}</span>
+          <span className="font-medium text-gray-900">{email}</span>
         </p>
 
         <div className="my-8 flex justify-center gap-2 sm:gap-3">
@@ -134,8 +132,7 @@ const OtpVerificationForm: React.FC<OtpVerificationFormProps> = ({
               onChange={(e) => handleChange(e, index)}
               onKeyDown={(e) => handleKeyDown(e, index)}
               onPaste={handlePaste}
-              /* Changed focus rings to white */
-              className="h-12 w-10 rounded-md border border-zinc-700 bg-zinc-800 text-center text-2xl font-semibold text-white shadow-inner focus:border-white focus:outline-none focus:ring-2 focus:ring-white sm:h-14 sm:w-12"
+              className="h-12 w-10 rounded-md border border-gray-300 bg-gray-50 text-center text-2xl font-semibold text-gray-900 shadow-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-black sm:h-14 sm:w-12"
               required
             />
           ))}
@@ -143,30 +140,27 @@ const OtpVerificationForm: React.FC<OtpVerificationFormProps> = ({
 
         <button
           type="submit"
-          /* Changed button to white background with dark text */
-          className="w-full rounded-lg bg-white py-3 text-base font-semibold text-zinc-900 transition-all duration-200 hover:bg-zinc-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-zinc-900"
+          className="w-full rounded-lg bg-gray-900 py-3 text-base font-semibold text-white transition-all duration-200 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2"
         >
           Verify Email
         </button>
 
-        <div className="mt-6 text-center text-sm text-zinc-400">
+        <div className="mt-6 text-center text-sm text-gray-600">
           <p>
             Didn't receive the code?{" "}
             <button
               type="button"
               onClick={handleResendClick}
               disabled={!canResend}
-              /* Changed resend link to white/zinc shades */
-              className={`font-medium ${
-                canResend
-                  ? "text-white hover:text-zinc-300"
-                  : "cursor-not-allowed text-zinc-600"
-              } transition-colors duration-200 focus:outline-none`}
+              className={`font-medium ${canResend
+                  ? "text-gray-900 hover:text-gray-700"
+                  : "cursor-not-allowed text-gray-400"
+                } transition-colors duration-200 focus:outline-none`}
             >
               Resend Code
             </button>
             {!canResend && (
-              <span className="ml-1 text-zinc-500">(in {timer}s)</span>
+              <span className="ml-1 text-gray-500">(in {timer}s)</span>
             )}
           </p>
         </div>
