@@ -14,6 +14,7 @@ import {
   Shield,
   TrendingUp,
   Users,
+  CheckCircle,
 } from "lucide-react";
 
 import DataTable from "@/app/components/containers/widgets/DataTable";
@@ -80,9 +81,8 @@ const ActionMenu = ({
                 setIsOpen(false);
                 onBlockToggle(row);
               }}
-              className={`w-full text-left px-4 py-3 text-sm flex items-center gap-3 hover:bg-gray-50 transition-colors ${
-                row.isBlocked ? "text-emerald-600" : "text-amber-600"
-              }`}
+              className={`w-full text-left px-4 py-3 text-sm flex items-center gap-3 hover:bg-gray-50 transition-colors ${row.isBlocked ? "text-emerald-600" : "text-amber-600"
+                }`}
             >
               {row.isBlocked ? (
                 <>
@@ -101,6 +101,8 @@ const ActionMenu = ({
   );
 };
 
+import UserDetailsModal from "./UserDetailsModal";
+
 /**
  * ----------------------------------------------------------------------------
  * MAIN CLIENTS VIEW COMPONENT
@@ -109,6 +111,8 @@ const ActionMenu = ({
 const UsersView = () => {
   const { users, loading, error } = useUsers();
   const [localUsers, setLocalUsers] = useState<any[]>([]);
+  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     if (users) setLocalUsers(users);
@@ -142,7 +146,8 @@ const UsersView = () => {
   }
 
   const handleViewDetails = (row: any) => {
-    alert(`Viewing details for: ${row.name || row.email}`);
+    setSelectedUser(row);
+    setIsModalOpen(true);
   };
 
   type ClientRow = (typeof users)[number];
@@ -203,16 +208,9 @@ const UsersView = () => {
       ),
     },
     {
-      header: "Status",
+      header: "Verification",
       accessorKey: "isVerified",
       cell: (row) => {
-        if (row.isBlocked) {
-          return (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-red-600 text-xs font-bold border border-red-100">
-              <Ban size={14} /> Blocked
-            </span>
-          );
-        }
         if (row.isVerified === VerificationStatus.VERIFIED) {
           return (
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-bold border border-blue-100">
@@ -235,13 +233,22 @@ const UsersView = () => {
       },
     },
     {
-      header: "Role",
-      accessorKey: "role",
-      cell: (row) => (
-        <span className="font-medium text-gray-600 text-sm bg-gray-50 px-3 py-1 rounded-lg border border-gray-100">
-          {row.role}
-        </span>
-      ),
+      header: "Active Status",
+      accessorKey: "isBlocked",
+      cell: (row) => {
+        if (row.isBlocked) {
+          return (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-red-600 text-xs font-bold border border-red-100">
+              <Ban size={14} /> Blocked
+            </span>
+          );
+        }
+        return (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 text-xs font-bold border border-emerald-100">
+            <CheckCircle size={14} /> Active
+          </span>
+        );
+      },
     },
     {
       header: "",
@@ -270,25 +277,25 @@ const UsersView = () => {
     );
   }
 
-  const StatCard = ({ title, value, icon: Icon, color, trend }: any) => (
-    <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between group hover:shadow-md transition-all">
+  const StatCard = ({ title, value, icon: Icon, color, iconColor, trend }: any) => (
+    <div className={`p-6 rounded-2xl shadow-sm flex items-center justify-between group hover:shadow-md transition-all ${color}`}>
       <div>
-        <p className="text-gray-500 text-xs font-bold uppercase tracking-wider mb-1">
+        <p className={`text-xs font-bold uppercase tracking-wider mb-1 ${color.includes('text-white') ? 'text-white/70' : 'text-gray-400'}`}>
           {title}
         </p>
-        <h3 className="text-2xl font-black text-gray-900 group-hover:text-[#1B4332] transition-colors">
+        <h3 className={`text-3xl font-black ${color.includes('text-white') ? 'text-white' : 'text-gray-900'}`}>
           {value}
         </h3>
         {trend && (
-          <p className="text-green-600 text-xs font-bold flex items-center gap-1 mt-2">
+          <p className={`text-xs font-bold flex items-center gap-1 mt-2 ${color.includes('text-white') ? 'text-white/90' : 'text-emerald-600'}`}>
             <TrendingUp size={12} /> {trend}
           </p>
         )}
       </div>
       <div
-        className={`w-12 h-12 rounded-xl flex items-center justify-center ${color} group-hover:scale-110 transition-transform`}
+        className={`w-14 h-14 rounded-2xl flex items-center justify-center ${color.includes('text-white') ? 'bg-white/20' : 'bg-gray-50'} group-hover:scale-110 transition-transform ${iconColor}`}
       >
-        <Icon size={24} />
+        <Icon size={28} />
       </div>
     </div>
   );
@@ -301,31 +308,35 @@ const UsersView = () => {
           title="Total Users"
           value={totalUsers}
           icon={Users}
-          color="bg-emerald-50 text-emerald-600"
+          color="bg-gradient-to-br from-emerald-500 to-emerald-600 text-white shadow-emerald-200"
+          iconColor="text-white/80"
           trend="+12% this month"
         />
         <StatCard
           title="Verified"
           value={verifiedUsers}
           icon={BadgeCheck}
-          color="bg-blue-50 text-blue-600"
+          color="bg-white text-gray-900 border border-gray-100"
+          iconColor="text-blue-500"
         />
         <StatCard
           title="Active Now"
           value={Math.round(totalUsers * 0.8)}
-          icon={User}
-          color="bg-purple-50 text-purple-600"
+          icon={TrendingUp}
+          color="bg-white text-gray-900 border border-gray-100"
+          iconColor="text-purple-500"
         />
         <StatCard
           title="Blocked"
           value={blockedUsers}
           icon={Ban}
-          color="bg-red-50 text-red-600"
+          color="bg-white text-gray-900 border border-gray-100"
+          iconColor="text-red-500"
         />
       </div>
 
       {/* Main Table */}
-      <div className="h-[600px] lg:h-[700px]">
+      <div className="h-[650px] bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden flex flex-col">
         <DataTable<ClientRow>
           title="User Management"
           columns={columns}
@@ -334,6 +345,12 @@ const UsersView = () => {
           searchPlaceholder="Search by name, email or role..."
         />
       </div>
+
+      <UserDetailsModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        user={selectedUser}
+      />
     </div>
   );
 };

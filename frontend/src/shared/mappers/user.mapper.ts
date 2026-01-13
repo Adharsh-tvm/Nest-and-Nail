@@ -7,8 +7,10 @@ export function mapUserFromApi(raw: any): User {
     name: raw.user_name,
     email: raw.email_address,
     role: raw.user_role,
+
     phone_number: raw.phone_number ?? null,
     profileImageUrl: raw.profileImageUrl || null,
+
     isBlocked: Boolean(raw.isBlocked),
     isVerified:
       raw.isVerified === "VERIFIED"
@@ -16,5 +18,14 @@ export function mapUserFromApi(raw: any): User {
         : raw.isVerified === "PENDING"
         ? VerificationStatus.PENDING
         : VerificationStatus.NOT_VERIFIED,
+
+    skills: Array.isArray(raw.skills) ? raw.skills : [],
+    address: Array.isArray(raw.address) ? raw.address : [],
+    documents: Array.isArray(raw.documents) ? raw.documents : [],
+    certificates: Array.isArray(raw.certificates) ? raw.certificates : [],
+    workPhotos: Array.isArray(raw.workPhotos) ? raw.workPhotos : [],
+
+    createdAt: raw.createdAt || undefined,
+    updatedAt: raw.updatedAt || undefined,
   };
 }
