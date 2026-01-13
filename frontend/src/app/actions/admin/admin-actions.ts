@@ -8,6 +8,7 @@ import {
   toggleUserAccess,
   fetchAllUsers,
 } from "@/services/api/admin.api";
+import { User } from "@/shared/types/userTypes";
 
 
 export async function getAllClientsAction() {
@@ -26,7 +27,9 @@ export async function rejectUserAction(userId: string) {
   return await rejectVerification(userId);
 }
 
-export async function toggleUserAccessAction(userId: string) {
+export async function toggleUserAccessAction(
+  userId: string
+): Promise<User> {
   return await toggleUserAccess(userId);
 }
 
