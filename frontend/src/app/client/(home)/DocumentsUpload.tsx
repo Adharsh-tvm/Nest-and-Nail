@@ -346,28 +346,9 @@ const WorkerVerificationFlow: React.FC<WorkerVerificationFlowProps> = ({
             : "Verify Identity"}
         </h2>
         <p className="text-gray-500 mt-1 text-sm">
-          {currentUser?.isVerified === VerificationStatus.REJECTED
-            ? "Please upload valid documents to address the rejection reason."
-            : "Upload a clear photo of your government-issued ID."}
+          Upload a clear photo of your government-issued ID.
         </p>
       </div>
-
-      {currentUser?.isVerified === VerificationStatus.REJECTED && (
-        <div className="bg-red-50 border border-red-100 rounded-xl p-4 mb-6">
-          <div className="flex items-start gap-3">
-            <AlertCircle className="text-red-600 flex-shrink-0 mt-0.5" size={18} />
-            <div>
-              <h4 className="text-sm font-bold text-red-700 mb-1">
-                Application Rejected
-              </h4>
-              <p className="text-xs text-red-600 leading-relaxed">
-                {currentUser?.rejectionReason ||
-                  "Your previous application was rejected. Please review your documents and try again."}
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
 
       <div className="bg-yellow-50 border border-yellow-100 rounded-xl p-3 mb-4 flex gap-3">
         <ShieldCheck className="text-yellow-600 flex-shrink-0" size={18} />
