@@ -26,17 +26,13 @@ export class UploadWorkerDocumentUseCase implements IUploadWorkerDocumentUseCase
 
         if (!user) throw new Error("User not found");
 
-        // Upload to Cloudinary
         const url = await CloudinaryUploadService.upload(filePath, "users/documents");
 
-        // Always append documents
         user.documents = user.documents || [];
         user.documents.push(url);
 
-        // 🔥 Mark verification status as PENDING
         user.isVerified = VerificationStatus.PENDING;
 
-        // Save changes
         await repo.updateById(userId, user);
 
         return { url };
