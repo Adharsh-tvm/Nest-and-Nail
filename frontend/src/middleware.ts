@@ -32,10 +32,12 @@ export async function middleware(req: NextRequest) {
     }
   }
 
-  // 2️⃣ No access token but refresh exists → refresh & retry
-  if (!userRole && !accessToken && refreshToken) {
+  // access token missing OR expired → refresh
+  if (!userRole && refreshToken) {
     const refreshed = await refreshTokens(refreshToken);
+
     if (refreshed) {
+      // force new request with fresh access token
       return NextResponse.redirect(req.nextUrl);
     }
   }
