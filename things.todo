@@ -89,7 +89,7 @@ TO FIX
 
 ✔ http to enum @done (11/25/2025, 7:32:00 AM)
 ✔ private naming @done (11/25/2025, 7:32:00 AM)
-☐ refresh call
+✔ refresh call @done (1/13/2026, 11:05:20 PM)
 ✔ A details already submitted page for worker @done (12/8/2025, 9:39:15 AM)
 
 
@@ -107,49 +107,56 @@ NEW PENDINGS...
 ✔ Become a worker button @done (12/8/2025, 9:37:55 AM)
 ✔ Worker profile completion @done (12/8/2025, 9:37:54 AM)
 ✔ if application is sent once, show already sent in Become a worker button @done (1/10/2026, 11:01:54 AM)
-☐ toast
-☐ validation
-☐ proper error handling
-☐ otp service tightly coulpled
-☐ repository factory is tightly coupled
+✔ toast @done (1/13/2026, 11:05:34 PM)
+✔ validation @done (1/13/2026, 11:05:36 PM)
+✔ proper error handling @done (1/13/2026, 11:05:37 PM)
+✔ otp service tightly coulpled @done (1/13/2026, 11:05:39 PM)
+✔ repository factory is tightly coupled @done (1/13/2026, 11:05:41 PM)
 ☐ make all roles same repo
-☐ check interface is given as type inside all private variables
+✔ check interface is given as type inside all private variables @done (1/13/2026, 11:05:51 PM)
 ☐ loader for header and all other pages
 
 ☐ add proper validations
 ☐ show correct messages to users
 ☐ fix the refresh issues
 ☐ option for admin to add reason for rejection
-☐ option to re-apply
+✔ option to re-apply @done (1/13/2026, 11:06:12 PM)
 ☐ ask for confirmation
-☐ user block / unblock - bug
+✔ user block / unblock - bug @done (1/13/2026, 11:06:20 PM)
 ☐ avoid using any/void
-☐ types of inheritance
-☐ make the ui smaller especially footer
+✔ types of inheritance @done (1/13/2026, 11:07:50 PM)
+✔ make the ui smaller especially footer @done (1/13/2026, 11:07:52 PM)
 ☐ make the profile pages perfect 
-☐ add taost for google login
-☐ prevent blocked user form google login
+✔ add taost for google login @done (1/13/2026, 11:07:58 PM)
+✔ prevent blocked user form google login @done (1/13/2026, 11:33:40 PM)
 ☐ logout blocked user
-☐ add toast in profile update
-☐ profile name correction
+✔ add toast in profile update @done (1/13/2026, 11:33:42 PM)
+✔ profile name correction @done (1/13/2026, 11:33:47 PM)
 ☐ axios call api services in one file
 ☐ ui stability
-☐ toast for otp login
+✔ toast for otp login @done (1/13/2026, 11:34:57 PM)
 ☐ after applicatoin send for approval page immediate refresh to show pending button
 ☐ worker profile ui along with sidebar 
-☐ client profile ui along with sidebar 
-☐ change landing page
-☐ text for all files creating code
-☐ make common types in root
-☐ type, interface, enums should be common
+✔ client profile ui along with sidebar @done (1/13/2026, 11:35:11 PM)
+✔ change landing page @done (1/13/2026, 11:35:13 PM)
+✔ text for all files creating code @done (1/13/2026, 11:35:17 PM)
+✔ make common types in root @done (1/13/2026, 11:35:20 PM)
+✔ type, interface, enums should be common @done (1/13/2026, 11:35:22 PM)
 ☐ add skills update option in profile
-☐ arrange the controllers , usecases and actions in appropriate 
-☐ check upload actions
-☐ wrong OTP broken 
-☐ document upload front side and back side
-☐ re-apply option enable prefectly
+✔ arrange the controllers , usecases and actions in appropriate @done (1/13/2026, 11:35:28 PM)
+✔ check upload actions @done (1/13/2026, 11:35:31 PM)
+✔ wrong OTP broken @done (1/13/2026, 11:35:33 PM)
+✔ document upload front side and back side @done (1/13/2026, 11:35:36 PM)
+✔ re-apply option enable prefectly @done (1/13/2026, 11:35:37 PM)
 ☐ fix logout time
 ☐ rejection reason by mail
+☐ Add more reusable components
+☐ Add optimizations in frontend (Error boundaries, Lazy loading, memoization)
+☐ Add more reusable components
+☐ option for admin to add reason for rejection - highlight the doc need to be uploaded again for reapply.
+☐ ask for confirmation - logout
+☐ user block / unblock - session handling  in already logged in user
+☐ when the role is switched correct page should be shown using auto refresh
 
 
 

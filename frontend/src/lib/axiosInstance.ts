@@ -1,4 +1,3 @@
-// services/lib/axiosInstance.ts (or wherever your axiosInstance file is)
 import axios from "axios";
 import { cookies } from "next/headers";
 
