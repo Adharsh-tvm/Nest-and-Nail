@@ -84,6 +84,71 @@ const StatusBadge = ({ status }: { status: VerificationStatus }) => {
   }
 };
 
+// --- Document Viewer Modal ---
+
+const DocumentViewerModal = ({
+  src,
+  onClose,
+}: {
+  src: string | null;
+  onClose: () => void;
+}) => {
+  if (!src) return null;
+
+  const isPdf = src.toLowerCase().endsWith(".pdf") || src.includes("application/pdf");
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+      <div
+        className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
+        onClick={onClose}
+      />
+
+      <div className="relative bg-white w-full max-w-4xl h-[85vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-white z-10">
+          <h3 className="font-bold text-gray-900 flex items-center gap-2">
+            <FileText size={20} className="text-[#1B4332]" />
+            Document Viewer
+          </h3>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-gray-100 rounded-full text-gray-500 hover:text-red-500 transition-colors"
+          >
+            <X size={24} />
+          </button>
+        </div>
+
+        <div className="flex-1 bg-gray-50 p-4 overflow-auto flex items-center justify-center">
+          {isPdf ? (
+            <iframe
+              src={src}
+              className="w-full h-full rounded-lg shadow-sm border border-gray-200 bg-white"
+              title="Document Viewer"
+            />
+          ) : (
+            <img
+              src={src}
+              alt="Document"
+              className="max-w-full max-h-full object-contain rounded-lg shadow-sm"
+            />
+          )}
+        </div>
+
+        <div className="px-6 py-4 border-t border-gray-100 bg-white flex justify-end">
+          <a
+            href={src}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-4 py-2 bg-[#1B4332] text-white rounded-lg font-medium hover:bg-[#143326] transition-colors"
+          >
+            <ExternalLink size={16} /> Open Original
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // --- View Components ---
 
 interface ViewProps {
@@ -92,9 +157,11 @@ interface ViewProps {
 }
 
 const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditingDetails, setIsEditingDetails] = useState(false);
+  const [isEditingSkills, setIsEditingSkills] = useState(false);
   const [formData, setFormData] = useState<User>(user);
   const [newSkill, setNewSkill] = useState("");
+  const [viewingDocument, setViewingDocument] = useState<string | null>(null);
 
   // Sync formData when user prop updates (e.g. after image upload in parent)
   useEffect(() => {
@@ -126,19 +193,16 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
     }));
   };
 
-  const handleSaveProfile = async () => {
+  const handleSaveDetails = async () => {
     // 1. Optimistic Update
     setUser(formData);
-    setIsEditing(false);
+    setIsEditingDetails(false);
 
     try {
       // 2. Prepare Payload
       const payload = {
         name: formData.name,
         phone: formData.phone_number,
-        // Assuming backend can accept skills, otherwise you might need a separate action
-        // For now, based on old file, we send name/phone/address/pic.
-        // We will include skills here if your backend supports it.
       };
 
       // 3. API Call
@@ -150,213 +214,245 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
         return;
       }
 
-      toast.success("Profile updated successfully");
+      toast.success("Profile details updated successfully");
+    } catch (err: any) {
+      toast.error(err.message || "Update failed");
+    }
+  };
+
+  const handleSaveSkills = async () => {
+    // 1. Optimistic Update
+    setUser(formData);
+    setIsEditingSkills(false);
+
+    try {
+      const payload = {
+        skills: formData.skills,
+      };
+
+      const response = await updateUserProfileAction(user.id, payload);
+
+      if (!response.success) {
+        toast.error(response.message);
+        return;
+      }
+
+      toast.success("Skills updated successfully");
     } catch (err: any) {
       toast.error(err.message || "Update failed");
     }
   };
 
   return (
-    <div className="grid lg:grid-cols-3 gap-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
-      {/* Left Column - Main Info */}
-      <div className="lg:col-span-2 space-y-8">
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-          <div className="px-8 py-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-            <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2.5">
-              <UserIcon size={20} className="text-[#1B4332]" /> Personal Details
-            </h3>
-            {isEditing ? (
-              <div className="flex gap-3">
-                <button
-                  onClick={() => {
-                    setFormData(user); // Reset to current user state
-                    setIsEditing(false);
-                  }}
-                  className="text-sm font-medium text-gray-500 hover:text-gray-900 px-4 py-2 rounded-md hover:bg-gray-100 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleSaveProfile}
-                  className="text-sm font-medium bg-[#1B4332] text-white px-4 py-2 rounded-md hover:bg-[#143326] transition-colors flex items-center gap-2"
-                >
-                  <Save size={16} /> Save
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={() => setIsEditing(true)}
-                className="text-sm font-medium text-gray-600 hover:text-[#1B4332] flex items-center gap-2 px-3 py-1.5 rounded hover:bg-gray-100 transition-colors"
-              >
-                <Edit2 size={16} /> Edit
-              </button>
-            )}
-          </div>
+    <>
+      <DocumentViewerModal
+        src={viewingDocument}
+        onClose={() => setViewingDocument(null)}
+      />
 
-          <div className="p-8 grid sm:grid-cols-2 gap-8">
-            <div>
-              <label className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2 block">
-                Full Name
-              </label>
-              {isEditing ? (
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  className="w-full text-base p-2.5 border border-gray-200 rounded-lg focus:ring-1 focus:ring-[#1B4332] focus:border-[#1B4332] outline-none"
-                />
+      <div className="grid lg:grid-cols-3 gap-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
+        {/* Left Column - Main Info */}
+        <div className="lg:col-span-2 space-y-8">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div className="px-8 py-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+              <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2.5">
+                <UserIcon size={20} className="text-[#1B4332]" /> Personal Details
+              </h3>
+              {isEditingDetails ? (
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => {
+                      setFormData(user); // Reset to current user state
+                      setIsEditingDetails(false);
+                    }}
+                    className="text-sm font-medium text-gray-500 hover:text-gray-900 px-4 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSaveDetails}
+                    className="text-sm font-medium bg-[#1B4332] text-white px-4 py-2 rounded-md hover:bg-[#143326] transition-colors flex items-center gap-2"
+                  >
+                    <Save size={16} /> Save
+                  </button>
+                </div>
               ) : (
-                <p className="text-base font-medium text-gray-900">
-                  {user.name}
-                </p>
+                <button
+                  onClick={() => setIsEditingDetails(true)}
+                  className="text-sm font-medium text-gray-600 hover:text-[#1B4332] flex items-center gap-2 px-3 py-1.5 rounded hover:bg-gray-100 transition-colors"
+                >
+                  <Edit2 size={16} /> Edit
+                </button>
               )}
             </div>
-            <div>
-              <label className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2 block">
-                Phone Number
-              </label>
-              {isEditing ? (
-                <input
-                  type="tel"
-                  name="phone_number"
-                  value={formData.phone_number || ""}
-                  onChange={handleInputChange}
-                  className="w-full text-base p-2.5 border border-gray-200 rounded-lg focus:ring-1 focus:ring-[#1B4332] focus:border-[#1B4332] outline-none"
-                />
-              ) : (
-                <p className="text-base font-medium text-gray-900">
-                  {user.phone_number}
-                </p>
-              )}
-            </div>
-            <div className="sm:col-span-2">
-              <label className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2 block">
-                Email Address
-              </label>
-              <div className="flex items-center justify-between p-2.5 bg-gray-50 rounded-lg border border-gray-100">
-                <span className="text-base text-gray-700">{user.email}</span>
-                <Lock size={16} className="text-gray-400" />
+
+            <div className="p-8 grid sm:grid-cols-2 gap-8">
+              <div>
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2 block">
+                  Full Name
+                </label>
+                {isEditingDetails ? (
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    className="w-full text-base p-2.5 border border-gray-200 rounded-lg focus:ring-1 focus:ring-[#1B4332] focus:border-[#1B4332] outline-none"
+                  />
+                ) : (
+                  <p className="text-base font-medium text-gray-900">
+                    {user.name}
+                  </p>
+                )}
+              </div>
+              <div>
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2 block">
+                  Phone Number
+                </label>
+                {isEditingDetails ? (
+                  <input
+                    type="tel"
+                    name="phone_number"
+                    value={formData.phone_number || ""}
+                    onChange={handleInputChange}
+                    className="w-full text-base p-2.5 border border-gray-200 rounded-lg focus:ring-1 focus:ring-[#1B4332] focus:border-[#1B4332] outline-none"
+                  />
+                ) : (
+                  <p className="text-base font-medium text-gray-900">
+                    {user.phone_number}
+                  </p>
+                )}
+              </div>
+              <div className="sm:col-span-2">
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2 block">
+                  Email Address
+                </label>
+                <div className="flex items-center justify-between p-2.5 bg-gray-50 rounded-lg border border-gray-100">
+                  <span className="text-base text-gray-700">{user.email}</span>
+                  <Lock size={16} className="text-gray-400" />
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-          <div className="px-8 py-5 border-b border-gray-100 bg-gray-50/50">
-            <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2.5">
-              <Briefcase size={20} className="text-[#1B4332]" /> Skills &
-              Expertise
-            </h3>
-          </div>
-          <div className="p-8">
-            <div className="flex flex-wrap gap-3 mb-6">
-              {(isEditing ? formData.skills : user.skills)?.map((skill, i) => (
-                <span
-                  key={i}
-                  className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium border ${
-                    isEditing
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div className="px-8 py-5 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
+              <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2.5">
+                <Briefcase size={20} className="text-[#1B4332]" /> Skills &
+                Expertise
+              </h3>
+              {isEditingSkills ? (
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => {
+                      setFormData(user); // Reset to current user state
+                      setIsEditingSkills(false);
+                    }}
+                    className="text-sm font-medium text-gray-500 hover:text-gray-900 px-4 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSaveSkills}
+                    className="text-sm font-medium bg-[#1B4332] text-white px-4 py-2 rounded-md hover:bg-[#143326] transition-colors flex items-center gap-2"
+                  >
+                    <Save size={16} /> Save
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setIsEditingSkills(true)}
+                  className="text-sm font-medium text-gray-600 hover:text-[#1B4332] flex items-center gap-2 px-3 py-1.5 rounded hover:bg-gray-100 transition-colors"
+                >
+                  <Edit2 size={16} /> Edit
+                </button>
+              )}
+            </div>
+            <div className="p-8">
+              <div className="flex flex-wrap gap-3 mb-6">
+                {(isEditingSkills ? formData.skills : user.skills)?.map((skill, i) => (
+                  <span
+                    key={i}
+                    className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium border ${isEditingSkills
                       ? "bg-white border-[#1B4332] text-[#1B4332]"
                       : "bg-[#1B4332]/5 border-[#1B4332]/10 text-[#1B4332]"
-                  }`}
-                >
-                  {skill}
-                  {isEditing && (
-                    <button
-                      onClick={() => handleRemoveSkill(skill)}
-                      className="hover:text-red-500"
-                    >
-                      <X size={14} />
-                    </button>
-                  )}
-                </span>
-              ))}
+                      }`}
+                  >
+                    {skill}
+                    {isEditingSkills && (
+                      <button
+                        onClick={() => handleRemoveSkill(skill)}
+                        className="hover:text-red-500"
+                      >
+                        <X size={14} />
+                      </button>
+                    )}
+                  </span>
+                ))}
+              </div>
+              {isEditingSkills && (
+                <div className="flex gap-3">
+                  <input
+                    type="text"
+                    value={newSkill}
+                    onChange={(e) => setNewSkill(e.target.value)}
+                    placeholder="Add a new skill..."
+                    className="flex-1 text-base p-2.5 border border-gray-200 rounded-lg focus:ring-1 focus:ring-[#1B4332] outline-none"
+                  />
+                  <button
+                    onClick={handleAddSkill}
+                    disabled={!newSkill.trim()}
+                    className="px-6 py-2.5 bg-gray-900 text-white rounded-lg text-sm font-bold hover:bg-black transition-colors disabled:opacity-50"
+                  >
+                    Add
+                  </button>
+                </div>
+              )}
             </div>
-            {isEditing && (
-              <div className="flex gap-3">
-                <input
-                  type="text"
-                  value={newSkill}
-                  onChange={(e) => setNewSkill(e.target.value)}
-                  placeholder="Add a new skill..."
-                  className="flex-1 text-base p-2.5 border border-gray-200 rounded-lg focus:ring-1 focus:ring-[#1B4332] outline-none"
-                />
-                <button
-                  onClick={handleAddSkill}
-                  disabled={!newSkill.trim()}
-                  className="px-6 py-2.5 bg-gray-900 text-white rounded-lg text-sm font-bold hover:bg-black transition-colors disabled:opacity-50"
-                >
-                  Add
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Right Column - Media & Docs */}
-      <div className="space-y-8">
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-          <div className="px-8 py-5 border-b border-gray-100 bg-gray-50/50">
-            <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2.5">
-              <ImageIcon size={20} className="text-[#1B4332]" /> Portfolio
-            </h3>
-          </div>
-          <div className="p-6 grid grid-cols-2 gap-3">
-            {user.workPhotos?.map((photo, i) => (
-              <div
-                key={i}
-                className="aspect-square rounded-lg overflow-hidden border border-gray-100 relative group cursor-pointer"
-              >
-                <img
-                  src={photo}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                  <Eye className="text-white" size={24} />
-                </div>
-              </div>
-            ))}
-            {isEditing && (
-              <button className="aspect-square rounded-lg border-2 border-dashed border-gray-200 flex flex-col items-center justify-center text-gray-400 hover:border-[#1B4332] hover:text-[#1B4332] hover:bg-[#1B4332]/5 transition-all">
-                <Plus size={24} />
-                <span className="text-xs font-bold mt-2">ADD</span>
-              </button>
-            )}
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-          <div className="px-8 py-5 border-b border-gray-100 bg-gray-50/50">
-            <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2.5">
-              <FileText size={20} className="text-[#1B4332]" /> Certifications
-            </h3>
-          </div>
-          <div className="divide-y divide-gray-50">
-            {user.certificates?.map((cert, i) => (
-              <div
-                key={i}
-                className="p-6 flex items-center gap-4 hover:bg-gray-50 transition-colors cursor-pointer group"
-              >
-                <div className="p-3 bg-red-50 text-red-500 rounded-lg group-hover:scale-110 transition-transform">
-                  <FileText size={20} />
+        {/* Right Column - Media & Docs */}
+        <div className="space-y-8">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div className="px-8 py-5 border-b border-gray-100 bg-gray-50/50">
+              <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2.5">
+                <FileText size={20} className="text-[#1B4332]" /> Documents
+              </h3>
+            </div>
+            <div className="divide-y divide-gray-50">
+              {user.documents && user.documents.length > 0 ? (
+                user.documents.slice(0, 4).map((doc, i) => (
+                  <div
+                    key={i}
+                    onClick={() => setViewingDocument(doc)}
+                    className="p-6 flex items-center gap-4 hover:bg-gray-50 transition-colors cursor-pointer group"
+                  >
+                    <div className="p-3 bg-blue-50 text-blue-500 rounded-lg group-hover:scale-110 transition-transform">
+                      <FileText size={20} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold text-gray-900 truncate">
+                        Document {i + 1}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-0.5">Click to view</p>
+                    </div>
+                    <Eye
+                      size={18}
+                      className="text-gray-300 group-hover:text-[#1B4332] transition-colors"
+                    />
+                  </div>
+                ))
+              ) : (
+                <div className="p-6 text-center text-gray-400 text-sm">
+                  No documents uploaded
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold text-gray-900 truncate">
-                    License #{1092 + i}
-                  </p>
-                  <p className="text-xs text-gray-500 mt-0.5">PDF Document</p>
-                </div>
-                <ChevronRight
-                  size={18}
-                  className="text-gray-300 group-hover:text-gray-900"
-                />
-              </div>
-            ))}
+              )}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
@@ -529,14 +625,12 @@ const SettingsView: React.FC = () => {
           </div>
           <button
             onClick={() => setIsAvailable(!isAvailable)}
-            className={`w-12 h-7 rounded-full relative transition-colors ${
-              isAvailable ? "bg-[#1B4332]" : "bg-gray-200"
-            }`}
+            className={`w-12 h-7 rounded-full relative transition-colors ${isAvailable ? "bg-[#1B4332]" : "bg-gray-200"
+              }`}
           >
             <span
-              className={`absolute top-1 left-1 bg-white w-5 h-5 rounded-full transition-transform ${
-                isAvailable ? "translate-x-5" : "translate-x-0"
-              }`}
+              className={`absolute top-1 left-1 bg-white w-5 h-5 rounded-full transition-transform ${isAvailable ? "translate-x-5" : "translate-x-0"
+                }`}
             />
           </button>
         </div>
@@ -710,20 +804,18 @@ const UserProfile = () => {
                   onClick={() => setActiveTab(tab.id as Tab)}
                   className={`
                                 group inline-flex items-center py-5 px-1 border-b-2 font-medium text-base transition-all
-                                ${
-                                  isActive
-                                    ? "border-[#1B4332] text-[#1B4332]"
-                                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                                }
+                                ${isActive
+                      ? "border-[#1B4332] text-[#1B4332]"
+                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                    }
                             `}
                 >
                   <Icon
                     size={18}
-                    className={`mr-2.5 ${
-                      isActive
-                        ? "text-[#1B4332]"
-                        : "text-gray-400 group-hover:text-gray-500"
-                    }`}
+                    className={`mr-2.5 ${isActive
+                      ? "text-[#1B4332]"
+                      : "text-gray-400 group-hover:text-gray-500"
+                      }`}
                   />
                   {tab.label}
                 </button>
