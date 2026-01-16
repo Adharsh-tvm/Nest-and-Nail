@@ -49,6 +49,8 @@ async function bootstrap() {
 
   app.use("/api/upload", createUploadRoutes(container.controllers.uploadController, container.controllers.authMiddleware));
 
+  app.use("/api/users", createUserRoutes(container.controllers.userController,container.controllers.userProfileController, container.controllers.authMiddleware))
+
 
   // Error Handler
   app.use(errorHandler);

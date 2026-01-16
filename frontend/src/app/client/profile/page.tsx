@@ -33,6 +33,7 @@ import {
 } from "lucide-react";
 import { useUserStore } from "@/store/userStore";
 import { updateUserProfileAction } from "@/app/actions/users/user-profile-actions";
+import { updateUserSkillsAction } from "@/app/actions/users/user-skills-action";
 import toast from "react-hot-toast";
 import { VerificationStatus } from "@/shared/enums/authEnums";
 import { User } from "@/shared/types/userTypes";
@@ -226,11 +227,7 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
     setIsEditingSkills(false);
 
     try {
-      const payload = {
-        skills: formData.skills,
-      };
-
-      const response = await updateUserProfileAction(user.id, payload);
+      const response = await updateUserSkillsAction(user.id, formData.skills || []);
 
       if (!response.success) {
         toast.error(response.message);
