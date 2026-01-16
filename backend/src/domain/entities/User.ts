@@ -18,7 +18,7 @@ export interface User {
     skills?: string[];
     address?: string[];
 
-    documents?: string[];      // Aadhar, PAN, ID proof
-    certificates?: string[];   // Skill certificates
+    documents?: string[];      
+    certificates?: string[];   
     workPhotos?: string[];
 }

@@ -18,7 +18,6 @@ export function createUserRoutes(
     );
 
 
-    // user.routes.ts
     router.get("/current/:email", (req, res) =>
         userController.getCurrentUser(req, res)
     );
@@ -28,11 +27,15 @@ export function createUserRoutes(
     router.put(
         "/user/:userId/profile",
         authMiddleware.verify.bind(authMiddleware),
-        upload.single("profilePicture"),   
+        upload.single("profilePicture"),
         (req, res) => userProfileController.updateProfile(req, res)
     );
 
-
+    router.put(
+        "/:userId/skills",
+        authMiddleware.verify,
+        userProfileController.updateSkills
+    );
 
     return router;
 }

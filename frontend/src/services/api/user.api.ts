@@ -1,5 +1,6 @@
 import axiosInstance from "@/lib/axiosInstance";
 import { ApiResponse } from "@/shared/types/responseTypes";
+import { User } from "@/shared/types/userTypes";
 
 /* ---------------- TYPES ---------------- */
 
@@ -30,6 +31,7 @@ const userApi = {
   /**
    * Get current user by email
    */
+
   getCurrentUserByEmail: async (
     email: string
   ): Promise<ApiResponse<any>> => {
@@ -40,6 +42,20 @@ const userApi = {
 
     return response.data;
   },
+
+
+  updateSkills: async (
+    userId: string,
+    skills: string[]
+  ): Promise<ApiResponse<User>> => {
+    const response = await axiosInstance.put<ApiResponse<User>>(
+      `/api/users/${userId}/skills`,
+      { skills },
+      { withCredentials: true }
+    );
+
+    return response.data;
+  }
 };
 
 export default userApi;
