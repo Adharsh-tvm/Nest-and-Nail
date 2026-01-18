@@ -16,6 +16,10 @@ export async function updateUserProfileAction(userId: string, updates: any) {
   if (updates.phone) fd.append("phone", updates.phone);
   if (updates.address) fd.append("address", updates.address);
 
+  if (typeof updates.isOnline === "boolean") {
+    fd.append("isOnline", String(updates.isOnline));
+  }
+
   if (updates.profilePicture instanceof File) {
     fd.append("profilePicture", updates.profilePicture);
   }
@@ -40,7 +44,6 @@ export async function updateUserProfileAction(userId: string, updates: any) {
 
   } catch (err: any) {
     console.error("Profile update failed", err.response?.data || err);
-    // throw new Error(err.response?.data?.message || "Profile update failed");
 
     return {
       success: false,

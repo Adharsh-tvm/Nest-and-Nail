@@ -8,6 +8,7 @@ export interface User {
     passwordhash: string,
     isBlocked?: boolean,
     isVerified?: VerificationStatus,
+    isOnline: boolean,
     profilePictureUrl?: string,
     role: Role,
     loginMethod: LoginMethod,

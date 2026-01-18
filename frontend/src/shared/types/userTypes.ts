@@ -8,6 +8,7 @@ export type User = {
   role: string;
   isBlocked: boolean;
   isVerified: VerificationStatus;
+  isOnline: boolean;
   profileImageUrl?: string | null;
 
   phone_number?: number;
@@ -22,4 +23,3 @@ export type User = {
   iat?: number;
   exp?: number;
 };
-

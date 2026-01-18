@@ -13,6 +13,7 @@ export class UserMapper {
             role: userData.user_role,
             isBlocked: false,
             isVerified: VerificationStatus.NOT_VERIFIED,
+            isOnline: true,
             loginMethod: LoginMethod.EMAIL_PASSWORD,
             profilePictureUrl: '',
             createdAt: new Date(),
@@ -30,6 +31,7 @@ export class UserMapper {
             user_role: userData.role,
             profileImageUrl: userData.profilePictureUrl,
             isBlocked: userData.isBlocked ?? false,
+            isOnline: userData.isOnline ?? false,
             isVerified: userData.isVerified ?? VerificationStatus.NOT_VERIFIED,
 
             skills: userData.skills ?? [],
@@ -43,8 +45,4 @@ export class UserMapper {
             updatedAt: userData.updatedAt?.toISOString?.() ?? "",
         };
     }
-
-
-
-
 }

@@ -12,12 +12,13 @@ export function mapUserFromApi(raw: any): User {
     profileImageUrl: raw.profileImageUrl || null,
 
     isBlocked: Boolean(raw.isBlocked),
+    isOnline: Boolean(raw.isOnline),
     isVerified:
       raw.isVerified === "VERIFIED"
         ? VerificationStatus.VERIFIED
         : raw.isVerified === "PENDING"
-        ? VerificationStatus.PENDING
-        : VerificationStatus.NOT_VERIFIED,
+          ? VerificationStatus.PENDING
+          : VerificationStatus.NOT_VERIFIED,
 
     skills: Array.isArray(raw.skills) ? raw.skills : [],
     address: Array.isArray(raw.address) ? raw.address : [],

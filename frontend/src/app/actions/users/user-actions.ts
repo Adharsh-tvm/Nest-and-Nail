@@ -33,6 +33,7 @@ export async function getCurrentUser(): Promise<User | null> {
       email: u.email_address,
       role: u.user_role,
       isBlocked: Boolean(u.isBlocked),
+      isOnline: Boolean(u.isOnline),
       isVerified: normalizeIsVerified(u.isVerified),
 
       profileImageUrl: u.profilePictureUrl ?? null,
