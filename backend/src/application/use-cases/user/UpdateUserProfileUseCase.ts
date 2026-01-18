@@ -39,16 +39,15 @@ export class UpdateUserProfileUseCase implements IUpdateUserProfileUseCase {
 
         let updatedUser: any = { ...user, ...updates };
 
-        // Upload profile picture if provided
+        console.log("-----------------------------------------",updatedUser)
+
         if (profilePictureFilePath) {
             const { url } = await this._uploadProfilePictureUseCase.execute(userId, profilePictureFilePath);
             updatedUser.profilePictureUrl = url;
         }
 
-        // NEVER modify role — keep user.role as it is
         updatedUser.role = user.role;
 
-        // Normal save (NO role conversion)
         const saved = await repo.updateById(userId, updatedUser);
 
         if (!saved) throw new Error("Failed to update user profile");

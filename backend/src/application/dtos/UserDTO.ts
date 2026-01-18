@@ -16,8 +16,9 @@ export interface UserResponseDTO {
     user_role: Role;
     profileImageUrl?: string;
     isBlocked: boolean;
+    isOnline: boolean;
     isVerified: VerificationStatus;
-
+    
     skills?: string[];
     address?: string[];
     documents?: string[];
@@ -43,6 +44,7 @@ export interface LoginResponseDTO {
         phone_number?: number;
         profileImageUrl?: string | undefined;
         isBlocked: boolean;
+        isOnline: boolean;
         isVerified: VerificationStatus;
     };
     accessToken: string;

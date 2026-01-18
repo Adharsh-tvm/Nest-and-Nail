@@ -11,6 +11,7 @@ const userSchema = new Schema<User>({
     passwordhash: { type: String, default: null },
 
     isBlocked: { type: Boolean, default: false },
+    isOnline: { type: Boolean, default: false },
     isVerified: {
         type: String,
         enum: Object.values(VerificationStatus),
@@ -45,6 +46,5 @@ const userSchema = new Schema<User>({
     timestamps: true,
     discriminatorKey: 'role'
 });
-
 
 export const UserModel: Model<User> = mongoose.model<User>('User', userSchema);
