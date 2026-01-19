@@ -27,9 +27,7 @@ const ClientHeader: React.FC = () => {
   const [isTogglingRole, setIsTogglingRole] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  const router = useRouter();
 
-  // NEW: controls worker verification modal
   const [isWorkerFlowOpen, setIsWorkerFlowOpen] = useState(false);
 
 
@@ -41,7 +39,6 @@ const ClientHeader: React.FC = () => {
   const verificationStatus: VerificationStatus =
     currentUser?.isVerified ?? VerificationStatus.NOT_VERIFIED;
 
-  // convenience booleans
   const isVerified = verificationStatus === VerificationStatus.VERIFIED;
   const isPending = verificationStatus === VerificationStatus.PENDING;
 
