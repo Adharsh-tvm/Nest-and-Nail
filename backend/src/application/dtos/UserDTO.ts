@@ -1,4 +1,5 @@
 import { Role, VerificationStatus } from "../../shared/enums/authEnums";
+import { AddressDTO } from "./AddressDTO";
 
 export interface UserRequestDTO {
     user_name: string;
@@ -18,9 +19,9 @@ export interface UserResponseDTO {
     isBlocked: boolean;
     isOnline: boolean;
     isVerified: VerificationStatus;
-    
+
     skills?: string[];
-    address?: string[];
+    address?: AddressDTO[];
     documents?: string[];
     certificates?: string[];
     workPhotos?: string[];
@@ -50,3 +51,4 @@ export interface LoginResponseDTO {
     accessToken: string;
     refreshToken: string;
 }
+

@@ -35,7 +35,18 @@ export class UserMapper {
             isVerified: userData.isVerified ?? VerificationStatus.NOT_VERIFIED,
 
             skills: userData.skills ?? [],
-            address: userData.address ?? [],
+            address: userData.address?.map(addr => ({
+                label: addr.label,
+                street: addr.street,
+                city: addr.city,
+                state: addr.state,
+                country: addr.country,
+                zip: addr.zip,
+                lat: addr.location.coordinates[1],
+                lng: addr.location.coordinates[0],
+                isDefault: addr.isDefault,
+            })) ?? [],
+
 
             documents: userData.documents ?? [],
             certificates: userData.certificates ?? [],

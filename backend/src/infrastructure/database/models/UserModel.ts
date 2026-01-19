@@ -1,8 +1,9 @@
 import mongoose, { Model, Schema } from "mongoose";
 import { User } from "../../../domain/entities/User";
 import { LoginMethod, Role, VerificationStatus } from "../../../shared/enums/authEnums";
+import { AddressSchema } from "./AddressModel";
 
-const userSchema = new Schema<User>({
+const UserSchema = new Schema<User>({
     userId: { type: String, required: true, unique: true },
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
@@ -33,7 +34,7 @@ const userSchema = new Schema<User>({
     },
 
     skills: { type: [String], default: [] },
-    address: { type: [String], default: [] },
+    address: { type: [AddressSchema], default: [] },
 
     lastLoginAt: { type: Date, default: Date.now },
     createdAt: { type: Date, default: Date.now },
@@ -47,4 +48,6 @@ const userSchema = new Schema<User>({
     discriminatorKey: 'role'
 });
 
-export const UserModel: Model<User> = mongoose.model<User>('User', userSchema);
+UserSchema.index({ "address.location": "2dsphere" });
+
+export const UserModel: Model<User> = mongoose.model<User>('User', UserSchema);
