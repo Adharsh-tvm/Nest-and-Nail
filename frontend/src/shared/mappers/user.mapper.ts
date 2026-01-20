@@ -9,7 +9,7 @@ export function mapUserFromApi(raw: any): User {
     role: raw.user_role,
 
     phone_number: raw.phone_number ?? null,
-    profileImageUrl: raw.profileImageUrl || null,
+    profileImageUrl: raw.profileImageUrl || raw.profilePictureUrl || raw.profilePicture || raw.profile_image_url || raw.profile_picture || null,
 
     isBlocked: Boolean(raw.isBlocked),
     isOnline: Boolean(raw.isOnline),
