@@ -30,6 +30,8 @@ export const RESPONSE_MESSAGES = {
   USER_BLOCKED: "User is blocked",
   USER_ACCESS_UPDATED: "User access updated successfully",
   SKILLS_UPDATED: "Skills Updated Successfully",
+  ADDRESS_UPDATED: "Address Updated Successfully",
+  FAILED: "Failed to Update",
 
   // Admin
   CLIENTS_FETCHED: "Clients fetched successfully",

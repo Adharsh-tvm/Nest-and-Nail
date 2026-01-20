@@ -1,8 +1,10 @@
+
+
 import axiosInstance from "@/lib/axiosInstance";
+import { Address } from "@/shared/types/addressType";
 import { ApiResponse } from "@/shared/types/responseTypes";
 import { User } from "@/shared/types/userTypes";
 
-/* ---------------- TYPES ---------------- */
 
 export type UpdateRolePayload = {
   user: any;
@@ -10,12 +12,9 @@ export type UpdateRolePayload = {
   refreshToken: string;
 };
 
-/* ---------------- API ---------------- */
 
 const userApi = {
-  /**
-   * Update user role/mode
-   */
+
   updateUserMode: async (
     role: "client" | "worker"
   ): Promise<ApiResponse<UpdateRolePayload>> => {
@@ -27,10 +26,6 @@ const userApi = {
 
     return response.data;
   },
-
-  /**
-   * Get current user by email
-   */
 
   getCurrentUserByEmail: async (
     email: string
@@ -55,6 +50,17 @@ const userApi = {
     );
 
     return response.data;
+  },
+
+  addUserAddressApi: async (
+    userId: string,
+    payload: Address
+  ): Promise<ApiResponse<User>> => {
+    const response = await axiosInstance.post(
+      `/api/user/${userId}/address`,
+      payload
+    );
+    return response.data
   }
 };
 

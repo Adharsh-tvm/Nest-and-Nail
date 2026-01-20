@@ -11,6 +11,7 @@ import { IRegisterUserUseCase } from "../../application/interfaces/IRegisterUser
 import { IResetPasswordUseCase } from "../../application/interfaces/IResetPasswordUseCase";
 import { ISendOtpUseCase } from "../../application/interfaces/ISendOtpUseCase";
 import { IUpdateUserAccessUseCase } from "../../application/interfaces/IUpdateUserAccessUseCase";
+import { IUpdateUserAddressUseCase } from "../../application/interfaces/IUpdateUserAddressUseCase";
 import { IUpdateUserProfileUseCase } from "../../application/interfaces/IUpdateUserProfileUseCase";
 import { IUpdateUserSkillsUseCase } from "../../application/interfaces/IUpdateUserSkillsUseCase";
 import { IUpdateVerificationStatusUseCase } from "../../application/interfaces/IUpdateVerificationStatusUseCase";
@@ -33,6 +34,7 @@ import { SendOtpUseCase } from "../../application/use-cases/auth/SendOtpUseCase"
 import { VerifyOtpUseCase } from "../../application/use-cases/auth/VerifyOtpUseCase";
 import { ChangeUserRoleUseCase } from "../../application/use-cases/user/ChangeUserRoleUseCase";
 import { GetCurrentUserUseCase } from "../../application/use-cases/user/GetCurrentUserUseCase";
+import { UpdateUserAddressUseCase } from "../../application/use-cases/user/UpdateUserAddressUseCase";
 import { UpdateUserProfileUseCase } from "../../application/use-cases/user/UpdateUserProfileUseCase";
 import { UpdateUserSkillsUseCase } from "../../application/use-cases/user/UpdateUserSkillsUseCase";
 import { UploadWorkerDocumentUseCase } from "../../application/use-cases/user/UploadWorkerDocumentUseCase";
@@ -69,6 +71,7 @@ export class UseCaseDI {
       private _updateUserProfileUseCase?: IUpdateUserProfileUseCase;
       private _updateVerificationStatusUseCase?: IUpdateVerificationStatusUseCase;
       private _updateUserSkillUseCase?: IUpdateUserSkillsUseCase;
+      private _updateUserAddressUseCase?: IUpdateUserAddressUseCase;
 
       constructor(private infra: InfrastructureDI) {}
 
@@ -267,5 +270,14 @@ export class UseCaseDI {
           );
         }
         return this._updateUserSkillUseCase;
+      }
+
+      get updateUserAddressUseCase(): IUpdateUserAddressUseCase {
+        if(!this._updateUserAddressUseCase) {
+          this._updateUserAddressUseCase = new UpdateUserAddressUseCase(
+            this.infra.userRepositoryFactory
+          )
+        }
+        return this._updateUserAddressUseCase;
       }
 }

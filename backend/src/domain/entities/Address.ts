@@ -13,5 +13,5 @@ export interface Address {
 
     isDefault: boolean;
     createdAt?: Date;
-    updatedAt: Date;
+    updatedAt?: Date;
 }
