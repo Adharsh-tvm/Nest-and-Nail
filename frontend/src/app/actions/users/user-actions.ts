@@ -36,7 +36,7 @@ export async function getCurrentUser(): Promise<User | null> {
       isOnline: Boolean(u.isOnline),
       isVerified: normalizeIsVerified(u.isVerified),
 
-      profileImageUrl: u.profilePictureUrl ?? null,
+      profileImageUrl: u.profileImageUrl || u.profilePictureUrl || u.profilePicture || u.profile_image_url || u.profile_picture || null,
       phone_number: u.phone_number,
       skills: u.skills ?? [],
       address: u.address ?? [],

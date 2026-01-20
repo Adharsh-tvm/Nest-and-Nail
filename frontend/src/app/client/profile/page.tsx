@@ -87,7 +87,8 @@ const DocumentViewerModal = ({
 }) => {
   if (!src) return null;
 
-  const isPdf = src.toLowerCase().endsWith(".pdf") || src.includes("application/pdf");
+  const isPdf =
+    src.toLowerCase().endsWith(".pdf") || src.includes("application/pdf");
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
@@ -161,7 +162,7 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
   }, [user]);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -218,7 +219,10 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
     setIsEditingSkills(false);
 
     try {
-      const response = await updateUserSkillsAction(user.id, formData.skills || []);
+      const response = await updateUserSkillsAction(
+        user.id,
+        formData.skills || [],
+      );
 
       if (!response.success) {
         toast.error(response.message);
@@ -244,7 +248,8 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
             <div className="px-8 py-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
               <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2.5">
-                <UserIcon size={20} className="text-[#1B4332]" /> Personal Details
+                <UserIcon size={20} className="text-[#1B4332]" /> Personal
+                Details
               </h3>
               {isEditingDetails ? (
                 <div className="flex gap-3">
@@ -358,25 +363,28 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
             </div>
             <div className="p-8">
               <div className="flex flex-wrap gap-3 mb-6">
-                {(isEditingSkills ? formData.skills : user.skills)?.map((skill, i) => (
-                  <span
-                    key={i}
-                    className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium border ${isEditingSkills
-                      ? "bg-white border-[#1B4332] text-[#1B4332]"
-                      : "bg-[#1B4332]/5 border-[#1B4332]/10 text-[#1B4332]"
+                {(isEditingSkills ? formData.skills : user.skills)?.map(
+                  (skill, i) => (
+                    <span
+                      key={i}
+                      className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium border ${
+                        isEditingSkills
+                          ? "bg-white border-[#1B4332] text-[#1B4332]"
+                          : "bg-[#1B4332]/5 border-[#1B4332]/10 text-[#1B4332]"
                       }`}
-                  >
-                    {skill}
-                    {isEditingSkills && (
-                      <button
-                        onClick={() => handleRemoveSkill(skill)}
-                        className="hover:text-red-500"
-                      >
-                        <X size={14} />
-                      </button>
-                    )}
-                  </span>
-                ))}
+                    >
+                      {skill}
+                      {isEditingSkills && (
+                        <button
+                          onClick={() => handleRemoveSkill(skill)}
+                          className="hover:text-red-500"
+                        >
+                          <X size={14} />
+                        </button>
+                      )}
+                    </span>
+                  ),
+                )}
               </div>
               {isEditingSkills && (
                 <div className="flex gap-3">
@@ -423,7 +431,9 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
                       <p className="text-sm font-bold text-gray-900 truncate">
                         Document {i + 1}
                       </p>
-                      <p className="text-xs text-gray-500 mt-0.5">Click to view</p>
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        Click to view
+                      </p>
                     </div>
                     <Eye
                       size={18}
@@ -455,7 +465,7 @@ const AddressesView: React.FC<ViewProps> = ({ user }) => {
       <div className="grid md:grid-cols-2 gap-6">
         {user.address?.map((addr, index) => (
           <div
-            key={typeof addr === "string" ? `${addr}-${index}` : addr.id}
+            key={`${addr.label}-${index}`}
             className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:border-[#1B4332] transition-colors group"
           >
             <div className="flex justify-between items-start mb-4">
@@ -613,12 +623,14 @@ const SettingsView: React.FC = () => {
           </div>
           <button
             onClick={() => setIsAvailable(!isAvailable)}
-            className={`w-12 h-7 rounded-full relative transition-colors ${isAvailable ? "bg-[#1B4332]" : "bg-gray-200"
-              }`}
+            className={`w-12 h-7 rounded-full relative transition-colors ${
+              isAvailable ? "bg-[#1B4332]" : "bg-gray-200"
+            }`}
           >
             <span
-              className={`absolute top-1 left-1 bg-white w-5 h-5 rounded-full transition-transform ${isAvailable ? "translate-x-5" : "translate-x-0"
-                }`}
+              className={`absolute top-1 left-1 bg-white w-5 h-5 rounded-full transition-transform ${
+                isAvailable ? "translate-x-5" : "translate-x-0"
+              }`}
             />
           </button>
         </div>
@@ -716,7 +728,6 @@ const UserProfile = () => {
     );
   }
 
-  // Safe cast currentUser to User type for the rest of the app
   const safeUser = currentUser as unknown as User;
 
   return (
@@ -792,18 +803,20 @@ const UserProfile = () => {
                   onClick={() => setActiveTab(tab.id as Tab)}
                   className={`
                                 group inline-flex items-center py-5 px-1 border-b-2 font-medium text-base transition-all
-                                ${isActive
-                      ? "border-[#1B4332] text-[#1B4332]"
-                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                    }
+                                ${
+                                  isActive
+                                    ? "border-[#1B4332] text-[#1B4332]"
+                                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                                }
                             `}
                 >
                   <Icon
                     size={18}
-                    className={`mr-2.5 ${isActive
-                      ? "text-[#1B4332]"
-                      : "text-gray-400 group-hover:text-gray-500"
-                      }`}
+                    className={`mr-2.5 ${
+                      isActive
+                        ? "text-[#1B4332]"
+                        : "text-gray-400 group-hover:text-gray-500"
+                    }`}
                   />
                   {tab.label}
                 </button>
