@@ -37,5 +37,11 @@ export function createUserRoutes(
         userProfileController.updateSkills
     );
 
+    router.post(
+        "/:userId/address",
+        authMiddleware.verify,
+        userProfileController.updateAddress
+    );
+
     return router;
 }

@@ -5,12 +5,14 @@ import { IUserProfileController } from "../interfaces/IUserProfileController";
 import { ResponseHandler } from "../responses/ApiResponse";
 import { RESPONSE_MESSAGES } from "../responses/ResponseMessages";
 import { IUpdateUserSkillsUseCase } from "../../application/interfaces/IUpdateUserSkillsUseCase";
+import { IUpdateUserAddressUseCase } from "../../application/interfaces/IUpdateUserAddressUseCase";
 
 export class UserProfileController implements IUserProfileController {
 
     constructor(
         private readonly _updateUserProfileUseCase: IUpdateUserProfileUseCase,
-        private readonly _updateUserSkillsUseCase: IUpdateUserSkillsUseCase
+        private readonly _updateUserSkillsUseCase: IUpdateUserSkillsUseCase,
+        private readonly _updatUserAddressUseCase: IUpdateUserAddressUseCase
     ) { }
 
     updateProfile = async (req: Request, res: Response): Promise<Response> => {
@@ -66,8 +68,7 @@ export class UserProfileController implements IUserProfileController {
             const updateUser = await this._updateUserSkillsUseCase.execute(userId, skills);
 
             return res.status(HttpStatusCode.OK).json(
-                ResponseHandler.success(updateUser, RESPONSE_MESSAGES.SKILLS_UPDATED
-                )
+                ResponseHandler.success(updateUser, RESPONSE_MESSAGES.SKILLS_UPDATED)
             );
         } catch (error: unknown) {
             console.error("[UpdateUserSkillsController] Error:", error);
@@ -77,6 +78,29 @@ export class UserProfileController implements IUserProfileController {
                     RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR,
                     error
                 )
+            )
+        }
+    }
+
+    updateAddress = async (req: Request, res: Response): Promise<Response> => {
+        try {
+            const { userId } = req.params;
+            const data = req.body;
+
+            const result = await this._updatUserAddressUseCase.execute(
+                userId,
+                data
+            );
+
+            return res.status(HttpStatusCode.OK).json(
+                ResponseHandler.success(
+                    result,
+                    RESPONSE_MESSAGES.ADDRESS_UPDATED
+                )
+            )
+        } catch (error: unknown) {
+            return res.status(HttpStatusCode.BAD_REQUEST).json(
+                ResponseHandler.error(RESPONSE_MESSAGES.FAILED, error)
             )
         }
     }

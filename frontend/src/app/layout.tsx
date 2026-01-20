@@ -1,4 +1,3 @@
-// app/layout.tsx
 import React from "react";
 import "./globals.css";
 import { GoogleOAuthProvider } from "@react-oauth/google";

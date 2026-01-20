@@ -9,10 +9,8 @@ export async function updateUserSkillsAction(
     skills: string[]
 ): Promise<ApiResponse<User>> {
     try {
-        console.log("update skills acalled ---------------==-------------------------------------------==================================")
         return await userApi.updateSkills(userId, skills);
     } catch (error: any) {
-        console.log(":---------------------------------------------------------------------------------")
         throw new Error(
             error?.normalizedMessage || "Failed to update skills"
         );

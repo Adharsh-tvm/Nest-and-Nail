@@ -17,6 +17,8 @@ export async function middleware(req: NextRequest) {
   const accessToken = req.cookies.get("accessToken")?.value;
   const refreshToken = req.cookies.get("refreshToken")?.value;
 
+  if(accessToken) console.log("Token is here : ",accessToken)
+
   const publicRoutes = ["/login", "/signup"];
   const isPublicRoute =
     publicRoutes.some((p) => pathname.startsWith(p)) ||

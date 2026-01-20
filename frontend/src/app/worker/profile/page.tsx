@@ -42,15 +42,6 @@ import { User } from "@/shared/types/userTypes";
 
 export type Tab = "profile" | "addresses" | "wallet" | "settings";
 
-export type Address = {
-  id: string;
-  label: string;
-  street: string;
-  city: string;
-  zip: string;
-  isDefault: boolean;
-};
-
 export type Transaction = {
   id: string;
   date: string;

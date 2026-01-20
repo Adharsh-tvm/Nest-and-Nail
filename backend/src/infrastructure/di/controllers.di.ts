@@ -98,7 +98,8 @@ export class ControllerDI {
         if (!this._userProfileController) {
             this._userProfileController = new UserProfileController(
                 this.useCases.updateUserProfileUseCase,
-                this.useCases.updateUserSkillsUseCase
+                this.useCases.updateUserSkillsUseCase,
+                this.useCases.updateUserAddressUseCase
             );
         }
         return this._userProfileController

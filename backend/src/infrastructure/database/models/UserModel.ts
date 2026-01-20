@@ -3,6 +3,8 @@ import { User } from "../../../domain/entities/User";
 import { LoginMethod, Role, VerificationStatus } from "../../../shared/enums/authEnums";
 import { AddressSchema } from "./AddressModel";
 
+
+
 const UserSchema = new Schema<User>({
     userId: { type: String, required: true, unique: true },
     name: { type: String, required: true },
