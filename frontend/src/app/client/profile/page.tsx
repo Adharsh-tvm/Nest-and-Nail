@@ -36,7 +36,9 @@ import { updateUserProfileAction } from "@/app/actions/users/user-profile-action
 import { updateUserSkillsAction } from "@/app/actions/users/user-skills-action";
 import toast from "react-hot-toast";
 import { VerificationStatus } from "@/shared/enums/authEnums";
+import { AddAddressModal } from "@/components/AddAddressModal"; // Import modal
 import { User } from "@/shared/types/userTypes";
+import { Address } from "@/shared/types/addressType";
 
 // --- Types ---
 
@@ -367,11 +369,10 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
                   (skill, i) => (
                     <span
                       key={i}
-                      className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium border ${
-                        isEditingSkills
-                          ? "bg-white border-[#1B4332] text-[#1B4332]"
-                          : "bg-[#1B4332]/5 border-[#1B4332]/10 text-[#1B4332]"
-                      }`}
+                      className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium border ${isEditingSkills
+                        ? "bg-white border-[#1B4332] text-[#1B4332]"
+                        : "bg-[#1B4332]/5 border-[#1B4332]/10 text-[#1B4332]"
+                        }`}
                     >
                       {skill}
                       {isEditingSkills && (
@@ -454,58 +455,94 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
   );
 };
 
-const AddressesView: React.FC<ViewProps> = ({ user }) => {
+const AddressesView: React.FC<ViewProps> = ({ user, setUser }) => {
+  const [isAddAddressOpen, setIsAddAddressOpen] = useState(false);
+
+  const handleSaveAddress = async (newAddress: Address) => {
+    // 1. Optimistic Update
+    const updatedAddresses = [...(user.address || []), newAddress];
+    const oldAddresses = user.address;
+
+    // Update local state immediately
+    const updatedUser = { ...user, address: updatedAddresses };
+    setUser(updatedUser);
+
+    try {
+      // 2. Server Action
+      const response = await updateUserProfileAction(user.id, {
+        address: updatedAddresses,
+      });
+
+      if (!response.success) {
+        // Revert on failure
+        setUser({ ...user, address: oldAddresses });
+        toast.error(response.message);
+        return;
+      }
+      toast.success("Address added successfully");
+    } catch (err: any) {
+      setUser({ ...user, address: oldAddresses });
+      toast.error(err.message || "Failed to add address");
+    }
+  };
+
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-      <div className="flex justify-end">
-        <button className="text-sm font-bold bg-[#1B4332] text-white px-5 py-2.5 rounded-lg hover:bg-[#143326] transition-colors flex items-center gap-2 shadow-sm">
-          <Plus size={16} /> Add New Address
-        </button>
-      </div>
-      <div className="grid md:grid-cols-2 gap-6">
-        {user.address?.map((addr, index) => (
-          <div
-            key={`${addr.label}-${index}`}
-            className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:border-[#1B4332] transition-colors group"
-          >
-            <div className="flex justify-between items-start mb-4">
-              <div className="flex items-center gap-3">
-                <div className="p-3 bg-gray-100 rounded-lg text-gray-600 group-hover:bg-[#1B4332]/10 group-hover:text-[#1B4332] transition-colors">
-                  <MapPin size={22} />
+    <>
+      <AddAddressModal
+        isOpen={isAddAddressOpen}
+        onClose={() => setIsAddAddressOpen(false)}
+        onSave={handleSaveAddress}
+      />
+      <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+
+        <div className="grid md:grid-cols-2 gap-6">
+          {user.address?.map((addr, index) => (
+            <div
+              key={`${addr.label}-${index}`}
+              className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:border-[#1B4332] transition-colors group"
+            >
+              <div className="flex justify-between items-start mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 bg-gray-100 rounded-lg text-gray-600 group-hover:bg-[#1B4332]/10 group-hover:text-[#1B4332] transition-colors">
+                    <MapPin size={22} />
+                  </div>
+                  <div>
+                    <h4 className="text-base font-bold text-gray-900">
+                      {addr.label}
+                    </h4>
+                    {addr.isDefault && (
+                      <span className="text-[11px] font-bold text-green-600 bg-green-50 px-2.5 py-0.5 rounded-full">
+                        Default
+                      </span>
+                    )}
+                  </div>
                 </div>
-                <div>
-                  <h4 className="text-base font-bold text-gray-900">
-                    {addr.label}
-                  </h4>
-                  {addr.isDefault && (
-                    <span className="text-[11px] font-bold text-green-600 bg-green-50 px-2.5 py-0.5 rounded-full">
-                      Default
-                    </span>
-                  )}
-                </div>
+                <MoreVertical
+                  size={20}
+                  className="text-gray-400 cursor-pointer hover:text-gray-600"
+                />
               </div>
-              <MoreVertical
-                size={20}
-                className="text-gray-400 cursor-pointer hover:text-gray-600"
-              />
+              <p className="text-base text-gray-600 pl-14 leading-relaxed">
+                {addr.street}
+                <br />
+                {addr.city}, {addr.zip}
+              </p>
             </div>
-            <p className="text-base text-gray-600 pl-14 leading-relaxed">
-              {addr.street}
-              <br />
-              {addr.city}, {addr.zip}
-            </p>
-          </div>
-        ))}
-        <button className="border-2 border-dashed border-gray-200 rounded-xl p-6 flex flex-col items-center justify-center text-gray-400 hover:border-[#1B4332] hover:text-[#1B4332] hover:bg-[#1B4332]/5 transition-all min-h-[160px]">
-          <Plus size={32} />
-          <span className="text-sm font-bold mt-3">Add New Location</span>
-        </button>
+          ))}
+          <button
+            onClick={() => setIsAddAddressOpen(true)}
+            className="border-2 border-dashed border-gray-200 rounded-xl p-6 flex flex-col items-center justify-center text-gray-400 hover:border-[#1B4332] hover:text-[#1B4332] hover:bg-[#1B4332]/5 transition-all min-h-[160px]"
+          >
+            <Plus size={32} />
+            <span className="text-sm font-bold mt-3">Add New Location</span>
+          </button>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
-// const WalletView: React.FC<ViewProps> = ({ user }) => {
+// const WalletView: React.FC<ViewProps> = ({user}) => {
 //   return (
 //     <div className="grid lg:grid-cols-3 gap-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
 //       <div className="lg:col-span-1">
@@ -623,14 +660,12 @@ const SettingsView: React.FC = () => {
           </div>
           <button
             onClick={() => setIsAvailable(!isAvailable)}
-            className={`w-12 h-7 rounded-full relative transition-colors ${
-              isAvailable ? "bg-[#1B4332]" : "bg-gray-200"
-            }`}
+            className={`w-12 h-7 rounded-full relative transition-colors ${isAvailable ? "bg-[#1B4332]" : "bg-gray-200"
+              }`}
           >
             <span
-              className={`absolute top-1 left-1 bg-white w-5 h-5 rounded-full transition-transform ${
-                isAvailable ? "translate-x-5" : "translate-x-0"
-              }`}
+              className={`absolute top-1 left-1 bg-white w-5 h-5 rounded-full transition-transform ${isAvailable ? "translate-x-5" : "translate-x-0"
+                }`}
             />
           </button>
         </div>
@@ -803,20 +838,18 @@ const UserProfile = () => {
                   onClick={() => setActiveTab(tab.id as Tab)}
                   className={`
                                 group inline-flex items-center py-5 px-1 border-b-2 font-medium text-base transition-all
-                                ${
-                                  isActive
-                                    ? "border-[#1B4332] text-[#1B4332]"
-                                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                                }
+                                ${isActive
+                      ? "border-[#1B4332] text-[#1B4332]"
+                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                    }
                             `}
                 >
                   <Icon
                     size={18}
-                    className={`mr-2.5 ${
-                      isActive
-                        ? "text-[#1B4332]"
-                        : "text-gray-400 group-hover:text-gray-500"
-                    }`}
+                    className={`mr-2.5 ${isActive
+                      ? "text-[#1B4332]"
+                      : "text-gray-400 group-hover:text-gray-500"
+                      }`}
                   />
                   {tab.label}
                 </button>

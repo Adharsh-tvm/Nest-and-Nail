@@ -13,7 +13,14 @@ export async function updateUserProfileAction(userId: string, updates: any) {
 
   if (updates.name) fd.append("name", updates.name);
   if (updates.phone) fd.append("phone", updates.phone);
-  if (updates.address) fd.append("address", updates.address);
+  if (updates.address) {
+    fd.append(
+      "address",
+      typeof updates.address === "object"
+        ? JSON.stringify(updates.address)
+        : updates.address
+    );
+  }
 
   if (typeof updates.isOnline === "boolean") {
     fd.append("isOnline", String(updates.isOnline));
