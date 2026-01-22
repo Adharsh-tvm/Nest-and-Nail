@@ -1,5 +1,9 @@
 "use server";
 
+import userApi from "@/services/api/user.api";
+import { Address } from "@/shared/types/addressType";
+import { ApiResponse } from "@/shared/types/responseTypes";
+import { User } from "@/shared/types/userTypes";
 import axios from "axios";
 import { cookies } from "next/headers";
 
@@ -78,4 +82,50 @@ export async function uploadDocumentAction(userId: string, file: File) {
 
   return res.data.url;
 }
+
+
+export async function addUSerAddressAction(
+  userId: string,
+  address: Address
+): Promise<ApiResponse<User>> {
+  try {
+    return await userApi.addUserAddressApi(userId, address);
+  } catch (error: any) {
+    return {
+      success: false,
+      message:
+        error?.response?.data?.message ||
+        error?.message ||
+        "Failed to add address",
+      error: {
+        status: error?.response?.status,
+        data: error?.response?.data,
+      }, 
+    };
+  }
+}
+
+
+export async function reverseGeocode(lat: number, lng: number) {
+  const res = await fetch(
+    `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
+  );
+
+  if (!res.ok) {
+    throw new Error("Failed to reverse geocode");
+  }
+
+  const data = await res.json();
+
+  const address = data.address;
+
+  return {
+    street: address.road || "",
+    city: address.city || address.town || address.village || "",
+    state: address.state || "",
+    country: address.country || "",
+    zip: address.postcode || "",
+  };
+}
+
 

@@ -12,7 +12,6 @@ export type UpdateRolePayload = {
   refreshToken: string;
 };
 
-
 const userApi = {
 
   updateUserMode: async (
@@ -23,7 +22,6 @@ const userApi = {
       { role },
       { withCredentials: true }
     );
-
     return response.data;
   },
 
@@ -48,7 +46,6 @@ const userApi = {
       { skills },
       { withCredentials: true }
     );
-
     return response.data;
   },
 
@@ -57,7 +54,7 @@ const userApi = {
     payload: Address
   ): Promise<ApiResponse<User>> => {
     const response = await axiosInstance.post(
-      `/api/user/${userId}/address`,
+      `/api/users/${userId}/address`,
       payload
     );
     return response.data

@@ -159,6 +159,7 @@ NEW PENDINGS...
 ☐ user block / unblock - session handling  in already logged in user
 ☐ when the role is switched correct page should be shown using auto refresh
 ☐ make document upload to cloudinary from frontend
+☐ address edit and delete and also make default option
 
 
 

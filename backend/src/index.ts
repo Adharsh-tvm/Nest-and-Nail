@@ -19,7 +19,7 @@ async function bootstrap() {
 
   app.use(
     cors({
-      origin: "http://localhost:3000",
+      origin: ["http://localhost:3000", "https://nominatim.openstreetmap.org/"],
       credentials: true,
       methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
       allowedHeaders: ["Content-Type", "Authorization"],
@@ -49,7 +49,7 @@ async function bootstrap() {
 
   app.use("/api/upload", createUploadRoutes(container.controllers.uploadController, container.controllers.authMiddleware));
 
-  app.use("/api/users", createUserRoutes(container.controllers.userController,container.controllers.userProfileController, container.controllers.authMiddleware))
+  app.use("/api/users", createUserRoutes(container.controllers.userController, container.controllers.userProfileController, container.controllers.authMiddleware))
 
 
   // Error Handler
