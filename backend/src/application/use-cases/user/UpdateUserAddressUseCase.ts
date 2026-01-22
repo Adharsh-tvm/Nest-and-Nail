@@ -25,11 +25,13 @@ export class UpdateUserAddressUseCase implements IUpdateUserAddressUseCase {
         }
 
         if (!user.address) {
-            throw new Error("Address not found");
+            user.address = [];
         }
 
         if (data.isDefault === true) {
-            user.address.forEach(addr => (addr.isDefault === false));
+            user.address.forEach(addr => {
+                addr.isDefault = false;
+            });
         }
 
         user.address.push({
@@ -46,14 +48,14 @@ export class UpdateUserAddressUseCase implements IUpdateUserAddressUseCase {
             },
         });
 
-        const updatedUser = await repo.updateById(userId, user);
-        if (!updatedUser) {
-            throw new Error("Failed to update address");
-        }
+        const updatedUser = await repo.updateById(userId, {
+            address: user.address,
+        });
 
         if (!updatedUser) {
             throw new Error("Failed to add address");
         }
+
         return UserMapper.toResponseDTO(updatedUser);
     }
 }
