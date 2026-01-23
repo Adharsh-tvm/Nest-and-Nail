@@ -118,7 +118,7 @@ const ClientHeader: React.FC = () => {
     <>
       <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm transition-all duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-20">
+          <div className="relative flex justify-between items-center h-20">
             {/* LEFT: Logo */}
             <Link href={homeHref}>
               <div className="flex-shrink-0 flex items-center gap-2 group cursor-pointer mr-4">
@@ -130,6 +130,36 @@ const ClientHeader: React.FC = () => {
                 </span>
               </div>
             </Link>
+
+            {/* CENTER: Navigation Links */}
+            <div className="hidden md:flex items-center gap-8 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+
+              <Link
+                href="/client/services"
+                className="text-gray-500 font-medium hover:text-[#1B4332] transition-colors text-sm"
+              >
+                Services
+              </Link>
+ 
+              <Link
+                href="/client/bookings"
+                className="text-gray-500 font-medium hover:text-[#1B4332] transition-colors text-sm"
+              >
+                Bookings
+              </Link>
+              <Link
+                href="/client/payments"
+                className="text-gray-500 font-medium hover:text-[#1B4332] transition-colors text-sm"
+              >
+                Payments
+              </Link>
+              <Link
+                href="/client/meetings"
+                className="text-gray-500 font-medium hover:text-[#1B4332] transition-colors text-sm"
+              >
+                Meetings
+              </Link>
+            </div>
 
             {/* RIGHT: Toggle + User Menu */}
             <div className="hidden md:flex items-center gap-4 flex-shrink-0">
