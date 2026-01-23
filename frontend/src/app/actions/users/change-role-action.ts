@@ -1,6 +1,6 @@
 "use server";
 
-import userApi from "@/services/api/user.api";
+import userApi from "@/sources/api/user.api";
 import { cookies } from "next/headers";
 
 

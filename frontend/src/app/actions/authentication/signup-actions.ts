@@ -3,7 +3,7 @@
 
 import { cookies } from "next/headers";
 import { AxiosError } from "axios";
-import authApi from "@/services/api/auth.api";
+import authApi from "@/sources/api/auth.api";
 
 import { SignupStartSchema } from "@/lib/validation/signup.schema";
 import { CompleteSignupSchema } from "@/lib/validation/complete-signup.schema";

@@ -1,6 +1,6 @@
 "use server"
 
-import {  uploadWorkerCertDocument, uploadWorkerIdDocument } from "@/services/api/worker.api";
+import { uploadWorkerCertDocument, uploadWorkerIdDocument } from "@/sources/api/worker.api";
 
 export async function uploadIdDocumentAction(
   workerId: string,

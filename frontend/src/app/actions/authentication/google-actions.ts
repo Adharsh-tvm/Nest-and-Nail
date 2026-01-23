@@ -1,6 +1,6 @@
 "use server";
 
-import authApi from "@/services/api/auth.api";
+import authApi from "@/sources/api/auth.api";
 import { OAuth2Client } from "google-auth-library";
 import { cookies } from "next/headers";
 
@@ -10,7 +10,7 @@ type GoogleAuthState =
   | {
     success: boolean;
     message: string;
-    user?: any; 
+    user?: any;
   }
   | undefined;
 

@@ -142,12 +142,6 @@ const ClientHeader: React.FC = () => {
               </Link>
  
               <Link
-                href="/client/bookings"
-                className="text-gray-500 font-medium hover:text-[#1B4332] transition-colors text-sm"
-              >
-                Bookings
-              </Link>
-              <Link
                 href="/client/payments"
                 className="text-gray-500 font-medium hover:text-[#1B4332] transition-colors text-sm"
               >
