@@ -1,6 +1,6 @@
 "use server";
 
-import userApi from "@/services/api/user.api";
+import userApi from "@/sources/api/user.api";
 import { Address } from "@/shared/types/addressType";
 import { ApiResponse } from "@/shared/types/responseTypes";
 import { User } from "@/shared/types/userTypes";
@@ -100,7 +100,7 @@ export async function addUSerAddressAction(
       error: {
         status: error?.response?.status,
         data: error?.response?.data,
-      }, 
+      },
     };
   }
 }

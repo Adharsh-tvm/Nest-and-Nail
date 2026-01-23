@@ -1,7 +1,7 @@
 "use server";
 
 import { cookies } from "next/headers";
-import userApi from "@/services/api/user.api";
+import userApi from "@/sources/api/user.api";
 import { VerificationStatus } from "@/shared/enums/authEnums";
 import { ApiResponse } from "@/shared/types/responseTypes";
 import { User } from "@/shared/types/userTypes";

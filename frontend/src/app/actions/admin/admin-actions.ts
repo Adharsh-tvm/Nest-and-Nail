@@ -7,7 +7,7 @@ import {
   rejectVerification,
   toggleUserAccess,
   fetchAllUsers,
-} from "@/services/api/admin.api";
+} from "@/sources/api/admin.api";                       
 import { User } from "@/shared/types/userTypes";
 
 

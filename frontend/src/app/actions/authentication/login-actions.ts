@@ -2,7 +2,7 @@
 "use server";
 
 import { cookies } from "next/headers";
-import authApi from "@/services/api/auth.api";
+import authApi from "@/sources/api/auth.api";
 import axios from "axios";
 import { ApiResponse } from "@/shared/types/responseTypes";
 
