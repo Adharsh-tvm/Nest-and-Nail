@@ -3,14 +3,14 @@ import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { connectDB } from "./infrastructure/database/connection";
-import { createAuthRoutes } from "./presentation/routes/authRoutes";
+import { createAuthRoutes } from "./presentation/routes/auth/authRoutes";
 import { errorHandler } from "./presentation/middlewares/ErrorHandler";
 import { RequestLogger } from "./presentation/middlewares/RequestLogger";
 import { DIContainer } from "./infrastructure/di/DIContainer";
-import { createGoogleAuthRoutes } from "./presentation/routes/GoogleAuthRoutes";
-import { createAdminRoutes } from "./presentation/routes/adminRoutes";
-import { createUserRoutes } from "./presentation/routes/userRoutes";
-import { createUploadRoutes } from "./presentation/routes/uploadRoutes";
+import { createGoogleAuthRoutes } from "./presentation/routes/auth/GoogleAuthRoutes";
+import { createAdminRoutes } from "./presentation/routes/admin/adminRoutes";
+import { createUserRoutes } from "./presentation/routes/user/userRoutes";
+import { createUploadRoutes } from "./presentation/routes/user/uploadRoutes";
 
 dotenv.config();
 

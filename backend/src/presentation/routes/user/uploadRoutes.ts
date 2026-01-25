@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { IUploadController } from "../interfaces/IUploadController";
-import { AuthMiddleware } from "../middlewares/AuthMiddleware";
-import { upload } from "../middlewares/multerMiddleware";
+import { IUploadController } from "../../interfaces/IUploadController";
+import { AuthMiddleware } from "../../middlewares/AuthMiddleware";
+import { upload } from "../../middlewares/multerMiddleware";
 
 const router = Router();
 
@@ -17,7 +17,7 @@ export function createUploadRoutes(
     upload.single("file"),
     (req, res) => uploadController.uploadProfile(req, res)
   );
-  
+
 
   // Upload Documents
   router.post(

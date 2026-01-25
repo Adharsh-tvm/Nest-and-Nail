@@ -5,12 +5,14 @@ import { IOtpService } from "../../application/services/IOtpService";
 import { IPasswordHasher } from "../../application/services/IPasswordHasher";
 import { ITokenService } from "../../application/services/ITokenService";
 import { IAdminRepository } from "../../domain/repositories/IAdminRepository";
+import { ICategoryRepository } from "../../domain/repositories/ICategoryRepository";
 import { IClientRepository } from "../../domain/repositories/IClientRepository";
 import { IOtpRepository } from "../../domain/repositories/IOtpRepository";
 import { IUserRepositoryFactory } from "../../domain/repositories/IUserRepositoryFactory";
 import { IWorkerRepository } from "../../domain/repositories/IWorkerRepository";
 import { loggerInstance } from "../logger/Logger";
 import { AdminRepository } from "../repo/AdminRepository";
+import { CategoryRepository } from "../repo/CategoryRepository";
 import { ClientRepository } from "../repo/ClientRepository";
 import { OtpRepository } from "../repo/OtpRepository";
 import { UserRepositoryFactory } from "../repo/UserRepositoryFactory";
@@ -36,6 +38,8 @@ export class InfrastructureDI {
 
     private _otpService?: IOtpService;
     private _emailService?: IEmailService;
+
+    private _categoryRepository?: ICategoryRepository;
 
 
 
@@ -76,6 +80,13 @@ export class InfrastructureDI {
           this._otpRepository = new OtpRepository();
         }
         return this._otpRepository;
+      }
+
+      get categoryRepository(): ICategoryRepository{
+        if(!this._categoryRepository) {
+        this._categoryRepository = new CategoryRepository()
+        }
+        return this._categoryRepository;
       }
     
       get passwordHasher(): IPasswordHasher {

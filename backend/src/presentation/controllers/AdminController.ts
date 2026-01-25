@@ -6,8 +6,8 @@ import { HttpStatusCode } from "../../shared/enums/httpCodes";
 import { IUpdateVerificationStatusUseCase } from "../../application/interfaces/IUpdateVerificationStatusUseCase";
 import { VerificationStatus } from "../../shared/enums/authEnums";
 import { IUpdateUserAccessUseCase } from "../../application/interfaces/IUpdateUserAccessUseCase";
-import { ResponseHandler } from "../responses/ApiResponse";
-import { RESPONSE_MESSAGES } from "../responses/ResponseMessages";
+import { ResponseHandler } from "../../shared/responses/ApiResponse";
+import { RESPONSE_MESSAGES } from "../../shared/responses/ResponseMessages";
 
 export class AdminController implements IAdminController {
     constructor(

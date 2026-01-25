@@ -9,8 +9,8 @@ import { IVerifyOtpUseCase } from "../../application/interfaces/IVerifyOtpUseCas
 import { IForgotPasswordUseCase } from "../../application/interfaces/IForgotPasswordUseCase";
 import { IResetPasswordUseCase } from "../../application/interfaces/IResetPasswordUseCase";
 import { IRefreshTokenUseCase } from "../../application/interfaces/IRefreshTokenUseCase";
-import { ResponseHandler } from "../responses/ApiResponse";
-import { RESPONSE_MESSAGES } from "../responses/ResponseMessages";
+import { ResponseHandler } from "../../shared/responses/ApiResponse";
+import { RESPONSE_MESSAGES } from "../../shared/responses/ResponseMessages";
 
 export class AuthController implements IAuthController {
 

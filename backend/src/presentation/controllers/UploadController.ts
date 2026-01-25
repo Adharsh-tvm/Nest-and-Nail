@@ -3,8 +3,8 @@ import { HttpStatusCode } from "../../shared/enums/httpCodes";
 import { IUploadProfilePictureUseCase } from "../../application/interfaces/IUploadProfilePictureUseCase";
 import { IUploadWorkerDocumentUseCase } from "../../application/interfaces/IUploadWorkerDocumentUseCase";
 import { IUploadController } from "../interfaces/IUploadController";
-import { ResponseHandler } from "../responses/ApiResponse";
-import { RESPONSE_MESSAGES } from "../responses/ResponseMessages";
+import { ResponseHandler } from "../../shared/responses/ApiResponse";
+import { RESPONSE_MESSAGES } from "../../shared/responses/ResponseMessages";
 
 export class UploadController implements IUploadController {
   constructor(
