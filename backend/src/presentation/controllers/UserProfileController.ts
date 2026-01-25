@@ -2,8 +2,8 @@ import { Request, Response } from "express";
 import { HttpStatusCode } from "../../shared/enums/httpCodes";
 import { IUpdateUserProfileUseCase } from "../../application/interfaces/IUpdateUserProfileUseCase";
 import { IUserProfileController } from "../interfaces/IUserProfileController";
-import { ResponseHandler } from "../responses/ApiResponse";
-import { RESPONSE_MESSAGES } from "../responses/ResponseMessages";
+import { ResponseHandler } from "../../shared/responses/ApiResponse";
+import { RESPONSE_MESSAGES } from "../../shared/responses/ResponseMessages";
 import { IUpdateUserSkillsUseCase } from "../../application/interfaces/IUpdateUserSkillsUseCase";
 import { IUpdateUserAddressUseCase } from "../../application/interfaces/IUpdateUserAddressUseCase";
 

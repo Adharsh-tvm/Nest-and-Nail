@@ -1,5 +1,5 @@
 import express from "express";
-import { IAdminController } from "../interfaces/IAdminController";
+import { IAdminController } from "../../interfaces/IAdminController";
 
 
 export function createAdminRoutes(adminController: IAdminController) {

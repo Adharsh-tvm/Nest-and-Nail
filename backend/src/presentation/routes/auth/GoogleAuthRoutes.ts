@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { IGoogleAuthController } from "../interfaces/IGoogleAuthController";
+import { IGoogleAuthController } from "../../interfaces/IGoogleAuthController";
 
 export function createGoogleAuthRoutes(
   googleAuthController: IGoogleAuthController

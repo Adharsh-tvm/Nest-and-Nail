@@ -1,11 +1,13 @@
 import { AdminController } from "../../presentation/controllers/AdminController";
 import { AuthController } from "../../presentation/controllers/AuthController";
+import { CategoryController } from "../../presentation/controllers/CategoryController";
 import { GoogleAuthController } from "../../presentation/controllers/GoogleAuthController";
 import { UploadController } from "../../presentation/controllers/UploadController";
 import { UserController } from "../../presentation/controllers/UserController";
 import { UserProfileController } from "../../presentation/controllers/UserProfileController";
 import { IAdminController } from "../../presentation/interfaces/IAdminController";
 import { IAuthController } from "../../presentation/interfaces/IAuthController";
+import { ICategoryController } from "../../presentation/interfaces/ICategoryController";
 import { IGoogleAuthController } from "../../presentation/interfaces/IGoogleAuthController";
 import { IUploadController } from "../../presentation/interfaces/IUploadController";
 import { IUserController } from "../../presentation/interfaces/IUserController";
@@ -24,6 +26,8 @@ export class ControllerDI {
 
     private _uploadController?: IUploadController;
     private _userProfileController?: IUserProfileController;
+
+    private _categoryController?: ICategoryController;
 
     constructor(
         private useCases: UseCaseDI,
@@ -103,6 +107,17 @@ export class ControllerDI {
             );
         }
         return this._userProfileController
+    }
+
+    get categoryController(): ICategoryController {
+        if(!this._categoryController) {
+            this._categoryController = new CategoryController(
+                this.useCases.createCategoryUseCase,
+                this.useCases.getAllCategoriesUseCase,
+                this.useCases.updateCategoryStatusUseCase
+            )
+        }
+        return this._categoryController
     }
 }
     

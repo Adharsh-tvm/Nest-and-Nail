@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { IUserController } from "../interfaces/IUserController";
-import { AuthMiddleware } from "../middlewares/AuthMiddleware";
-import { upload } from "../middlewares/multerMiddleware";
-import { IUserProfileController } from "../interfaces/IUserProfileController";
+import { IUserController } from "../../interfaces/IUserController";
+import { AuthMiddleware } from "../../middlewares/AuthMiddleware";
+import { upload } from "../../middlewares/multerMiddleware";
+import { IUserProfileController } from "../../interfaces/IUserProfileController";
 
 const router = Router();
 

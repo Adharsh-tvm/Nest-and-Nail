@@ -9,9 +9,9 @@ import {
     UserNotFoundError
 } from "../../domain/errors/DomainError";
 import { IGetAllUsersUseCase } from "../../application/interfaces/IGetAllUsersUseCase";
-import { ResponseHandler } from "../responses/ApiResponse";
+import { ResponseHandler } from "../../shared/responses/ApiResponse";
 import { LoginResponseDTO } from "../../application/dtos/UserDTO";
-import { RESPONSE_MESSAGES } from "../responses/ResponseMessages";
+import { RESPONSE_MESSAGES } from "../../shared/responses/ResponseMessages";
 
 export class UserController implements IUserController {
 
