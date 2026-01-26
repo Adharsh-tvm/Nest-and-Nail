@@ -1,8 +1,9 @@
 import express from "express";
 import { IAdminController } from "../../interfaces/IAdminController";
+import { ICategoryController } from "../../interfaces/ICategoryController";
 
 
-export function createAdminRoutes(adminController: IAdminController) {
+export function createAdminRoutes(adminController: IAdminController, categoryController: ICategoryController) {
     const router = express.Router();
 
     router.get("/clients", (req, res) => adminController.getAllClients(req, res));
@@ -10,6 +11,9 @@ export function createAdminRoutes(adminController: IAdminController) {
     router.patch("/verify/:userId", (req, res) => adminController.approveVerification(req, res));
     router.patch("/reject/:userId", (req, res) => adminController.rejectVerification(req, res));
     router.patch("/access/:userId", (req, res) => adminController.updateUserAccess(req, res));
+    router.post("/categories", (req, res) => categoryController.create(req, res));
+    router.get("/categories", (req, res) => categoryController.getAll(req, res));
+    router.patch("/:id/status", (req, res) => categoryController.updateStatus(req, res));
 
     return router;
 }
