@@ -27,6 +27,7 @@ const navItems = [
     href: "/admin",
   },
   { id: "clients", label: "Clients", icon: Users, href: "/admin/users" },
+  { id: "categories", label: "Categories", icon: Briefcase, href: "/admin/categories" },
   {
     id: "verification",
     label: "Verification",
