@@ -30,20 +30,20 @@ export class ControllerDI {
     private _categoryController?: ICategoryController;
 
     constructor(
-        private useCases: UseCaseDI,
-        private infra: InfrastructureDI
+        private _useCases: UseCaseDI,
+        private _infra: InfrastructureDI
     ) { };
 
     get authController(): IAuthController {
         if (!this._authController) {
             this._authController = new AuthController(
-                this.useCases.registerUserUseCase,
-                this.useCases.loginUserUseCase,
-                this.useCases.sendOtpUseCase,
-                this.useCases.verifyOtpUseCase,
-                this.useCases.refreshTokenUseCase,
-                this.useCases.forgotPasswordUseCase,
-                this.useCases.resetPasswordUseCase
+                this._useCases.registerUserUseCase,
+                this._useCases.loginUserUseCase,
+                this._useCases.sendOtpUseCase,
+                this._useCases.verifyOtpUseCase,
+                this._useCases.refreshTokenUseCase,
+                this._useCases.forgotPasswordUseCase,
+                this._useCases.resetPasswordUseCase
             );
         }
         return this._authController;
@@ -52,10 +52,10 @@ export class ControllerDI {
     get adminController(): IAdminController {
         if (!this._adminController) {
             this._adminController = new AdminController(
-                this.useCases.getAllClientsUseCase,
-                this.useCases.getAllWorkersUseCase,
-                this.useCases.updateVerificationStatusUseCase,
-                this.useCases.updateUserAccessUseCase
+                this._useCases.getAllClientsUseCase,
+                this._useCases.getAllWorkersUseCase,
+                this._useCases.updateVerificationStatusUseCase,
+                this._useCases.updateUserAccessUseCase
             );
         }
         return this._adminController;
@@ -64,7 +64,7 @@ export class ControllerDI {
     get googleAuthController(): IGoogleAuthController {
         if (!this._googleAuthController) {
             this._googleAuthController = new GoogleAuthController(
-                this.useCases.googleLoginUseCase
+                this._useCases.googleLoginUseCase
             );
         }
         return this._googleAuthController;
@@ -73,9 +73,9 @@ export class ControllerDI {
     get userController(): IUserController {
         if (!this._userController) {
             this._userController = new UserController(
-                this.useCases.changeUserRoleUseCase,
-                this.useCases.getCurrentUserUseCase,
-                this.useCases.getAllUsersUseCase
+                this._useCases.changeUserRoleUseCase,
+                this._useCases.getCurrentUserUseCase,
+                this._useCases.getAllUsersUseCase
             )
         }
         return this._userController;
@@ -83,7 +83,7 @@ export class ControllerDI {
 
     get authMiddleware(): AuthMiddleware {
         if (!this._authMiddleware) {
-            this._authMiddleware = new AuthMiddleware(this.infra.tokenService);
+            this._authMiddleware = new AuthMiddleware(this._infra.tokenService);
         }
         return this._authMiddleware;
     }
@@ -91,8 +91,8 @@ export class ControllerDI {
     get uploadController(): IUploadController {
         if (!this._uploadController) {
             this._uploadController = new UploadController(
-                this.useCases.uploadProfilePictureUseCase,
-                this.useCases.uploadWorkerDocumentUseCase,
+                this._useCases.uploadProfilePictureUseCase,
+                this._useCases.uploadWorkerDocumentUseCase,
             );
         }
         return this._uploadController;
@@ -101,23 +101,24 @@ export class ControllerDI {
     get userProfileController(): IUserProfileController {
         if (!this._userProfileController) {
             this._userProfileController = new UserProfileController(
-                this.useCases.updateUserProfileUseCase,
-                this.useCases.updateUserSkillsUseCase,
-                this.useCases.updateUserAddressUseCase
+                this._useCases.updateUserProfileUseCase,
+                this._useCases.updateUserSkillsUseCase,
+                this._useCases.updateUserAddressUseCase
             );
         }
         return this._userProfileController
     }
 
     get categoryController(): ICategoryController {
-        if(!this._categoryController) {
+        if (!this._categoryController) {
             this._categoryController = new CategoryController(
-                this.useCases.createCategoryUseCase,
-                this.useCases.getAllCategoriesUseCase,
-                this.useCases.updateCategoryStatusUseCase
+                this._useCases.createCategoryUseCase,
+                this._useCases.getAllCategoriesUseCase,
+                this._useCases.updateCategoryUseCase,
+                this._useCases.updateCategoryStatusUseCase,
             )
         }
         return this._categoryController
     }
 }
-    
+

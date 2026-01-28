@@ -1,35 +1,54 @@
 import { Request, Response } from "express";
 import { ICreateCategoryUseCase } from "../../application/interfaces/ICreateCategoryUseCase";
 import { IGetAllCategoriesUseCase } from "../../application/interfaces/IGetAllCategoriesUseCase";
-import { IUpdateCategoryStatusUseCase } from "../../application/interfaces/IUpdateCategoryStatusUseCase";
+import { IUpdateCategoryUseCase } from "../../application/interfaces/IUpdateCategoryUseCase";
 import { ICategoryController } from "../interfaces/ICategoryController";
 import { ResponseHandler } from "../../shared/responses/ApiResponse";
 import { RESPONSE_MESSAGES } from "../../shared/responses/ResponseMessages";
 import { HttpStatusCode } from "../../shared/enums/httpCodes";
+import { IUpdateCategoryStatusUseCase } from "../../application/interfaces/IUpdateCategoryStatusUseCase";
 
 export class CategoryController implements ICategoryController {
     constructor(
-        private readonly createCategoryUseCase: ICreateCategoryUseCase,
-        private readonly getAllCategoriesUseCase: IGetAllCategoriesUseCase,
-        private readonly updateCategoryStatusUseCase: IUpdateCategoryStatusUseCase
+        private readonly _createCategoryUseCase: ICreateCategoryUseCase,
+        private readonly _getAllCategoriesUseCase: IGetAllCategoriesUseCase,
+        private readonly _updateCategoryUseCase: IUpdateCategoryUseCase,
+        private readonly _updateCategoryStatusUseCase: IUpdateCategoryStatusUseCase
     ) { }
 
     create = async (req: Request, res: Response) => {
         const { name } = req.body;
-        const category = await this.createCategoryUseCase.execute(name);
+        const category = await this._createCategoryUseCase.execute(name);
         res.status(HttpStatusCode.CREATED).json(ResponseHandler.success(category, RESPONSE_MESSAGES.UPDATED));
     };
 
     getAll = async (_req: Request, res: Response) => {
-        const categories = await this.getAllCategoriesUseCase.execute();
+        const categories = await this._getAllCategoriesUseCase.execute();
         res.status(HttpStatusCode.OK).json(ResponseHandler.success(categories, RESPONSE_MESSAGES.UPDATED));
     };
+
+    async update(req: Request, res: Response): Promise<void> {
+        const { id } = req.params;
+        const { name, slug, isActive } = req.body;
+
+        const category = await this._updateCategoryUseCase.execute(id, {
+            name,
+            slug,
+            isActive,
+        });
+
+        res.status(HttpStatusCode.OK).json(
+            ResponseHandler.success(category, RESPONSE_MESSAGES.UPDATED)
+        );
+    }
 
     updateStatus = async (req: Request, res: Response) => {
         const { id } = req.params;
         const { isActive } = req.body;
 
-        await this.updateCategoryStatusUseCase.execute(id, isActive);
+        await this._updateCategoryStatusUseCase.execute(id, isActive);
         res.status(HttpStatusCode.OK).json(ResponseHandler.success(null, RESPONSE_MESSAGES.UPDATED));
     };
+
+
 }

@@ -13,6 +13,7 @@ import { IRegisterUserUseCase } from "../../application/interfaces/IRegisterUser
 import { IResetPasswordUseCase } from "../../application/interfaces/IResetPasswordUseCase";
 import { ISendOtpUseCase } from "../../application/interfaces/ISendOtpUseCase";
 import { IUpdateCategoryStatusUseCase } from "../../application/interfaces/IUpdateCategoryStatusUseCase";
+import { IUpdateCategoryUseCase } from "../../application/interfaces/IUpdateCategoryUseCase";
 import { IUpdateUserAccessUseCase } from "../../application/interfaces/IUpdateUserAccessUseCase";
 import { IUpdateUserAddressUseCase } from "../../application/interfaces/IUpdateUserAddressUseCase";
 import { IUpdateUserProfileUseCase } from "../../application/interfaces/IUpdateUserProfileUseCase";
@@ -38,6 +39,7 @@ import { VerifyOtpUseCase } from "../../application/use-cases/auth/VerifyOtpUseC
 import { CreateCategoryUseCase } from "../../application/use-cases/category/CreateCategoryUseCase";
 import { GetAllCategoriesUseCase } from "../../application/use-cases/category/GetAllCategoriesUseCase";
 import { UpdateCategoryStatusUseCase } from "../../application/use-cases/category/UpdateCategoryStatusUseCase";
+import { UpdateCategoryUseCase } from "../../application/use-cases/category/UpdateCategoryUseCase";
 import { ChangeUserRoleUseCase } from "../../application/use-cases/user/ChangeUserRoleUseCase";
 import { GetCurrentUserUseCase } from "../../application/use-cases/user/GetCurrentUserUseCase";
 import { UpdateUserAddressUseCase } from "../../application/use-cases/user/UpdateUserAddressUseCase";
@@ -82,6 +84,7 @@ export class UseCaseDI {
   private _createCategoryUseCase?: ICreateCategoryUseCase;
   private _getAllCategoriesUseCase?: IGetAllCategoriesUseCase;
   private _updateCategoryStatusUseCase?: IUpdateCategoryStatusUseCase;
+  private _updateCategoryUseCase?: IUpdateCategoryUseCase;
 
 
   constructor(private infra: InfrastructureDI) { }
@@ -292,8 +295,8 @@ export class UseCaseDI {
     return this._updateUserAddressUseCase;
   }
 
-  get createCategoryUseCase(): ICreateCategoryUseCase{
-    if(!this._createCategoryUseCase) {
+  get createCategoryUseCase(): ICreateCategoryUseCase {
+    if (!this._createCategoryUseCase) {
       this._createCategoryUseCase = new CreateCategoryUseCase(
         this.infra.categoryRepository
       )
@@ -301,21 +304,31 @@ export class UseCaseDI {
     return this._createCategoryUseCase
   }
 
-  get getAllCategoriesUseCase(): IGetAllCategoriesUseCase{
-    if(!this._getAllCategoriesUseCase) {
+  get getAllCategoriesUseCase(): IGetAllCategoriesUseCase {
+    if (!this._getAllCategoriesUseCase) {
       this._getAllCategoriesUseCase = new GetAllCategoriesUseCase(
         this.infra.categoryRepository
       )
     }
     return this._getAllCategoriesUseCase
   }
+  
+  get updateCategoryUseCase(): IUpdateCategoryUseCase {
+    if(!this._updateCategoryUseCase) {
+      this._updateCategoryUseCase = new UpdateCategoryUseCase(
+        this.infra.categoryRepository
+      )
+    }
+    return this._updateCategoryUseCase
+  }
 
-  get updateCategoryStatusUseCase(): IUpdateCategoryStatusUseCase{
-    if(!this._updateCategoryStatusUseCase) {
+  get updateCategoryStatusUseCase(): IUpdateCategoryStatusUseCase {
+    if (!this._updateCategoryStatusUseCase) {
       this._updateCategoryStatusUseCase = new UpdateCategoryStatusUseCase(
         this.infra.categoryRepository
       )
     }
     return this._updateCategoryStatusUseCase
   }
+
 }

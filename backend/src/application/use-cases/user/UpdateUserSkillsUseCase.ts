@@ -6,12 +6,13 @@ import { UserMapper } from "../../mappers/UserMapper";
 
 export class UpdateUserSkillsUseCase implements IUpdateUserSkillsUseCase {
     constructor(
-        private readonly userRepositoryFactory: IUserRepositoryFactory
+        private readonly _userRepositoryFactory: IUserRepositoryFactory
     ) { }
 
     async execute(userId: string, skills: string[]): Promise<UserResponseDTO> {
-        const workerRepo = this.userRepositoryFactory.getRepository(Role.WORKER);
-        const clientRepo = this.userRepositoryFactory.getRepository(Role.CLIENT);
+        
+        const workerRepo = this._userRepositoryFactory.getRepository(Role.WORKER);
+        const clientRepo = this._userRepositoryFactory.getRepository(Role.CLIENT);
 
         let user = await workerRepo.findById(userId);
         let repo = workerRepo;
