@@ -35,7 +35,6 @@ axiosInstance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// RESPONSE INTERCEPTOR — normalizes server message + data
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
