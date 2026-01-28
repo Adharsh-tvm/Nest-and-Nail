@@ -150,7 +150,7 @@ NEW PENDINGS...
 ✔ re-apply option enable prefectly @done (1/13/2026, 11:35:37 PM)
 ☐ remove the existing user details when re applied
 ☐ fix logout time
-☐ rejection reason by mail
+✔ rejection reason by mail @done (1/28/2026, 8:10:02 PM)
 ☐ Add more reusable components
 ☐ Add optimizations in frontend (Error boundaries, Lazy loading, memoization)
 ☐ Add more reusable components
@@ -167,7 +167,7 @@ NEW PENDINGS...
 ☐ error handling interceptor
 ☐ 400 ,500 pages
 ☐ blocking of logged in user
-☐ confirmation modal- ask for confirmation
+✔ confirmation modal- ask for confirmation @done (1/28/2026, 8:08:18 PM)
 ☐ s3 and signed url
 ☐ profile need proper validation
 

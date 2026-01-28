@@ -16,6 +16,7 @@ import {
   Users,
   CheckCircle,
 } from "lucide-react";
+import toast from "react-hot-toast";
 
 import DataTable from "@/app/components/containers/widgets/DataTable";
 import type { Column } from "@/app/components/containers/widgets/DataTable";
@@ -102,6 +103,7 @@ const ActionMenu = ({
 };
 
 import UserDetailsModal from "./UserDetailsModal";
+import BlockConfirmationModal from "./BlockConfirmationModal";
 
 /**
  * ----------------------------------------------------------------------------
@@ -113,6 +115,8 @@ const UsersView = () => {
   const [localUsers, setLocalUsers] = useState<any[]>([]);
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [blockConfirmOpen, setBlockConfirmOpen] = useState(false);
+  const [userToBlock, setUserToBlock] = useState<any>(null);
 
   useEffect(() => {
     if (users) setLocalUsers(users);
@@ -125,25 +129,40 @@ const UsersView = () => {
   // Derive stats
   const totalUsers = localUsers.length;
   const verifiedUsers = localUsers.filter(
-    (u) => u.isVerified === VerificationStatus.VERIFIED
+    (u) => u.isVerified === VerificationStatus.VERIFIED,
   ).length;
   const blockedUsers = localUsers.filter((u) => u.isBlocked).length;
 
-  async function handleBlockToggle(row: any) {
+  const handleBlockToggle = (row: any) => {
+    setUserToBlock(row);
+    setBlockConfirmOpen(true);
+  };
+
+  const onConfirmBlock = async () => {
+    if (!userToBlock) return;
+
     try {
-      const updatedUser = await toggleUserAccessAction(row.id);
+      const updatedUser = await toggleUserAccessAction(userToBlock.id);
 
       setLocalUsers((prev) =>
         prev.map((u) =>
           u.id === updatedUser.id
             ? { ...u, isBlocked: updatedUser.isBlocked }
-            : u
-        )
+            : u,
+        ),
+      );
+      setBlockConfirmOpen(false);
+      setUserToBlock(null);
+      toast.success(
+        updatedUser.isBlocked
+          ? "User blocked successfully"
+          : "User unblocked successfully"
       );
     } catch (err) {
       console.error(err);
+      toast.error("Failed to update user status");
     }
-  }
+  };
 
   const handleViewDetails = (row: any) => {
     setSelectedUser(row);
@@ -277,23 +296,38 @@ const UsersView = () => {
     );
   }
 
-  const StatCard = ({ title, value, icon: Icon, color, iconColor, trend }: any) => (
-    <div className={`p-6 rounded-2xl shadow-sm flex items-center justify-between group hover:shadow-md transition-all ${color}`}>
+  const StatCard = ({
+    title,
+    value,
+    icon: Icon,
+    color,
+    iconColor,
+    trend,
+  }: any) => (
+    <div
+      className={`p-6 rounded-2xl shadow-sm flex items-center justify-between group hover:shadow-md transition-all ${color}`}
+    >
       <div>
-        <p className={`text-xs font-bold uppercase tracking-wider mb-1 ${color.includes('text-white') ? 'text-white/70' : 'text-gray-400'}`}>
+        <p
+          className={`text-xs font-bold uppercase tracking-wider mb-1 ${color.includes("text-white") ? "text-white/70" : "text-gray-400"}`}
+        >
           {title}
         </p>
-        <h3 className={`text-3xl font-black ${color.includes('text-white') ? 'text-white' : 'text-gray-900'}`}>
+        <h3
+          className={`text-3xl font-black ${color.includes("text-white") ? "text-white" : "text-gray-900"}`}
+        >
           {value}
         </h3>
         {trend && (
-          <p className={`text-xs font-bold flex items-center gap-1 mt-2 ${color.includes('text-white') ? 'text-white/90' : 'text-emerald-600'}`}>
+          <p
+            className={`text-xs font-bold flex items-center gap-1 mt-2 ${color.includes("text-white") ? "text-white/90" : "text-emerald-600"}`}
+          >
             <TrendingUp size={12} /> {trend}
           </p>
         )}
       </div>
       <div
-        className={`w-14 h-14 rounded-2xl flex items-center justify-center ${color.includes('text-white') ? 'bg-white/20' : 'bg-gray-50'} group-hover:scale-110 transition-transform ${iconColor}`}
+        className={`w-14 h-14 rounded-2xl flex items-center justify-center ${color.includes("text-white") ? "bg-white/20" : "bg-gray-50"} group-hover:scale-110 transition-transform ${iconColor}`}
       >
         <Icon size={28} />
       </div>
@@ -350,6 +384,17 @@ const UsersView = () => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         user={selectedUser}
+      />
+
+      <BlockConfirmationModal
+        isOpen={blockConfirmOpen}
+        onClose={() => {
+          setBlockConfirmOpen(false);
+          setUserToBlock(null);
+        }}
+        onConfirm={onConfirmBlock}
+        userName={userToBlock?.name || "User"}
+        isBlocked={userToBlock?.isBlocked || false}
       />
     </div>
   );
