@@ -261,6 +261,7 @@ export class UseCaseDI {
     if (!this._updateVerificationStatusUseCase) {
       this._updateVerificationStatusUseCase = new UpdateVerificationStatusUseCase(
         this.infra.userRepositoryFactory,
+        this.infra.emailService,
         this.infra.logger
       );
     }

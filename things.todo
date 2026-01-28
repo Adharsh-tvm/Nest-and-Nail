@@ -163,7 +163,7 @@ NEW PENDINGS...
 ☐ make the google login button responsive
 ☐ adding category in admin side
 ☐ duplicate category error fix 
-☐ fix category toggle
+☐ fix category toggle error
 ☐ error handling interceptor
 ☐ 400 ,500 pages
 ☐ blocking of logged in user
@@ -177,9 +177,9 @@ NEW PENDINGS...
 
 
 Next week:
-✔ Complete the worker profile module with all required details @done (1/28/2026, 10:43:20 AM)
-✔ Complete client and worker profile sections, including location information @done (1/28/2026, 10:43:23 AM)
-✔ Implement online/offline mode functionality for workers. @done (1/28/2026, 10:43:53 AM)=
+☐ Complete the worker profile module with all required details
+☐ Complete client and worker profile sections, including location information
+☐ Implement online/offline mode functionality for workers.
 Add an issue-raising feature for clients.
 Show client-raised issues to workers based on their location.
 Build the issue detail page with full information about the required work.
