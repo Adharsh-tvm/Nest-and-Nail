@@ -117,9 +117,13 @@ export async function approveVerification(userId: string): Promise<void> {
   }
 }
 
-export async function rejectVerification(userId: string): Promise<void> {
+export async function rejectVerification(
+  userId: string,
+  reason: string
+): Promise<void> {
   const res = await axiosInstance.patch<ApiResponse<null>>(
-    `/api/admin/reject/${userId}`
+    `/api/admin/reject/${userId}`,
+    { reason }
   );
 
   if (!res.data.success) {

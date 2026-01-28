@@ -68,10 +68,19 @@ export class AdminController implements IAdminController {
     rejectVerification = async (req: Request, res: Response): Promise<void> => {
         try {
             const { userId } = req.params;
+            const { reason } = req.body;
+
+            if (!reason) {
+                res.status(HttpStatusCode.BAD_REQUEST).json(
+                    ResponseHandler.error("Rejection reason is required")
+                );
+                return;
+            }
 
             const result = await this._updateVerificationStatusUseCase.execute(
                 userId,
-                VerificationStatus.REJECTED
+                VerificationStatus.REJECTED,
+                reason
             );
 
             res.status(HttpStatusCode.OK).json(ResponseHandler.success(result, RESPONSE_MESSAGES.SUCCESS));
