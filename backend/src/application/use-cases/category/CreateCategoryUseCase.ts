@@ -3,7 +3,7 @@ import { Category } from "../../../domain/entities/Category";
 import { ICreateCategoryUseCase } from "../../interfaces/ICreateCategoryUseCase";
 
 export class CreateCategoryUseCase implements ICreateCategoryUseCase {
-  constructor(private readonly categoryRepo: ICategoryRepository) {}
+  constructor(private readonly _categoryRepo: ICategoryRepository) { }
 
   async execute(name: string) {
     const slug = name
@@ -11,7 +11,7 @@ export class CreateCategoryUseCase implements ICreateCategoryUseCase {
       .trim()
       .replace(/\s+/g, "-");
 
-    const existing = await this.categoryRepo.findBySlug(slug);
+    const existing = await this._categoryRepo.findBySlug(slug);
     if (existing) {
       throw new Error("Category already exists");
     }
@@ -24,6 +24,6 @@ export class CreateCategoryUseCase implements ICreateCategoryUseCase {
       new Date()
     );
 
-    return await this.categoryRepo.create(category);
+    return await this._categoryRepo.create(category);
   }
 }

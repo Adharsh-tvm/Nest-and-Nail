@@ -11,9 +11,11 @@ export function createAdminRoutes(adminController: IAdminController, categoryCon
     router.patch("/verify/:userId", (req, res) => adminController.approveVerification(req, res));
     router.patch("/reject/:userId", (req, res) => adminController.rejectVerification(req, res));
     router.patch("/access/:userId", (req, res) => adminController.updateUserAccess(req, res));
+
     router.post("/categories", (req, res) => categoryController.create(req, res));
     router.get("/categories", (req, res) => categoryController.getAll(req, res));
-    router.patch("/:id/status", (req, res) => categoryController.updateStatus(req, res));
+    router.put("/categories/:id", (req, res) => categoryController.update(req, res));
+    router.patch("/categories/:id/toggle-status", (req, res) => categoryController.updateStatus(req, res))
 
     return router;
 }

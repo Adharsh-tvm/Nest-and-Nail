@@ -2,9 +2,9 @@ import { ICategoryRepository } from "../../../domain/repositories/ICategoryRepos
 import { IGetAllCategoriesUseCase } from "../../interfaces/IGetAllCategoriesUseCase";
 
 export class GetAllCategoriesUseCase implements IGetAllCategoriesUseCase{
-    constructor(private readonly categoryRepo: ICategoryRepository) { }
+    constructor(private readonly _categoryRepo: ICategoryRepository) { }
 
     async execute() {
-        return await this.categoryRepo.findAll();
+        return await this._categoryRepo.findAll();
     }
 }

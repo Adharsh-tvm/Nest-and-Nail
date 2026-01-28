@@ -148,7 +148,7 @@ NEW PENDINGS...
 ✔ wrong OTP broken @done (1/13/2026, 11:35:33 PM)
 ✔ document upload front side and back side @done (1/13/2026, 11:35:36 PM)
 ✔ re-apply option enable prefectly @done (1/13/2026, 11:35:37 PM)
-☐ remove the existing user details when rea applied
+☐ remove the existing user details when re applied
 ☐ fix logout time
 ☐ rejection reason by mail
 ☐ Add more reusable components
@@ -161,6 +161,8 @@ NEW PENDINGS...
 ☐ make document upload to cloudinary from frontend
 ☐ address edit and delete and also make default option
 ☐ make the google login button responsive
+☐ adding category in admin side
+☐ duplicate category error fix 
 
 
 

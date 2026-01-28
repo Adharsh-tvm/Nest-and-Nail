@@ -1,3 +1,5 @@
+import { Category } from "../../domain/entities/Category";
+
 export interface IUpdateCategoryStatusUseCase {
-  execute(categoryId: string, isActive: boolean): Promise<void>;
+  execute(id: string, isActive: boolean): Promise<Category>;
 }

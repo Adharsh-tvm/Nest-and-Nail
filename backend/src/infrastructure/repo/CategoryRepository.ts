@@ -47,7 +47,35 @@ export class CategoryRepository implements ICategoryRepository {
         );
     }
 
-    async updateStatus(id: string, isActive: boolean): Promise<void> {
-        await CategoryModel.findByIdAndUpdate(id, { isActive });
+    async update(
+        id: string,
+        data: {
+            name: string;
+            slug: string;
+            isActive: boolean;
+        }
+    ): Promise<Category> {
+        const updated = await CategoryModel.findByIdAndUpdate(
+            id,
+            {
+                name: data.name,
+                slug: data.slug,
+                isActive: data.isActive,
+            },
+            { new: true }
+        );
+
+        if (!updated) {
+            throw new Error("Category not found");
+        }
+
+        return new Category(
+            updated.id,
+            updated.name,
+            updated.slug,
+            updated.isActive,
+            updated.createdAt
+        );
     }
+
 }

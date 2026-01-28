@@ -21,6 +21,7 @@ async findAll(): Promise<Client[]> {
         updatedAt: worker.updatedAt,
         isBlocked: worker.isBlocked,
         isVerified: worker.isVerified,
+        isOnline: worker.isOnline,
         profilePictureUrl: worker.profilePictureUrl,
         role: worker.role,
         skills: worker.skills,
