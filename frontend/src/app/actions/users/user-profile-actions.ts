@@ -15,8 +15,43 @@ export async function updateUserProfileAction(userId: string, updates: any) {
 
   const fd = new FormData();
 
-  if (updates.name) fd.append("name", updates.name);
-  if (updates.phone) fd.append("phone", updates.phone);
+  if (updates.name !== undefined) {
+    const name = updates.name.trim();
+
+    if (!name) {
+      return { success: false, message: "Name cannot be empty" };
+    }
+
+    if (name.length < 2 || name.length > 50) {
+      return {
+        success: false,
+        message: "Name must be between 2 and 50 characters",
+      };
+    }
+
+    if (!/^[A-Za-z\s]+$/.test(name)) {
+      return {
+        success: false,
+        message: "Name can only contain letters and spaces",
+      };
+    }
+
+    fd.append("name", name);
+  }
+
+  if (updates.phone !== undefined) {
+    const phone = String(updates.phone).trim();
+
+    if (!/^\d{10}$/.test(phone)) {
+      return {
+        success: false,
+        message: "Phone number must be a valid 10-digit number",
+      };
+    }
+
+    fd.append("phone", phone);
+  }
+
   if (updates.address) {
     fd.append(
       "address",
@@ -49,16 +84,15 @@ export async function updateUserProfileAction(userId: string, updates: any) {
     return {
       success: true,
       message: "Profile Updated successfully",
-      user: res.data.user
-    }
-
+      user: res.data.user,
+    };
   } catch (err: any) {
     console.error("Profile update failed", err.response?.data || err);
 
     return {
       success: false,
-      message: err.response?.data?.message || "Profile update failed"
-    }
+      message: err.response?.data?.message || "Profile update failed",
+    };
   }
 }
 
