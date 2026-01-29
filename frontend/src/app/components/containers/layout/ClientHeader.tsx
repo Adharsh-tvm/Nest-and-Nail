@@ -20,11 +20,13 @@ import WorkerVerificationFlow from "../../../client/(home)/DocumentsUpload";
 import { VerificationStatus } from "@/shared/enums/authEnums";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import SwitchRoleConfirmationModal from "./SwitchRoleConfirmationModal";
 
 const ClientHeader: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isTogglingRole, setIsTogglingRole] = useState(false);
+  const [isSwitchRoleModalOpen, setIsSwitchRoleModalOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const router = useRouter();
@@ -87,13 +89,21 @@ const ClientHeader: React.FC = () => {
     buttonPlaceHolder = "Become a worker";
   }
 
-  const toggleUserMode = async () => {
+  const toggleUserMode = () => {
     if (!currentUser || isTogglingRole) return;
+    setIsSwitchRoleModalOpen(true);
+  };
+
+  const handleConfirmSwitchRole = async () => {
+    if (!currentUser) return;
 
     const newMode: "client" | "worker" =
       userMode === "client" ? "worker" : "client";
 
     setIsTogglingRole(true);
+    setIsSwitchRoleModalOpen(false); // Close modal immediately or keep open until finish? Usually close first for better UX with a loading toast if needed, but here we have isTogglingRole loading state on the UI.
+    // Actually, let's close it after setting loading state so the specific toggle UI shows loading.
+
     try {
       const updatedUser = await changeRoleAction(newMode);
       setUser({
@@ -101,8 +111,10 @@ const ClientHeader: React.FC = () => {
         role: updatedUser.role,
       });
       router.refresh();
+      toast.success(`Switched to ${newMode} mode`);
     } catch (err) {
       console.error("Failed to toggle user mode:", err);
+      toast.error("Failed to switch role");
     } finally {
       setIsTogglingRole(false);
     }
@@ -184,28 +196,24 @@ const ClientHeader: React.FC = () => {
               {isVerified && (
                 <div
                   onClick={toggleUserMode}
-                  className={`relative flex items-center bg-gray-100 rounded-full p-1 w-32 h-10 border border-gray-200 shadow-inner ${
-                    isTogglingRole ? "opacity-50 cursor-wait" : "cursor-pointer"
-                  }`}
+                  className={`relative flex items-center bg-gray-100 rounded-full p-1 w-32 h-10 border border-gray-200 shadow-inner ${isTogglingRole ? "opacity-50 cursor-wait" : "cursor-pointer"
+                    }`}
                 >
                   <div
-                    className={`absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-full shadow-sm transition-all duration-300 ease-out ${
-                      userMode === "client"
-                        ? "left-1 bg-[#1B4332]"
-                        : "left-[calc(50%)] bg-[#DC2626]"
-                    }`}
+                    className={`absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-full shadow-sm transition-all duration-300 ease-out ${userMode === "client"
+                      ? "left-1 bg-[#1B4332]"
+                      : "left-[calc(50%)] bg-[#DC2626]"
+                      }`}
                   />
                   <div
-                    className={`flex-1 z-10 text-center text-xs font-bold ${
-                      userMode === "client" ? "text-white" : "text-gray-500"
-                    }`}
+                    className={`flex-1 z-10 text-center text-xs font-bold ${userMode === "client" ? "text-white" : "text-gray-500"
+                      }`}
                   >
                     Client
                   </div>
                   <div
-                    className={`flex-1 z-10 text-center text-xs font-bold ${
-                      userMode === "worker" ? "text-white" : "text-gray-500"
-                    }`}
+                    className={`flex-1 z-10 text-center text-xs font-bold ${userMode === "worker" ? "text-white" : "text-gray-500"
+                      }`}
                   >
                     Worker
                   </div>
@@ -227,9 +235,8 @@ const ClientHeader: React.FC = () => {
                   </span>
                   <ChevronDown
                     size={16}
-                    className={`text-gray-400 transition-transform duration-200 ${
-                      isUserMenuOpen ? "rotate-180" : ""
-                    }`}
+                    className={`text-gray-400 transition-transform duration-200 ${isUserMenuOpen ? "rotate-180" : ""
+                      }`}
                   />
                 </button>
 
@@ -295,6 +302,13 @@ const ClientHeader: React.FC = () => {
       <WorkerVerificationFlow
         isOpen={isWorkerFlowOpen}
         onClose={() => setIsWorkerFlowOpen(false)}
+      />
+
+      <SwitchRoleConfirmationModal
+        isOpen={isSwitchRoleModalOpen}
+        onClose={() => setIsSwitchRoleModalOpen(false)}
+        onConfirm={handleConfirmSwitchRole}
+        targetRole={userMode === "client" ? "worker" : "client"}
       />
     </>
   );
