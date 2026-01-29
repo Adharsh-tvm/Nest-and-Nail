@@ -39,8 +39,6 @@ export class UpdateUserProfileUseCase implements IUpdateUserProfileUseCase {
 
         let updatedUser: any = { ...user, ...updates };
 
-        console.log("-----------------------------------------",updatedUser)
-
         if (profilePictureFilePath) {
             const { url } = await this._uploadProfilePictureUseCase.execute(userId, profilePictureFilePath);
             updatedUser.profilePictureUrl = url;
