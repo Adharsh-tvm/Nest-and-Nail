@@ -16,6 +16,7 @@ export type User = {
   address?: Address[];
   documents?: string[];
   certificates?: string[];
+  categories: string[];
   workPhotos?: string[];
   createdAt?: string;
   updatedAt?: string;

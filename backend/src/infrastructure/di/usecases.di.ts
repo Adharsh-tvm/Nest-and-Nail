@@ -19,6 +19,7 @@ import { IUpdateUserAddressUseCase } from "../../application/interfaces/IUpdateU
 import { IUpdateUserProfileUseCase } from "../../application/interfaces/IUpdateUserProfileUseCase";
 import { IUpdateUserSkillsUseCase } from "../../application/interfaces/IUpdateUserSkillsUseCase";
 import { IUpdateVerificationStatusUseCase } from "../../application/interfaces/IUpdateVerificationStatusUseCase";
+import { IUpdateWorkerCategoriesUseCase } from "../../application/interfaces/IUpdateWorkerCategoriesUseCase";
 import { IUploadProfilePictureUseCase } from "../../application/interfaces/IUploadProfilePictureUseCase";
 import { IUploadWorkerDocumentUseCase } from "../../application/interfaces/IUploadWorkerDocumentUseCase";
 import { IVerifyOtpUseCase } from "../../application/interfaces/IVerifyOtpUseCase";
@@ -45,6 +46,7 @@ import { GetCurrentUserUseCase } from "../../application/use-cases/user/GetCurre
 import { UpdateUserAddressUseCase } from "../../application/use-cases/user/UpdateUserAddressUseCase";
 import { UpdateUserProfileUseCase } from "../../application/use-cases/user/UpdateUserProfileUseCase";
 import { UpdateUserSkillsUseCase } from "../../application/use-cases/user/UpdateUserSkillsUseCase";
+import { UpdateWorkerCategoriesUseCase } from "../../application/use-cases/user/UpdateWorkerCategoriesUseCase";
 import { UploadWorkerDocumentUseCase } from "../../application/use-cases/user/UploadWorkerDocumentUseCase";
 import { InfrastructureDI } from "./infrastructure.di";
 
@@ -85,6 +87,7 @@ export class UseCaseDI {
   private _getAllCategoriesUseCase?: IGetAllCategoriesUseCase;
   private _updateCategoryStatusUseCase?: IUpdateCategoryStatusUseCase;
   private _updateCategoryUseCase?: IUpdateCategoryUseCase;
+  private _updateWorkerCategoriesUseCase?: IUpdateWorkerCategoriesUseCase;
 
 
   constructor(private infra: InfrastructureDI) { }
@@ -331,5 +334,15 @@ export class UseCaseDI {
     }
     return this._updateCategoryStatusUseCase
   }
+
+  get updateWorkerCategoriesUseCase(): IUpdateWorkerCategoriesUseCase {
+    if(!this._updateWorkerCategoriesUseCase) {
+      this._updateWorkerCategoriesUseCase = new UpdateWorkerCategoriesUseCase(
+        this.infra.userRepositoryFactory,
+        this.infra.categoryRepository
+      )
+    }
+    return this._updateWorkerCategoriesUseCase
+  } 
 
 }

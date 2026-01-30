@@ -50,6 +50,7 @@ export class UserMapper {
 
             documents: userData.documents ?? [],
             certificates: userData.certificates ?? [],
+            categories: userData.categories ?? [],
             workPhotos: userData.workPhotos ?? [],
 
             createdAt: userData.createdAt?.toISOString?.() ?? "",

@@ -24,6 +24,7 @@ export interface UserResponseDTO {
     address?: AddressDTO[];
     documents?: string[];
     certificates?: string[];
+    categories?: string[];
     workPhotos?: string[];
     createdAt?: string;
     updatedAt?: string;
@@ -47,6 +48,7 @@ export interface LoginResponseDTO {
         isBlocked: boolean;
         isOnline: boolean;
         isVerified: VerificationStatus;
+        categories?: string[];
     };
     accessToken: string;
     refreshToken: string;

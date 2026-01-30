@@ -44,6 +44,12 @@ const UserSchema = new Schema<User>({
 
     documents: [String],
     certificates: [String],
+    categories: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Category",
+        default: []
+    }],
+
     workPhotos: [String],
 }, {
     timestamps: true,
