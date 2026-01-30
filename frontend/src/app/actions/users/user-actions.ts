@@ -42,6 +42,7 @@ export async function getCurrentUser(): Promise<User | null> {
       address: u.address ?? [],
       documents: u.documents ?? [],
       certificates: u.certificates ?? [],
+      categories: u.categories ?? [],
       workPhotos: u.workPhotos ?? [],
 
       createdAt: u.createdAt,

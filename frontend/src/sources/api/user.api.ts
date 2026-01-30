@@ -41,7 +41,7 @@ const userApi = {
     userId: string,
     skills: string[]
   ): Promise<ApiResponse<User>> => {
-    const response = await axiosInstance.put<ApiResponse<User>>(
+    const response = await axiosInstance.patch<ApiResponse<User>>(
       `/api/users/${userId}/skills`,
       { skills },
       { withCredentials: true }
@@ -56,6 +56,28 @@ const userApi = {
     const response = await axiosInstance.post(
       `/api/users/${userId}/address`,
       payload
+    );
+    return response.data
+  },
+
+  updateCategories: async (
+    userId: string,
+    categories: string[]
+  ): Promise<ApiResponse<User>> => {
+    const response = await axiosInstance.patch<ApiResponse<User>>(
+      `/api/users/${userId}/categories`,
+      { categoryIds: categories },
+      { withCredentials: true }
+    );
+    return response.data;
+  },
+
+  getWorkerCategories: async (
+    userId: string,
+  ): Promise<ApiResponse<User>> => {
+    const response = await axiosInstance.get<ApiResponse<User>>(
+      `/api/users/${userId}/categories`,
+      {withCredentials: true}
     );
     return response.data
   }

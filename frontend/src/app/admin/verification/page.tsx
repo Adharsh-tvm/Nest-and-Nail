@@ -396,7 +396,7 @@ const VerificationsPendingView: React.FC = () => {
           documents: u.documents ?? [],
           certificates: u.certificates ?? [],
           workPhotos: u.workPhotos ?? [],
-
+          categories: u.categories ?? [],
           address: Array.isArray(u.address)
             ? u.address.map((a) => a.street).join(", ")
             : undefined,

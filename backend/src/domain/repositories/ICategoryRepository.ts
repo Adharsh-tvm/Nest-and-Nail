@@ -4,6 +4,7 @@ export interface ICategoryRepository {
   create(category: Category): Promise<Category>;
   findAll(): Promise<Category[]>;
   findBySlug(slug: string): Promise<Category | null>;
+  findByIds(ids: string[]): Promise<Category[]>;
   update(
     id: string,
     data: Partial<{

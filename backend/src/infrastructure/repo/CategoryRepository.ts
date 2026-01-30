@@ -47,6 +47,24 @@ export class CategoryRepository implements ICategoryRepository {
         );
     }
 
+    async findByIds(ids: string[]): Promise<Category[]> {
+        const docs = await CategoryModel.find({
+            _id: { $in: ids },
+            isActive: true,
+        }).lean();
+
+        return docs.map(
+            doc =>
+                new Category(
+                    doc._id.toString(),
+                    doc.name,
+                    doc.slug,
+                    doc.isActive,
+                    doc.createdAt
+                )
+        );
+    }
+
     async update(
         id: string,
         data: {

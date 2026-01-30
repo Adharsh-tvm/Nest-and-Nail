@@ -31,7 +31,7 @@ export function createUserRoutes(
         (req, res) => userProfileController.updateProfile(req, res)
     );
 
-    router.put(
+    router.patch(
         "/:userId/skills",
         authMiddleware.verify,
         userProfileController.updateSkills
@@ -41,6 +41,12 @@ export function createUserRoutes(
         "/:userId/address",
         authMiddleware.verify,
         userProfileController.updateAddress
+    );
+
+    router.patch(
+        "/:userId/categories",
+        authMiddleware.verify,
+        userProfileController.updateCategories
     );
 
     return router;

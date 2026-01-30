@@ -24,6 +24,7 @@ export function mapUserFromApi(raw: any): User {
     address: Array.isArray(raw.address) ? raw.address : [],
     documents: Array.isArray(raw.documents) ? raw.documents : [],
     certificates: Array.isArray(raw.certificates) ? raw.certificates : [],
+    categories: Array.isArray(raw.categories) ? raw.categories: [],
     workPhotos: Array.isArray(raw.workPhotos) ? raw.workPhotos : [],
 
     createdAt: raw.createdAt || undefined,
