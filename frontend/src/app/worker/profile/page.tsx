@@ -150,6 +150,53 @@ const DocumentViewerModal = ({
   );
 };
 
+// --- Confirmation Modal ---
+
+const ConfirmationModal = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  title,
+  message,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  title: string;
+  message: string;
+}) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+      <div
+        className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
+        onClick={onClose}
+      />
+      <div className="relative bg-white w-full max-w-md rounded-2xl shadow-xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+        <div className="p-6">
+          <h3 className="text-lg font-bold text-gray-900 mb-2">{title}</h3>
+          <p className="text-gray-600">{message}</p>
+        </div>
+        <div className="px-6 py-4 bg-gray-50 flex justify-end gap-3">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-200 rounded-lg transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            className="px-4 py-2 text-sm font-bold bg-[#1B4332] text-white rounded-lg hover:bg-[#143326] transition-colors"
+          >
+            Confirm
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // --- View Components ---
 
 interface ViewProps {
@@ -161,6 +208,8 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
   const [isEditingDetails, setIsEditingDetails] = useState(false);
   const [isEditingSkills, setIsEditingSkills] = useState(false);
   const [isEditingCategories, setIsEditingCategories] = useState(false);
+  const [isCategorySaveConfirmOpen, setIsCategorySaveConfirmOpen] =
+    useState(false);
   const [formData, setFormData] = useState<User>(user);
   const [newSkill, setNewSkill] = useState("");
   const [viewingDocument, setViewingDocument] = useState<string | null>(null);
@@ -278,8 +327,8 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
         categories: currentCats.filter((c) => c !== catId),
       }));
     } else {
-      if (currentCats.length >= 3) {
-        toast.error("You can select up to 3 categories");
+      if (currentCats.length >= 10) {
+        toast.error("You can select up to 10 categories");
         return;
       }
       setFormData((prev) => ({
@@ -289,7 +338,12 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
     }
   };
 
-  const handleSaveCategories = async () => {
+  const handleSaveCategoriesClick = () => {
+    setIsCategorySaveConfirmOpen(true);
+  };
+
+  const confirmSaveCategories = async () => {
+    setIsCategorySaveConfirmOpen(false);
     // 1. Optimistic Update
     setUser(formData);
     setIsEditingCategories(false);
@@ -444,8 +498,8 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
                     <span
                       key={i}
                       className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium border ${isEditingSkills
-                          ? "bg-white border-[#1B4332] text-[#1B4332]"
-                          : "bg-[#1B4332]/5 border-[#1B4332]/10 text-[#1B4332]"
+                        ? "bg-white border-[#1B4332] text-[#1B4332]"
+                        : "bg-[#1B4332]/5 border-[#1B4332]/10 text-[#1B4332]"
                         }`}
                     >
                       {skill}
@@ -503,7 +557,7 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
                     Cancel
                   </button>
                   <button
-                    onClick={handleSaveCategories}
+                    onClick={handleSaveCategoriesClick}
                     className="text-sm font-medium bg-[#1B4332] text-white px-4 py-2 rounded-md hover:bg-[#143326] transition-colors flex items-center gap-2"
                   >
                     <Save size={16} /> Save
@@ -518,6 +572,13 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
                 </button>
               )}
             </div>
+            <ConfirmationModal
+              isOpen={isCategorySaveConfirmOpen}
+              onClose={() => setIsCategorySaveConfirmOpen(false)}
+              onConfirm={confirmSaveCategories}
+              title="Save Categories"
+              message="Are you sure you want to save these categories? You can select up to 10 categories."
+            />
             <div className="p-8">
               <div className="flex flex-wrap gap-3 mb-6">
                 {(isEditingCategories ? formData.categories : user.categories)
@@ -568,8 +629,8 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
                           key={cat.id}
                           onClick={() => handleToggleCategory(cat.id)}
                           className={`text-left px-4 py-2 rounded-lg text-sm transition-all border ${isSelected
-                              ? "bg-[#1B4332] text-white border-[#1B4332]"
-                              : "bg-gray-50 text-gray-600 border-gray-100 hover:border-gray-200"
+                            ? "bg-[#1B4332] text-white border-[#1B4332]"
+                            : "bg-gray-50 text-gray-600 border-gray-100 hover:border-gray-200"
                             }`}
                         >
                           <div className="flex justify-between items-center">
@@ -1111,8 +1172,8 @@ const UserProfile = () => {
                   <Icon
                     size={18}
                     className={`mr-2.5 ${isActive
-                        ? "text-[#1B4332]"
-                        : "text-gray-400 group-hover:text-gray-500"
+                      ? "text-[#1B4332]"
+                      : "text-gray-400 group-hover:text-gray-500"
                       }`}
                   />
                   {tab.label}
