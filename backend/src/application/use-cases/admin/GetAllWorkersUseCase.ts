@@ -1,6 +1,6 @@
 import { IWorkerRepository } from "../../../domain/repositories/IWorkerRepository";
 import { UserResponseDTO } from "../../dtos/UserDTO";
-import { IGetAllWorkersUseCase } from "../../interfaces/IGetAllWorkersUseCase";
+import { IGetAllWorkersUseCase } from "../../interfaces/admin/IGetAllWorkersUseCase";
 import { UserMapper } from "../../mappers/UserMapper";
 
 export class GetAllWorkersUseCase implements IGetAllWorkersUseCase {

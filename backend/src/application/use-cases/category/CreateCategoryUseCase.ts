@@ -1,6 +1,6 @@
 import { ICategoryRepository } from "../../../domain/repositories/ICategoryRepository";
 import { Category } from "../../../domain/entities/Category";
-import { ICreateCategoryUseCase } from "../../interfaces/ICreateCategoryUseCase";
+import { ICreateCategoryUseCase } from "../../interfaces/category/ICreateCategoryUseCase";
 
 export class CreateCategoryUseCase implements ICreateCategoryUseCase {
   constructor(private readonly _categoryRepo: ICategoryRepository) { }

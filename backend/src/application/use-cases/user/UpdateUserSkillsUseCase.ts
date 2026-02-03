@@ -1,7 +1,7 @@
 import { IUserRepositoryFactory } from "../../../domain/repositories/IUserRepositoryFactory";
 import { Role } from "../../../shared/enums/authEnums";
 import { UserResponseDTO } from "../../dtos/UserDTO";
-import { IUpdateUserSkillsUseCase } from "../../interfaces/IUpdateUserSkillsUseCase";
+import { IUpdateUserSkillsUseCase } from "../../interfaces/user/IUpdateUserSkillsUseCase";
 import { UserMapper } from "../../mappers/UserMapper";
 
 export class UpdateUserSkillsUseCase implements IUpdateUserSkillsUseCase {
@@ -10,22 +10,22 @@ export class UpdateUserSkillsUseCase implements IUpdateUserSkillsUseCase {
     ) { }
 
     async execute(userId: string, skills: string[]): Promise<UserResponseDTO> {
-        
+
         const workerRepo = this._userRepositoryFactory.getRepository(Role.WORKER);
         const clientRepo = this._userRepositoryFactory.getRepository(Role.CLIENT);
 
         let user = await workerRepo.findById(userId);
         let repo = workerRepo;
 
-        if(!user) {
+        if (!user) {
             user = await clientRepo.findById(userId);
             repo = clientRepo;
         }
 
-        if(!user) throw new Error("User Not Found");
+        if (!user) throw new Error("User Not Found");
 
         const normalizedSkills = [
-            ...new Set(skills.map(s=>s.trim()).filter(Boolean)),
+            ...new Set(skills.map(s => s.trim()).filter(Boolean)),
         ];
 
         const updated = await repo.updateById(userId, {

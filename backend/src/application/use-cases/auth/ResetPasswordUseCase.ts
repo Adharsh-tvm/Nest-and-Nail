@@ -1,8 +1,8 @@
 import { IOtpRepository } from "../../../domain/repositories/IOtpRepository";
-import { ILogger } from "../../interfaces/ILogger";
-import { IPasswordHasher } from "../../services/IPasswordHasher";
+import { ILogger } from "../../../infrastructure/logger/ILogger";
+import { IPasswordHasher } from "../../contracts/IPasswordHasher";
 import { Role } from "../../../shared/enums/authEnums";
-import { IResetPasswordUseCase } from "../../interfaces/IResetPasswordUseCase";
+import { IResetPasswordUseCase } from "../../interfaces/auth/IResetPasswordUseCase";
 import { IUserRepositoryFactory } from "../../../domain/repositories/IUserRepositoryFactory";
 
 export class ResetPasswordUseCase implements IResetPasswordUseCase {

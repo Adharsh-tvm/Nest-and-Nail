@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
-import { ICreateCategoryUseCase } from "../../application/interfaces/ICreateCategoryUseCase";
-import { IGetAllCategoriesUseCase } from "../../application/interfaces/IGetAllCategoriesUseCase";
-import { IUpdateCategoryUseCase } from "../../application/interfaces/IUpdateCategoryUseCase";
+import { ICreateCategoryUseCase } from "../../application/interfaces/category/ICreateCategoryUseCase";
+import { IGetAllCategoriesUseCase } from "../../application/interfaces/category/IGetAllCategoriesUseCase";
+import { IUpdateCategoryUseCase } from "../../application/interfaces/category/IUpdateCategoryUseCase";
 import { ICategoryController } from "../interfaces/ICategoryController";
 import { ResponseHandler } from "../../shared/responses/ApiResponse";
 import { RESPONSE_MESSAGES } from "../../shared/responses/ResponseMessages";
 import { HttpStatusCode } from "../../shared/enums/httpCodes";
-import { IUpdateCategoryStatusUseCase } from "../../application/interfaces/IUpdateCategoryStatusUseCase";
+import { IUpdateCategoryStatusUseCase } from "../../application/interfaces/category/IUpdateCategoryStatusUseCase";
 
 export class CategoryController implements ICategoryController {
     constructor(

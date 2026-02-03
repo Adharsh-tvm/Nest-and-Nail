@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
 import { IAdminController } from "../interfaces/IAdminController";
-import { IGetAllClientsUseCase } from "../../application/interfaces/IGetAllClientsUseCase";
-import { IGetAllWorkersUseCase } from "../../application/interfaces/IGetAllWorkersUseCase";
+import { IGetAllClientsUseCase } from "../../application/interfaces/admin/IGetAllClientsUseCase";
+import { IGetAllWorkersUseCase } from "../../application/interfaces/admin/IGetAllWorkersUseCase";
 import { HttpStatusCode } from "../../shared/enums/httpCodes";
-import { IUpdateVerificationStatusUseCase } from "../../application/interfaces/IUpdateVerificationStatusUseCase";
+import { IUpdateVerificationStatusUseCase } from "../../application/interfaces/admin/IUpdateVerificationStatusUseCase";
 import { VerificationStatus } from "../../shared/enums/authEnums";
-import { IUpdateUserAccessUseCase } from "../../application/interfaces/IUpdateUserAccessUseCase";
+import { IUpdateUserAccessUseCase } from "../../application/interfaces/admin/IUpdateUserAccessUseCase";
 import { ResponseHandler } from "../../shared/responses/ApiResponse";
 import { RESPONSE_MESSAGES } from "../../shared/responses/ResponseMessages";
 

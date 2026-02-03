@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { IGoogleSignUpUseCase } from "../../application/interfaces/IGoogleSignUpUseCase";
+import { IGoogleSignUpUseCase } from "../../application/interfaces/auth/IGoogleSignUpUseCase";
 import { HttpStatusCode } from "../../shared/enums/httpCodes";
 import { IGoogleAuthController } from "../interfaces/IGoogleAuthController";
 import { ResponseHandler } from "../../shared/responses/ApiResponse";

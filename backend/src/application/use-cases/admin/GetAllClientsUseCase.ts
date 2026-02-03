@@ -1,6 +1,6 @@
 import { IClientRepository } from "../../../domain/repositories/IClientRepository";
 import { UserResponseDTO } from "../../dtos/UserDTO";
-import { IGetAllClientsUseCase } from "../../interfaces/IGetAllClientsUseCase";
+import { IGetAllClientsUseCase } from "../../interfaces/admin/IGetAllClientsUseCase";
 import { UserMapper } from "../../mappers/UserMapper";
 
 export class GetAllClientsUseCase implements IGetAllClientsUseCase {

@@ -1,5 +1,5 @@
 import { ICategoryRepository } from "../../../domain/repositories/ICategoryRepository";
-import { IUpdateCategoryUseCase } from "../../interfaces/IUpdateCategoryUseCase";
+import { IUpdateCategoryUseCase } from "../../interfaces/category/IUpdateCategoryUseCase";
 
 export class UpdateCategoryUseCase implements IUpdateCategoryUseCase {
     constructor(private readonly _categoryRepo: ICategoryRepository) { }

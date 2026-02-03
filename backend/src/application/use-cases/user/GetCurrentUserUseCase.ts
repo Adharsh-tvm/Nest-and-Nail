@@ -1,7 +1,7 @@
 import { AuthenticationError, UserBlockedError, UserNotFoundError } from "../../../domain/errors/DomainError";
 import { UserResponseDTO } from "../../dtos/UserDTO";
-import { IGetCurrentUserUseCase } from "../../interfaces/IGetCurrentUserUseCase";
-import { ILogger } from "../../interfaces/ILogger";
+import { IGetCurrentUserUseCase } from "../../interfaces/user/IGetCurrentUserUseCase";
+import { ILogger } from "../../../infrastructure/logger/ILogger";
 import { UserMapper } from "../../mappers/UserMapper";
 import { Role } from "../../../shared/enums/authEnums";
 import { IUserRepositoryFactory } from "../../../domain/repositories/IUserRepositoryFactory";

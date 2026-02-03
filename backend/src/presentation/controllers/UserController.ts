@@ -1,14 +1,14 @@
 import { Request, Response } from "express";
 import { HttpStatusCode } from "../../shared/enums/httpCodes";
 import { IUserController } from "../interfaces/IUserController";
-import { IChangeUserRoleUseCase } from "../../application/interfaces/IChangeUserRoleUseCase";
-import { IGetCurrentUserUseCase } from "../../application/interfaces/IGetCurrentUserUseCase";
+import { IChangeUserRoleUseCase } from "../../application/interfaces/user/IChangeUserRoleUseCase";
+import { IGetCurrentUserUseCase } from "../../application/interfaces/user/IGetCurrentUserUseCase";
 import {
     AuthenticationError,
     UserBlockedError,
     UserNotFoundError
 } from "../../domain/errors/DomainError";
-import { IGetAllUsersUseCase } from "../../application/interfaces/IGetAllUsersUseCase";
+import { IGetAllUsersUseCase } from "../../application/interfaces/admin/IGetAllUsersUseCase";
 import { ResponseHandler } from "../../shared/responses/ApiResponse";
 import { LoginResponseDTO } from "../../application/dtos/UserDTO";
 import { RESPONSE_MESSAGES } from "../../shared/responses/ResponseMessages";

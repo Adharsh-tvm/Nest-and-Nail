@@ -1,5 +1,5 @@
 import { ICategoryRepository } from "../../../domain/repositories/ICategoryRepository";
-import { IUpdateCategoryStatusUseCase } from "../../interfaces/IUpdateCategoryStatusUseCase";
+import { IUpdateCategoryStatusUseCase } from "../../interfaces/category/IUpdateCategoryStatusUseCase";
 
 export class UpdateCategoryStatusUseCase implements IUpdateCategoryStatusUseCase {
 
