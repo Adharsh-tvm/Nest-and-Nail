@@ -2,6 +2,7 @@ import { AdminController } from "../../presentation/controllers/AdminController"
 import { AuthController } from "../../presentation/controllers/AuthController";
 import { CategoryController } from "../../presentation/controllers/CategoryController";
 import { GoogleAuthController } from "../../presentation/controllers/GoogleAuthController";
+import { ServiceRequestController } from "../../presentation/controllers/ServiceRequestController";
 import { UploadController } from "../../presentation/controllers/UploadController";
 import { UserController } from "../../presentation/controllers/UserController";
 import { UserProfileController } from "../../presentation/controllers/UserProfileController";
@@ -9,6 +10,7 @@ import { IAdminController } from "../../presentation/interfaces/IAdminController
 import { IAuthController } from "../../presentation/interfaces/IAuthController";
 import { ICategoryController } from "../../presentation/interfaces/ICategoryController";
 import { IGoogleAuthController } from "../../presentation/interfaces/IGoogleAuthController";
+import { IServiceRequestController } from "../../presentation/interfaces/IServiceRequestController";
 import { IUploadController } from "../../presentation/interfaces/IUploadController";
 import { IUserController } from "../../presentation/interfaces/IUserController";
 import { IUserProfileController } from "../../presentation/interfaces/IUserProfileController";
@@ -28,6 +30,8 @@ export class ControllerDI {
     private _userProfileController?: IUserProfileController;
 
     private _categoryController?: ICategoryController;
+
+    private _serviceRequestController?: IServiceRequestController;
 
     constructor(
         private _useCases: UseCaseDI,
@@ -120,6 +124,18 @@ export class ControllerDI {
             )
         }
         return this._categoryController
+    }
+
+    get serviceRequestController(): IServiceRequestController {
+        if (!this._serviceRequestController) {
+            this._serviceRequestController = new ServiceRequestController(
+                this._useCases.createServiceRequestUseCase,
+                this._useCases.getOpenServiceRequestsUseCase,
+                this._useCases.reserveServiceRequestUseCase,
+                this._useCases.releaseServiceRequestUseCase
+            )
+        }
+        return this._serviceRequestController;
     }
 }
 

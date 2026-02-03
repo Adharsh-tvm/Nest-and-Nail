@@ -11,6 +11,7 @@ import { createGoogleAuthRoutes } from "./presentation/routes/auth/GoogleAuthRou
 import { createAdminRoutes } from "./presentation/routes/admin/adminRoutes";
 import { createUserRoutes } from "./presentation/routes/user/userRoutes";
 import { createUploadRoutes } from "./presentation/routes/user/uploadRoutes";
+import { createServiceRequestRoutes } from "./presentation/routes/serviceRequest/serviceRequest.routes";
 
 dotenv.config();
 
@@ -51,6 +52,7 @@ async function bootstrap() {
 
   app.use("/api/users", createUserRoutes(container.controllers.userController, container.controllers.userProfileController, container.controllers.authMiddleware))
 
+  app.use("/api/service-requests", createServiceRequestRoutes(container.controllers.serviceRequestController))
 
   // Error Handler
   app.use(errorHandler);
