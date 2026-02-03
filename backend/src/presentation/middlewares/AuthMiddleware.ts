@@ -1,6 +1,6 @@
 // src/presentation/middlewares/AuthMiddleware.ts
 import { Request, Response, NextFunction, RequestHandler } from "express";
-import { ITokenService } from "../../application/services/ITokenService";
+import { ITokenService } from "../../application/contracts/ITokenService";
 import { HttpStatusCode } from "../../shared/enums/httpCodes";
 
 declare global {

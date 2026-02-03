@@ -1,8 +1,8 @@
-import { IGetAllUsersUseCase } from "../../interfaces/IGetAllUsersUseCase";
+import { IGetAllUsersUseCase } from "../../interfaces/admin/IGetAllUsersUseCase";
 import { Role } from "../../../shared/enums/authEnums";
 import { UserMapper } from "../../mappers/UserMapper";
 import { UserResponseDTO } from "../../dtos/UserDTO";
-import { ILogger } from "../../interfaces/ILogger";
+import { ILogger } from "../../../infrastructure/logger/ILogger";
 import { IUserRepositoryFactory } from "../../../domain/repositories/IUserRepositoryFactory";
 
 export class GetAllUsersUseCase implements IGetAllUsersUseCase {

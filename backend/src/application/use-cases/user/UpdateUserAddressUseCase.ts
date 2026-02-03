@@ -1,6 +1,6 @@
 import { IUserRepositoryFactory } from "../../../domain/repositories/IUserRepositoryFactory";
 import { Role } from "../../../shared/enums/authEnums";
-import { IUpdateUserAddressUseCase } from "../../interfaces/IUpdateUserAddressUseCase";
+import { IUpdateUserAddressUseCase } from "../../interfaces/user/IUpdateUserAddressUseCase";
 import { UserMapper } from "../../mappers/UserMapper";
 
 export class UpdateUserAddressUseCase implements IUpdateUserAddressUseCase {

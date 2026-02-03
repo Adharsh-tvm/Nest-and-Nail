@@ -1,34 +1,34 @@
-import { IChangeUserRoleUseCase } from "../../application/interfaces/IChangeUserRoleUseCase";
-import { ICreateCategoryUseCase } from "../../application/interfaces/ICreateCategoryUseCase";
-import { IForgotPasswordUseCase } from "../../application/interfaces/IForgotPasswordUseCase";
-import { IGetAllCategoriesUseCase } from "../../application/interfaces/IGetAllCategoriesUseCase";
-import { IGetAllClientsUseCase } from "../../application/interfaces/IGetAllClientsUseCase";
-import { IGetAllUsersUseCase } from "../../application/interfaces/IGetAllUsersUseCase";
-import { IGetAllWorkersUseCase } from "../../application/interfaces/IGetAllWorkersUseCase";
-import { IGetCurrentUserUseCase } from "../../application/interfaces/IGetCurrentUserUseCase";
-import { IGoogleSignUpUseCase } from "../../application/interfaces/IGoogleSignUpUseCase";
-import { ILoginUserUseCase } from "../../application/interfaces/ILoginUserUseCase";
-import { IRefreshTokenUseCase } from "../../application/interfaces/IRefreshTokenUseCase";
-import { IRegisterUserUseCase } from "../../application/interfaces/IRegisterUserUseCase";
-import { IResetPasswordUseCase } from "../../application/interfaces/IResetPasswordUseCase";
-import { ISendOtpUseCase } from "../../application/interfaces/ISendOtpUseCase";
-import { IUpdateCategoryStatusUseCase } from "../../application/interfaces/IUpdateCategoryStatusUseCase";
-import { IUpdateCategoryUseCase } from "../../application/interfaces/IUpdateCategoryUseCase";
-import { IUpdateUserAccessUseCase } from "../../application/interfaces/IUpdateUserAccessUseCase";
-import { IUpdateUserAddressUseCase } from "../../application/interfaces/IUpdateUserAddressUseCase";
+import { IChangeUserRoleUseCase } from "../../application/interfaces/user/IChangeUserRoleUseCase";
+import { ICreateCategoryUseCase } from "../../application/interfaces/category/ICreateCategoryUseCase";
+import { IForgotPasswordUseCase } from "../../application/interfaces/auth/IForgotPasswordUseCase";
+import { IGetAllCategoriesUseCase } from "../../application/interfaces/category/IGetAllCategoriesUseCase";
+import { IGetAllClientsUseCase } from "../../application/interfaces/admin/IGetAllClientsUseCase";
+import { IGetAllUsersUseCase } from "../../application/interfaces/admin/IGetAllUsersUseCase";
+import { IGetAllWorkersUseCase } from "../../application/interfaces/admin/IGetAllWorkersUseCase";
+import { IGetCurrentUserUseCase } from "../../application/interfaces/user/IGetCurrentUserUseCase";
+import { IGoogleSignUpUseCase } from "../../application/interfaces/auth/IGoogleSignUpUseCase";
+import { ILoginUserUseCase } from "../../application/interfaces/auth/ILoginUserUseCase";
+import { IRefreshTokenUseCase } from "../../application/interfaces/auth/IRefreshTokenUseCase";
+import { IRegisterUserUseCase } from "../../application/interfaces/auth/IRegisterUserUseCase";
+import { IResetPasswordUseCase } from "../../application/interfaces/auth/IResetPasswordUseCase";
+import { ISendOtpUseCase } from "../../application/interfaces/auth/ISendOtpUseCase";
+import { IUpdateCategoryStatusUseCase } from "../../application/interfaces/category/IUpdateCategoryStatusUseCase";
+import { IUpdateCategoryUseCase } from "../../application/interfaces/category/IUpdateCategoryUseCase";
+import { IUpdateUserAccessUseCase } from "../../application/interfaces/admin/IUpdateUserAccessUseCase";
+import { IUpdateUserAddressUseCase } from "../../application/interfaces/user/IUpdateUserAddressUseCase";
 import { IUpdateUserProfileUseCase } from "../../application/interfaces/IUpdateUserProfileUseCase";
-import { IUpdateUserSkillsUseCase } from "../../application/interfaces/IUpdateUserSkillsUseCase";
-import { IUpdateVerificationStatusUseCase } from "../../application/interfaces/IUpdateVerificationStatusUseCase";
-import { IUpdateWorkerCategoriesUseCase } from "../../application/interfaces/IUpdateWorkerCategoriesUseCase";
-import { IUploadProfilePictureUseCase } from "../../application/interfaces/IUploadProfilePictureUseCase";
-import { IUploadWorkerDocumentUseCase } from "../../application/interfaces/IUploadWorkerDocumentUseCase";
-import { IVerifyOtpUseCase } from "../../application/interfaces/IVerifyOtpUseCase";
+import { IUpdateUserSkillsUseCase } from "../../application/interfaces/user/IUpdateUserSkillsUseCase";
+import { IUpdateVerificationStatusUseCase } from "../../application/interfaces/admin/IUpdateVerificationStatusUseCase";
+import { IUpdateWorkerCategoriesUseCase } from "../../application/interfaces/worker/IUpdateWorkerCategoriesUseCase";
+import { IUploadProfilePictureUseCase } from "../../application/interfaces/user/IUploadProfilePictureUseCase";
+import { IUploadWorkerDocumentUseCase } from "../../application/interfaces/user/IUploadWorkerDocumentUseCase";
+import { IVerifyOtpUseCase } from "../../application/interfaces/auth/IVerifyOtpUseCase";
 import { GetAllClientsUseCase } from "../../application/use-cases/admin/GetAllClientsUseCase";
 import { GetAllUsersUseCase } from "../../application/use-cases/admin/GetAllUsersUseCase";
 import { GetAllWorkersUseCase } from "../../application/use-cases/admin/GetAllWorkersUseCase";
 import { UpdateUserAccessUseCase } from "../../application/use-cases/admin/UpdateUserAccessUseCase";
 import { UpdateVerificationStatusUseCase } from "../../application/use-cases/admin/UpdateVerificationStatusUseCase";
-import { UploadProfilePictureUseCase } from "../../application/use-cases/admin/UploadProfilePictureUseCase";
+import { UploadProfilePictureUseCase } from "../../application/use-cases/user/UploadProfilePictureUseCase";
 import { ForgotPasswordUseCase } from "../../application/use-cases/auth/ForgotPasswordUseCase";
 import { GoogleSignUpUseCase } from "../../application/use-cases/auth/GoogleSignUpUseCase";
 import { LoginUserUseCase } from "../../application/use-cases/auth/LoginUserUseCase";
@@ -46,7 +46,7 @@ import { GetCurrentUserUseCase } from "../../application/use-cases/user/GetCurre
 import { UpdateUserAddressUseCase } from "../../application/use-cases/user/UpdateUserAddressUseCase";
 import { UpdateUserProfileUseCase } from "../../application/use-cases/user/UpdateUserProfileUseCase";
 import { UpdateUserSkillsUseCase } from "../../application/use-cases/user/UpdateUserSkillsUseCase";
-import { UpdateWorkerCategoriesUseCase } from "../../application/use-cases/user/UpdateWorkerCategoriesUseCase";
+import { UpdateWorkerCategoriesUseCase } from "../../application/use-cases/worker/UpdateWorkerCategoriesUseCase";
 import { UploadWorkerDocumentUseCase } from "../../application/use-cases/user/UploadWorkerDocumentUseCase";
 import { InfrastructureDI } from "./infrastructure.di";
 
@@ -316,9 +316,9 @@ export class UseCaseDI {
     }
     return this._getAllCategoriesUseCase
   }
-  
+
   get updateCategoryUseCase(): IUpdateCategoryUseCase {
-    if(!this._updateCategoryUseCase) {
+    if (!this._updateCategoryUseCase) {
       this._updateCategoryUseCase = new UpdateCategoryUseCase(
         this.infra.categoryRepository
       )
@@ -336,13 +336,13 @@ export class UseCaseDI {
   }
 
   get updateWorkerCategoriesUseCase(): IUpdateWorkerCategoriesUseCase {
-    if(!this._updateWorkerCategoriesUseCase) {
+    if (!this._updateWorkerCategoriesUseCase) {
       this._updateWorkerCategoriesUseCase = new UpdateWorkerCategoriesUseCase(
         this.infra.userRepositoryFactory,
         this.infra.categoryRepository
       )
     }
     return this._updateWorkerCategoriesUseCase
-  } 
+  }
 
 }

@@ -1,10 +1,10 @@
 import { InvalidCredentialsError, UserBlockedError } from "../../../domain/errors/DomainError";
 import { LoginUserDTO, UserResponseDTO } from "../../dtos/UserDTO";
-import { ILogger } from "../../interfaces/ILogger";
-import { ILoginUserUseCase } from "../../interfaces/ILoginUserUseCase";
+import { ILogger } from "../../../infrastructure/logger/ILogger";
+import { ILoginUserUseCase } from "../../interfaces/auth/ILoginUserUseCase";
 import { UserMapper } from "../../mappers/UserMapper";
-import { IPasswordHasher } from "../../services/IPasswordHasher";
-import { ITokenService } from "../../services/ITokenService";
+import { IPasswordHasher } from "../../contracts/IPasswordHasher";
+import { ITokenService } from "../../contracts/ITokenService";
 import { Role } from "../../../shared/enums/authEnums";
 import { User } from "../../../domain/entities/User";
 import { IUserRepositoryFactory } from "../../../domain/repositories/IUserRepositoryFactory";

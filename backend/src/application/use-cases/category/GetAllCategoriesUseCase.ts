@@ -1,7 +1,7 @@
 import { ICategoryRepository } from "../../../domain/repositories/ICategoryRepository";
-import { IGetAllCategoriesUseCase } from "../../interfaces/IGetAllCategoriesUseCase";
+import { IGetAllCategoriesUseCase } from "../../interfaces/category/IGetAllCategoriesUseCase";
 
-export class GetAllCategoriesUseCase implements IGetAllCategoriesUseCase{
+export class GetAllCategoriesUseCase implements IGetAllCategoriesUseCase {
     constructor(private readonly _categoryRepo: ICategoryRepository) { }
 
     async execute() {

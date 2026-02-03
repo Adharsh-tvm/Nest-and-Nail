@@ -1,4 +1,4 @@
-import { ILogger } from "../../application/interfaces/ILogger";
+import { ILogger } from "./ILogger";
 import { loggerInstance } from "./Logger";
 
 export class WinstonLogger implements ILogger {

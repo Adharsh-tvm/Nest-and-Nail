@@ -1,10 +1,10 @@
-import { IUpdateVerificationStatusUseCase } from "../../interfaces/IUpdateVerificationStatusUseCase";
+import { IUpdateVerificationStatusUseCase } from "../../interfaces/admin/IUpdateVerificationStatusUseCase";
 import { VerificationStatus } from "../../../shared/enums/authEnums";
 import { UserMapper } from "../../mappers/UserMapper";
-import { ILogger } from "../../interfaces/ILogger";
+import { ILogger } from "../../../infrastructure/logger/ILogger";
 import { Role } from "../../../shared/enums/authEnums";
 import { IUserRepositoryFactory } from "../../../domain/repositories/IUserRepositoryFactory";
-import { IEmailService } from "../../services/IEmailService";
+import { IEmailService } from "../../contracts/IEmailService";
 
 export class UpdateVerificationStatusUseCase implements IUpdateVerificationStatusUseCase {
     constructor(

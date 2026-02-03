@@ -4,9 +4,9 @@ import { IUpdateUserProfileUseCase } from "../../application/interfaces/IUpdateU
 import { IUserProfileController } from "../interfaces/IUserProfileController";
 import { ResponseHandler } from "../../shared/responses/ApiResponse";
 import { RESPONSE_MESSAGES } from "../../shared/responses/ResponseMessages";
-import { IUpdateUserSkillsUseCase } from "../../application/interfaces/IUpdateUserSkillsUseCase";
-import { IUpdateUserAddressUseCase } from "../../application/interfaces/IUpdateUserAddressUseCase";
-import { IUpdateWorkerCategoriesUseCase } from "../../application/interfaces/IUpdateWorkerCategoriesUseCase";
+import { IUpdateUserSkillsUseCase } from "../../application/interfaces/user/IUpdateUserSkillsUseCase";
+import { IUpdateUserAddressUseCase } from "../../application/interfaces/user/IUpdateUserAddressUseCase";
+import { IUpdateWorkerCategoriesUseCase } from "../../application/interfaces/worker/IUpdateWorkerCategoriesUseCase";
 
 export class UserProfileController implements IUserProfileController {
 
