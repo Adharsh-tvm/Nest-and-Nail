@@ -1,12 +1,12 @@
 import { ServiceRequest } from "../../domain/entities/ServiceRequest";
-import { ServiceRequestResponseDTO } from "../dtos/ServiceRequestDTO";
+import { CreateServiceRequestDTO, ServiceRequestResponseDTO } from "../dtos/ServiceRequestDTO";
 
 export class ServiceRequestMapper {
     static toResponseDTO(
         entity: ServiceRequest
     ): ServiceRequestResponseDTO {
         return {
-            requestId: entity.id,
+            requestId: entity.requestId,
             title: entity.title,
             description: entity.description,
             category: entity.category,
@@ -28,28 +28,12 @@ export class ServiceRequestMapper {
     }
 
     static fromCreateDTO(
-        dto: {
-            title: string,
-            description: string;
-            category: string;
-            location: { lat: number; lng: number };
-            budget?: number;
-            servicePhotos?: string[];
-        },
+        dto: CreateServiceRequestDTO,
         clientId: string
-    ): Partial<ServiceRequest> {
+    ): CreateServiceRequestDTO & { clientId: string } {
         return {
-            clientId,
-            title: dto.title,
-            description: dto.description,
-            category: dto.category,
-            location: {
-                type: "Point",
-                coordinates: [dto.location.lng, dto.location.lat]
-            },
-            budget: dto.budget,
-
-            servicePhotos: dto.servicePhotos ?? []
+            ...dto,
+            clientId
         };
     }
 }

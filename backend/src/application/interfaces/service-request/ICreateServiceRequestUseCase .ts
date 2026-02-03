@@ -1,16 +1,8 @@
 import { ServiceRequest } from "../../../domain/entities/ServiceRequest";
+import { CreateServiceRequestDTO } from "../../dtos/ServiceRequestDTO";
 
 export interface ICreateServiceRequestUseCase {
     execute(
-        data: Omit<
-            ServiceRequest,
-            | "id"
-            | "requestId"
-            | "status"
-            | "reservedBy"
-            | "reservationExpiresAt"
-            | "createdAt"
-            | "updatedAt"
-        >
+        data: CreateServiceRequestDTO & { clientId: string }
     ): Promise<ServiceRequest>;
 }

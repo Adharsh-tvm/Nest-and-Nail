@@ -22,6 +22,10 @@ import { JwtTokenService } from "../adapters/JwtTokenService";
 import { NodemailerEmailService } from "../adapters/NodemailerEmailService";
 import { OtpService } from "../adapters/OtpService";
 import { UUIDGenerator } from "../adapters/UUIDGenerator";
+import { IServiceRequestRepository } from "../../domain/repositories/IServiceRequestRepository";
+import { ServiceRequestRespository } from "../repo/ServiceRequestRepository";
+import { IGenerateServiceRequestId } from "../../application/contracts/IGenerateServiceRequestId";
+import { ServiceRequestIdGenerator } from "../adapters/ServiceRequestIdGenerator";
 
 export class InfrastructureDI {
   private _userRepositoryFactory?: IUserRepositoryFactory;
@@ -40,6 +44,9 @@ export class InfrastructureDI {
   private _emailService?: IEmailService;
 
   private _categoryRepository?: ICategoryRepository;
+
+  private _serviceRequestRepository?: IServiceRequestRepository;
+  private _serviceRequestIdGenerator?: IGenerateServiceRequestId;
 
 
 
@@ -132,5 +139,18 @@ export class InfrastructureDI {
     return this._emailService;
   }
 
+  get serviceRequestRepository(): IServiceRequestRepository {
+    if (!this._serviceRequestRepository) {
+      this._serviceRequestRepository = new ServiceRequestRespository();
+    }
+    return this._serviceRequestRepository;
+  }
+
+  get serviceRequestIdGenerator(): IGenerateServiceRequestId {
+    if (!this._serviceRequestIdGenerator) {
+      this._serviceRequestIdGenerator = new ServiceRequestIdGenerator();
+    }
+    return this._serviceRequestIdGenerator;
+  }
 }
 

@@ -6,6 +6,7 @@ export const RESPONSE_MESSAGES = {
   FORBIDDEN: "Forbidden",
   NOT_FOUND: "Resource not found",
   INTERNAL_SERVER_ERROR: "Internal server error",
+  CREATED: "Created",
 
   // Auth
   REGISTER_SUCCESS: "User registered successfully",

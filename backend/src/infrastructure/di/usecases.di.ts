@@ -16,7 +16,7 @@ import { IUpdateCategoryStatusUseCase } from "../../application/interfaces/categ
 import { IUpdateCategoryUseCase } from "../../application/interfaces/category/IUpdateCategoryUseCase";
 import { IUpdateUserAccessUseCase } from "../../application/interfaces/admin/IUpdateUserAccessUseCase";
 import { IUpdateUserAddressUseCase } from "../../application/interfaces/user/IUpdateUserAddressUseCase";
-import { IUpdateUserProfileUseCase } from "../../application/interfaces/IUpdateUserProfileUseCase";
+import { IUpdateUserProfileUseCase } from "../../application/interfaces/user/IUpdateUserProfileUseCase";
 import { IUpdateUserSkillsUseCase } from "../../application/interfaces/user/IUpdateUserSkillsUseCase";
 import { IUpdateVerificationStatusUseCase } from "../../application/interfaces/admin/IUpdateVerificationStatusUseCase";
 import { IUpdateWorkerCategoriesUseCase } from "../../application/interfaces/worker/IUpdateWorkerCategoriesUseCase";
@@ -49,6 +49,14 @@ import { UpdateUserSkillsUseCase } from "../../application/use-cases/user/Update
 import { UpdateWorkerCategoriesUseCase } from "../../application/use-cases/worker/UpdateWorkerCategoriesUseCase";
 import { UploadWorkerDocumentUseCase } from "../../application/use-cases/user/UploadWorkerDocumentUseCase";
 import { InfrastructureDI } from "./infrastructure.di";
+import { ICreateServiceRequestUseCase } from "../../application/interfaces/service-request/ICreateServiceRequestUseCase ";
+import { IGetOpenServiceRequestsUseCase } from "../../application/interfaces/service-request/IGetOpenServiceRequestsUseCase";
+import { IReleaseServiceRequestUseCase } from "../../application/interfaces/service-request/IReleaseServiceRequestUseCase";
+import { IReserveServiceRequestUseCase } from "../../application/interfaces/service-request/IReserveServiceRequestUseCase ";
+import { CreateServiceRequestUseCase } from "../../application/use-cases/service-request/CreateServiceRequestUseCase";
+import { GetOpenServiceRequestsUseCase } from "../../application/use-cases/service-request/GetOpenServiceRequestsUseCase";
+import { ReserveServiceRequestUseCase } from "../../application/use-cases/service-request/ReserveServiceRequestUseCase";
+import { ReleaseServiceRequestUseCase } from "../../application/use-cases/service-request/ReleaseServiceRequestUseCase";
 
 
 
@@ -88,6 +96,11 @@ export class UseCaseDI {
   private _updateCategoryStatusUseCase?: IUpdateCategoryStatusUseCase;
   private _updateCategoryUseCase?: IUpdateCategoryUseCase;
   private _updateWorkerCategoriesUseCase?: IUpdateWorkerCategoriesUseCase;
+
+  private _createServiceRequestUseCase?: ICreateServiceRequestUseCase;
+  private _getOpenServiceRequestsUseCase?: IGetOpenServiceRequestsUseCase;
+  private _releaseServiceRequestUseCase?: IReleaseServiceRequestUseCase;
+  private _reserveServiceRequestUseCase?: IReserveServiceRequestUseCase;
 
 
   constructor(private infra: InfrastructureDI) { }
@@ -345,4 +358,40 @@ export class UseCaseDI {
     return this._updateWorkerCategoriesUseCase
   }
 
+  get createServiceRequestUseCase(): ICreateServiceRequestUseCase {
+    if (!this._createServiceRequestUseCase) {
+      this._createServiceRequestUseCase = new CreateServiceRequestUseCase(
+        this.infra.serviceRequestRepository,
+        this.infra.serviceRequestIdGenerator
+      )
+    }
+    return this._createServiceRequestUseCase
+  }
+
+  get getOpenServiceRequestsUseCase(): IGetOpenServiceRequestsUseCase {
+    if (!this._getOpenServiceRequestsUseCase) {
+      this._getOpenServiceRequestsUseCase = new GetOpenServiceRequestsUseCase(
+        this.infra.serviceRequestRepository
+      )
+    }
+    return this._getOpenServiceRequestsUseCase
+  }
+
+  get reserveServiceRequestUseCase(): IReserveServiceRequestUseCase {
+    if (!this._reserveServiceRequestUseCase) {
+      this._reserveServiceRequestUseCase = new ReserveServiceRequestUseCase(
+        this.infra.serviceRequestRepository
+      )
+    }
+    return this._reserveServiceRequestUseCase;
+  }
+
+  get releaseServiceRequestUseCase(): IReleaseServiceRequestUseCase {
+    if (!this._releaseServiceRequestUseCase) {
+      this._releaseServiceRequestUseCase = new ReleaseServiceRequestUseCase(
+        this.infra.serviceRequestRepository
+      )
+    }
+    return this._releaseServiceRequestUseCase;
+  }
 }

@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import { ServiceRequest } from "../../domain/entities/ServiceRequest";
 import { IServiceRequestRepository } from "../../domain/repositories/IServiceRequestRepository";
 import { ServiceRequestStatus } from "../../shared/enums/serviceEnums";
@@ -29,23 +28,40 @@ export class ServiceRequestRespository implements IServiceRequestRepository {
         };
     }
 
-    async create(data: Partial<ServiceRequest>): Promise<ServiceRequest> {
+    async create(
+        data: Omit<ServiceRequest, "id" | "createdAt" | "updatedAt">
+    ): Promise<ServiceRequest> {
         const doc = await ServiceRequestModel.create(data);
         return this.toDomain(doc);
     }
 
     async findOpenNearby(coordinates: [number, number], radiusMeters?: number): Promise<ServiceRequest[]> {
+
+        const now = new Date();
+        const maxDistance = radiusMeters ?? 10000;
         const results = await ServiceRequestModel.find({
-            status: ServiceRequestStatus.OPEN,
-            location: {
-                $near: {
-                    $geometry: {
-                        type: "Point",
-                        coordinates
-                    },
-                    $maxDistance: radiusMeters
+            $and: [
+                {
+                    $or: [
+                        { status: ServiceRequestStatus.OPEN },
+                        {
+                            status: ServiceRequestStatus.RESERVED,
+                            reservationExpiresAt: { $lt: now }
+                        }
+                    ]
+                },
+                {
+                    location: {
+                        $near: {
+                            $geometry: {
+                                type: "Point",
+                                coordinates
+                            },
+                            $maxDistance: maxDistance
+                        }
+                    }
                 }
-            }
+            ]
         }).lean();
 
         return results.map(doc => this.toDomain(doc));
@@ -58,10 +74,18 @@ export class ServiceRequestRespository implements IServiceRequestRepository {
     }
 
     async reserveByRequestId(requestId: string, workerId: string, expiresAt: Date): Promise<boolean> {
+
+        const now = new Date();
         const updated = await ServiceRequestModel.findOneAndUpdate(
             {
                 requestId,
-                status: ServiceRequestStatus.OPEN
+                $or: [
+                    { status: ServiceRequestStatus.OPEN },
+                    {
+                        status: ServiceRequestStatus.RESERVED,
+                        reservationExpiresAt: { $lt: now }
+                    }
+                ]
             },
             {
                 $set: {
