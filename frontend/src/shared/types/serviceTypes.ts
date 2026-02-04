@@ -1,11 +1,28 @@
 export type ServiceStatus = 'pending' | 'accepted' | 'in_progress' | 'completed' | 'cancelled';
 
-export type ServiceRequest = {
+export interface ServiceRequest {
     id: string;
     title: string;
     description: string;
     category: string;
+    location: {
+        lat: number;
+        lng: number;
+    };
+    budget?: number;
+    servicePhotos?: string[];
     status: ServiceStatus;
-    images?: string[];
     createdAt: string;
-};
+}
+
+export interface CreateServiceRequestDTO {
+    title: string;
+    description: string;
+    category: string;
+    location: {
+        lat: number;
+        lng: number;
+    };
+    budget?: number;
+    servicePhotos?: string[];
+}
