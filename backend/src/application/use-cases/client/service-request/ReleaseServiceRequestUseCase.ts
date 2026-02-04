@@ -1,10 +1,10 @@
-import { IServiceRequestRepository } from "../../../domain/repositories/IServiceRequestRepository";
-import { IReleaseServiceRequestUseCase } from "../../interfaces/service-request/IReleaseServiceRequestUseCase";
+import { IServiceRequestRepository } from "../../../../domain/repositories/IServiceRequestRepository";
+import { IReleaseServiceRequestUseCase } from "../../../interfaces/client/service-request/IReleaseServiceRequestUseCase";
 
 export class ReleaseServiceRequestUseCase implements IReleaseServiceRequestUseCase {
     constructor(
         private readonly _serviceRequestRepo: IServiceRequestRepository
-    ) {}
+    ) { }
 
     async execute(requestId: string): Promise<void> {
         await this._serviceRequestRepo.releaseReservationByRequestId(

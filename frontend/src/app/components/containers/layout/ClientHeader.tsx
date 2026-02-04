@@ -147,10 +147,10 @@ const ClientHeader: React.FC = () => {
             {/* CENTER: Navigation Links */}
             <div className="hidden md:flex items-center gap-8 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
               <Link
-                href="/client/services"
+                href={userMode === "worker" ? "/worker/services" : "/client/services"}
                 className="text-gray-500 font-medium hover:text-[#1B4332] transition-colors text-sm"
               >
-                Services
+                {userMode === "worker" ? "Service Requests" : "Services"}
               </Link>
 
               <Link

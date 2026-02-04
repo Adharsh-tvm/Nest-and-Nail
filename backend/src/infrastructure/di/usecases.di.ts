@@ -49,14 +49,15 @@ import { UpdateUserSkillsUseCase } from "../../application/use-cases/user/Update
 import { UpdateWorkerCategoriesUseCase } from "../../application/use-cases/worker/UpdateWorkerCategoriesUseCase";
 import { UploadWorkerDocumentUseCase } from "../../application/use-cases/user/UploadWorkerDocumentUseCase";
 import { InfrastructureDI } from "./infrastructure.di";
-import { ICreateServiceRequestUseCase } from "../../application/interfaces/service-request/ICreateServiceRequestUseCase ";
-import { IGetOpenServiceRequestsUseCase } from "../../application/interfaces/service-request/IGetOpenServiceRequestsUseCase";
-import { IReleaseServiceRequestUseCase } from "../../application/interfaces/service-request/IReleaseServiceRequestUseCase";
-import { IReserveServiceRequestUseCase } from "../../application/interfaces/service-request/IReserveServiceRequestUseCase ";
-import { CreateServiceRequestUseCase } from "../../application/use-cases/service-request/CreateServiceRequestUseCase";
-import { GetOpenServiceRequestsUseCase } from "../../application/use-cases/service-request/GetOpenServiceRequestsUseCase";
-import { ReserveServiceRequestUseCase } from "../../application/use-cases/service-request/ReserveServiceRequestUseCase";
-import { ReleaseServiceRequestUseCase } from "../../application/use-cases/service-request/ReleaseServiceRequestUseCase";
+import { ICreateServiceRequestUseCase } from "../../application/interfaces/client/service-request/ICreateServiceRequestUseCase ";
+import { IGetOpenServiceRequestsUseCase } from "../../application/interfaces/client/service-request/IGetOpenServiceRequestsUseCase";
+import { IReleaseServiceRequestUseCase } from "../../application/interfaces/client/service-request/IReleaseServiceRequestUseCase";
+import { IReserveServiceRequestUseCase } from "../../application/interfaces/client/service-request/IReserveServiceRequestUseCase ";
+import { GetOpenServiceRequestsUseCase } from "../../application/use-cases/client/service-request/GetOpenServiceRequestsUseCase";
+import { CreateServiceRequestUseCase } from "../../application/use-cases/client/service-request/CreateServiceRequestUseCase";
+import { ReserveServiceRequestUseCase } from "../../application/use-cases/client/service-request/ReserveServiceRequestUseCase";
+import { ReleaseServiceRequestUseCase } from "../../application/use-cases/client/service-request/ReleaseServiceRequestUseCase";
+
 
 
 

@@ -1,4 +1,4 @@
-import { ServiceRequest } from "../../../domain/entities/ServiceRequest";
+import { ServiceRequest } from "../../../../domain/entities/ServiceRequest";
 
 
 export interface IGetOpenServiceRequestsUseCase {
