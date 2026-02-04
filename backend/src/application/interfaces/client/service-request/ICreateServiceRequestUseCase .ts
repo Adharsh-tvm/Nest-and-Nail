@@ -1,5 +1,5 @@
-import { ServiceRequest } from "../../../domain/entities/ServiceRequest";
-import { CreateServiceRequestDTO } from "../../dtos/ServiceRequestDTO";
+import { ServiceRequest } from "../../../../domain/entities/ServiceRequest";
+import { CreateServiceRequestDTO } from "../../../dtos/ServiceRequestDTO";
 
 export interface ICreateServiceRequestUseCase {
     execute(

@@ -1,6 +1,6 @@
-import { ServiceRequest } from "../../../domain/entities/ServiceRequest";
-import { IServiceRequestRepository } from "../../../domain/repositories/IServiceRequestRepository";
-import { IGetOpenServiceRequestsUseCase } from "../../interfaces/service-request/IGetOpenServiceRequestsUseCase";
+import { ServiceRequest } from "../../../../domain/entities/ServiceRequest";
+import { IServiceRequestRepository } from "../../../../domain/repositories/IServiceRequestRepository";
+import { IGetOpenServiceRequestsUseCase } from "../../../interfaces/client/service-request/IGetOpenServiceRequestsUseCase";
 
 export class GetOpenServiceRequestsUseCase implements IGetOpenServiceRequestsUseCase {
     constructor(

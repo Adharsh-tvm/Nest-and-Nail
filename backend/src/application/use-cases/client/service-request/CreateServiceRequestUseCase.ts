@@ -1,9 +1,9 @@
-import { ServiceRequest } from "../../../domain/entities/ServiceRequest";
-import { IServiceRequestRepository } from "../../../domain/repositories/IServiceRequestRepository";
-import { ServiceRequestStatus } from "../../../shared/enums/serviceEnums";
-import { IGenerateServiceRequestId } from "../../contracts/IGenerateServiceRequestId";
-import { CreateServiceRequestDTO } from "../../dtos/ServiceRequestDTO";
-import { ICreateServiceRequestUseCase } from "../../interfaces/service-request/ICreateServiceRequestUseCase ";
+import { ServiceRequest } from "../../../../domain/entities/ServiceRequest";
+import { IServiceRequestRepository } from "../../../../domain/repositories/IServiceRequestRepository";
+import { ServiceRequestStatus } from "../../../../shared/enums/serviceEnums";
+import { IGenerateServiceRequestId } from "../../../contracts/IGenerateServiceRequestId";
+import { CreateServiceRequestDTO } from "../../../dtos/ServiceRequestDTO";
+import { ICreateServiceRequestUseCase } from "../../../interfaces/client/service-request/ICreateServiceRequestUseCase ";
 
 export class CreateServiceRequestUseCase implements ICreateServiceRequestUseCase {
     constructor(

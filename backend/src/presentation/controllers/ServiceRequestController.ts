@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import { ICreateServiceRequestUseCase } from "../../application/interfaces/service-request/ICreateServiceRequestUseCase ";
-import { IGetOpenServiceRequestsUseCase } from "../../application/interfaces/service-request/IGetOpenServiceRequestsUseCase";
-import { IReleaseServiceRequestUseCase } from "../../application/interfaces/service-request/IReleaseServiceRequestUseCase";
-import { IReserveServiceRequestUseCase } from "../../application/interfaces/service-request/IReserveServiceRequestUseCase ";
+import { ICreateServiceRequestUseCase } from "../../application/interfaces/client/service-request/ICreateServiceRequestUseCase ";
+import { IGetOpenServiceRequestsUseCase } from "../../application/interfaces/client/service-request/IGetOpenServiceRequestsUseCase";
+import { IReleaseServiceRequestUseCase } from "../../application/interfaces/client/service-request/IReleaseServiceRequestUseCase";
+import { IReserveServiceRequestUseCase } from "../../application/interfaces/client/service-request/IReserveServiceRequestUseCase ";
 import { IServiceRequestController } from "../interfaces/IServiceRequestController";
 import { ServiceRequestMapper } from "../../application/mappers/ServiceRequestMapper";
 import { HttpStatusCode } from "../../shared/enums/httpCodes";
@@ -39,12 +39,12 @@ export class ServiceRequestController implements IServiceRequestController {
     };
 
     getOpenRequests = async (req: Request, res: Response): Promise<Response> => {
-        try{
-            const {lat, lng, radius} = req.query;
+        try {
+            const { lat, lng, radius } = req.query;
 
             const requests = await this._getOpenServiceRequestsUseCase.execute(
                 [Number(lng), Number(lat)],
-                radius ? Number(radius): undefined
+                radius ? Number(radius) : undefined
             );
 
             return res.status(HttpStatusCode.OK).json(
@@ -59,11 +59,11 @@ export class ServiceRequestController implements IServiceRequestController {
             );
         }
     };
-    
+
     reserve = async (req: Request, res: Response): Promise<Response> => {
-        try{
+        try {
             const workerId = req.user.id;
-            const {requestId} = req.params;
+            const { requestId } = req.params;
 
             const result = await this._reserveServiceRequestUseCase.execute(
                 requestId,
@@ -72,11 +72,11 @@ export class ServiceRequestController implements IServiceRequestController {
 
             return res.status(HttpStatusCode.OK).json(
                 ResponseHandler.success(
-                    result, 
+                    result,
                     RESPONSE_MESSAGES.SUCCESS
                 )
             );
-        }catch (error: any) {
+        } catch (error: any) {
             return res.status(HttpStatusCode.CONFLICT).json(
                 ResponseHandler.error("Request not available", error.message)
             );
@@ -85,7 +85,7 @@ export class ServiceRequestController implements IServiceRequestController {
 
     release = async (req: Request, res: Response): Promise<Response> => {
         try {
-            const {requestId} = req.params;
+            const { requestId } = req.params;
 
             await this._releaseServiceRequestUseCase.execute(requestId);
 
