@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import {
   Plus,
   MapPin,
@@ -662,11 +663,10 @@ export default function ServicesPage() {
                 key={status}
                 onClick={() => setStatusFilter(status)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium capitalize whitespace-nowrap transition-all
-                            ${
-                              statusFilter === status
-                                ? "bg-[#1B4332] text-white shadow-md shadow-green-900/10"
-                                : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
-                            }
+                            ${statusFilter === status
+                    ? "bg-[#1B4332] text-white shadow-md shadow-green-900/10"
+                    : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
+                  }
                         `}
               >
                 {status.replace("_", " ")}
@@ -764,16 +764,18 @@ export default function ServicesPage() {
                 </CardContent>
 
                 <CardFooter className="p-4 bg-gray-50/50">
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-between text-[#1B4332] hover:text-[#153426] hover:bg-green-100/50 font-semibold group/btn"
-                  >
-                    View Details
-                    <ArrowUpRight
-                      size={16}
-                      className="transition-transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5"
-                    />
-                  </Button>
+                  <Link href={`/client/services/${request.requestId}`} className="w-full">
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-between text-[#1B4332] hover:text-[#153426] hover:bg-green-100/50 font-semibold group/btn"
+                    >
+                      View Details
+                      <ArrowUpRight
+                        size={16}
+                        className="transition-transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5"
+                      />
+                    </Button>
+                  </Link>
                 </CardFooter>
               </Card>
             ))}

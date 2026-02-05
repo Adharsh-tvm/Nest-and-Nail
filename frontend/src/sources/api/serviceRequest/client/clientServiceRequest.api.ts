@@ -32,3 +32,12 @@ export async function getMyServiceRequestsApi(): Promise<
   );
   return res.data;
 }
+
+export async function getServiceRequestByIdApi(
+  requestId: string
+): Promise<ApiResponse<ServiceRequestResponse>> {
+  const res = await axiosInstance.get<ApiResponse<ServiceRequestResponse>>(
+    `/api/service-requests/${requestId}`
+  );
+  return res.data;
+}

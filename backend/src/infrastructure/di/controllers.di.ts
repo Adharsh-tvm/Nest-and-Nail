@@ -2,6 +2,7 @@ import { AdminController } from "../../presentation/controllers/AdminController"
 import { AuthController } from "../../presentation/controllers/AuthController";
 import { CategoryController } from "../../presentation/controllers/CategoryController";
 import { GoogleAuthController } from "../../presentation/controllers/GoogleAuthController";
+import { MediaController } from "../../presentation/controllers/MediaController";
 import { ServiceRequestController } from "../../presentation/controllers/ServiceRequestController";
 import { UploadController } from "../../presentation/controllers/UploadController";
 import { UserController } from "../../presentation/controllers/UserController";
@@ -32,6 +33,7 @@ export class ControllerDI {
     private _categoryController?: ICategoryController;
 
     private _serviceRequestController?: IServiceRequestController;
+    private _mediaController?: MediaController;
 
     constructor(
         private _useCases: UseCaseDI,
@@ -133,10 +135,20 @@ export class ControllerDI {
                 this._useCases.getOpenServiceRequestsUseCase,
                 this._useCases.reserveServiceRequestUseCase,
                 this._useCases.releaseServiceRequestUseCase,
-                this._useCases.getMyServiceRequestsUseCase
+                this._useCases.getMyServiceRequestsUseCase,
+                this._useCases.getServiceRequestByIdUseCase
             )
         }
         return this._serviceRequestController;
+    }
+
+    get mediaController(): MediaController {
+        if (!this._mediaController) {
+            this._mediaController = new MediaController(
+                this._useCases.getCloudinaryUploadSignatureUseCase
+            )
+        }
+        return this._mediaController;
     }
 }
 

@@ -1,5 +1,5 @@
-import { IServiceRequestRepository } from "../../../domain/repositories/IServiceRequestRepository";
-import { IReserveServiceRequestUseCase } from "../../interfaces/service-requests/worker/IReserveServiceRequestUseCase ";
+import { IServiceRequestRepository } from "../../../../domain/repositories/IServiceRequestRepository";
+import { IReserveServiceRequestUseCase } from "../../../interfaces/service-requests/worker/IReserveServiceRequestUseCase ";
 
 export class ReserveServiceRequestUseCase implements IReserveServiceRequestUseCase {
     constructor(

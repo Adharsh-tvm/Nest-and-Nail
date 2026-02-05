@@ -20,7 +20,7 @@ export async function getCloudinarySignatureApi(): Promise<
       signature: string;
       folder: string;
     }>
-  >("/media/cloudinary/signature");
+  >("/api/media/cloudinary/signature");
 
   return res.data;
 }

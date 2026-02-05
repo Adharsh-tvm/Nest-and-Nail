@@ -9,11 +9,40 @@ export function createServiceRequestRoutes(
 ) {
     const router = express.Router();
 
-    router.post("/", (req, res) => serviceRequestController.create(req, res));
-    router.post("/:requestId/release", (req, res) => serviceRequestController.release(req, res));
-    router.get("/open", (req, res) => serviceRequestController.getOpenRequests(req, res));
-    router.post("/:requestId/release", (req, res) => serviceRequestController.reserve(req, res));
-    router.get("/my", authMiddleware.verify.bind(authMiddleware), (req, res) => serviceRequestController.getMyRequests(req, res)
+    router.post(
+        "/",
+        authMiddleware.verify.bind(authMiddleware),
+        (req, res) => serviceRequestController.create(req, res)
     );
+
+    router.get(
+        "/open",
+        (req, res) => serviceRequestController.getOpenRequests(req, res)
+    );
+
+    router.post(
+        "/:requestId/reserve",
+        authMiddleware.verify.bind(authMiddleware),
+        (req, res) => serviceRequestController.reserve(req, res)
+    );
+
+    router.post(
+        "/:requestId/release",
+        authMiddleware.verify.bind(authMiddleware),
+        (req, res) => serviceRequestController.release(req, res)
+    );
+
+    router.get(
+        "/my",
+        authMiddleware.verify.bind(authMiddleware),
+        (req, res) => serviceRequestController.getMyRequests(req, res)
+    );
+
+    router.get(
+        "/:requestId",
+        authMiddleware.verify.bind(authMiddleware),
+        (req, res) => serviceRequestController.getById(req, res)
+    );
+
     return router;
 }

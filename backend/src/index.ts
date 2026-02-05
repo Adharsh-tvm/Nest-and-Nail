@@ -12,6 +12,7 @@ import { createAdminRoutes } from "./presentation/routes/admin/adminRoutes";
 import { createUserRoutes } from "./presentation/routes/user/user.routes";
 import { createUploadRoutes } from "./presentation/routes/user/upload.routes";
 import { createServiceRequestRoutes } from "./presentation/routes/serviceRequest/serviceRequest.routes";
+import { createMediaRoutes } from "./presentation/routes/user/media.routes";
 
 dotenv.config();
 
@@ -53,6 +54,8 @@ async function bootstrap() {
   app.use("/api/users", createUserRoutes(container.controllers.userController, container.controllers.userProfileController, container.controllers.authMiddleware))
 
   app.use("/api/service-requests", createServiceRequestRoutes(container.controllers.serviceRequestController, container.controllers.authMiddleware))
+
+  app.use("/api/media", createMediaRoutes(container.controllers.mediaController))
 
   // Error Handler
   app.use(errorHandler);

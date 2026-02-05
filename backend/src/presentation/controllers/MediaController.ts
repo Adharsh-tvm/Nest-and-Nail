@@ -5,12 +5,12 @@ import { HttpStatusCode } from "../../shared/enums/httpCodes";
 
 export class MediaController {
   constructor(
-    private readonly getSignatureUseCase: IGetCloudinaryUploadSignatureUseCase
+    private readonly _getSignatureUseCase: IGetCloudinaryUploadSignatureUseCase
   ) {}
 
   getCloudinarySignature = async (_req: Request, res: Response) => {
     try {
-      const signature = this.getSignatureUseCase.execute();
+      const signature = this._getSignatureUseCase.execute();
 
       return res.json(
         ResponseHandler.success(
