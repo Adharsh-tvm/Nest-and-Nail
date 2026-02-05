@@ -139,7 +139,7 @@ export default function ServiceDetailPage() {
                                 {/* Note: In a real app, you might want to fetch category name properly here too */}
                                 <span className="bg-gray-100 px-2 py-0.5 rounded text-gray-700 font-medium">
                                     {/* For now displaying ID as placeholder or passed category name if available */}
-                                    Category ID: {request.category}
+                                    Request ID: {request.requestId}
                                 </span>
                             </div>
                         </div>
