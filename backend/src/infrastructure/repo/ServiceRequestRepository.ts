@@ -3,7 +3,7 @@ import { IServiceRequestRepository } from "../../domain/repositories/IServiceReq
 import { ServiceRequestStatus } from "../../shared/enums/serviceEnums";
 import { ServiceRequestModel } from "../database/models/ServiceRequestModel";
 
-export class ServiceRequestRespository implements IServiceRequestRepository {
+export class ServiceRequestRepository implements IServiceRequestRepository {
 
     private toDomain(doc: any): ServiceRequest {
         return {
