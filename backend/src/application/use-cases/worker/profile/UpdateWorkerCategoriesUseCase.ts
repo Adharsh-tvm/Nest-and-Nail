@@ -1,8 +1,8 @@
-import { User } from "../../../domain/entities/User";
-import { ICategoryRepository } from "../../../domain/repositories/ICategoryRepository";
-import { IUserRepositoryFactory } from "../../../domain/repositories/IUserRepositoryFactory";
-import { Role } from "../../../shared/enums/authEnums";
-import { IUpdateWorkerCategoriesUseCase } from "../../interfaces/worker/IUpdateWorkerCategoriesUseCase";
+import { User } from "../../../../domain/entities/User";
+import { ICategoryRepository } from "../../../../domain/repositories/ICategoryRepository";
+import { IUserRepositoryFactory } from "../../../../domain/repositories/IUserRepositoryFactory";
+import { Role } from "../../../../shared/enums/authEnums";
+import { IUpdateWorkerCategoriesUseCase } from "../../../interfaces/worker/profile/IUpdateWorkerCategoriesUseCase";
 
 export class UpdateWorkerCategoriesUseCase implements IUpdateWorkerCategoriesUseCase {
     constructor(

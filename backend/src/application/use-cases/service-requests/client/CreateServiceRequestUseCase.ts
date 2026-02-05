@@ -3,7 +3,7 @@ import { IServiceRequestRepository } from "../../../../domain/repositories/IServ
 import { ServiceRequestStatus } from "../../../../shared/enums/serviceEnums";
 import { IGenerateServiceRequestId } from "../../../contracts/IGenerateServiceRequestId";
 import { CreateServiceRequestDTO } from "../../../dtos/ServiceRequestDTO";
-import { ICreateServiceRequestUseCase } from "../../../interfaces/client/service-request/ICreateServiceRequestUseCase ";
+import { ICreateServiceRequestUseCase } from "../../../interfaces/service-requests/client/ICreateServiceRequestUseCase ";
 
 export class CreateServiceRequestUseCase implements ICreateServiceRequestUseCase {
     constructor(

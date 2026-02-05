@@ -40,15 +40,7 @@ const CategoriesPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   const fetchCategories = async () => {
-    try {
-      setLoading(true);
-      const data = await getAllCategoriesAction();
-      setCategories(data);
-    } catch (error: any) {
-      toast.error(error.message || "Failed to fetch categories");
-    } finally {
-      setLoading(false);
-    }
+    
   };
 
   useEffect(() => {
@@ -65,51 +57,40 @@ const CategoriesPage = () => {
     setIsModalOpen(true);
   };
 
-  const handleSave = async (data: CategoryInput) => {
-    try {
-      setActionLoading(true);
-      if (selectedCategory) {
-        const updated = await updateCategoryAction(selectedCategory.id, data);
-        setCategories((prev) =>
-          prev.map((c) => (c.id === updated.id ? updated : c)),
-        );
-        toast.success("Category updated successfully");
-      } else {
-        const created = await createCategoryAction(data);
-        setCategories((prev) => [...prev, created]);
-        toast.success("Category created successfully");
-      }
-      setIsModalOpen(false);
-    } catch (error: any) {
-      toast.error(error.message || "Failed to save category");
-    } finally {
-      setActionLoading(false);
-    }
+  const handleSave = async () => {
+    
   };
 
   const handleToggleStatus = async (category: Category) => {
+    const previous = category;
+
+    // Optimistic update
+    setCategories((prev) =>
+      prev.map((c) =>
+        c.id === category.id ? { ...c, isActive: !c.isActive } : c,
+      ),
+    );
+
     try {
-      // Optimistic update
-      const newStatus = !category.isActive;
+      const res = await toggleCategoryStatusAction(category.id);
+
+      if (!res.success) {
+        throw new Error(res.message);
+      }
+
       setCategories((prev) =>
-        prev.map((c) => (c.id === category.id ? { ...c, isActive: newStatus } : c))
+        prev.map((c) => (c.id === res.payload.id ? res.payload : c)),
       );
 
-      const updated = await toggleCategoryStatusAction(category.id);
-
-      // Update with actual server response
-      setCategories((prev) =>
-        prev.map((c) => (c.id === updated.id ? updated : c)),
-      );
       toast.success(
-        `Category ${updated.isActive ? "activated" : "blocked"} successfully`,
+        `Category ${res.payload.isActive ? "activated" : "blocked"} successfully`,
       );
     } catch (error: any) {
-      // Revert on error
       setCategories((prev) =>
-        prev.map((c) => (c.id === category.id ? category : c))
+        prev.map((c) => (c.id === previous.id ? previous : c)),
       );
-      toast.error(error.message || "Failed to update status");
+
+      toast.error(error.message || "Failed to update category status");
     }
   };
 
@@ -164,9 +145,13 @@ const CategoriesPage = () => {
               className="sr-only peer"
               disabled={actionLoading}
             />
-            <div className={`w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all ${row.isActive ? 'peer-checked:bg-emerald-600' : 'peer-checked:bg-gray-300'}`}></div>
+            <div
+              className={`w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all ${row.isActive ? "peer-checked:bg-emerald-600" : "peer-checked:bg-gray-300"}`}
+            ></div>
           </label>
-          <span className={`text-xs font-bold ${row.isActive ? "text-emerald-600" : "text-gray-400"}`}>
+          <span
+            className={`text-xs font-bold ${row.isActive ? "text-emerald-600" : "text-gray-400"}`}
+          >
             {row.isActive ? "Active" : "Blocked"}
           </span>
         </div>
@@ -202,10 +187,11 @@ const CategoriesPage = () => {
               e.stopPropagation();
               handleToggleStatus(row);
             }}
-            className={`p-2 hover:bg-gray-100 rounded-lg transition-colors ${row.isActive
-              ? "text-gray-500 hover:text-red-600"
-              : "text-red-500 hover:text-emerald-600"
-              }`}
+            className={`p-2 hover:bg-gray-100 rounded-lg transition-colors ${
+              row.isActive
+                ? "text-gray-500 hover:text-red-600"
+                : "text-red-500 hover:text-emerald-600"
+            }`}
             title={row.isActive ? "Block" : "Unblock"}
           >
             {row.isActive ? <Trash2 size={16} /> : <CheckCircle size={16} />}

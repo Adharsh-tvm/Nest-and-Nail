@@ -21,4 +21,9 @@ export interface IServiceRequestRepository {
   releaseReservationByRequestId(
     requestId: string
   ): Promise<void>;
+
+  findByClientId(
+    clientId: string
+  ): Promise<ServiceRequest[]>;
+
 }
