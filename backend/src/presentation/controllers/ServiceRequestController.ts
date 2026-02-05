@@ -47,9 +47,24 @@ export class ServiceRequestController implements IServiceRequestController {
         try {
             const { lat, lng, radius } = req.query;
 
+            const latNum = Number(lat);
+            const lngNum = Number(lng);
+
+            if (
+                Number.isNaN(latNum) ||
+                Number.isNaN(lngNum)
+            ) {
+                return res.status(HttpStatusCode.BAD_REQUEST).json(
+                    ResponseHandler.error("Invalid latitude or longitude")
+                );
+            }
+
+            const MAX_RADIUS = 10_000;
+            const radiusMeters = Math.min(Number(radius) || MAX_RADIUS, MAX_RADIUS);
+
             const requests = await this._getOpenServiceRequestsUseCase.execute(
-                [Number(lng), Number(lat)],
-                radius ? Number(radius) : undefined
+                [lngNum,latNum],
+                radiusMeters ? Number(radiusMeters) : undefined
             );
 
             return res.status(HttpStatusCode.OK).json(

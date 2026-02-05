@@ -23,7 +23,7 @@ import { NodemailerEmailService } from "../adapters/NodemailerEmailService";
 import { OtpService } from "../adapters/OtpService";
 import { UUIDGenerator } from "../adapters/UUIDGenerator";
 import { IServiceRequestRepository } from "../../domain/repositories/IServiceRequestRepository";
-import { ServiceRequestRespository } from "../repo/ServiceRequestRepository";
+import { ServiceRequestRepository } from "../repo/ServiceRequestRepository";
 import { IGenerateServiceRequestId } from "../../application/contracts/IGenerateServiceRequestId";
 import { ServiceRequestIdGenerator } from "../adapters/ServiceRequestIdGenerator";
 
@@ -141,7 +141,7 @@ export class InfrastructureDI {
 
   get serviceRequestRepository(): IServiceRequestRepository {
     if (!this._serviceRequestRepository) {
-      this._serviceRequestRepository = new ServiceRequestRespository();
+      this._serviceRequestRepository = new ServiceRequestRepository();
     }
     return this._serviceRequestRepository;
   }
