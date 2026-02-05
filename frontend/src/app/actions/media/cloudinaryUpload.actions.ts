@@ -1,7 +1,7 @@
 "use server";
 
 import { ApiResponse } from "@/shared/types/responseTypes";
-import { getCloudinarySignatureApi } from "@/sources/api/media/cloudinaryUpload,api";
+import { getCloudinarySignatureApi } from "@/sources/api/media/cloudinaryUpload.api";
 
 export async function getCloudinarySignatureAction(): Promise<
   ApiResponse<any>

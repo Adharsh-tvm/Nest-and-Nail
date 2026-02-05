@@ -6,9 +6,8 @@ const router = Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
 export function createMediaRoutes(controller: MediaController) {
-  router.post(
-    "/upload/images",
-    upload.array("images", 5),
+  router.get(
+    "/cloudinary/signature",
     controller.getCloudinarySignature
   );
 

@@ -1,7 +1,7 @@
 import { ApiResponse } from "@/shared/types/responseTypes";
 import { ServiceRequestResponse } from "@/shared/types/ServiceRequestResponse";
 import { CreateServiceRequestDTO } from "@/shared/types/serviceTypes";
-import { createServiceRequestApi, getMyServiceRequestsApi } from "@/sources/api/serviceRequest/client/clientServiceRequest.api";
+import { createServiceRequestApi, getMyServiceRequestsApi, getServiceRequestByIdApi } from "@/sources/api/serviceRequest/client/clientServiceRequest.api";
 
 export async function createServiceRequestAction(
     payload: CreateServiceRequestDTO
@@ -32,5 +32,20 @@ export async function getMyServiceRequestsAction(): Promise<
         };
     }
 }
+
+export async function getServiceRequestByIdAction(
+    requestId: string
+): Promise<ApiResponse<ServiceRequestResponse>> {
+    try {
+        return await getServiceRequestByIdApi(requestId);
+    } catch (error: any) {
+        return {
+            success: false,
+            message: error.normalizedMessage ?? "Failed to fetch service request details",
+            error: error.serverData ?? error.message,
+        };
+    }
+}
+
 
 

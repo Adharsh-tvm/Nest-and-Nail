@@ -53,12 +53,16 @@ import { ICreateServiceRequestUseCase } from "../../application/interfaces/servi
 import { IGetOpenServiceRequestsUseCase } from "../../application/interfaces/service-requests/worker/IGetOpenServiceRequestsUseCase";
 import { IReleaseServiceRequestUseCase } from "../../application/interfaces/service-requests/client/IReleaseServiceRequestUseCase";
 import { IReserveServiceRequestUseCase } from "../../application/interfaces/service-requests/worker/IReserveServiceRequestUseCase ";
-import { GetOpenServiceRequestsUseCase } from "../../application/use-cases/service-requests/GetOpenServiceRequestsUseCase";
+import { GetOpenServiceRequestsUseCase } from "../../application/use-cases/service-requests/worker/GetOpenServiceRequestsUseCase";
 import { CreateServiceRequestUseCase } from "../../application/use-cases/service-requests/client/CreateServiceRequestUseCase";
-import { ReserveServiceRequestUseCase } from "../../application/use-cases/service-requests/ReserveServiceRequestUseCase";
+import { ReserveServiceRequestUseCase } from "../../application/use-cases/service-requests/worker/ReserveServiceRequestUseCase";
 import { ReleaseServiceRequestUseCase } from "../../application/use-cases/service-requests/client/ReleaseServiceRequestUseCase";
 import { IGetMyServiceRequestsUseCase } from "../../application/interfaces/service-requests/client/IGetMyServiceRequestsUseCase";
 import { GetMyServiceRequestsUseCase } from "../../application/use-cases/service-requests/client/GetMyServiceRequestsUseCase";
+import { IGetCloudinaryUploadSignatureUseCase } from "../../application/interfaces/media/IGetCloudinaryUploadSignatureUseCase";
+import { GetCloudinaryUploadSignatureUseCase } from "../../application/use-cases/media/GetCloudinaryUploadSignatureUseCase";
+import { IGetServiceRequestByIdUseCase } from "../../application/interfaces/service-requests/IGetServiceRequestByIdUseCase";
+import { GetServiceRequestByIdUseCase } from "../../application/use-cases/service-requests/GetServiceRequestByIdUseCase";
 
 
 
@@ -106,6 +110,8 @@ export class UseCaseDI {
   private _reserveServiceRequestUseCase?: IReserveServiceRequestUseCase;
   private _getMyServiceRequestsUseCase?: IGetMyServiceRequestsUseCase;
 
+  private _getCloudinaryUploadSignatureUseCase?: IGetCloudinaryUploadSignatureUseCase;
+  private _getServiceRequestByIdUseCase?: IGetServiceRequestByIdUseCase;
 
   constructor(private infra: InfrastructureDI) { }
 
@@ -406,5 +412,21 @@ export class UseCaseDI {
       )
     }
     return this._getMyServiceRequestsUseCase;
+  }
+
+  get getCloudinaryUploadSignatureUseCase(): IGetCloudinaryUploadSignatureUseCase {
+    if (!this._getCloudinaryUploadSignatureUseCase) {
+      this._getCloudinaryUploadSignatureUseCase = new GetCloudinaryUploadSignatureUseCase()
+    }
+    return this._getCloudinaryUploadSignatureUseCase
+  }
+  
+  get getServiceRequestByIdUseCase(): IGetServiceRequestByIdUseCase {
+    if(!this._getServiceRequestByIdUseCase) {
+      this._getServiceRequestByIdUseCase = new GetServiceRequestByIdUseCase(
+        this.infra.serviceRequestRepository
+      )
+    }
+    return this._getServiceRequestByIdUseCase
   }
 }

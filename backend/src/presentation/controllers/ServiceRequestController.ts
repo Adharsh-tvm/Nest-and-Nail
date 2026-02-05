@@ -9,6 +9,7 @@ import { HttpStatusCode } from "../../shared/enums/httpCodes";
 import { ResponseHandler } from "../../shared/responses/ApiResponse";
 import { RESPONSE_MESSAGES } from "../../shared/responses/ResponseMessages";
 import { IGetMyServiceRequestsUseCase } from "../../application/interfaces/service-requests/client/IGetMyServiceRequestsUseCase";
+import { IGetServiceRequestByIdUseCase } from "../../application/interfaces/service-requests/IGetServiceRequestByIdUseCase";
 
 export class ServiceRequestController implements IServiceRequestController {
     constructor(
@@ -16,7 +17,9 @@ export class ServiceRequestController implements IServiceRequestController {
         private readonly _getOpenServiceRequestsUseCase: IGetOpenServiceRequestsUseCase,
         private readonly _reserveServiceRequestUseCase: IReserveServiceRequestUseCase,
         private readonly _releaseServiceRequestUseCase: IReleaseServiceRequestUseCase,
-        private readonly _getMyServiceRequestsUseCase: IGetMyServiceRequestsUseCase
+        private readonly _getMyServiceRequestsUseCase: IGetMyServiceRequestsUseCase,
+        private readonly _getServiceRequestByIdUseCase: IGetServiceRequestByIdUseCase,
+
     ) { }
 
     create = async (req: Request, res: Response): Promise<Response> => {
@@ -119,4 +122,28 @@ export class ServiceRequestController implements IServiceRequestController {
             );
         }
     };
+
+    getById = async (req: Request, res: Response): Promise<Response> => {
+        try {
+            const { requestId } = req.params;
+            const userId = req.user.id;
+
+            const request = await this._getServiceRequestByIdUseCase.execute(
+                requestId,
+                userId
+            );
+
+            return res.status(HttpStatusCode.OK).json(
+                ResponseHandler.success(
+                    ServiceRequestMapper.toResponseDTO(request),
+                    "Service request details"
+                )
+            );
+        } catch (error: any) {
+            return res.status(HttpStatusCode.NOT_FOUND).json(
+                ResponseHandler.error("Service request not found", error.message)
+            );
+        }
+    };
+
 } 
