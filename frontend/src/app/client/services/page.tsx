@@ -646,7 +646,7 @@ export default function ServicesPage() {
         </div>
 
         {/* Filters Bar */}
-        <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-4 items-center justify-between sticky top-4 z-10 backdrop-blur-md ">
+        {/* <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-4 items-center justify-between sticky top-4 z-10 backdrop-blur-md ">
           <div className="relative w-full md:max-w-md">
             <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
             <Input
@@ -673,7 +673,7 @@ export default function ServicesPage() {
               </button>
             ))}
           </div>
-        </div>
+        </div> */}
 
         {/* Content Grid */}
         {loading ? (
