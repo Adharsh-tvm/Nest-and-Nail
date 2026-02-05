@@ -756,7 +756,7 @@ export default function ServicesPage() {
                     </div>
                     {request.budget && (
                       <div className="flex items-center gap-1.5 text-green-700 bg-green-50 px-2.5 py-1 rounded-md text-xs font-bold ml-auto">
-                        <DollarSign size={12} />
+                        <IndianRupee size={12} />
                         <span>{request.budget}</span>
                       </div>
                     )}
