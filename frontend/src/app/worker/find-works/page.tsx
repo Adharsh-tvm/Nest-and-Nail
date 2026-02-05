@@ -21,6 +21,14 @@ import {
   CardContent,
   CardFooter,
 } from "@/app/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/app/components/ui/dialog";
+import { Address } from "@/shared/types/addressType";
 import { getOpenServiceRequestsAction } from "@/app/actions/serviceRequest/worker/workerServiceRequest.actions";
 import { getAllCategoriesAction } from "@/app/actions/admin/category-actions";
 import { ServiceRequestResponse } from "@/shared/types/ServiceRequestResponse";
@@ -66,6 +74,7 @@ export default function WorkerFindWorksPage() {
     lng: number;
     label: string;
   } | null>(null);
+  const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -118,11 +127,22 @@ export default function WorkerFindWorksPage() {
           label: "Current Location",
         });
         toast.success("Location updated");
+        setIsLocationModalOpen(false);
       },
       () => {
         toast.error("Unable to retrieve your location");
       }
     );
+  };
+
+  const handleSelectSavedAddress = (address: Address) => {
+    setWorkerLocation({
+      lat: address.lat,
+      lng: address.lng,
+      label: address.label,
+    });
+    setIsLocationModalOpen(false);
+    toast.success(`Location set to ${address.label}`);
   };
 
   const getCategoryName = (id: string) =>
@@ -164,14 +184,84 @@ export default function WorkerFindWorksPage() {
             </div>
 
             <div className="flex items-center gap-3 bg-[#153426] p-2 rounded-xl border border-[#2d5f4e]">
-              <Button
-                onClick={handleGetCurrentLocation}
-                className="bg-[#DC2626] hover:bg-[#b91c1c] text-white border-none"
-                size="sm"
+              <Dialog
+                open={isLocationModalOpen}
+                onOpenChange={setIsLocationModalOpen}
               >
-                <Navigation size={16} className="mr-2" />
-                Use Current Location
-              </Button>
+                <DialogTrigger asChild>
+                  <Button
+                    className="bg-[#DC2626] hover:bg-[#b91c1c] text-white border-none"
+                    size="sm"
+                  >
+                    <Navigation size={16} className="mr-2" />
+                    Change Location
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md p-0 overflow-hidden border-none shadow-2xl bg-white">
+                  <DialogHeader className="bg-[#1B4332] px-6 py-6 text-white">
+                    <DialogTitle className="text-xl font-bold text-white">
+                      Select Location
+                    </DialogTitle>
+                    <p className="text-green-100/80 text-sm font-normal">
+                      Choose where you want to find work
+                    </p>
+                  </DialogHeader>
+                  <div className="flex flex-col gap-3 p-6 pt-2">
+                    <Button
+                      onClick={handleGetCurrentLocation}
+                      className="w-full justify-start bg-red-50/50 hover:bg-red-50 text-slate-900 border border-[#DC2626]/20 hover:border-[#DC2626] transition-all duration-300 py-6"
+                      variant="outline"
+                    >
+                      <Navigation size={18} className="mr-3 text-[#DC2626]" />
+                      <div className="flex flex-col items-start gap-0.5">
+                        <span className="font-bold text-slate-900">Current Location</span>
+                        <span className="text-xs text-slate-500 font-medium">
+                          Use GPS to find nearby works
+                        </span>
+                      </div>
+                    </Button>
+
+                    {user?.address && user.address.length > 0 && (
+                      <>
+                        <div className="relative py-2">
+                          <div className="absolute inset-0 flex items-center">
+                            <span className="w-full border-t border-slate-200" />
+                          </div>
+                          <div className="relative flex justify-center text-xs uppercase">
+                            <span className="bg-white px-2 text-slate-500">
+                              Or Saved Addresses
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col gap-2">
+                          {user.address.map((addr, index) => (
+                            <Button
+                              key={index}
+                              onClick={() => handleSelectSavedAddress(addr)}
+                              className="w-full justify-start bg-white hover:bg-green-50 text-slate-900 border border-slate-200 hover:border-[#1B4332]/30 h-auto py-3 group transition-all"
+                              variant="ghost"
+                            >
+                              <MapPin
+                                size={18}
+                                className="mr-3 text-[#1B4332]"
+                              />
+                              <div className="flex flex-col items-start text-left gap-0.5">
+                                <span className="font-semibold capitalize text-slate-700 group-hover:text-[#1B4332] transition-colors">
+                                  {addr.label}
+                                </span>
+                                <span className="text-xs text-slate-500 font-medium line-clamp-1">
+                                  {addr.street}, {addr.city}
+                                </span>
+                              </div>
+                            </Button>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </DialogContent>
+              </Dialog>
               <div className="h-4 w-px bg-[#DC2626] mx-2" />
               <div className="flex items-center gap-2 text-sm text-green-100 pr-2">
                 <MapPin size={16} className="text-[#DC2626]" />
@@ -182,8 +272,8 @@ export default function WorkerFindWorksPage() {
             </div>
           </div>
         </div>
-      </div>
 
+      </div>
       <div className="max-w-7xl mx-auto px-6 md:px-10 -mt-8">
         {/* Filters Card */}
         <div className="bg-white p-4 rounded-xl shadow-md border border-slate-200 flex flex-col md:flex-row gap-4 items-center justify-between mb-8">
