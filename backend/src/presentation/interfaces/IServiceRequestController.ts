@@ -5,4 +5,5 @@ export interface IServiceRequestController {
     getOpenRequests(req: Request, res: Response): Promise<Response>;
     reserve(req: Request, res: Response): Promise<Response>;
     release(req: Request, res: Response): Promise<Response>;
+    getMyRequests(req: Request, res: Response): Promise<Response>;
 }

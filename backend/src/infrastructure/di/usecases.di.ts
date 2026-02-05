@@ -19,7 +19,7 @@ import { IUpdateUserAddressUseCase } from "../../application/interfaces/user/IUp
 import { IUpdateUserProfileUseCase } from "../../application/interfaces/user/IUpdateUserProfileUseCase";
 import { IUpdateUserSkillsUseCase } from "../../application/interfaces/user/IUpdateUserSkillsUseCase";
 import { IUpdateVerificationStatusUseCase } from "../../application/interfaces/admin/IUpdateVerificationStatusUseCase";
-import { IUpdateWorkerCategoriesUseCase } from "../../application/interfaces/worker/IUpdateWorkerCategoriesUseCase";
+import { IUpdateWorkerCategoriesUseCase } from "../../application/interfaces/worker/profile/IUpdateWorkerCategoriesUseCase";
 import { IUploadProfilePictureUseCase } from "../../application/interfaces/user/IUploadProfilePictureUseCase";
 import { IUploadWorkerDocumentUseCase } from "../../application/interfaces/user/IUploadWorkerDocumentUseCase";
 import { IVerifyOtpUseCase } from "../../application/interfaces/auth/IVerifyOtpUseCase";
@@ -46,17 +46,19 @@ import { GetCurrentUserUseCase } from "../../application/use-cases/user/GetCurre
 import { UpdateUserAddressUseCase } from "../../application/use-cases/user/UpdateUserAddressUseCase";
 import { UpdateUserProfileUseCase } from "../../application/use-cases/user/UpdateUserProfileUseCase";
 import { UpdateUserSkillsUseCase } from "../../application/use-cases/user/UpdateUserSkillsUseCase";
-import { UpdateWorkerCategoriesUseCase } from "../../application/use-cases/worker/UpdateWorkerCategoriesUseCase";
+import { UpdateWorkerCategoriesUseCase } from "../../application/use-cases/worker/profile/UpdateWorkerCategoriesUseCase";
 import { UploadWorkerDocumentUseCase } from "../../application/use-cases/user/UploadWorkerDocumentUseCase";
 import { InfrastructureDI } from "./infrastructure.di";
-import { ICreateServiceRequestUseCase } from "../../application/interfaces/client/service-request/ICreateServiceRequestUseCase ";
-import { IGetOpenServiceRequestsUseCase } from "../../application/interfaces/client/service-request/IGetOpenServiceRequestsUseCase";
-import { IReleaseServiceRequestUseCase } from "../../application/interfaces/client/service-request/IReleaseServiceRequestUseCase";
-import { IReserveServiceRequestUseCase } from "../../application/interfaces/client/service-request/IReserveServiceRequestUseCase ";
-import { GetOpenServiceRequestsUseCase } from "../../application/use-cases/client/service-request/GetOpenServiceRequestsUseCase";
-import { CreateServiceRequestUseCase } from "../../application/use-cases/client/service-request/CreateServiceRequestUseCase";
-import { ReserveServiceRequestUseCase } from "../../application/use-cases/client/service-request/ReserveServiceRequestUseCase";
-import { ReleaseServiceRequestUseCase } from "../../application/use-cases/client/service-request/ReleaseServiceRequestUseCase";
+import { ICreateServiceRequestUseCase } from "../../application/interfaces/service-requests/client/ICreateServiceRequestUseCase ";
+import { IGetOpenServiceRequestsUseCase } from "../../application/interfaces/service-requests/worker/IGetOpenServiceRequestsUseCase";
+import { IReleaseServiceRequestUseCase } from "../../application/interfaces/service-requests/client/IReleaseServiceRequestUseCase";
+import { IReserveServiceRequestUseCase } from "../../application/interfaces/service-requests/worker/IReserveServiceRequestUseCase ";
+import { GetOpenServiceRequestsUseCase } from "../../application/use-cases/service-requests/GetOpenServiceRequestsUseCase";
+import { CreateServiceRequestUseCase } from "../../application/use-cases/service-requests/client/CreateServiceRequestUseCase";
+import { ReserveServiceRequestUseCase } from "../../application/use-cases/service-requests/ReserveServiceRequestUseCase";
+import { ReleaseServiceRequestUseCase } from "../../application/use-cases/service-requests/client/ReleaseServiceRequestUseCase";
+import { IGetMyServiceRequestsUseCase } from "../../application/interfaces/service-requests/client/IGetMyServiceRequestsUseCase";
+import { GetMyServiceRequestsUseCase } from "../../application/use-cases/service-requests/client/GetMyServiceRequestsUseCase";
 
 
 
@@ -102,6 +104,7 @@ export class UseCaseDI {
   private _getOpenServiceRequestsUseCase?: IGetOpenServiceRequestsUseCase;
   private _releaseServiceRequestUseCase?: IReleaseServiceRequestUseCase;
   private _reserveServiceRequestUseCase?: IReserveServiceRequestUseCase;
+  private _getMyServiceRequestsUseCase?: IGetMyServiceRequestsUseCase;
 
 
   constructor(private infra: InfrastructureDI) { }
@@ -394,5 +397,14 @@ export class UseCaseDI {
       )
     }
     return this._releaseServiceRequestUseCase;
+  }
+
+  get getMyServiceRequestsUseCase(): IGetMyServiceRequestsUseCase {
+    if (!this._getMyServiceRequestsUseCase) {
+      this._getMyServiceRequestsUseCase = new GetMyServiceRequestsUseCase(
+        this.infra.serviceRequestRepository
+      )
+    }
+    return this._getMyServiceRequestsUseCase;
   }
 }

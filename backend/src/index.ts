@@ -9,8 +9,8 @@ import { RequestLogger } from "./presentation/middlewares/RequestLogger";
 import { DIContainer } from "./infrastructure/di/DIContainer";
 import { createGoogleAuthRoutes } from "./presentation/routes/auth/GoogleAuthRoutes";
 import { createAdminRoutes } from "./presentation/routes/admin/adminRoutes";
-import { createUserRoutes } from "./presentation/routes/user/userRoutes";
-import { createUploadRoutes } from "./presentation/routes/user/uploadRoutes";
+import { createUserRoutes } from "./presentation/routes/user/user.routes";
+import { createUploadRoutes } from "./presentation/routes/user/upload.routes";
 import { createServiceRequestRoutes } from "./presentation/routes/serviceRequest/serviceRequest.routes";
 
 dotenv.config();
@@ -52,7 +52,7 @@ async function bootstrap() {
 
   app.use("/api/users", createUserRoutes(container.controllers.userController, container.controllers.userProfileController, container.controllers.authMiddleware))
 
-  app.use("/api/service-requests", createServiceRequestRoutes(container.controllers.serviceRequestController))
+  app.use("/api/service-requests", createServiceRequestRoutes(container.controllers.serviceRequestController, container.controllers.authMiddleware))
 
   // Error Handler
   app.use(errorHandler);

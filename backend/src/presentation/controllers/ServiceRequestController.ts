@@ -1,20 +1,22 @@
 import { Request, Response } from "express";
-import { ICreateServiceRequestUseCase } from "../../application/interfaces/client/service-request/ICreateServiceRequestUseCase ";
-import { IGetOpenServiceRequestsUseCase } from "../../application/interfaces/client/service-request/IGetOpenServiceRequestsUseCase";
-import { IReleaseServiceRequestUseCase } from "../../application/interfaces/client/service-request/IReleaseServiceRequestUseCase";
-import { IReserveServiceRequestUseCase } from "../../application/interfaces/client/service-request/IReserveServiceRequestUseCase ";
+import { ICreateServiceRequestUseCase } from "../../application/interfaces/service-requests/client/ICreateServiceRequestUseCase ";
+import { IGetOpenServiceRequestsUseCase } from "../../application/interfaces/service-requests/worker/IGetOpenServiceRequestsUseCase";
+import { IReleaseServiceRequestUseCase } from "../../application/interfaces/service-requests/client/IReleaseServiceRequestUseCase";
+import { IReserveServiceRequestUseCase } from "../../application/interfaces/service-requests/worker/IReserveServiceRequestUseCase ";
 import { IServiceRequestController } from "../interfaces/IServiceRequestController";
 import { ServiceRequestMapper } from "../../application/mappers/ServiceRequestMapper";
 import { HttpStatusCode } from "../../shared/enums/httpCodes";
 import { ResponseHandler } from "../../shared/responses/ApiResponse";
 import { RESPONSE_MESSAGES } from "../../shared/responses/ResponseMessages";
+import { IGetMyServiceRequestsUseCase } from "../../application/interfaces/service-requests/client/IGetMyServiceRequestsUseCase";
 
 export class ServiceRequestController implements IServiceRequestController {
     constructor(
         private readonly _createServiceRequestUseCase: ICreateServiceRequestUseCase,
         private readonly _getOpenServiceRequestsUseCase: IGetOpenServiceRequestsUseCase,
         private readonly _reserveServiceRequestUseCase: IReserveServiceRequestUseCase,
-        private readonly _releaseServiceRequestUseCase: IReleaseServiceRequestUseCase
+        private readonly _releaseServiceRequestUseCase: IReleaseServiceRequestUseCase,
+        private readonly _getMyServiceRequestsUseCase: IGetMyServiceRequestsUseCase
     ) { }
 
     create = async (req: Request, res: Response): Promise<Response> => {
@@ -95,6 +97,25 @@ export class ServiceRequestController implements IServiceRequestController {
         } catch (error: any) {
             return res.status(HttpStatusCode.BAD_REQUEST).json(
                 ResponseHandler.error(RESPONSE_MESSAGES.BAD_REQUEST, error.message)
+            );
+        }
+    };
+
+    getMyRequests = async (req: Request, res: Response) => {
+        try {
+            const clientId = req.user.id;
+
+            const requests = await this._getMyServiceRequestsUseCase.execute(clientId);
+
+            return res.status(HttpStatusCode.OK).json(
+                ResponseHandler.success(
+                    requests.map(ServiceRequestMapper.toResponseDTO),
+                    "My service requests"
+                )
+            );
+        } catch (error: any) {
+            return res.status(HttpStatusCode.BAD_REQUEST).json(
+                ResponseHandler.error("Failed to fetch requests", error.message)
             );
         }
     };

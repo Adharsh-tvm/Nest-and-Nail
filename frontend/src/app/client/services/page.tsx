@@ -37,12 +37,17 @@ import {
   DialogTrigger,
 } from "@/app/components/ui/dialog";
 import { Category } from "@/shared/types/categoryTypes";
-import {
-  ServiceRequest,
-  CreateServiceRequestDTO,
-} from "@/shared/types/serviceTypes";
-import { uploadDocumentAction } from "@/app/actions/users/user-profile-actions";
+import { CreateServiceRequestDTO } from "@/shared/types/serviceTypes";
 import toast from "react-hot-toast";
+import { releaseServiceRequestAction } from "@/app/actions/serviceRequest/common/serviceRequestActions";
+import {
+  createServiceRequestAction,
+  getMyServiceRequestsAction,
+} from "@/app/actions/serviceRequest/client/clientServiceRequest.actions";
+import { getAllCategoriesAction } from "@/app/actions/admin/category-actions";
+import { ServiceRequestResponse } from "@/shared/types/ServiceRequestResponse";
+import { getCloudinarySignatureAction } from "@/app/actions/media/cloudinaryUpload.actions";
+import { uploadToCloudinary } from "@/lib/uploadToCloudinary";
 
 // --- Multi-File Uploader Component ---
 interface FileUploaderProps {
@@ -206,7 +211,7 @@ const StatusBadge = ({ status }: { status: string }) => {
 
 export default function ServicesPage() {
   const { user } = useUserStore();
-  const [requests, setRequests] = useState<ServiceRequest[]>([]);
+  const [requests, setRequests] = useState<ServiceRequestResponse[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -232,7 +237,53 @@ export default function ServicesPage() {
     loadData();
   }, []);
 
-  const loadData = async () => {};
+  const loadData = async () => {
+    try {
+      setLoading(true);
+
+      const reqRes = await getMyServiceRequestsAction();
+      if (!reqRes.success) {
+        toast.error(reqRes.message);
+        return;
+      }
+      setRequests(reqRes.payload);
+
+      const catRes = await getAllCategoriesAction();
+      if (!catRes.success) {
+        toast.error(catRes.message);
+        return;
+      }
+
+      const activeCategories = catRes.payload.filter(
+        (cat) => cat.isActive === true,
+      );
+
+      setCategories(activeCategories);
+    } catch (error) {
+      toast.error("Failed to load data");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRelease = async (requestId: string) => {
+    try {
+      const res = await releaseServiceRequestAction(requestId);
+
+      if (!res.success) {
+        toast.error(res.message);
+        return;
+      }
+
+      toast.success("Service request cancelled");
+
+      loadData();
+    } catch (err) {
+      toast.error("Failed to cancel service request");
+      console.error(err);
+    }
+  };
 
   const resetForm = () => {
     setFormData({
@@ -252,9 +303,59 @@ export default function ServicesPage() {
       return;
     }
 
-    if (formData.location?.lat === 0 && formData.location?.lng === 0) {
+    if (
+      !formData.location ||
+      (formData.location.lat === 0 && formData.location.lng === 0)
+    ) {
       toast.error("Please select a valid location");
       return;
+    }
+
+    try {
+      setSubmitting(true);
+
+      let uploadedPhotos: string[] = [];
+
+      if (selectedImages.length > 0) {
+        const signatureRes = await getCloudinarySignatureAction();
+
+        if (!signatureRes.success) {
+          toast.error(signatureRes.message || "Failed to prepare image upload");
+          return;
+        }
+
+        const uploaded = await uploadToCloudinary(
+          selectedImages,
+          signatureRes.payload,
+        );
+
+        uploadedPhotos = uploaded.map((img) => img.url);
+      }
+
+      const res = await createServiceRequestAction({
+        title: formData.title,
+        description: formData.description,
+        category: formData.category,
+        location: formData.location,
+        budget: formData.budget,
+        servicePhotos: uploadedPhotos,
+      });
+
+      if (!res.success) {
+        toast.error(res.message);
+        return;
+      }
+
+      toast.success("Service request created successfully");
+
+      resetForm();
+      setIsModalOpen(false);
+      loadData();
+    } catch (error) {
+      toast.error("Something went wrong while creating request");
+      console.error(error);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -275,6 +376,24 @@ export default function ServicesPage() {
         location: { lat: address.lat, lng: address.lng },
       }));
       toast.success("Address selected");
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      setLoading(true);
+      const res = await getAllCategoriesAction();
+
+      if (!res.success) {
+        toast.error(res.message);
+        return;
+      }
+
+      setCategories(res.payload);
+    } catch (error: any) {
+      toast.error(error.message || "Failed to fetch categories");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -526,7 +645,7 @@ export default function ServicesPage() {
         </div>
 
         {/* Filters Bar */}
-        <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-4 items-center justify-between sticky top-4 z-10 backdrop-blur-md bg-white/90">
+        <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-4 items-center justify-between sticky top-4 z-10 backdrop-blur-md ">
           <div className="relative w-full md:max-w-md">
             <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
             <Input
@@ -591,7 +710,7 @@ export default function ServicesPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredRequests.map((request) => (
               <Card
-                key={request.id}
+                key={request.requestId}
                 className="group flex flex-col h-full overflow-hidden border-0 shadow-sm hover:shadow-xl transition-all duration-300 bg-white rounded-2xl ring-1 ring-gray-100 hover:ring-green-100/50"
               >
                 <div className="relative h-48 w-full bg-gray-100 overflow-hidden">

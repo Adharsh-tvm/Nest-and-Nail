@@ -116,4 +116,13 @@ export class ServiceRequestRespository implements IServiceRequestRepository {
             }
         )
     }
+
+    async findByClientId(clientId: string): Promise<ServiceRequest[]> {
+        const docs = await ServiceRequestModel.find({ clientId })
+            .sort({ createdAt: -1 })
+            .lean();
+
+        return docs.map(this.toDomain);
+    }
+
 }

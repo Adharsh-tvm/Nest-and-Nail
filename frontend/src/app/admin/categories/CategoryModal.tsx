@@ -142,7 +142,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
                 value={formData.slug}
                 onChange={handleInputChange}
                 placeholder="e.g. plumbing"
-                className="w-full text-base p-3 pl-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332] outline-none transition-all font-mono text-sm text-gray-600"
+                className="w-full p-3 pl-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332] outline-none transition-all font-mono text-sm text-gray-600"
               />
             </div>
           </div>

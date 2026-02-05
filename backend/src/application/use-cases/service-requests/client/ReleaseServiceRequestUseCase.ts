@@ -1,5 +1,5 @@
 import { IServiceRequestRepository } from "../../../../domain/repositories/IServiceRequestRepository";
-import { IReleaseServiceRequestUseCase } from "../../../interfaces/client/service-request/IReleaseServiceRequestUseCase";
+import { IReleaseServiceRequestUseCase } from "../../../interfaces/service-requests/client/IReleaseServiceRequestUseCase";
 
 export class ReleaseServiceRequestUseCase implements IReleaseServiceRequestUseCase {
     constructor(
