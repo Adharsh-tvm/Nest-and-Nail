@@ -2,11 +2,12 @@ import { ApiResponse } from "@/shared/types/responseTypes";
 import { ServiceRequestResponse } from "@/shared/types/ServiceRequestResponse";
 import { getOpenServiceRequestsApi, reserveServiceRequestApi } from "@/sources/api/serviceRequest/worker/workerServiceRequest.api";
 
-export async function getOpenServiceRequestsAction(): Promise<
-    ApiResponse<ServiceRequestResponse[]>
-> {
+export async function getOpenServiceRequestsAction(
+    lat: number,
+    lng: number
+): Promise<ApiResponse<ServiceRequestResponse[]>> {
     try {
-        return await getOpenServiceRequestsApi();
+        return await getOpenServiceRequestsApi(lat, lng);
     } catch (error: any) {
         return {
             success: false,
@@ -17,6 +18,7 @@ export async function getOpenServiceRequestsAction(): Promise<
         };
     }
 }
+
 
 
 export async function reserveServiceRequestAction(
