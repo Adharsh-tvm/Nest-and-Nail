@@ -16,11 +16,7 @@ import {
 import { useUserStore } from "@/store/userStore";
 import { Button } from "@/app/components/ui/button";
 import { Input } from "@/app/components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-} from "@/app/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/app/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -40,7 +36,7 @@ const calculateDistance = (
   lat1: number,
   lon1: number,
   lat2: number,
-  lon2: number
+  lon2: number,
 ) => {
   const R = 6371; // Radius of the earth in km
   const dLat = deg2rad(lat2 - lat1);
@@ -48,9 +44,9 @@ const calculateDistance = (
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos(deg2rad(lat1)) *
-    Math.cos(deg2rad(lat2)) *
-    Math.sin(dLon / 2) *
-    Math.sin(dLon / 2);
+      Math.cos(deg2rad(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   const d = R * c; // Distance in km
   return d;
@@ -77,40 +73,41 @@ export default function WorkerFindWorksPage() {
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
 
   useEffect(() => {
-    loadData();
-    // Default to user's first address if available, otherwise try current
-    if (user?.address && user.address.length > 0) {
+    if (user?.address && user.address.length > 0 && !workerLocation) {
       setWorkerLocation({
         lat: user.address[0].lat,
         lng: user.address[0].lng,
         label: "Home Address",
       });
     }
-  }, [user]);
+  }, [user, workerLocation]);
+
+  useEffect(() => {
+    if (!workerLocation) return;
+    loadData();
+  }, [workerLocation]);
 
   const loadData = async () => {
-    try {
-      setLoading(true);
-      const [reqRes, catRes] = await Promise.all([
-        getOpenServiceRequestsAction(),
-        getAllCategoriesAction(),
-      ]);
+    if (!workerLocation) return;
 
-      if (reqRes.success) {
-        setRequests(reqRes.payload);
-      } else {
-        toast.error(reqRes.message);
-      }
+    setLoading(true);
 
-      if (catRes.success) {
-        setCategories(catRes.payload);
-      }
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to load data");
-    } finally {
-      setLoading(false);
+    const [reqRes, catRes] = await Promise.all([
+      getOpenServiceRequestsAction(workerLocation.lat, workerLocation.lng),
+      getAllCategoriesAction(),
+    ]);
+
+    if (reqRes.success) {
+      setRequests(reqRes.payload);
+    } else {
+      toast.error(reqRes.message);
     }
+
+    if (catRes.success) {
+      setCategories(catRes.payload);
+    }
+
+    setLoading(false);
   };
 
   const handleGetCurrentLocation = () => {
@@ -131,7 +128,7 @@ export default function WorkerFindWorksPage() {
       },
       () => {
         toast.error("Unable to retrieve your location");
-      }
+      },
     );
   };
 
@@ -156,7 +153,7 @@ export default function WorkerFindWorksPage() {
           workerLocation.lat,
           workerLocation.lng,
           req.location.lat,
-          req.location.lng
+          req.location.lng,
         );
       }
       return { ...req, distance };
@@ -214,7 +211,9 @@ export default function WorkerFindWorksPage() {
                     >
                       <Navigation size={18} className="mr-3 text-[#DC2626]" />
                       <div className="flex flex-col items-start gap-0.5">
-                        <span className="font-bold text-slate-900">Current Location</span>
+                        <span className="font-bold text-slate-900">
+                          Current Location
+                        </span>
                         <span className="text-xs text-slate-500 font-medium">
                           Use GPS to find nearby works
                         </span>
@@ -272,7 +271,6 @@ export default function WorkerFindWorksPage() {
             </div>
           </div>
         </div>
-
       </div>
       <div className="max-w-7xl mx-auto px-6 md:px-10 -mt-8">
         {/* Filters Card */}
@@ -316,9 +314,7 @@ export default function WorkerFindWorksPage() {
             <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-6">
               <Search className="h-8 w-8 text-slate-400" />
             </div>
-            <h3 className="text-xl font-bold text-slate-900">
-              No works found
-            </h3>
+            <h3 className="text-xl font-bold text-slate-900">No works found</h3>
             <p className="text-slate-500 mt-2 text-center max-w-sm">
               Try adjusting your search or location to find more opportunities.
             </p>
@@ -386,10 +382,11 @@ export default function WorkerFindWorksPage() {
                 </CardContent>
 
                 <CardFooter className="p-4 bg-slate-50 border-t border-slate-100">
-                  <Link href={`/worker/find-works/${request.requestId}`} className="w-full">
-                    <Button
-                      className="w-full bg-[#DC2626] hover:bg-[#b91c1c] text-white font-medium group/btn"
-                    >
+                  <Link
+                    href={`/worker/find-works/${request.requestId}`}
+                    className="w-full"
+                  >
+                    <Button className="w-full bg-[#DC2626] hover:bg-[#b91c1c] text-white font-medium group/btn">
                       View Details
                       <ArrowUpRight
                         size={16}
