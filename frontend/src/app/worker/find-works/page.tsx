@@ -44,9 +44,9 @@ const calculateDistance = (
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos(deg2rad(lat1)) *
-      Math.cos(deg2rad(lat2)) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
+    Math.cos(deg2rad(lat2)) *
+    Math.sin(dLon / 2) *
+    Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   const d = R * c; // Distance in km
   return d;
@@ -169,29 +169,34 @@ export default function WorkerFindWorksPage() {
     .sort((a, b) => a.distance - b.distance); // Sort by distance
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 animate-in fade-in duration-500">
-      {/* Dark Header Section */}
-      <div className="bg-[#1B4332] text-white pb-12 pt-10 px-6 md:px-10 shadow-lg">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+    <div className="min-h-screen bg-gray-50/50 text-slate-900 font-sans">
+      {/* Hero / Header Section */}
+      <div className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
-                Find Open Works
+              <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+                Find Work
               </h1>
+              <p className="text-sm text-slate-500 mt-1">
+                Discover local opportunities near you
+              </p>
             </div>
 
-            <div className="flex items-center gap-3 bg-[#153426] p-2 rounded-xl border border-[#2d5f4e]">
+            <div className="flex items-center gap-3">
               <Dialog
                 open={isLocationModalOpen}
                 onOpenChange={setIsLocationModalOpen}
               >
                 <DialogTrigger asChild>
                   <Button
-                    className="bg-[#DC2626] hover:bg-[#b91c1c] text-white border-none"
-                    size="sm"
+                    variant="outline"
+                    className="h-10 border-slate-200 bg-white hover:bg-slate-50 hover:text-[#DC2626] text-slate-700 font-medium transition-colors"
                   >
-                    <Navigation size={16} className="mr-2" />
-                    Change Location
+                    <MapPin size={16} className="mr-2 text-[#DC2626]" />
+                    <span className="max-w-[120px] truncate">
+                      {workerLocation?.label || "Set Location"}
+                    </span>
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-md p-0 overflow-hidden border-none shadow-2xl bg-white">
@@ -261,139 +266,136 @@ export default function WorkerFindWorksPage() {
                   </div>
                 </DialogContent>
               </Dialog>
-              <div className="h-4 w-px bg-[#DC2626] mx-2" />
-              <div className="flex items-center gap-2 text-sm text-green-100 pr-2">
-                <MapPin size={16} className="text-[#DC2626]" />
-                <span className="font-medium truncate max-w-[150px]">
-                  {workerLocation?.label || "No Location Set"}
-                </span>
-              </div>
+            </div>
+          </div>
+
+          {/* Search & Filter Bar */}
+          <div className="mt-6 flex flex-col md:flex-row gap-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+              <Input
+                placeholder="Search for services..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9 bg-slate-50 border-slate-200 focus:bg-white transition-all"
+              />
+            </div>
+            <div className="relative md:w-48">
+              <select
+                className="w-full h-10 pl-3 pr-8 rounded-md border border-slate-200 bg-slate-50 text-sm focus:outline-none focus:ring-2 focus:ring-[#DC2626] focus:bg-white transition-all appearance-none cursor-pointer"
+                value={categoryFilter}
+                onChange={(e) => setCategoryFilter(e.target.value)}
+              >
+                <option value="all">All Categories</option>
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
+              <Filter className="absolute right-3 top-3 h-4 w-4 text-slate-400 pointer-events-none" />
             </div>
           </div>
         </div>
       </div>
-      <div className="max-w-7xl mx-auto px-6 md:px-10 -mt-8">
-        {/* Filters Card */}
-        <div className="bg-white p-4 rounded-xl shadow-md border border-slate-200 flex flex-col md:flex-row gap-4 items-center justify-between mb-8">
-          <div className="relative w-full md:max-w-md">
-            <Search className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
-            <Input
-              placeholder="Search jobs..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 h-11 border-slate-200 focus:ring-[#DC2626]"
-            />
-          </div>
-          <div className="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0 scrollbar-hide">
-            <Filter size={16} className="text-slate-400 mr-1" />
-            <select
-              className="h-11 pl-3 pr-8 rounded-md border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#DC2626]"
-              value={categoryFilter}
-              onChange={(e) => setCategoryFilter(e.target.value)}
-            >
-              <option value="all">All Categories</option>
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
 
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Content Grid */}
         {loading ? (
-          <div className="flex flex-col justify-center items-center h-60 gap-4">
-            <Loader2 className="h-10 w-10 animate-spin text-[#DC2626]" />
-            <p className="text-slate-500 font-medium animate-pulse">
-              Finding nearby requests...
+          <div className="flex flex-col justify-center items-center h-64 gap-4">
+            <Loader2 className="h-8 w-8 animate-spin text-[#DC2626]" />
+            <p className="text-slate-500 text-sm font-medium">
+              Scanning your area for jobs...
             </p>
           </div>
         ) : processedRequests.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-24 bg-white rounded-2xl border border-dashed border-slate-300">
-            <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-6">
+          <div className="text-center py-20">
+            <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 mb-4">
               <Search className="h-8 w-8 text-slate-400" />
             </div>
-            <h3 className="text-xl font-bold text-slate-900">No works found</h3>
-            <p className="text-slate-500 mt-2 text-center max-w-sm">
-              Try adjusting your search or location to find more opportunities.
+            <h3 className="text-lg font-semibold text-slate-900">
+              No jobs found nearby
+            </h3>
+            <p className="text-slate-500 mt-2 text-sm max-w-xs mx-auto">
+              Try expanding your search area or changing filters.
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {processedRequests.map((request) => (
               <Card
                 key={request.requestId}
-                className="group flex flex-col h-full overflow-hidden border-0 shadow-sm hover:shadow-xl transition-all duration-300 bg-white rounded-xl ring-1 ring-slate-200 hover:ring-[#DC2626]/30"
+                className="group flex flex-col overflow-hidden border border-slate-200 shadow-sm hover:shadow-md hover:border-[#DC2626]/30 transition-all duration-300 bg-white"
               >
-                <div className="relative h-48 w-full bg-slate-100 overflow-hidden">
+                {/* Card Header with Image & Badge */}
+                <div className="relative h-48 bg-slate-100 overflow-hidden">
                   {request.servicePhotos?.[0] ? (
                     <img
                       src={request.servicePhotos[0]}
                       alt={request.title}
-                      className="h-full w-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                   ) : (
-                    <div className="h-full w-full flex items-center justify-center bg-slate-200 text-slate-400">
-                      <ImageIcon size={40} />
+                    <div className="h-full w-full flex items-center justify-center bg-slate-50">
+                      <ImageIcon className="h-10 w-10 text-slate-300" />
                     </div>
                   )}
-                  <div className="absolute top-3 right-3 z-10">
-                    <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white/90 text-slate-700 backdrop-blur-sm shadow-sm">
+                  <div className="absolute top-3 left-3">
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-white/95 text-slate-700 shadow-sm backdrop-blur-[2px] ring-1 ring-black/5">
                       {getCategoryName(request.category)}
                     </span>
                   </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent opacity-80" />
-
-                  <div className="absolute bottom-3 left-3 right-3 text-white">
-                    <div className="flex items-center gap-1.5 text-xs font-medium opacity-90 mb-1">
-                      <MapPin size={12} className="text-[#DC2626]" />
-                      <span>
-                        {request.distance < 1000
-                          ? `${request.distance.toFixed(1)} km away`
-                          : "Unknown Distance"}
-                      </span>
+                  {/* Distance Overlay */}
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3 pt-8">
+                    <div className="flex items-center text-white/95 text-xs font-medium">
+                      <MapPin size={12} className="text-[#DC2626] mr-1" />
+                      {request.distance < 1000
+                        ? `${request.distance.toFixed(1)} km away`
+                        : "Unknown Distance"}
                     </div>
                   </div>
                 </div>
 
-                <CardContent className="flex-1 p-5 space-y-3">
-                  <h3 className="text-lg font-bold text-slate-900 leading-snug line-clamp-2 group-hover:text-[#DC2626] transition-colors">
-                    {request.title}
-                  </h3>
-                  <p className="text-sm text-slate-500 line-clamp-3 leading-relaxed">
+                {/* Card Body */}
+                <CardContent className="flex-1 p-4 flex flex-col gap-3">
+                  <div className="flex justify-between items-start gap-4">
+                    <h3 className="font-bold text-slate-900 text-base line-clamp-2 leading-tight group-hover:text-[#DC2626] transition-colors">
+                      {request.title}
+                    </h3>
+                  </div>
+
+                  {/* Budget Highlight */}
+                  {request.budget ? (
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-lg font-bold text-green-700">
+                        ₹{request.budget.toLocaleString()}
+                      </span>
+                      <span className="text-xs text-slate-400 font-medium">est. budget</span>
+                    </div>
+                  ) : (
+                    <div className="text-sm text-slate-400 font-medium italic">
+                      Budget negotiable
+                    </div>
+                  )}
+
+                  <p className="text-sm text-slate-500 line-clamp-2 leading-relaxed">
                     {request.description}
                   </p>
-
-                  <div className="flex items-center justify-between pt-4 mt-auto border-t border-slate-100">
-                    <div className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
-                      <Calendar size={14} className="text-slate-400" />
-                      <span>
-                        {new Date(request.createdAt).toLocaleDateString()}
-                      </span>
-                    </div>
-                    {request.budget && (
-                      <div className="flex items-center gap-1 text-green-700 font-bold text-sm bg-green-50 px-2 py-1 rounded">
-                        <IndianRupee size={12} />
-                        <span>{request.budget}</span>
-                      </div>
-                    )}
-                  </div>
                 </CardContent>
 
-                <CardFooter className="p-4 bg-slate-50 border-t border-slate-100">
-                  <Link
-                    href={`/worker/find-works/${request.requestId}`}
-                    className="w-full"
-                  >
-                    <Button className="w-full bg-[#DC2626] hover:bg-[#b91c1c] text-white font-medium group/btn">
-                      View Details
-                      <ArrowUpRight
-                        size={16}
-                        className="ml-2 transition-transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5"
-                      />
-                    </Button>
-                  </Link>
+                <CardFooter className="p-4 pt-0 mt-auto">
+                  <div className="w-full flex items-center justify-between border-t border-slate-100 pt-4">
+                    <div className="text-xs text-slate-400 font-medium flex items-center">
+                      <Calendar size={12} className="mr-1.5" />
+                      {new Date(request.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                    </div>
+
+                    <Link href={`/worker/find-works/${request.requestId}`}>
+                      <Button size="sm" className="bg-[#DC2626] hover:bg-[#b91c1c] text-white rounded-lg h-9 px-4 text-xs font-semibold shadow-sm hover:shadow transition-all">
+                        View Details
+                      </Button>
+                    </Link>
+                  </div>
                 </CardFooter>
               </Card>
             ))}
