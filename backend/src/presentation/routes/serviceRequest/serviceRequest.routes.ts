@@ -17,6 +17,7 @@ export function createServiceRequestRoutes(
 
     router.get(
         "/open",
+        authMiddleware.verify.bind(authMiddleware),
         (req, res) => serviceRequestController.getOpenRequests(req, res)
     );
 

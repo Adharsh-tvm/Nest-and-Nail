@@ -7,11 +7,16 @@ export class GetOpenServiceRequestsUseCase implements IGetOpenServiceRequestsUse
         private readonly _serviceRequestRepo: IServiceRequestRepository
     ) { }
 
-    async execute(workerLocation: [number, number], radiusMeters?: number): Promise<ServiceRequest[]> {
-
+    async execute(
+        workerId: string,
+        workerLocation: [number, number],
+        radiusMeters?: number
+    ): Promise<ServiceRequest[]> {
         return this._serviceRequestRepo.findOpenNearby(
             workerLocation,
+            workerId,
             radiusMeters
         );
     }
+
 }

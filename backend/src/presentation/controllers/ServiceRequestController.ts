@@ -45,6 +45,8 @@ export class ServiceRequestController implements IServiceRequestController {
 
     getOpenRequests = async (req: Request, res: Response): Promise<Response> => {
         try {
+            console.log("ojhsdujol h-------------------------------------------------------------------------",req.user)
+            const workerId = req.user.id; 
             const { lat, lng, radius } = req.query;
 
             const latNum = Number(lat);
@@ -63,6 +65,7 @@ export class ServiceRequestController implements IServiceRequestController {
             const radiusMeters = Math.min(Number(radius) || MAX_RADIUS, MAX_RADIUS);
 
             const requests = await this._getOpenServiceRequestsUseCase.execute(
+                workerId,
                 [lngNum,latNum],
                 radiusMeters ? Number(radiusMeters) : undefined
             );
