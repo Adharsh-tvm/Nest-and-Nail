@@ -1,6 +1,6 @@
 import { ApiResponse } from "@/shared/types/responseTypes";
 import { ServiceRequestResponse } from "@/shared/types/ServiceRequestResponse";
-import { getOpenServiceRequestsApi, reserveServiceRequestApi } from "@/sources/api/serviceRequest/worker/workerServiceRequest.api";
+import { getOpenServiceRequestsApi, reserveServiceRequestApi, getServiceRequestByIdApi } from "@/sources/api/serviceRequest/worker/workerServiceRequest.api";
 
 export async function getOpenServiceRequestsAction(
     lat: number,
@@ -21,6 +21,7 @@ export async function getOpenServiceRequestsAction(
 
 
 
+
 export async function reserveServiceRequestAction(
     requestId: string
 ): Promise<ApiResponse<{ reservedUntil: string }>> {
@@ -32,6 +33,22 @@ export async function reserveServiceRequestAction(
             message:
                 error.normalizedMessage ??
                 "Failed to reserve service request",
+            error: error.serverData ?? error.message,
+        };
+    }
+}
+
+export async function getServiceRequestByIdAction(
+    requestId: string
+): Promise<ApiResponse<ServiceRequestResponse>> {
+    try {
+        return await getServiceRequestByIdApi(requestId);
+    } catch (error: any) {
+        return {
+            success: false,
+            message:
+                error.normalizedMessage ??
+                "Failed to fetch service request details",
             error: error.serverData ?? error.message,
         };
     }
