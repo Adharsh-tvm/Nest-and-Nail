@@ -5,6 +5,7 @@ export interface IServiceRequestRepository {
 
   findOpenNearby(
     coordinates: [number, number],
+    workerId: string,
     radiusMeters?: number
   ): Promise<ServiceRequest[]>;
 

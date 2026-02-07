@@ -35,12 +35,18 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
         return this.toDomain(doc);
     }
 
-    async findOpenNearby(coordinates: [number, number], radiusMeters?: number): Promise<ServiceRequest[]> {
+    async findOpenNearby(
+        coordinates: [number, number],
+        workerId: string,
+        radiusMeters?: number
+    ): Promise<ServiceRequest[]> {
 
         const now = new Date();
         const maxDistance = radiusMeters ?? 10000;
+
         const results = await ServiceRequestModel.find({
             $and: [
+                { clientId: { $ne: workerId } },
                 {
                     $or: [
                         { status: ServiceRequestStatus.OPEN },
@@ -66,6 +72,7 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
 
         return results.map(doc => this.toDomain(doc));
     }
+
 
     async findByRequestId(requestId: string): Promise<ServiceRequest | null> {
         const result = await ServiceRequestModel.findOne({ requestId }).lean();

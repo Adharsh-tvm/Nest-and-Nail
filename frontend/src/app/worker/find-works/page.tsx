@@ -44,9 +44,9 @@ const calculateDistance = (
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos(deg2rad(lat1)) *
-    Math.cos(deg2rad(lat2)) *
-    Math.sin(dLon / 2) *
-    Math.sin(dLon / 2);
+      Math.cos(deg2rad(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   const d = R * c; // Distance in km
   return d;
@@ -370,7 +370,9 @@ export default function WorkerFindWorksPage() {
                       <span className="text-lg font-bold text-green-700">
                         ₹{request.budget.toLocaleString()}
                       </span>
-                      <span className="text-xs text-slate-400 font-medium">est. budget</span>
+                      <span className="text-xs text-slate-400 font-medium">
+                        est. budget
+                      </span>
                     </div>
                   ) : (
                     <div className="text-sm text-slate-400 font-medium italic">
@@ -387,11 +389,17 @@ export default function WorkerFindWorksPage() {
                   <div className="w-full flex items-center justify-between border-t border-slate-100 pt-4">
                     <div className="text-xs text-slate-400 font-medium flex items-center">
                       <Calendar size={12} className="mr-1.5" />
-                      {new Date(request.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                      {new Date(request.createdAt).toLocaleDateString(
+                        undefined,
+                        { month: "short", day: "numeric" },
+                      )}
                     </div>
 
                     <Link href={`/worker/find-works/${request.requestId}`}>
-                      <Button size="sm" className="bg-[#DC2626] hover:bg-[#b91c1c] text-white rounded-lg h-9 px-4 text-xs font-semibold shadow-sm hover:shadow transition-all">
+                      <Button
+                        size="sm"
+                        className="bg-[#DC2626] hover:bg-[#b91c1c] text-white rounded-lg h-9 px-4 text-xs font-semibold shadow-sm hover:shadow transition-all"
+                      >
                         View Details
                       </Button>
                     </Link>
