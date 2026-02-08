@@ -44,11 +44,15 @@ export class CategoryController implements ICategoryController {
 
     updateStatus = async (req: Request, res: Response) => {
         const { id } = req.params;
-        const { isActive } = req.body;
 
-        await this._updateCategoryStatusUseCase.execute(id, isActive);
-        res.status(HttpStatusCode.OK).json(ResponseHandler.success(null, RESPONSE_MESSAGES.UPDATED));
+        const updatedCategory =
+            await this._updateCategoryStatusUseCase.execute(id);
+
+        res.status(HttpStatusCode.OK).json(
+            ResponseHandler.success(updatedCategory, RESPONSE_MESSAGES.UPDATED)
+        );
     };
+
 
 
 }

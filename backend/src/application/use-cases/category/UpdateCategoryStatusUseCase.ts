@@ -5,14 +5,20 @@ export class UpdateCategoryStatusUseCase implements IUpdateCategoryStatusUseCase
 
   constructor(private readonly _categoryRepo: ICategoryRepository) { }
 
-  async execute(id: string, isActive: boolean) {
-
-    const category = await this._categoryRepo.update(id, { isActive });
+  async execute(id: string) {
+    const category = await this._categoryRepo.findById(id);
 
     if (!category) {
       throw new Error("Category not found");
     }
 
-    return this._categoryRepo.update(id, { isActive });
+    const updated = await this._categoryRepo.update(id, {
+      isActive: !category.isActive,
+    });
+
+    return updated;
   }
+
+
+
 }

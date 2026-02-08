@@ -90,8 +90,12 @@ const CategoriesPage = () => {
         throw new Error(res.message);
       }
 
+      if (!res.payload) {
+        throw new Error("Invalid server response");
+      }
+
       setCategories((prev) =>
-        prev.map((c) => (c.id === res.payload.id ? res.payload : c)),
+        prev.map((c) => (c.id === res.payload!.id ? res.payload! : c)),
       );
 
       toast.success(
