@@ -135,7 +135,7 @@ NEW PENDINGS...
 ☐ axios call api services in one file
 ☐ ui stability
 ✔ toast for otp login @done (1/13/2026, 11:34:57 PM)
-☐ after applicatoin send for approval page immediate refresh to show pending button
+☐ after applicatin send for approval page immediate refresh to show pending button
 ☐ worker profile ui along with sidebar 
 ✔ client profile ui along with sidebar @done (1/13/2026, 11:35:11 PM)
 ✔ change landing page @done (1/13/2026, 11:35:13 PM)
