@@ -353,13 +353,13 @@ const UsersView = () => {
           color="bg-white text-gray-900 border border-gray-100"
           iconColor="text-blue-500"
         />
-        <StatCard
+        {/* <StatCard
           title="Active Now"
-          value={Math.round(totalUsers * 0.8)}
+          value={Math.round(totalUsers)}
           icon={TrendingUp}
           color="bg-white text-gray-900 border border-gray-100"
           iconColor="text-purple-500"
-        />
+        /> */}
         <StatCard
           title="Blocked"
           value={blockedUsers}

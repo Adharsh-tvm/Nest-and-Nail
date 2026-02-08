@@ -185,7 +185,7 @@ NEW PENDINGS...
 ☐ admin only middleware for admin access
 ☐ implement exact middlewares in authorization backend
 ☐ list all the service requests in admin side
-
+☐ show category name instead of id in service requests
 
 
 
