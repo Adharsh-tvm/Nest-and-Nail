@@ -138,7 +138,7 @@ export default function ServiceRequestDetailsPage() {
                                     <div>
                                         <div className="flex items-center justify-between mb-2">
                                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#1B4332]/10 text-[#1B4332]">
-                                                Category: {request.category}
+                                                Request Id: {request.requestId}
                                             </span>
                                             <span className="text-sm text-slate-500 flex items-center">
                                                 <Clock size={14} className="mr-1.5" />
