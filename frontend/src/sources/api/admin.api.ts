@@ -97,7 +97,7 @@ export async function fetchAllWorkers(): Promise<Worker[]> {
 
 export async function fetchAllUsers(): Promise<User[]> {
   const res = await axiosInstance.get<ApiResponse<any[]>>(
-    "/api/auth/all"
+    "/api/admin/users/all"
   );
 
   if (!res.data.success) {

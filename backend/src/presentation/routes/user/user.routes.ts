@@ -22,8 +22,6 @@ export function createUserRoutes(
         userController.getCurrentUser(req, res)
     );
 
-    router.get("/all", (req, res) => userController.getAllUsers(req, res));
-
     router.put(
         "/user/:userId/profile",
         authMiddleware.verify.bind(authMiddleware),
