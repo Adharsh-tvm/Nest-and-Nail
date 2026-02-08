@@ -9,6 +9,7 @@ export function createAdminRoutes(adminController: IAdminController, categoryCon
 
     router.get("/clients", authMiddleware.verify.bind(authMiddleware), (req, res) => adminController.getAllClients(req, res));
     router.get("/workers", authMiddleware.verify.bind(authMiddleware), (req, res) => adminController.getAllWorkers(req, res));
+    router.get("/users/all", (req, res) => adminController.getAllUsers(req, res));
     router.patch("/verify/:userId", authMiddleware.verify.bind(authMiddleware), (req, res) => adminController.approveVerification(req, res));
     router.patch("/reject/:userId", authMiddleware.verify.bind(authMiddleware), (req, res) => adminController.rejectVerification(req, res));
     router.patch("/access/:userId", authMiddleware.verify.bind(authMiddleware), (req, res) => adminController.updateUserAccess(req, res));

@@ -61,7 +61,8 @@ export class ControllerDI {
                 this._useCases.getAllClientsUseCase,
                 this._useCases.getAllWorkersUseCase,
                 this._useCases.updateVerificationStatusUseCase,
-                this._useCases.updateUserAccessUseCase
+                this._useCases.updateUserAccessUseCase,
+                this._useCases.getAllUsersUseCase
             );
         }
         return this._adminController;
@@ -81,7 +82,6 @@ export class ControllerDI {
             this._userController = new UserController(
                 this._useCases.changeUserRoleUseCase,
                 this._useCases.getCurrentUserUseCase,
-                this._useCases.getAllUsersUseCase
             )
         }
         return this._userController;

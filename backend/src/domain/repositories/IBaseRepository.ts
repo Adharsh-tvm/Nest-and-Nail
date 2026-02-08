@@ -6,5 +6,18 @@ export interface IBaseRepository<T> {
     update(email: string, updateData: Partial<T>): Promise<T | null>;
     updateById(userId: string, updateData: Partial<T>): Promise<T | null>;
     delete(email: string): Promise<boolean>;
-    deleteByUserId(userId: string): Promise<boolean>; 
+    deleteByUserId(userId: string): Promise<boolean>;
+    findWithQuery(
+        filter: {
+            isBlocked?: boolean;
+            isVerified?: any;
+            search?: string;
+        },
+        options: {
+            sortBy: string;
+            sortOrder: "asc" | "desc";
+            page: number;
+            limit: number;
+        }
+    ): Promise<T[]>;
 }

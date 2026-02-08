@@ -114,5 +114,56 @@ export abstract class BaseRepository<T extends User> implements IBaseRepository<
         return clean as T;
     }
 
+    async findWithQuery(
+        filter: {
+            isBlocked?: boolean;
+            isVerified?: any;
+            search?: string;
+        },
+        options: {
+            sortBy: string;
+            sortOrder: "asc" | "desc";
+            page: number;
+            limit: number;
+        }
+    ): Promise<T[]> {
+
+        const mongoFilter: any = {};
+
+        if (typeof filter.isBlocked === "boolean") {
+            mongoFilter.isBlocked = filter.isBlocked;
+        }
+
+        if (filter.isVerified) {
+            mongoFilter.isVerified = filter.isVerified;
+        }
+
+        if (filter.search) {
+            mongoFilter.$or = [
+                { name: { $regex: filter.search, $options: "i" } },
+                { email: { $regex: filter.search, $options: "i" } },
+            ];
+        }
+
+        const sort: Record<string, 1 | -1> = {
+            [options.sortBy]: options.sortOrder === "asc" ? 1 : -1,
+        };
+
+        const skip = (options.page - 1) * options.limit;
+
+        const results = await this.model
+            .find(mongoFilter)
+            .sort(sort)
+            .skip(skip)
+            .limit(options.limit)
+            .lean()
+            .exec();
+
+        return results.map(doc => {
+            const { _id, __v, ...rest } = doc as any;
+            return rest as T;
+        });
+    }
+
 
 }
