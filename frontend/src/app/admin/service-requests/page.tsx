@@ -49,7 +49,7 @@ export default function ServicesPage() {
     const acceptedRequests = data.filter((r) => r.status === ServiceRequestStatus.ACCEPTED).length;
 
     const handleRowClick = (row: ServiceRequestResponse) => {
-        router.push(`/admin/services/${row.requestId}`);
+        router.push(`/admin/service-requests/${row.requestId}`);
     };
 
     const columns: Column<ServiceRequestResponse>[] = [
@@ -127,7 +127,7 @@ export default function ServicesPage() {
             cell: (row) => (
                 <div className="flex justify-end">
                     <Link
-                        href={`/admin/services/${row.requestId}`}
+                        href={`/admin/service-requests/${row.requestId}`}
                         onClick={(e) => e.stopPropagation()}
                         className="p-2 bg-gray-50 hover:bg-[#1B4332] text-gray-400 hover:text-white rounded-lg transition-all duration-200 shadow-sm"
                     >

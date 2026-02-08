@@ -40,7 +40,7 @@ const navItems = [
     icon: ShieldCheck,
     href: "/admin/verification",
   },
-  { id: "services", label: "Services", icon: Wrench, href: "/admin/services" },
+  { id: "service-requests", label: "Services", icon: Wrench, href: "/admin/service-requests" },
   {
     id: "payments",
     label: "Payments",
