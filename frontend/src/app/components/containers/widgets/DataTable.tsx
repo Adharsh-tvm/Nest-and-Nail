@@ -25,6 +25,13 @@ export interface DataTableProps<T = any> {
   actions?: React.ReactNode;
   searchPlaceholder?: string;
   isLoading?: boolean;
+  // New props for remote data
+  searchValue?: string;
+  onSearchChange?: (value: string) => void;
+  page?: number;
+  totalPages?: number;
+  onPageChange?: (page: number) => void;
+  onFilterClick?: () => void;
 }
 
 const DataTable = <T,>({
@@ -35,7 +42,75 @@ const DataTable = <T,>({
   actions,
   searchPlaceholder = "Search...",
   isLoading = false,
+  searchValue,
+  onSearchChange,
+  page = 1,
+  totalPages = 1,
+  onPageChange,
+  onFilterClick,
 }: DataTableProps<T>) => {
+  // Use internal state if no controlled props provided
+  const [internalSearch, setInternalSearch] = React.useState("");
+  const isControlled = onSearchChange !== undefined;
+  const currentSearch = isControlled ? searchValue : internalSearch;
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (isControlled) {
+      onSearchChange?.(e.target.value);
+    } else {
+      setInternalSearch(e.target.value);
+    }
+  };
+
+  const renderPagination = () => {
+    const pages = [];
+    // Always show first, last, current, and neighbors
+    const range = 2; // Neighbors on each side
+
+    for (let i = 1; i <= totalPages; i++) {
+      if (
+        i === 1 ||
+        i === totalPages ||
+        (i >= page - range && i <= page + range)
+      ) {
+        pages.push(i);
+      } else if (
+        (i === page - range - 1 && i > 1) ||
+        (i === page + range + 1 && i < totalPages)
+      ) {
+        pages.push("...");
+      }
+    }
+
+    // Deduplicate ellipses
+    const uniquePages = pages.filter((val, index, arr) => val !== "..." || arr[index - 1] !== "...");
+
+    return uniquePages.map((p, idx) => {
+      if (p === "...") {
+        return (
+          <span key={`ellipsis-${idx}`} className="text-gray-300 px-2">...</span>
+        );
+      }
+
+      const pageNum = p as number;
+      const isActive = pageNum === page;
+
+      return (
+        <button
+          key={pageNum}
+          onClick={() => onPageChange?.(pageNum)}
+          disabled={!onPageChange}
+          className={`w-8 h-8 flex items-center justify-center rounded-lg shadow-sm font-bold transition-all ${isActive
+              ? "bg-[#1B4332] text-white"
+              : "hover:bg-gray-50 text-gray-600 font-medium"
+            }`}
+        >
+          {pageNum}
+        </button>
+      );
+    });
+  };
+
   return (
     <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 flex flex-col h-full overflow-hidden relative">
       {/* Decorative gradient top bar */}
@@ -59,15 +134,22 @@ const DataTable = <T,>({
             </div>
             <input
               type="text"
+              value={currentSearch || ""}
+              onChange={handleSearch}
               placeholder={searchPlaceholder}
               className="w-full pl-11 pr-4 py-3 text-sm rounded-xl border border-gray-100 bg-gray-50/50 text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1B4332]/10 focus:border-[#1B4332]/20 focus:bg-white transition-all shadow-sm"
             />
           </div>
 
           {/* Filter Button */}
-          <button className="p-3 bg-white border border-gray-100 rounded-xl hover:bg-gray-50 text-gray-500 hover:text-[#1B4332] transition-colors shadow-sm active:scale-95">
-            <Filter size={20} />
-          </button>
+          {onFilterClick && (
+            <button
+              onClick={onFilterClick}
+              className="p-3 bg-white border border-gray-100 rounded-xl hover:bg-gray-50 text-gray-500 hover:text-[#1B4332] transition-colors shadow-sm active:scale-95"
+            >
+              <Filter size={20} />
+            </button>
+          )}
 
           {/* Extra Actions */}
           {actions}
@@ -82,9 +164,8 @@ const DataTable = <T,>({
               {columns.map((col, idx) => (
                 <th
                   key={idx}
-                  className={`px-6 py-5 text-xs font-bold text-gray-400 uppercase tracking-wider first:pl-2 ${
-                    col.className || ""
-                  }`}
+                  className={`px-6 py-5 text-xs font-bold text-gray-400 uppercase tracking-wider first:pl-2 ${col.className || ""
+                    }`}
                 >
                   <div className="flex items-center gap-2 group cursor-pointer hover:text-gray-600">
                     {col.header}
@@ -131,11 +212,10 @@ const DataTable = <T,>({
                       return;
                     onRowClick && onRowClick(row);
                   }}
-                  className={`group transition-all duration-200 hover:bg-emerald-50/30 ${
-                    onRowClick
+                  className={`group transition-all duration-200 hover:bg-emerald-50/30 ${onRowClick
                       ? "cursor-pointer hover:transform hover:scale-[1.01]"
                       : ""
-                  }`}
+                    }`}
                 >
                   {columns.map((col, colIndex) => {
                     const value =
@@ -146,9 +226,8 @@ const DataTable = <T,>({
                     return (
                       <td
                         key={colIndex}
-                        className={`px-6 py-5 text-sm text-gray-600 first:pl-2 first:rounded-l-2xl last:rounded-r-2xl ${
-                          col.className || ""
-                        }`}
+                        className={`px-6 py-5 text-sm text-gray-600 first:pl-2 first:rounded-l-2xl last:rounded-r-2xl ${col.className || ""
+                          }`}
                       >
                         {col.cell ? col.cell(row) : value ?? "—"}
                       </td>
@@ -189,24 +268,22 @@ const DataTable = <T,>({
 
         <div className="flex items-center gap-2">
           <button
+            onClick={() => onPageChange?.(page - 1)}
+            disabled={page <= 1 || !onPageChange}
             className="w-8 h-8 flex items-center justify-center border border-gray-100 rounded-lg hover:bg-gray-50 hover:border-gray-200 disabled:opacity-50 disabled:hover:bg-white transition-colors text-gray-600"
-            disabled
           >
             <ChevronLeft size={16} />
           </button>
+
           <div className="flex items-center gap-1 mx-2">
-            <button className="w-8 h-8 flex items-center justify-center bg-[#1B4332] text-white rounded-lg shadow-sm font-bold">
-              1
-            </button>
-            <button className="w-8 h-8 flex items-center justify-center hover:bg-gray-50 rounded-lg text-gray-600 font-medium transition-colors">
-              2
-            </button>
-            <button className="w-8 h-8 flex items-center justify-center hover:bg-gray-50 rounded-lg text-gray-600 font-medium transition-colors">
-              3
-            </button>
-            <span className="text-gray-300">...</span>
+            {renderPagination()}
           </div>
-          <button className="w-8 h-8 flex items-center justify-center border border-gray-100 rounded-lg hover:bg-gray-50 hover:border-gray-200 transition-colors text-gray-600">
+
+          <button
+            onClick={() => onPageChange?.(page + 1)}
+            disabled={page >= totalPages || !onPageChange}
+            className="w-8 h-8 flex items-center justify-center border border-gray-100 rounded-lg hover:bg-gray-50 hover:border-gray-200 disabled:opacity-50 disabled:hover:bg-white transition-colors text-gray-600"
+          >
             <ChevronRight size={16} />
           </button>
         </div>

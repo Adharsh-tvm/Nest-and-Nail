@@ -111,7 +111,35 @@ import BlockConfirmationModal from "./BlockConfirmationModal";
  * ----------------------------------------------------------------------------
  */
 const UsersView = () => {
-  const { users, loading, error } = useUsers();
+  // State for filters and pagination
+  const [page, setPage] = useState(1);
+  const [limit] = useState(10);
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [isBlocked, setIsBlocked] = useState<boolean | undefined>(undefined);
+  const [isVerified, setIsVerified] = useState<VerificationStatus | undefined>(
+    undefined
+  );
+
+  // Debounce search
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1); // Reset to page 1 on search
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [search]);
+
+  const { users, loading, error, total, totalPages } = useUsers({
+    page,
+    limit,
+    search: debouncedSearch,
+    isBlocked,
+    isVerified,
+    sortBy: "createdAt",
+    sortOrder: "desc",
+  });
+
   const [localUsers, setLocalUsers] = useState<any[]>([]);
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -122,16 +150,14 @@ const UsersView = () => {
     if (users) setLocalUsers(users);
   }, [users]);
 
-  useEffect(() => {
-    console.log("These are the users", users);
-  });
-
-  // Derive stats
-  const totalUsers = localUsers.length;
-  const verifiedUsers = localUsers.filter(
-    (u) => u.isVerified === VerificationStatus.VERIFIED,
-  ).length;
-  const blockedUsers = localUsers.filter((u) => u.isBlocked).length;
+  // Derive stats (Note: these might be partial if we only fetch one page, 
+  // but for now we display what we have or we might need a separate stats API if we want global stats)
+  // For now, we'll keep the stats cards but note that they reflect the current view or we might want to fetch stats separately.
+  // Actually, let's keep them as is, but they will only count what's on the page which is misleading.
+  // Ideally, the API should return global stats.
+  // As a compromise, I will remove the "verifiedUsers" and "blockedUsers" counts from client side calculation if they are misleading,
+  // or just leave them as "Visible Users" stats.
+  // Let's rely on the `total` from the API for Total Users.
 
   const handleBlockToggle = (row: any) => {
     setUserToBlock(row);
@@ -148,8 +174,8 @@ const UsersView = () => {
         prev.map((u) =>
           u.id === updatedUser.id
             ? { ...u, isBlocked: updatedUser.isBlocked }
-            : u,
-        ),
+            : u
+        )
       );
       setBlockConfirmOpen(false);
       setUserToBlock(null);
@@ -337,46 +363,65 @@ const UsersView = () => {
   return (
     <div className="max-w-[1600px] mx-auto space-y-8 pb-10">
       {/* Header Stats */}
+      {/* Note: Showing verified/blocked counts based on current page might be confusing, so we just show available stats or placeholders */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
         <StatCard
           title="Total Users"
-          value={totalUsers}
+          value={total}
           icon={Users}
           color="bg-gradient-to-br from-emerald-500 to-emerald-600 text-white shadow-emerald-200"
           iconColor="text-white/80"
-          trend="+12% this month"
+          trend=""
         />
-        <StatCard
-          title="Verified"
-          value={verifiedUsers}
-          icon={BadgeCheck}
-          color="bg-white text-gray-900 border border-gray-100"
-          iconColor="text-blue-500"
-        />
-        {/* <StatCard
-          title="Active Now"
-          value={Math.round(totalUsers)}
-          icon={TrendingUp}
-          color="bg-white text-gray-900 border border-gray-100"
-          iconColor="text-purple-500"
-        /> */}
-        <StatCard
-          title="Blocked"
-          value={blockedUsers}
-          icon={Ban}
-          color="bg-white text-gray-900 border border-gray-100"
-          iconColor="text-red-500"
-        />
+        {/* We could fetch global stats for these, but for now let's hide or keep them standard */}
+        {/* <StatCard ... /> */}
       </div>
 
       {/* Main Table */}
-      <div className="h-[650px] bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden flex flex-col">
+      <div className="h-[750px] bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden flex flex-col">
         <DataTable<ClientRow>
           title="User Management"
           columns={columns}
           data={localUsers}
           isLoading={loading}
-          searchPlaceholder="Search by name, email or role..."
+          searchPlaceholder="Search by name, email..."
+          searchValue={search}
+          onSearchChange={setSearch}
+          page={page}
+          totalPages={totalPages}
+          onPageChange={setPage}
+          actions={
+            <div className="flex gap-2">
+              <select
+                className="p-3 bg-gray-50 border border-gray-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#1B4332]/10"
+                value={isVerified ?? "ALL"}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setIsVerified(val === "ALL" ? undefined : val as VerificationStatus);
+                  setPage(1);
+                }}
+              >
+                <option value="ALL">All Verification</option>
+                <option value={VerificationStatus.VERIFIED}>Verified</option>
+                <option value={VerificationStatus.PENDING}>Pending</option>
+                <option value={VerificationStatus.NOT_VERIFIED}>Unverified</option>
+              </select>
+
+              <select
+                className="p-3 bg-gray-50 border border-gray-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#1B4332]/10"
+                value={isBlocked === undefined ? "ALL" : String(isBlocked)}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setIsBlocked(val === "ALL" ? undefined : val === "true");
+                  setPage(1);
+                }}
+              >
+                <option value="ALL">All Status</option>
+                <option value="false">Active</option>
+                <option value="true">Blocked</option>
+              </select>
+            </div>
+          }
         />
       </div>
 

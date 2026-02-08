@@ -4,7 +4,7 @@ import axiosInstance from "@/lib/axiosInstance";
 import { VerificationStatus } from "@/shared/enums/authEnums";
 import { mapUserFromApi } from "@/shared/mappers/user.mapper";
 import { ApiResponse } from "@/shared/types/responseTypes";
-import { User } from "@/shared/types/userTypes";
+import { User, UserQueryParams } from "@/shared/types/userTypes";
 
 /* ---------------- TYPES ---------------- */
 
@@ -95,16 +95,61 @@ export async function fetchAllWorkers(): Promise<Worker[]> {
   }
 }
 
-export async function fetchAllUsers(): Promise<User[]> {
-  const res = await axiosInstance.get<ApiResponse<any[]>>(
-    "/api/admin/users/all"
-  );
+// Helper to build query string
+function buildQueryString(params: UserQueryParams): string {
+  const query = new URLSearchParams();
+
+  if (params.isBlocked !== undefined) {
+    query.append("isBlocked", String(params.isBlocked));
+  }
+  if (params.isVerified) {
+    query.append("isVerified", params.isVerified);
+  }
+  if (params.search) {
+    query.append("search", params.search);
+  }
+  if (params.sortBy) {
+    query.append("sortBy", params.sortBy);
+  }
+  if (params.sortOrder) {
+    query.append("sortOrder", params.sortOrder);
+  }
+  if (params.page) {
+    query.append("page", String(params.page));
+  }
+  if (params.limit) {
+    query.append("limit", String(params.limit));
+  }
+
+  return query.toString();
+}
+
+export async function fetchAllUsers(
+  params: UserQueryParams = {}
+): Promise<{ users: User[]; total: number; totalPages: number }> {
+  const queryString = buildQueryString(params);
+  const url = `/api/admin/users/all${queryString ? `?${queryString}` : ""}`;
+
+  const res = await axiosInstance.get<ApiResponse<any>>(url);
 
   if (!res.data.success) {
     throw new Error(res.data.message || "Failed to fetch users");
   }
 
-  return res.data.payload.map(mapUserFromApi);
+  // Handle both array response (legacy) and paginated response
+  if (Array.isArray(res.data.payload)) {
+    return {
+      users: res.data.payload.map(mapUserFromApi),
+      total: res.data.payload.length,
+      totalPages: 1,
+    };
+  } else {
+    return {
+      users: (res.data.payload.users || []).map(mapUserFromApi),
+      total: res.data.payload.total || 0,
+      totalPages: res.data.payload.totalPages || 1,
+    };
+  }
 }
 
 export async function approveVerification(userId: string): Promise<void> {

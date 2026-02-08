@@ -24,3 +24,21 @@ export type User = {
   iat?: number;
   exp?: number;
 };
+
+export type UserQueryParams = {
+  isBlocked?: boolean;
+  isVerified?: VerificationStatus;
+  search?: string;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
+  page?: number;
+  limit?: number;
+};
+
+export type PaginatedUserResponse = {
+  users: User[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+};

@@ -8,7 +8,7 @@ import {
   toggleUserAccess,
   fetchAllUsers,
 } from "@/sources/api/admin.api";
-import { User } from "@/shared/types/userTypes";
+import { User, UserQueryParams } from "@/shared/types/userTypes";
 
 
 export async function getAllClientsAction() {
@@ -33,6 +33,6 @@ export async function toggleUserAccessAction(
   return await toggleUserAccess(userId);
 }
 
-export async function getAllUsers() {
-  return await fetchAllUsers();
+export async function getAllUsers(params: UserQueryParams = {}) {
+  return await fetchAllUsers(params);
 }
