@@ -119,14 +119,14 @@ NEW PENDINGS...
 ☐ add proper validations
 ☐ show correct messages to users
 ☐ fix the refresh issues
-☐ option for admin to add reason for rejection
+✔ option for admin to add reason for rejection @done (2/8/2026, 12:56:25 PM)
 ✔ option to re-apply @done (1/13/2026, 11:06:12 PM)
 ☐ ask for confirmation
 ✔ user block / unblock - bug @done (1/13/2026, 11:06:20 PM)
 ☐ avoid using any/void
 ✔ types of inheritance @done (1/13/2026, 11:07:50 PM)
 ✔ make the ui smaller especially footer @done (1/13/2026, 11:07:52 PM)
-☐ make the profile pages perfect 
+✔ make the profile pages perfect @done (2/8/2026, 12:56:33 PM)
 ✔ add taost for google login @done (1/13/2026, 11:07:58 PM)
 ✔ prevent blocked user form google login @done (1/13/2026, 11:33:40 PM)
 ☐ logout blocked user
@@ -179,6 +179,10 @@ NEW PENDINGS...
 ☐ need to add custom location while adding address
 ☐ auto logout after token expire
 ☐ address delete option 
+☐ add service delete option
+☐ meeting ui set up
+☐ fetch services based on categories 
+
 
 
 
