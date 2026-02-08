@@ -4,8 +4,8 @@ import { ApiResponse } from "@/shared/types/responseTypes";
 import { ServiceRequestResponse } from "@/shared/types/ServiceRequestResponse";
 import {
     getAllServiceRequestsApi,
-    getServiceRequestByIdApi,
 } from "@/sources/api/serviceRequest/admin/adminServiceRequest.api";
+import { getServiceRequestByIdApi } from "@/sources/api/serviceRequest/client/clientServiceRequest.api";
 
 export async function getAllServiceRequestsAction(): Promise<
     ApiResponse<ServiceRequestResponse[]>

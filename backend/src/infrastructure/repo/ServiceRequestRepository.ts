@@ -132,4 +132,12 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
         return docs.map(this.toDomain);
     }
 
+    async findAll(): Promise<ServiceRequest[]> {
+        const docs = await ServiceRequestModel.find()
+            .sort({ createdAt: -1 })
+            .lean();
+
+        return docs.map(doc => this.toDomain(doc));
+    }
+
 }

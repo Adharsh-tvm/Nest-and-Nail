@@ -8,16 +8,7 @@ export async function getAllServiceRequestsApi(): Promise<
     ApiResponse<ServiceRequestResponse[]>
 > {
     const res = await axiosInstance.get<ApiResponse<ServiceRequestResponse[]>>(
-        "/api/admin/service-requests"
-    );
-    return res.data;
-}
-
-export async function getServiceRequestByIdApi(
-    requestId: string
-): Promise<ApiResponse<ServiceRequestResponse>> {
-    const res = await axiosInstance.get<ApiResponse<ServiceRequestResponse>>(
-        `/api/admin/service-requests/${requestId}`
+        "/api/service-requests/admin/all"
     );
     return res.data;
 }

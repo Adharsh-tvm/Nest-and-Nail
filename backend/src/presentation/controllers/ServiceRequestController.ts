@@ -10,6 +10,7 @@ import { ResponseHandler } from "../../shared/responses/ApiResponse";
 import { RESPONSE_MESSAGES } from "../../shared/responses/ResponseMessages";
 import { IGetMyServiceRequestsUseCase } from "../../application/interfaces/service-requests/client/IGetMyServiceRequestsUseCase";
 import { IGetServiceRequestByIdUseCase } from "../../application/interfaces/service-requests/IGetServiceRequestByIdUseCase";
+import { IGetAllServiceRequestsUseCase } from "../../application/interfaces/service-requests/admin/IGetAllServiceRequestsUseCase";
 
 export class ServiceRequestController implements IServiceRequestController {
     constructor(
@@ -19,7 +20,7 @@ export class ServiceRequestController implements IServiceRequestController {
         private readonly _releaseServiceRequestUseCase: IReleaseServiceRequestUseCase,
         private readonly _getMyServiceRequestsUseCase: IGetMyServiceRequestsUseCase,
         private readonly _getServiceRequestByIdUseCase: IGetServiceRequestByIdUseCase,
-
+        private readonly _getAllServiceRequestsUseCase: IGetAllServiceRequestsUseCase
     ) { }
 
     create = async (req: Request, res: Response): Promise<Response> => {
@@ -45,8 +46,8 @@ export class ServiceRequestController implements IServiceRequestController {
 
     getOpenRequests = async (req: Request, res: Response): Promise<Response> => {
         try {
-            console.log("ojhsdujol h-------------------------------------------------------------------------",req.user)
-            const workerId = req.user.id; 
+            console.log("ojhsdujol h-------------------------------------------------------------------------", req.user)
+            const workerId = req.user.id;
             const { lat, lng, radius } = req.query;
 
             const latNum = Number(lat);
@@ -66,7 +67,7 @@ export class ServiceRequestController implements IServiceRequestController {
 
             const requests = await this._getOpenServiceRequestsUseCase.execute(
                 workerId,
-                [lngNum,latNum],
+                [lngNum, latNum],
                 radiusMeters ? Number(radiusMeters) : undefined
             );
 
@@ -163,5 +164,23 @@ export class ServiceRequestController implements IServiceRequestController {
             );
         }
     };
+
+    getAllForAdmin = async (_req: Request, res: Response): Promise<Response> => {
+        try {
+            const requests = await this._getAllServiceRequestsUseCase.execute();
+
+            return res.status(HttpStatusCode.OK).json(
+                ResponseHandler.success(
+                    requests.map(ServiceRequestMapper.toResponseDTO),
+                    "All service requests"
+                )
+            );
+        } catch (error: any) {
+            return res.status(HttpStatusCode.INTERNAL_SERVER).json(
+                ResponseHandler.error("Failed to fetch service requests", error.message)
+            );
+        }
+    };
+
 
 } 
