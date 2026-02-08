@@ -40,7 +40,21 @@ const CategoriesPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   const fetchCategories = async () => {
-    
+    try {
+      setLoading(true);
+
+      const res = await getAllCategoriesAction();
+
+      if (!res.success) {
+        throw new Error(res.message);
+      }
+
+      setCategories(res.payload);
+    } catch (error: any) {
+      toast.error(error.message || "Failed to load categories");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -57,9 +71,7 @@ const CategoriesPage = () => {
     setIsModalOpen(true);
   };
 
-  const handleSave = async () => {
-    
-  };
+  const handleSave = async () => {};
 
   const handleToggleStatus = async (category: Category) => {
     const previous = category;
