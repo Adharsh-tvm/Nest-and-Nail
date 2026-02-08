@@ -27,4 +27,6 @@ export interface IServiceRequestRepository {
     clientId: string
   ): Promise<ServiceRequest[]>;
 
+  findAll(): Promise<ServiceRequest[]>;
+
 }

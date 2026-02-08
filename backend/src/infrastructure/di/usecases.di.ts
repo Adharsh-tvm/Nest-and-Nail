@@ -63,6 +63,8 @@ import { IGetCloudinaryUploadSignatureUseCase } from "../../application/interfac
 import { GetCloudinaryUploadSignatureUseCase } from "../../application/use-cases/media/GetCloudinaryUploadSignatureUseCase";
 import { IGetServiceRequestByIdUseCase } from "../../application/interfaces/service-requests/IGetServiceRequestByIdUseCase";
 import { GetServiceRequestByIdUseCase } from "../../application/use-cases/service-requests/GetServiceRequestByIdUseCase";
+import { IGetAllServiceRequestsUseCase } from "../../application/interfaces/service-requests/admin/IGetAllServiceRequestsUseCase";
+import { GetAllServiceRequestsUseCase } from "../../application/use-cases/service-requests/admin/GetAllServiceRequestsUseCase";
 
 
 
@@ -109,9 +111,11 @@ export class UseCaseDI {
   private _releaseServiceRequestUseCase?: IReleaseServiceRequestUseCase;
   private _reserveServiceRequestUseCase?: IReserveServiceRequestUseCase;
   private _getMyServiceRequestsUseCase?: IGetMyServiceRequestsUseCase;
+  private _getServiceRequestByIdUseCase?: IGetServiceRequestByIdUseCase;
+  private _getAllServiceRequestsUseCase?: IGetAllServiceRequestsUseCase;
 
   private _getCloudinaryUploadSignatureUseCase?: IGetCloudinaryUploadSignatureUseCase;
-  private _getServiceRequestByIdUseCase?: IGetServiceRequestByIdUseCase;
+
 
   constructor(private infra: InfrastructureDI) { }
 
@@ -420,13 +424,22 @@ export class UseCaseDI {
     }
     return this._getCloudinaryUploadSignatureUseCase
   }
-  
+
   get getServiceRequestByIdUseCase(): IGetServiceRequestByIdUseCase {
-    if(!this._getServiceRequestByIdUseCase) {
+    if (!this._getServiceRequestByIdUseCase) {
       this._getServiceRequestByIdUseCase = new GetServiceRequestByIdUseCase(
         this.infra.serviceRequestRepository
       )
     }
     return this._getServiceRequestByIdUseCase
+  }
+
+  get getAllServiceRequestsUseCase(): IGetAllServiceRequestsUseCase {
+    if (!this._getAllServiceRequestsUseCase) {
+      this._getAllServiceRequestsUseCase = new GetAllServiceRequestsUseCase(
+        this.infra.serviceRequestRepository
+      )
+    }
+    return this._getAllServiceRequestsUseCase;
   }
 }

@@ -45,5 +45,11 @@ export function createServiceRequestRoutes(
         (req, res) => serviceRequestController.getById(req, res)
     );
 
+    router.get(
+        "/admin/all",
+        authMiddleware.verify.bind(authMiddleware),
+        (req, res) => serviceRequestController.getAllForAdmin(req, res)
+    );
+
     return router;
 }
