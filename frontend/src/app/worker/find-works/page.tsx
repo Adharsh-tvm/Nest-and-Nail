@@ -60,7 +60,7 @@ export default function WorkerFindWorksPage() {
   const { user } = useUserStore();
   const [requests, setRequests] = useState<ServiceRequestResponse[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
 
@@ -71,6 +71,8 @@ export default function WorkerFindWorksPage() {
     label: string;
   } | null>(null);
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
+
+  const hasLocation = Boolean(workerLocation);
 
   useEffect(() => {
     if (user?.address && user.address.length > 0 && !workerLocation) {
@@ -92,22 +94,21 @@ export default function WorkerFindWorksPage() {
 
     setLoading(true);
 
-    const [reqRes, catRes] = await Promise.all([
-      getOpenServiceRequestsAction(workerLocation.lat, workerLocation.lng),
-      getAllCategoriesAction(),
-    ]);
+    try {
+      const [reqRes, catRes] = await Promise.all([
+        getOpenServiceRequestsAction(workerLocation.lat, workerLocation.lng),
+        getAllCategoriesAction(),
+      ]);
 
-    if (reqRes.success) {
-      setRequests(reqRes.payload);
-    } else {
-      toast.error(reqRes.message);
+      setRequests(reqRes.success ? reqRes.payload : []);
+      setCategories(catRes.success ? catRes.payload : []);
+    } catch {
+      setRequests([]);
+      setCategories([]);
+      toast.error("Failed to fetch jobs");
+    } finally {
+      setLoading(false);
     }
-
-    if (catRes.success) {
-      setCategories(catRes.payload);
-    }
-
-    setLoading(false);
   };
 
   const handleGetCurrentLocation = () => {
@@ -178,9 +179,6 @@ export default function WorkerFindWorksPage() {
               <h1 className="text-2xl font-bold tracking-tight text-slate-900">
                 Find Work
               </h1>
-              <p className="text-sm text-slate-500 mt-1">
-                Discover local opportunities near you
-              </p>
             </div>
 
             <div className="flex items-center gap-3">
@@ -301,6 +299,30 @@ export default function WorkerFindWorksPage() {
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Content Grid */}
+
+        {!hasLocation && (
+          <div className="flex flex-col items-center justify-center h-[60vh] text-center gap-4">
+            <div className="h-16 w-16 rounded-full bg-slate-100 flex items-center justify-center">
+              <MapPin className="h-8 w-8 text-[#DC2626]" />
+            </div>
+
+            <h3 className="text-lg font-semibold text-slate-900">
+              Set your location
+            </h3>
+
+            <p className="text-sm text-slate-500 max-w-xs">
+              We need your location to find nearby work opportunities.
+            </p>
+
+            <Button
+              onClick={() => setIsLocationModalOpen(true)}
+              className="mt-2 bg-[#DC2626] hover:bg-[#b91c1c] text-white px-6"
+            >
+              Set Location
+            </Button>
+          </div>
+        )}
+
         {loading ? (
           <div className="flex flex-col justify-center items-center h-64 gap-4">
             <Loader2 className="h-8 w-8 animate-spin text-[#DC2626]" />
