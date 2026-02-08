@@ -43,7 +43,7 @@ import toast from "react-hot-toast";
 import { VerificationStatus } from "@/shared/enums/authEnums";
 import { User } from "@/shared/types/userTypes";
 import { Category } from "@/shared/types/categoryTypes";
-import { AddAddressModal } from "@/components/AddAddressModal";
+import { AddAddressModal } from "@/app/components/containers/layout/AddAddressModal";
 import { Address } from "@/shared/types/addressType";
 
 // --- Types ---
@@ -234,11 +234,11 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
             setUser({ ...user, categories: fetchedUser.categories || [] });
           }
         })
-        .catch(err => console.error("Failed to fetch worker categories", err));
+        .catch((err) =>
+          console.error("Failed to fetch worker categories", err),
+        );
     }
   }, [user.id, setUser]); // Added setUser to deps, though it's likely stable
-
-
 
   // Sync formData when user prop updates (e.g. after image upload in parent)
   useEffect(() => {
@@ -497,10 +497,11 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
                   (skill, i) => (
                     <span
                       key={i}
-                      className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium border ${isEditingSkills
-                        ? "bg-white border-[#1B4332] text-[#1B4332]"
-                        : "bg-[#1B4332]/5 border-[#1B4332]/10 text-[#1B4332]"
-                        }`}
+                      className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium border ${
+                        isEditingSkills
+                          ? "bg-white border-[#1B4332] text-[#1B4332]"
+                          : "bg-[#1B4332]/5 border-[#1B4332]/10 text-[#1B4332]"
+                      }`}
                     >
                       {skill}
                       {isEditingSkills && (
@@ -628,10 +629,11 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
                         <button
                           key={cat.id}
                           onClick={() => handleToggleCategory(cat.id)}
-                          className={`text-left px-4 py-2 rounded-lg text-sm transition-all border ${isSelected
-                            ? "bg-[#1B4332] text-white border-[#1B4332]"
-                            : "bg-gray-50 text-gray-600 border-gray-100 hover:border-gray-200"
-                            }`}
+                          className={`text-left px-4 py-2 rounded-lg text-sm transition-all border ${
+                            isSelected
+                              ? "bg-[#1B4332] text-white border-[#1B4332]"
+                              : "bg-gray-50 text-gray-600 border-gray-100 hover:border-gray-200"
+                          }`}
                         >
                           <div className="flex justify-between items-center">
                             <span>{cat.name}</span>
@@ -931,12 +933,14 @@ const SettingsView: React.FC<ViewProps> = ({ user, setUser }) => {
           <button
             onClick={handleToggleOnline}
             disabled={isUpdating}
-            className={`w-12 h-7 rounded-full relative transition-colors ${user.isOnline ? "bg-[#1B4332]" : "bg-gray-200"
-              } ${isUpdating ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+            className={`w-12 h-7 rounded-full relative transition-colors ${
+              user.isOnline ? "bg-[#1B4332]" : "bg-gray-200"
+            } ${isUpdating ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
           >
             <span
-              className={`absolute top-1 left-1 bg-white w-5 h-5 rounded-full transition-transform ${user.isOnline ? "translate-x-5" : "translate-x-0"
-                }`}
+              className={`absolute top-1 left-1 bg-white w-5 h-5 rounded-full transition-transform ${
+                user.isOnline ? "translate-x-5" : "translate-x-0"
+              }`}
             />
           </button>
         </div>
@@ -1131,9 +1135,10 @@ const UserProfile = () => {
               disabled={isUpdatingStatus}
               className={`
                 flex items-center gap-3 px-6 py-3 rounded-xl font-bold text-sm transition-all shadow-sm
-                ${safeUser.isOnline
-                  ? "bg-[#1B4332] text-white hover:bg-[#143326] shadow-emerald-900/10"
-                  : "bg-white text-gray-500 border border-gray-200 hover:bg-gray-50 hover:text-gray-700"
+                ${
+                  safeUser.isOnline
+                    ? "bg-[#1B4332] text-white hover:bg-[#143326] shadow-emerald-900/10"
+                    : "bg-white text-gray-500 border border-gray-200 hover:bg-gray-50 hover:text-gray-700"
                 }
                 ${isUpdatingStatus ? "opacity-70 cursor-wait" : ""}
               `}
@@ -1163,18 +1168,20 @@ const UserProfile = () => {
                   onClick={() => setActiveTab(tab.id as Tab)}
                   className={`
                                 group inline-flex items-center py-5 px-1 border-b-2 font-medium text-base transition-all
-                                ${isActive
-                      ? "border-[#1B4332] text-[#1B4332]"
-                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                    }
+                                ${
+                                  isActive
+                                    ? "border-[#1B4332] text-[#1B4332]"
+                                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                                }
                             `}
                 >
                   <Icon
                     size={18}
-                    className={`mr-2.5 ${isActive
-                      ? "text-[#1B4332]"
-                      : "text-gray-400 group-hover:text-gray-500"
-                      }`}
+                    className={`mr-2.5 ${
+                      isActive
+                        ? "text-[#1B4332]"
+                        : "text-gray-400 group-hover:text-gray-500"
+                    }`}
                   />
                   {tab.label}
                 </button>

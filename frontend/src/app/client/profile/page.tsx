@@ -36,7 +36,7 @@ import { updateUserProfileAction } from "@/app/actions/users/user-profile-action
 import { updateUserSkillsAction } from "@/app/actions/users/user-skills-action";
 import toast from "react-hot-toast";
 import { VerificationStatus } from "@/shared/enums/authEnums";
-import { AddAddressModal } from "@/components/AddAddressModal"; // Import modal
+import { AddAddressModal } from "@/app/components/containers/layout/AddAddressModal"; // Import modal
 import { User } from "@/shared/types/userTypes";
 import { Address } from "@/shared/types/addressType";
 
@@ -369,10 +369,11 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
                   (skill, i) => (
                     <span
                       key={i}
-                      className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium border ${isEditingSkills
-                        ? "bg-white border-[#1B4332] text-[#1B4332]"
-                        : "bg-[#1B4332]/5 border-[#1B4332]/10 text-[#1B4332]"
-                        }`}
+                      className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium border ${
+                        isEditingSkills
+                          ? "bg-white border-[#1B4332] text-[#1B4332]"
+                          : "bg-[#1B4332]/5 border-[#1B4332]/10 text-[#1B4332]"
+                      }`}
                     >
                       {skill}
                       {isEditingSkills && (
@@ -494,7 +495,6 @@ const AddressesView: React.FC<ViewProps> = ({ user, setUser }) => {
         onSave={handleSaveAddress}
       />
       <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-
         <div className="grid md:grid-cols-2 gap-6">
           {user.address?.map((addr, index) => (
             <div
@@ -660,12 +660,14 @@ const SettingsView: React.FC = () => {
           </div>
           <button
             onClick={() => setIsAvailable(!isAvailable)}
-            className={`w-12 h-7 rounded-full relative transition-colors ${isAvailable ? "bg-[#1B4332]" : "bg-gray-200"
-              }`}
+            className={`w-12 h-7 rounded-full relative transition-colors ${
+              isAvailable ? "bg-[#1B4332]" : "bg-gray-200"
+            }`}
           >
             <span
-              className={`absolute top-1 left-1 bg-white w-5 h-5 rounded-full transition-transform ${isAvailable ? "translate-x-5" : "translate-x-0"
-                }`}
+              className={`absolute top-1 left-1 bg-white w-5 h-5 rounded-full transition-transform ${
+                isAvailable ? "translate-x-5" : "translate-x-0"
+              }`}
             />
           </button>
         </div>
@@ -838,18 +840,20 @@ const UserProfile = () => {
                   onClick={() => setActiveTab(tab.id as Tab)}
                   className={`
                                 group inline-flex items-center py-5 px-1 border-b-2 font-medium text-base transition-all
-                                ${isActive
-                      ? "border-[#1B4332] text-[#1B4332]"
-                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                    }
+                                ${
+                                  isActive
+                                    ? "border-[#1B4332] text-[#1B4332]"
+                                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                                }
                             `}
                 >
                   <Icon
                     size={18}
-                    className={`mr-2.5 ${isActive
-                      ? "text-[#1B4332]"
-                      : "text-gray-400 group-hover:text-gray-500"
-                      }`}
+                    className={`mr-2.5 ${
+                      isActive
+                        ? "text-[#1B4332]"
+                        : "text-gray-400 group-hover:text-gray-500"
+                    }`}
                   />
                   {tab.label}
                 </button>
