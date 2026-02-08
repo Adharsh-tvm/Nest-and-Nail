@@ -182,6 +182,8 @@ NEW PENDINGS...
 ☐ add service delete option
 ☐ meeting ui set up
 ☐ fetch services based on categories 
+☐ admin only middleware for admin access
+☐ implement exact middlewares in authorization backend
 
 
 

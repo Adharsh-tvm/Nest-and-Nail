@@ -47,7 +47,7 @@ async function bootstrap() {
 
   app.use("/api/auth", createUserRoutes(container.controllers.userController, container.controllers.userProfileController, container.controllers.authMiddleware));
 
-  app.use("/api/admin", createAdminRoutes(container.controllers.adminController, container.controllers.categoryController));
+  app.use("/api/admin", createAdminRoutes(container.controllers.adminController, container.controllers.categoryController, container.controllers.authMiddleware));
 
   app.use("/api/upload", createUploadRoutes(container.controllers.uploadController, container.controllers.authMiddleware));
 
