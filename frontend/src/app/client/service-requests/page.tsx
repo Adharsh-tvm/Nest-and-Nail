@@ -764,7 +764,7 @@ export default function ServicesPage() {
                 </CardContent>
 
                 <CardFooter className="p-4 bg-gray-50/50">
-                  <Link href={`/client/services/${request.requestId}`} className="w-full">
+                  <Link href={`/client/service-requests/${request.requestId}`} className="w-full">
                     <Button
                       variant="ghost"
                       className="w-full justify-between text-[#1B4332] hover:text-[#153426] hover:bg-green-100/50 font-semibold group/btn"

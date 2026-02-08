@@ -75,7 +75,7 @@ export default function ServiceDetailPage() {
             const res = await getServiceRequestByIdAction(id);
             if (!res.success) {
                 toast.error(res.message);
-                router.push("/client/services"); // Redirect back on error
+                router.push("/client/service-requests"); // Redirect back on error
                 return;
             }
             setRequest(res.payload);
