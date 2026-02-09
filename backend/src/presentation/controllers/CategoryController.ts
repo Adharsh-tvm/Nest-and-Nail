@@ -28,18 +28,27 @@ export class CategoryController implements ICategoryController {
     };
 
     async update(req: Request, res: Response): Promise<void> {
-        const { id } = req.params;
-        const { name, slug, isActive } = req.body;
+        try {
+            const { id } = req.params;
+            const { name, isActive } = req.body;
 
-        const category = await this._updateCategoryUseCase.execute(id, {
-            name,
-            slug,
-            isActive,
-        });
+            const category = await this._updateCategoryUseCase.execute(id, {
+                name,
+                isActive,
+            });
 
-        res.status(HttpStatusCode.OK).json(
-            ResponseHandler.success(category, RESPONSE_MESSAGES.UPDATED)
-        );
+            res.status(HttpStatusCode.OK).json(
+                ResponseHandler.success(category, RESPONSE_MESSAGES.UPDATED)
+            );
+        } catch (error: any) {
+            console.error("[CategoryController.update]", error);
+
+            res.status(HttpStatusCode.BAD_REQUEST).json(
+                ResponseHandler.error(
+                    error.message || "Failed to update category"
+                )
+            );
+        }
     }
 
     updateStatus = async (req: Request, res: Response) => {
@@ -52,7 +61,4 @@ export class CategoryController implements ICategoryController {
             ResponseHandler.success(updatedCategory, RESPONSE_MESSAGES.UPDATED)
         );
     };
-
-
-
 }

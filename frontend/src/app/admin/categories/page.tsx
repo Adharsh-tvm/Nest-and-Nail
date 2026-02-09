@@ -71,12 +71,45 @@ const CategoriesPage = () => {
     setIsModalOpen(true);
   };
 
-  const handleSave = async () => {};
+  const handleSave = async (data: CategoryInput) => {
+    setActionLoading(true);
+
+    try {
+      if (selectedCategory) {
+        const res = await updateCategoryAction(selectedCategory.id, data);
+
+        if (!res.success) {
+          toast.error(res.message);
+          return;
+        }
+
+        setCategories((prev) =>
+          prev.map((c) => (c.id === res.payload!.id ? res.payload! : c)),
+        );
+
+        toast.success("Category updated successfully");
+      } else {
+        const res = await createCategoryAction(data);
+
+        if (!res.success) {
+          toast.error(res.message);
+          return;
+        }
+
+        setCategories((prev) => [res.payload!, ...prev]);
+        toast.success("Category created successfully");
+      }
+
+      setIsModalOpen(false);
+      setSelectedCategory(null);
+    } finally {
+      setActionLoading(false);
+    }
+  };
 
   const handleToggleStatus = async (category: Category) => {
     const previous = category;
 
-    // Optimistic update
     setCategories((prev) =>
       prev.map((c) =>
         c.id === category.id ? { ...c, isActive: !c.isActive } : c,
