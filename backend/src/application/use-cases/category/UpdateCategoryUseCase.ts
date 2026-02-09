@@ -8,16 +8,16 @@ export class UpdateCategoryUseCase implements IUpdateCategoryUseCase {
         id: string,
         data: {
             name: string;
-            slug: string;
             isActive: boolean;
         }
     ) {
-        const slug = data.slug
+        const slug = data.name
             .toLowerCase()
             .trim()
             .replace(/\s+/g, "-");
 
         const existing = await this._categoryRepo.findBySlug(slug);
+
         if (existing && existing.id !== id) {
             throw new Error("Category slug already exists");
         }
@@ -28,4 +28,5 @@ export class UpdateCategoryUseCase implements IUpdateCategoryUseCase {
             isActive: data.isActive,
         });
     }
+
 }

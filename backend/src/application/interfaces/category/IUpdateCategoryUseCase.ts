@@ -5,7 +5,6 @@ export interface IUpdateCategoryUseCase {
     id: string,
     data: {
       name: string;
-      slug: string;
       isActive: boolean;
     }
   ): Promise<Category>;
