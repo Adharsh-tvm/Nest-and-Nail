@@ -17,7 +17,6 @@ export function createUserRoutes(
         (req, res) => userController.changeRole(req, res)
     );
 
-
     router.get("/current/:email", (req, res) =>
         userController.getCurrentUser(req, res)
     );
@@ -36,9 +35,21 @@ export function createUserRoutes(
     );
 
     router.post(
-        "/:userId/address",
+        "/:userId/addresses",
         authMiddleware.verify,
-        userProfileController.updateAddress
+        userProfileController.addAddress
+    );
+
+    router.put(
+        "/:userId/addresses/:addressId",
+        authMiddleware.verify,
+        userProfileController.editAddress
+    );
+
+    router.delete(
+        "/:userId/addresses/:addressId",
+        authMiddleware.verify,
+        userProfileController.deleteAddress
     );
 
     router.patch(

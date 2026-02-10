@@ -1,4 +1,5 @@
 export interface Address {
+    addressId: string;
     label: "HOME" | "WORK" | "OTHER";
     street: string;
     city: string;
@@ -12,6 +13,6 @@ export interface Address {
     };
 
     isDefault: boolean;
-    createdAt?: Date;
+    createdAt?: Date;                                         
     updatedAt?: Date;
 }
