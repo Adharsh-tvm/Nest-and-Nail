@@ -54,7 +54,7 @@ const userApi = {
     payload: Address
   ): Promise<ApiResponse<User>> => {
     const response = await axiosInstance.post(
-      `/api/users/${userId}/address`,
+      `/api/users/${userId}/addresses`,
       payload
     );
     return response.data
@@ -77,9 +77,33 @@ const userApi = {
   ): Promise<ApiResponse<User>> => {
     const response = await axiosInstance.get<ApiResponse<User>>(
       `/api/users/${userId}/categories`,
-      {withCredentials: true}
+      { withCredentials: true }
     );
     return response.data
+  },
+
+  editUserAddressApi: async (
+    userId: string,
+    addressId: string,
+    payload: Address
+  ): Promise<ApiResponse<User>> => {
+    const response = await axiosInstance.put<ApiResponse<User>>(
+      `/api/users/${userId}/addresses/${addressId}`,
+      payload,
+      { withCredentials: true }
+    );
+    return response.data;
+  },
+
+  deleteUserAddressApi: async (
+    userId: string,
+    addressId: string
+  ): Promise<ApiResponse<User>> => {
+    const response = await axiosInstance.delete<ApiResponse<User>>(
+      `/api/users/${userId}/addresses/${addressId}`,
+      { withCredentials: true }
+    );
+    return response.data;
   }
 };
 

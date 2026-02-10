@@ -139,6 +139,49 @@ export async function addUSerAddressAction(
   }
 }
 
+export async function editUserAddressAction(
+  userId: string,
+  addressId: string,
+  address: Address
+): Promise<ApiResponse<User>> {
+  try {
+    return await userApi.editUserAddressApi(userId, addressId, address);
+  } catch (error: any) {
+    return {
+      success: false,
+      message:
+        error?.response?.data?.message ||
+        error?.message ||
+        "Failed to edit address",
+      error: {
+        status: error?.response?.status,
+        data: error?.response?.data,
+      },
+    };
+  }
+}
+
+export async function deleteUserAddressAction(
+  userId: string,
+  addressId: string
+): Promise<ApiResponse<User>> {
+  try {
+    return await userApi.deleteUserAddressApi(userId, addressId);
+  } catch (error: any) {
+    return {
+      success: false,
+      message:
+        error?.response?.data?.message ||
+        error?.message ||
+        "Failed to delete address",
+      error: {
+        status: error?.response?.status,
+        data: error?.response?.data,
+      },
+    };
+  }
+}
+
 
 export async function reverseGeocode(lat: number, lng: number) {
   const res = await fetch(
