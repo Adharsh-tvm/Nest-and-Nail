@@ -20,5 +20,12 @@ export type ServiceRequestResponse = {
   reservedBy?: string;
   reservationExpiresAt?: Date;
 
-  createdAt: string; 
+  createdAt: string;
+
+  client?: {
+    name: string;
+    email: string;
+    phone?: number;
+    profilePictureUrl?: string;
+  }
 }

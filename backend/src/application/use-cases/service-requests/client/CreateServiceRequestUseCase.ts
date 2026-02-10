@@ -5,15 +5,23 @@ import { IGenerateServiceRequestId } from "../../../contracts/IGenerateServiceRe
 import { CreateServiceRequestDTO } from "../../../dtos/ServiceRequestDTO";
 import { ICreateServiceRequestUseCase } from "../../../interfaces/service-requests/client/ICreateServiceRequestUseCase ";
 
+import { IClientRepository } from "../../../../domain/repositories/IClientRepository";
+
 export class CreateServiceRequestUseCase implements ICreateServiceRequestUseCase {
     constructor(
         private readonly _serviceRequestRepo: IServiceRequestRepository,
-        private readonly _idGenerator: IGenerateServiceRequestId
+        private readonly _idGenerator: IGenerateServiceRequestId,
+        private readonly _clientRepo: IClientRepository
     ) { }
 
     async execute(
         data: CreateServiceRequestDTO & { clientId: string }
     ): Promise<ServiceRequest> {
+
+        const client = await this._clientRepo.findById(data.clientId);
+        if (!client) {
+            throw new Error("Client not found");
+        }
 
         const requestId = this._idGenerator.generate();
 
@@ -29,7 +37,13 @@ export class CreateServiceRequestUseCase implements ICreateServiceRequestUseCase
             budget: data.budget,
             servicePhotos: data.servicePhotos ?? [],
             requestId,
-            status: ServiceRequestStatus.OPEN
+            status: ServiceRequestStatus.OPEN,
+            client: {
+                name: client.name,
+                email: client.email,
+                phone: client.phone,
+                profilePictureUrl: client.profilePictureUrl
+            }
         });
     }
 }

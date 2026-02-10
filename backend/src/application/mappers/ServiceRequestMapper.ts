@@ -23,7 +23,13 @@ export class ServiceRequestMapper {
             status: entity.status,
             reservedBy: entity.reservedBy,
             reservationExpiresAt: entity.reservationExpiresAt,
-            createdAt: entity.createdAt
+            createdAt: entity.createdAt,
+            client: entity.client ? {
+                name: entity.client.name,
+                email: entity.client.email,
+                phone: entity.client.phone,
+                profilePictureUrl: entity.client.profilePictureUrl
+            } : undefined
         };
     }
 

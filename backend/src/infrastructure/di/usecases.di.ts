@@ -399,7 +399,8 @@ export class UseCaseDI {
     if (!this._createServiceRequestUseCase) {
       this._createServiceRequestUseCase = new CreateServiceRequestUseCase(
         this.infra.serviceRequestRepository,
-        this.infra.serviceRequestIdGenerator
+        this.infra.serviceRequestIdGenerator,
+        this.infra.clientRepository
       )
     }
     return this._createServiceRequestUseCase

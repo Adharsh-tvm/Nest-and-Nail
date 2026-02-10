@@ -26,4 +26,11 @@ export interface ServiceRequest {
 
   createdAt: Date;
   updatedAt: Date;
+
+  client?: {
+    name: string;
+    email: string;
+    phone?: number;
+    profilePictureUrl?: string;
+  }
 }
