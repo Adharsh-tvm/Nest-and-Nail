@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from "next/navigation";
 
 import React, { useState, useEffect, useRef } from "react";
 import {
@@ -504,8 +505,8 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
                     <span
                       key={i}
                       className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium border ${isEditingSkills
-                          ? "bg-white border-[#1B4332] text-[#1B4332]"
-                          : "bg-[#1B4332]/5 border-[#1B4332]/10 text-[#1B4332]"
+                        ? "bg-white border-[#1B4332] text-[#1B4332]"
+                        : "bg-[#1B4332]/5 border-[#1B4332]/10 text-[#1B4332]"
                         }`}
                     >
                       {skill}
@@ -635,8 +636,8 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
                           key={cat.id}
                           onClick={() => handleToggleCategory(cat.id)}
                           className={`text-left px-4 py-2 rounded-lg text-sm transition-all border ${isSelected
-                              ? "bg-[#1B4332] text-white border-[#1B4332]"
-                              : "bg-gray-50 text-gray-600 border-gray-100 hover:border-gray-200"
+                            ? "bg-[#1B4332] text-white border-[#1B4332]"
+                            : "bg-gray-50 text-gray-600 border-gray-100 hover:border-gray-200"
                             }`}
                         >
                           <div className="flex justify-between items-center">
@@ -701,6 +702,7 @@ const AddressesView: React.FC<ViewProps> = ({ user, setUser }) => {
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [addressToDelete, setAddressToDelete] = useState<string | null>(null);
+  const router = useRouter();
 
   const handleSaveAddress = async (addressData: Address) => {
     // Determine if we are adding or editing
@@ -743,6 +745,7 @@ const AddressesView: React.FC<ViewProps> = ({ user, setUser }) => {
 
       setUser(response.payload || oldUser);
       toast.success(isEditing ? "Address updated successfully" : "Address added successfully");
+      router.refresh();
     } catch (err: any) {
       setUser(oldUser);
       toast.error(err.message || "Failed to save address");
@@ -778,6 +781,7 @@ const AddressesView: React.FC<ViewProps> = ({ user, setUser }) => {
       }
       setUser(response.payload || oldUser);
       toast.success("Address deleted successfully");
+      router.refresh();
     } catch (err: any) {
       setUser(oldUser);
       toast.error(err.message || "Failed to delete address");
@@ -839,7 +843,14 @@ const AddressesView: React.FC<ViewProps> = ({ user, setUser }) => {
                     <Edit2 size={16} />
                   </button>
                   <button
-                    onClick={() => addr.addressId && handleDeleteClick(addr.addressId)}
+                    onClick={() => {
+                      const id = addr.addressId || (addr as any)._id;
+                      if (id) {
+                        handleDeleteClick(id);
+                      } else {
+                        toast.error("Cannot delete: Address ID missing. Please refresh.");
+                      }
+                    }}
                     className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
                   >
                     <Trash2 size={16} />
@@ -1265,8 +1276,8 @@ const UserProfile = () => {
                   <Icon
                     size={18}
                     className={`mr-2.5 ${isActive
-                        ? "text-[#1B4332]"
-                        : "text-gray-400 group-hover:text-gray-500"
+                      ? "text-[#1B4332]"
+                      : "text-gray-400 group-hover:text-gray-500"
                       }`}
                   />
                   {tab.label}

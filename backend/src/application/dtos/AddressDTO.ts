@@ -1,4 +1,5 @@
-export interface AddAddressDTO {
+export interface AddressDTO {
+  addressId: string;
   label: "HOME" | "WORK" | "OTHER";
   street: string;
   city: string;
@@ -10,4 +11,5 @@ export interface AddAddressDTO {
   isDefault?: boolean;
 }
 
-export interface UpdateAddressDTO extends Partial<AddAddressDTO> { }
+export interface UpdateAddressDTO extends Partial<AddressDTO> { }
+

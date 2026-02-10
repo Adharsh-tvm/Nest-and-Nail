@@ -36,6 +36,7 @@ export class UserMapper {
 
             skills: userData.skills ?? [],
             address: userData.address?.map(addr => ({
+                addressId: addr.addressId,
                 label: addr.label,
                 street: addr.street,
                 city: addr.city,

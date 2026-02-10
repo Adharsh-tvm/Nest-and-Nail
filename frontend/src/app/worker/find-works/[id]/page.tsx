@@ -239,7 +239,7 @@ export default function ServiceRequestDetailsPage() {
 
                 <div className="space-y-3">
                   <Button className="w-full bg-[#DC2626] hover:bg-[#b91c1c] text-white font-semibold py-6 text-lg shadow-lg hover:shadow-xl transition-all">
-                    Accept & Start Work
+                    Reserve 
                   </Button>
                   <p className="text-xs text-center text-slate-400">
                     By accepting, you agree to the terms of service.
