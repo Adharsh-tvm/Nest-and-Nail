@@ -29,4 +29,6 @@ export interface IServiceRequestRepository {
 
   findAll(): Promise<ServiceRequest[]>;
 
+  delete(requestId: string): Promise<boolean>;
+
 }

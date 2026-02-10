@@ -13,7 +13,6 @@ import {
   Loader2,
   Search,
   ArrowUpRight,
-  Filter,
   IndianRupee,
 } from "lucide-react";
 import { useUserStore } from "@/store/userStore";
@@ -764,18 +763,16 @@ export default function ServicesPage() {
                 </CardContent>
 
                 <CardFooter className="p-4 bg-gray-50/50">
-                  <Link href={`/client/service-requests/${request.requestId}`} className="w-full">
-                    <Button
-                      variant="ghost"
-                      className="w-full justify-between text-[#1B4332] hover:text-[#153426] hover:bg-green-100/50 font-semibold group/btn"
+                  <div className="flex justify-end gap-2 w-full">
+                    <Link
+                      href={`/client/service-requests/${request.requestId}`}
                     >
-                      View Details
-                      <ArrowUpRight
-                        size={16}
-                        className="transition-transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5"
-                      />
-                    </Button>
-                  </Link>
+                      <Button variant="outline" size="sm">
+                        View Details
+                        <ArrowUpRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </Link>
+                  </div>
                 </CardFooter>
               </Card>
             ))}

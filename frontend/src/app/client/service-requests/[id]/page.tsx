@@ -18,8 +18,19 @@ import {
     AlertCircle,
     XCircle,
     Image as ImageIcon,
+    Trash2,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { deleteServiceRequestAction } from "@/app/actions/serviceRequest/client/clientServiceRequest.actions";
+import { ServiceRequestStatus } from "@/shared/enums/ServiceRequestStatus";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/app/components/ui/dialog";
 
 const StatusBadge = ({ status }: { status: string }) => {
     const styles = {
@@ -62,6 +73,8 @@ export default function ServiceDetailPage() {
     const [request, setRequest] = useState<ServiceRequestResponse | null>(null);
     const [loading, setLoading] = useState(true);
     const [activeImageIndex, setActiveImageIndex] = useState(0);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     useEffect(() => {
         if (params.id) {
@@ -87,6 +100,27 @@ export default function ServiceDetailPage() {
         }
     };
 
+    const handleDelete = async () => {
+        if (!request) return;
+
+        setIsDeleting(true);
+        try {
+            const res = await deleteServiceRequestAction(request.requestId);
+            if (res.success) {
+                toast.success("Service request deleted successfully");
+                router.push("/client/service-requests");
+            } else {
+                toast.error(res.message || "Failed to delete request");
+            }
+        } catch (error) {
+            toast.error("An error occurred while deleting the request");
+            console.error(error);
+        } finally {
+            setIsDeleting(false);
+            setIsDeleteModalOpen(false);
+        }
+    };
+
     if (loading) {
         return (
             <div className="min-h-screen flex flex-col justify-center items-center bg-gray-50 animate-in fade-in duration-500">
@@ -99,7 +133,7 @@ export default function ServiceDetailPage() {
     }
 
     if (!request) {
-        return null; 
+        return null;
     }
 
     return (
@@ -190,8 +224,8 @@ export default function ServiceDetailPage() {
                                                 key={idx}
                                                 onClick={() => setActiveImageIndex(idx)}
                                                 className={`aspect-square rounded-lg overflow-hidden border-2 transition-all ${idx === activeImageIndex
-                                                        ? "border-[#1B4332] opacity-100"
-                                                        : "border-transparent opacity-60 hover:opacity-100"
+                                                    ? "border-[#1B4332] opacity-100"
+                                                    : "border-transparent opacity-60 hover:opacity-100"
                                                     }`}
                                             >
                                                 <img
@@ -264,7 +298,16 @@ export default function ServiceDetailPage() {
                             <p className="text-xs text-gray-600">
                                 Need to modify this request? Currently, editing is disabled once published. Cancel and create a new one if necessary.
                             </p>
-                            {/* Placeholder for cancel/edit buttons if needed later */}
+
+                            {request.status === ServiceRequestStatus.OPEN && (
+                                <Button
+                                    className="w-full justify-start mt-4 bg-red-600 hover:bg-red-700 text-white shadow-sm transition-all"
+                                    onClick={() => setIsDeleteModalOpen(true)}
+                                >
+                                    <Trash2 size={16} className="mr-2" />
+                                    Delete Request
+                                </Button>
+                            )}
                         </div>
 
                     </div>
@@ -272,7 +315,49 @@ export default function ServiceDetailPage() {
                 </div>
 
             </div>
-        </div>
+
+            {/* Delete Confirmation Dialog */}
+            <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+                <DialogContent className="sm:max-w-md bg-white">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2 text-red-600">
+                            <AlertCircle className="h-5 w-5" />
+                            Delete Service Request
+                        </DialogTitle>
+                        <DialogDescription className="pt-2">
+                            Are you sure you want to delete this service request?
+                            <span className="block mt-2 p-3 bg-red-50 border border-red-100 rounded-lg text-red-800 text-sm font-medium">
+                                This action cannot be undone and will permanently remove this request from the platform.
+                            </span>
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter className="gap-2 sm:gap-0">
+                        <Button
+                            variant="outline"
+                            onClick={() => setIsDeleteModalOpen(false)}
+                            disabled={isDeleting}
+                            className="w-full sm:w-auto"
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            className="bg-red-600 hover:bg-red-700 text-white w-full sm:w-auto"
+                            onClick={handleDelete}
+                            disabled={isDeleting}
+                        >
+                            {isDeleting ? (
+                                <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Deleting...
+                                </>
+                            ) : (
+                                "Delete Request"
+                            )}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+        </div >
     );
 }
 

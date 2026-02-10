@@ -196,4 +196,9 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
         return docs.map(doc => this.toDomain(doc));
     }
 
+    async delete(requestId: string): Promise<boolean> {
+        const result = await ServiceRequestModel.deleteOne({ requestId });
+        return result.deletedCount === 1;
+    }
+
 }
