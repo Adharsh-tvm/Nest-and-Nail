@@ -239,8 +239,16 @@ const ClientHeader: React.FC = () => {
                     onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                     className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-full border border-gray-200 hover:border-[#1B4332] hover:bg-gray-50 transition-all group"
                   >
-                    <div className="w-8 h-8 rounded-full bg-[#1B4332] text-white flex items-center justify-center shadow-sm">
-                      <User size={18} />
+                    <div className="w-8 h-8 rounded-full bg-[#1B4332] text-white flex items-center justify-center shadow-sm overflow-hidden">
+                      {currentUser?.profileImageUrl ? (
+                        <img
+                          src={currentUser.profileImageUrl}
+                          alt={currentUser.name || "User"}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <User size={18} />
+                      )}
                     </div>
                     <span className="text-sm font-semibold text-gray-700 group-hover:text-[#1B4332] max-w-[100px] truncate">
                       {currentUser?.name}
