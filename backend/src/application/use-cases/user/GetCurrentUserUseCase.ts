@@ -20,10 +20,8 @@ export class GetCurrentUserUseCase implements IGetCurrentUserUseCase {
 
         this._logger.info(`[GetCurrentUserUseCase] Finding user with ID: ${email}`);
 
-        // Try to find user across all repositories
         let user = null;
 
-        // Search in Client repository
         try {
             const clientRepo = this._repositoryFactory.getRepository(Role.CLIENT);
             user = await clientRepo.findByEmail(email);
@@ -35,7 +33,6 @@ export class GetCurrentUserUseCase implements IGetCurrentUserUseCase {
             // Continue to next repository
         }
 
-        // If not found, search in Worker repository
         if (!user) {
             try {
                 const workerRepo = this._repositoryFactory.getRepository(Role.WORKER);
@@ -44,7 +41,6 @@ export class GetCurrentUserUseCase implements IGetCurrentUserUseCase {
                     this._logger.info(`[GetCurrentUserUseCase] User found as WORKER`);
                 }
             } catch (error) {
-                // Continue
             }
         }
 
