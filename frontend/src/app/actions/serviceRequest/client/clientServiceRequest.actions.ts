@@ -9,11 +9,10 @@ export async function createServiceRequestAction(
     try {
         return await createServiceRequestApi(payload);
     } catch (error: any) {
+        const errorMsg = error.serverData?.error || error.serverData?.message || error.normalizedMessage || "Failed to create service request";
         return {
             success: false,
-            message:
-                error.normalizedMessage ??
-                "Failed to create service request",
+            message: errorMsg,
             error: error.serverData ?? error.message,
         };
     }

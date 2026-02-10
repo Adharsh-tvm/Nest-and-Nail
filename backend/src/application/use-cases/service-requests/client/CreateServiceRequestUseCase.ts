@@ -18,6 +18,18 @@ export class CreateServiceRequestUseCase implements ICreateServiceRequestUseCase
         data: CreateServiceRequestDTO & { clientId: string }
     ): Promise<ServiceRequest> {
 
+        if (!data.title || data.title.trim().split(/\s+/).length <= 5) {
+            throw new Error("Title must have more than 5 words.");
+        }
+
+        if (!data.description || data.description.trim().split(/\s+/).length <= 5) {
+            throw new Error("Description must have more than 5 words.");
+        }
+
+        if (data.budget !== undefined && data.budget <= 500) {
+            throw new Error("Budget must be more than 500.");
+        }
+
         const client = await this._clientRepo.findById(data.clientId);
         if (!client) {
             throw new Error("Client not found");
