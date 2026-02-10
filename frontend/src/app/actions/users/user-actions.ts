@@ -50,8 +50,24 @@ export async function getCurrentUser(): Promise<User | null> {
     };
 
     return user;
-  } catch (err) {
+  } catch (err: any) {
+    // If 401/403, just return null (user not logged in or session expired)
+    // Don't log to console to avoid noise
+    if (err?.response?.status === 401 || err?.response?.status === 403) {
+      return null;
+    }
+
     console.error("[getCurrentUser] failed:", err);
+    return null;
+  }
+}
+
+export async function validateUser() {
+  try {
+    const { authApi } = await import("@/sources/api/auth.api");
+    const res = await authApi.validate();
+    return res.data;
+  } catch {
     return null;
   }
 }

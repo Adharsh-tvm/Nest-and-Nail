@@ -21,6 +21,8 @@ import { IUpdateVerificationStatusUseCase } from "../../application/interfaces/a
 import { IUpdateWorkerCategoriesUseCase } from "../../application/interfaces/worker/profile/IUpdateWorkerCategoriesUseCase";
 import { IUploadProfilePictureUseCase } from "../../application/interfaces/user/IUploadProfilePictureUseCase";
 import { IUploadWorkerDocumentUseCase } from "../../application/interfaces/user/IUploadWorkerDocumentUseCase";
+import { IValidateUserUseCase } from "../../application/interfaces/auth/IValidateUserUseCase";
+import { ValidateUserUseCase } from "../../application/use-cases/auth/ValidateUserUseCase";
 import { IVerifyOtpUseCase } from "../../application/interfaces/auth/IVerifyOtpUseCase";
 import { GetAllClientsUseCase } from "../../application/use-cases/admin/GetAllClientsUseCase";
 import { GetAllUsersUseCase } from "../../application/use-cases/admin/GetAllUsersUseCase";
@@ -77,28 +79,29 @@ export class UseCaseDI {
 
   private _registerUserUseCase?: IRegisterUserUseCase;
   private _loginUserUseCase?: ILoginUserUseCase;
-  
+
   private _sendOtpUseCase?: ISendOtpUseCase;
   private _verifyOtpUseCase?: IVerifyOtpUseCase;
-  
+  private _validateUserUseCase?: IValidateUserUseCase;
+
   private _googleLoginUseCase?: IGoogleSignUpUseCase;
-  
+
   private _getAllClientsUseCase?: IGetAllClientsUseCase;
   private _getAllWorkersUseCase?: IGetAllWorkersUseCase;
   private _getAllUsersUseCase?: IGetAllUsersUseCase;
   private _getCurrentUserUseCase?: IGetCurrentUserUseCase;
-  
+
   private _forgotpasswordUseCase?: IForgotPasswordUseCase;
   private _resetPasswordUseCase?: IResetPasswordUseCase;
-  
+
   private _refreshTokenUseCase?: IRefreshTokenUseCase;
-  
+
   private _changeUserRoleuseCase?: IChangeUserRoleUseCase;
   private _updateUserAccessUseCase?: IUpdateUserAccessUseCase;
-  
+
   private _uploadProfilePictureUseCase?: IUploadProfilePictureUseCase;
   private _uploadWorkerDocumentUseCase?: IUploadWorkerDocumentUseCase;
-  
+
   private _updateUserProfileUseCase?: IUpdateUserProfileUseCase;
   private _updateVerificationStatusUseCase?: IUpdateVerificationStatusUseCase;
   private _updateUserSkillUseCase?: IUpdateUserSkillsUseCase;
@@ -110,7 +113,7 @@ export class UseCaseDI {
   private _addUserAddressUseCase?: IAddUserAddressUseCase;
   private _editUserAddressUseCase?: IEditUserAddressUseCase;
   private _deleteUserAddressUseCase?: IDeleteUserAddressUseCase;
-  
+
   private _createServiceRequestUseCase?: ICreateServiceRequestUseCase;
   private _getOpenServiceRequestsUseCase?: IGetOpenServiceRequestsUseCase;
   private _releaseServiceRequestUseCase?: IReleaseServiceRequestUseCase;
@@ -119,13 +122,13 @@ export class UseCaseDI {
   private _getServiceRequestByIdUseCase?: IGetServiceRequestByIdUseCase;
   private _getAllServiceRequestsUseCase?: IGetAllServiceRequestsUseCase;
   private _deleteServiceRequestUseCase?: IDeleteServiceRequestUseCase;
-  
+
   private _getCloudinaryUploadSignatureUseCase?: IGetCloudinaryUploadSignatureUseCase;
-  
-  
+
+
   constructor(private infra: InfrastructureDI) { }
-  
-  
+
+
   get registerUserUseCase(): IRegisterUserUseCase {
     if (!this._registerUserUseCase) {
       this._registerUserUseCase = new RegisterUserUseCase(
@@ -198,6 +201,15 @@ export class UseCaseDI {
         this.infra.logger);
     }
     return this._verifyOtpUseCase;
+  }
+
+  get validateUserUseCase(): IValidateUserUseCase {
+    if (!this._validateUserUseCase) {
+      this._validateUserUseCase = new ValidateUserUseCase(
+        this.infra.userRepositoryFactory
+      );
+    }
+    return this._validateUserUseCase;
   }
 
 
@@ -469,7 +481,7 @@ export class UseCaseDI {
   }
 
   get deleteServiceRequestUseCase(): IDeleteServiceRequestUseCase {
-    if(!this._deleteServiceRequestUseCase) {
+    if (!this._deleteServiceRequestUseCase) {
       this._deleteServiceRequestUseCase = new DeleteServiceRequestUseCase(
         this.infra.serviceRequestRepository
       )

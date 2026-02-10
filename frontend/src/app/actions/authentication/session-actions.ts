@@ -81,3 +81,12 @@ export async function refreshTokens(refreshToken: string): Promise<boolean> {
   }
 }
 
+export async function validateUser() {
+  try {
+    const res = await authApi.validate();
+    return res.data;
+  } catch {
+    return null;
+  }
+}
+
