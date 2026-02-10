@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from "next/navigation";
 
 import React, { useState, useEffect, useRef } from "react";
 import {
@@ -513,6 +514,7 @@ const AddressesView: React.FC<ViewProps> = ({ user, setUser }) => {
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [addressToDelete, setAddressToDelete] = useState<string | null>(null);
+  const router = useRouter();
 
   const handleSaveAddress = async (addressData: Address) => {
     // Determine if we are adding or editing
@@ -555,6 +557,7 @@ const AddressesView: React.FC<ViewProps> = ({ user, setUser }) => {
 
       setUser(response.payload || oldUser); // Use payload if available, else revert/keep
       toast.success(isEditing ? "Address updated successfully" : "Address added successfully");
+      router.refresh();
     } catch (err: any) {
       setUser(oldUser);
       toast.error(err.message || "Failed to save address");
@@ -590,6 +593,7 @@ const AddressesView: React.FC<ViewProps> = ({ user, setUser }) => {
       }
       setUser(response.payload || oldUser);
       toast.success("Address deleted successfully");
+      router.refresh();
     } catch (err: any) {
       setUser(oldUser);
       toast.error(err.message || "Failed to delete address");
@@ -651,7 +655,14 @@ const AddressesView: React.FC<ViewProps> = ({ user, setUser }) => {
                     <Edit2 size={16} />
                   </button>
                   <button
-                    onClick={() => addr.addressId && handleDeleteClick(addr.addressId)}
+                    onClick={() => {
+                      const id = addr.addressId || (addr as any)._id;
+                      if (id) {
+                        handleDeleteClick(id);
+                      } else {
+                        toast.error("Cannot delete: Address ID missing. Please refresh.");
+                      }
+                    }}
                     className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
                   >
                     <Trash2 size={16} />
