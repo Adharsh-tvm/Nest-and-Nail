@@ -2,6 +2,7 @@ import { ServiceRequest } from "../../domain/entities/ServiceRequest";
 import { IServiceRequestRepository } from "../../domain/repositories/IServiceRequestRepository";
 import { ServiceRequestStatus } from "../../shared/enums/serviceEnums";
 import { ServiceRequestModel } from "../database/models/ServiceRequestModel";
+import { UserModel } from "../database/models/UserModel";
 
 export class ServiceRequestRepository implements IServiceRequestRepository {
 
@@ -24,14 +25,24 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
             reservationExpiresAt: doc.reservationExpiresAt,
 
             createdAt: doc.createdAt,
-            updatedAt: doc.updatedAt
+            updatedAt: doc.updatedAt,
+
+            client: doc.client ? {
+                name: doc.client.name,
+                email: doc.client.email,
+                phone: doc.client.phone,
+                profilePictureUrl: doc.client.profilePictureUrl
+            } : undefined
         };
     }
 
     async create(
         data: Omit<ServiceRequest, "id" | "createdAt" | "updatedAt">
     ): Promise<ServiceRequest> {
-        const doc = await ServiceRequestModel.create(data);
+        const doc = await ServiceRequestModel.create({
+            ...data,
+            client: data.client
+        });
         return this.toDomain(doc);
     }
 
@@ -70,14 +81,59 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
             ]
         }).lean();
 
-        return results.map(doc => this.toDomain(doc));
+        // Extract client IDs
+        const clientIds = [...new Set(results.map(r => r.clientId))];
+
+        // Fetch user details
+        const users = await UserModel.find({ userId: { $in: clientIds } })
+            .select("userId name email phone profilePictureUrl")
+            .lean();
+
+        // Create a map for quick lookup
+        const userMap = new Map(users.map(u => [u.userId, u]));
+
+        return results.map(doc => {
+            const domainEntity = this.toDomain(doc);
+            const user = userMap.get(doc.clientId);
+
+            if (user) {
+                domainEntity.client = {
+                    name: user.name,
+                    email: user.email,
+                    phone: user.phone,
+                    profilePictureUrl: user.profilePictureUrl
+                };
+            }
+
+            return domainEntity;
+        });
     }
 
 
     async findByRequestId(requestId: string): Promise<ServiceRequest | null> {
         const result = await ServiceRequestModel.findOne({ requestId }).lean();
 
-        return result ? this.toDomain(result) : null;
+        if (!result) return null;
+
+        const domainEntity = this.toDomain(result);
+
+        // Fallback for old records where client details are not persisted
+        if (!domainEntity.client) {
+            const user = await UserModel.findOne({ userId: result.clientId })
+                .select("name email phone profilePictureUrl")
+                .lean();
+
+            if (user) {
+                domainEntity.client = {
+                    name: user.name,
+                    email: user.email,
+                    phone: user.phone,
+                    profilePictureUrl: user.profilePictureUrl
+                };
+            }
+        }
+
+        return domainEntity;
     }
 
     async reserveByRequestId(requestId: string, workerId: string, expiresAt: Date): Promise<boolean> {

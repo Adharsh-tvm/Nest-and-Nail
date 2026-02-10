@@ -41,7 +41,14 @@ const ServiceRequestSchema = new mongoose.Schema(
         },
 
         reservedBy: { type: String },
-        reservationExpiresAt: { type: Date }
+        reservationExpiresAt: { type: Date },
+
+        client: {
+            name: { type: String, required: true },
+            email: { type: String, required: true },
+            phone: { type: Number },
+            profilePictureUrl: { type: String }
+        }
     },
     { timestamps: true }
 );

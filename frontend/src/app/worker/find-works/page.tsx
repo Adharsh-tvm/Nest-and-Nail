@@ -12,6 +12,9 @@ import {
   Navigation,
   Loader2,
   Image as ImageIcon,
+  User,
+  Mail,
+  Phone,
 } from "lucide-react";
 import { useUserStore } from "@/store/userStore";
 import { Button } from "@/app/components/ui/button";
@@ -44,9 +47,9 @@ const calculateDistance = (
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos(deg2rad(lat1)) *
-      Math.cos(deg2rad(lat2)) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
+    Math.cos(deg2rad(lat2)) *
+    Math.sin(dLon / 2) *
+    Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   const d = R * c; // Distance in km
   return d;
@@ -405,6 +408,26 @@ export default function WorkerFindWorksPage() {
                   <p className="text-sm text-slate-500 line-clamp-2 leading-relaxed">
                     {request.description}
                   </p>
+
+                  {/* Client Details */}
+                  {request.client && (
+                    <div className="mt-3 p-3 bg-slate-50 rounded-lg border border-slate-100 text-xs text-slate-600 flex flex-col gap-1.5">
+                      <div className="flex items-center gap-2 font-medium text-slate-900">
+                        <User size={14} className="text-slate-400" />
+                        <span>{request.client.name}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Mail size={14} className="text-slate-400" />
+                        <span className="truncate">{request.client.email}</span>
+                      </div>
+                      {request.client.phone && (
+                        <div className="flex items-center gap-2">
+                          <Phone size={14} className="text-slate-400" />
+                          <span>{request.client.phone}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </CardContent>
 
                 <CardFooter className="p-4 pt-0 mt-auto">

@@ -1,15 +1,15 @@
 import { ServiceRequestStatus } from "../../shared/enums/serviceEnums";
 
 export interface CreateServiceRequestDTO {
-    title: string;
-    description: string;
-    category: string;
-    location: {
-        lat: number;
-        lng: number;
-    };
-    budget?: number;
-    servicePhotos?: string[];
+  title: string;
+  description: string;
+  category: string;
+  location: {
+    lat: number;
+    lng: number;
+  };
+  budget?: number;
+  servicePhotos?: string[];
 }
 
 export interface ServiceRequestResponseDTO {
@@ -32,4 +32,10 @@ export interface ServiceRequestResponseDTO {
   reservationExpiresAt?: Date;
 
   createdAt: Date;
+  client?: {
+    name: string;
+    email: string;
+    phone?: number;
+    profilePictureUrl?: string;
+  }
 }
