@@ -259,6 +259,32 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const [profilePicPreview, setProfilePicPreview] = useState<string | null>(
+    user.profileImageUrl || null
+  );
+  const [selectedProfilePic, setSelectedProfilePic] = useState<File | null>(
+    null
+  );
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleProfilePicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedProfilePic(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfilePicPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleAvatarClick = () => {
+    if (isEditingDetails && fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
   const handleAddSkill = (e: React.FormEvent) => {
     e.preventDefault();
     if (newSkill.trim() && !formData.skills?.includes(newSkill.trim())) {
@@ -287,6 +313,7 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
       const payload = {
         name: formData.name,
         phone: formData.phone_number,
+        profilePicture: selectedProfilePic,
       };
 
       // 3. API Call
@@ -297,6 +324,11 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
         // Revert on error could be implemented here
         return;
       }
+
+      if (response.user) {
+        setUser(response.user);
+      }
+      setSelectedProfilePic(null);
 
       toast.success("Profile details updated successfully");
     } catch (err: any) {
@@ -393,6 +425,8 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
                   <button
                     onClick={() => {
                       setFormData(user); // Reset to current user state
+                      setProfilePicPreview(user.profileImageUrl || null);
+                      setSelectedProfilePic(null);
                       setIsEditingDetails(false);
                     }}
                     className="text-sm font-medium text-gray-500 hover:text-gray-900 px-4 py-2 rounded-md hover:bg-gray-100 transition-colors"
@@ -416,7 +450,45 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
               )}
             </div>
 
-            <div className="p-8 grid sm:grid-cols-2 gap-8">
+            <div className="p-8 grid sm:grid-cols-2 gap-8 relative">
+              {/* Profile Picture Section */}
+              <div className="sm:col-span-2 flex justify-center mb-6">
+                <div className="relative group">
+                  <div
+                    onClick={handleAvatarClick}
+                    className={`w-28 h-28 rounded-full overflow-hidden border-4 border-white shadow-lg relative ${isEditingDetails ? "cursor-pointer" : ""
+                      }`}
+                  >
+                    {profilePicPreview ? (
+                      <img
+                        src={profilePicPreview}
+                        alt="Profile"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-[#1B4332] flex items-center justify-center text-white text-3xl font-bold">
+                        {user.name?.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+
+                    {/* Overlay for editing */}
+                    {isEditingDetails && (
+                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <Camera className="text-white" size={24} />
+                      </div>
+                    )}
+                  </div>
+                  {isEditingDetails && (
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleProfilePicChange}
+                      accept="image/*"
+                      className="hidden"
+                    />
+                  )}
+                </div>
+              </div>
               <div>
                 <label className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2 block">
                   Full Name
