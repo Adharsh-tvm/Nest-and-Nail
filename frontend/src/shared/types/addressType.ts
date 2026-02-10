@@ -12,4 +12,7 @@ export interface Address {
   lng: number;
 
   isDefault?: boolean;
+  addressId?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }

@@ -30,10 +30,16 @@ import {
   ExternalLink,
   Camera,
   Upload,
+  Trash2,
 } from "lucide-react";
 import { useUserStore } from "@/store/userStore";
 import { updateUserProfileAction } from "@/app/actions/users/user-profile-actions";
 import { updateUserSkillsAction } from "@/app/actions/users/user-skills-action";
+import {
+  addUSerAddressAction,
+  editUserAddressAction,
+  deleteUserAddressAction
+} from "@/app/actions/users/user-profile-actions";
 import {
   updateUserCategoriesAction,
   fetchCategoriesAction,
@@ -497,11 +503,10 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
                   (skill, i) => (
                     <span
                       key={i}
-                      className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium border ${
-                        isEditingSkills
+                      className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium border ${isEditingSkills
                           ? "bg-white border-[#1B4332] text-[#1B4332]"
                           : "bg-[#1B4332]/5 border-[#1B4332]/10 text-[#1B4332]"
-                      }`}
+                        }`}
                     >
                       {skill}
                       {isEditingSkills && (
@@ -629,11 +634,10 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
                         <button
                           key={cat.id}
                           onClick={() => handleToggleCategory(cat.id)}
-                          className={`text-left px-4 py-2 rounded-lg text-sm transition-all border ${
-                            isSelected
+                          className={`text-left px-4 py-2 rounded-lg text-sm transition-all border ${isSelected
                               ? "bg-[#1B4332] text-white border-[#1B4332]"
                               : "bg-gray-50 text-gray-600 border-gray-100 hover:border-gray-200"
-                          }`}
+                            }`}
                         >
                           <div className="flex justify-between items-center">
                             <span>{cat.name}</span>
@@ -694,32 +698,91 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
 
 const AddressesView: React.FC<ViewProps> = ({ user, setUser }) => {
   const [isAddAddressOpen, setIsAddAddressOpen] = useState(false);
+  const [editingAddress, setEditingAddress] = useState<Address | null>(null);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [addressToDelete, setAddressToDelete] = useState<string | null>(null);
 
-  const handleSaveAddress = async (newAddress: Address) => {
-    // 1. Optimistic Update
-    const updatedAddresses = [...(user.address || []), newAddress];
-    const oldAddresses = user.address;
+  const handleSaveAddress = async (addressData: Address) => {
+    // Determine if we are adding or editing
+    const isEditing = !!editingAddress;
+    const oldUser = user;
 
-    // Update local state immediately
-    const updatedUser = { ...user, address: updatedAddresses };
-    setUser(updatedUser);
+    // Optimistic Update
+    let updatedAddresses = [...(user.address || [])];
+    if (isEditing && editingAddress) {
+      updatedAddresses = updatedAddresses.map((addr) =>
+        addr.addressId === editingAddress.addressId ? { ...addressData, addressId: editingAddress.addressId } : addr
+      );
+    } else {
+      updatedAddresses.push(addressData);
+    }
+
+    // Handle default address logic locally for optimistic update
+    if (addressData.isDefault) {
+      updatedAddresses = updatedAddresses.map(a => ({
+        ...a,
+        isDefault: a === addressData || (isEditing && a.addressId === editingAddress?.addressId)
+      }));
+    }
+
+    setUser({ ...user, address: updatedAddresses });
 
     try {
-      // 2. Server Action
-      const response = await updateUserProfileAction(user.id, {
-        address: updatedAddresses,
-      });
+      let response;
+      if (isEditing && editingAddress?.addressId) {
+        response = await editUserAddressAction(user.id, editingAddress.addressId, addressData);
+      } else {
+        response = await addUSerAddressAction(user.id, addressData);
+      }
 
       if (!response.success) {
-        // Revert on failure
-        setUser({ ...user, address: oldAddresses });
+        setUser(oldUser);
         toast.error(response.message);
         return;
       }
-      toast.success("Address added successfully");
+
+      setUser(response.payload || oldUser);
+      toast.success(isEditing ? "Address updated successfully" : "Address added successfully");
     } catch (err: any) {
-      setUser({ ...user, address: oldAddresses });
-      toast.error(err.message || "Failed to add address");
+      setUser(oldUser);
+      toast.error(err.message || "Failed to save address");
+    } finally {
+      setEditingAddress(null);
+    }
+  };
+
+  const handleEditClick = (address: Address) => {
+    setEditingAddress(address);
+    setIsAddAddressOpen(true);
+  };
+
+  const handleDeleteClick = (addressId: string) => {
+    setAddressToDelete(addressId);
+    setIsDeleteConfirmOpen(true);
+  };
+
+  const confirmDeleteAddress = async () => {
+    if (!addressToDelete) return;
+    setIsDeleteConfirmOpen(false);
+
+    const oldUser = user;
+    const updatedAddresses = user.address?.filter(a => a.addressId !== addressToDelete);
+    setUser({ ...user, address: updatedAddresses });
+
+    try {
+      const response = await deleteUserAddressAction(user.id, addressToDelete);
+      if (!response.success) {
+        setUser(oldUser);
+        toast.error(response.message);
+        return;
+      }
+      setUser(response.payload || oldUser);
+      toast.success("Address deleted successfully");
+    } catch (err: any) {
+      setUser(oldUser);
+      toast.error(err.message || "Failed to delete address");
+    } finally {
+      setAddressToDelete(null);
     }
   };
 
@@ -727,15 +790,29 @@ const AddressesView: React.FC<ViewProps> = ({ user, setUser }) => {
     <>
       <AddAddressModal
         isOpen={isAddAddressOpen}
-        onClose={() => setIsAddAddressOpen(false)}
+        onClose={() => {
+          setIsAddAddressOpen(false);
+          setEditingAddress(null);
+        }}
         onSave={handleSaveAddress}
+        initialData={editingAddress}
+        mode={editingAddress ? "edit" : "add"}
       />
+
+      <ConfirmationModal
+        isOpen={isDeleteConfirmOpen}
+        onClose={() => setIsDeleteConfirmOpen(false)}
+        onConfirm={confirmDeleteAddress}
+        title="Delete Address"
+        message="Are you sure you want to delete this address? This action cannot be undone."
+      />
+
       <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
         <div className="grid md:grid-cols-2 gap-6">
           {user.address?.map((addr, index) => (
             <div
               key={`${addr.label}-${index}`}
-              className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:border-[#1B4332] transition-colors group"
+              className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:border-[#1B4332] transition-colors group relative"
             >
               <div className="flex justify-between items-start mb-4">
                 <div className="flex items-center gap-3">
@@ -753,10 +830,21 @@ const AddressesView: React.FC<ViewProps> = ({ user, setUser }) => {
                     )}
                   </div>
                 </div>
-                <MoreVertical
-                  size={20}
-                  className="text-gray-400 cursor-pointer hover:text-gray-600"
-                />
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handleEditClick(addr)}
+                    className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
+                  >
+                    <Edit2 size={16} />
+                  </button>
+                  <button
+                    onClick={() => addr.addressId && handleDeleteClick(addr.addressId)}
+                    className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
               </div>
               <p className="text-base text-gray-600 pl-14 leading-relaxed">
                 {addr.street}
@@ -766,7 +854,10 @@ const AddressesView: React.FC<ViewProps> = ({ user, setUser }) => {
             </div>
           ))}
           <button
-            onClick={() => setIsAddAddressOpen(true)}
+            onClick={() => {
+              setEditingAddress(null);
+              setIsAddAddressOpen(true);
+            }}
             className="border-2 border-dashed border-gray-200 rounded-xl p-6 flex flex-col items-center justify-center text-gray-400 hover:border-[#1B4332] hover:text-[#1B4332] hover:bg-[#1B4332]/5 transition-all min-h-[160px]"
           >
             <Plus size={32} />
@@ -933,14 +1024,12 @@ const SettingsView: React.FC<ViewProps> = ({ user, setUser }) => {
           <button
             onClick={handleToggleOnline}
             disabled={isUpdating}
-            className={`w-12 h-7 rounded-full relative transition-colors ${
-              user.isOnline ? "bg-[#1B4332]" : "bg-gray-200"
-            } ${isUpdating ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+            className={`w-12 h-7 rounded-full relative transition-colors ${user.isOnline ? "bg-[#1B4332]" : "bg-gray-200"
+              } ${isUpdating ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
           >
             <span
-              className={`absolute top-1 left-1 bg-white w-5 h-5 rounded-full transition-transform ${
-                user.isOnline ? "translate-x-5" : "translate-x-0"
-              }`}
+              className={`absolute top-1 left-1 bg-white w-5 h-5 rounded-full transition-transform ${user.isOnline ? "translate-x-5" : "translate-x-0"
+                }`}
             />
           </button>
         </div>
@@ -1135,10 +1224,9 @@ const UserProfile = () => {
               disabled={isUpdatingStatus}
               className={`
                 flex items-center gap-3 px-6 py-3 rounded-xl font-bold text-sm transition-all shadow-sm
-                ${
-                  safeUser.isOnline
-                    ? "bg-[#1B4332] text-white hover:bg-[#143326] shadow-emerald-900/10"
-                    : "bg-white text-gray-500 border border-gray-200 hover:bg-gray-50 hover:text-gray-700"
+                ${safeUser.isOnline
+                  ? "bg-[#1B4332] text-white hover:bg-[#143326] shadow-emerald-900/10"
+                  : "bg-white text-gray-500 border border-gray-200 hover:bg-gray-50 hover:text-gray-700"
                 }
                 ${isUpdatingStatus ? "opacity-70 cursor-wait" : ""}
               `}
@@ -1168,20 +1256,18 @@ const UserProfile = () => {
                   onClick={() => setActiveTab(tab.id as Tab)}
                   className={`
                                 group inline-flex items-center py-5 px-1 border-b-2 font-medium text-base transition-all
-                                ${
-                                  isActive
-                                    ? "border-[#1B4332] text-[#1B4332]"
-                                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                                }
+                                ${isActive
+                      ? "border-[#1B4332] text-[#1B4332]"
+                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                    }
                             `}
                 >
                   <Icon
                     size={18}
-                    className={`mr-2.5 ${
-                      isActive
+                    className={`mr-2.5 ${isActive
                         ? "text-[#1B4332]"
                         : "text-gray-400 group-hover:text-gray-500"
-                    }`}
+                      }`}
                   />
                   {tab.label}
                 </button>

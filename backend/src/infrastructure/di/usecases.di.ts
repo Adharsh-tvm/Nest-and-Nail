@@ -15,7 +15,6 @@ import { ISendOtpUseCase } from "../../application/interfaces/auth/ISendOtpUseCa
 import { IUpdateCategoryStatusUseCase } from "../../application/interfaces/category/IUpdateCategoryStatusUseCase";
 import { IUpdateCategoryUseCase } from "../../application/interfaces/category/IUpdateCategoryUseCase";
 import { IUpdateUserAccessUseCase } from "../../application/interfaces/admin/IUpdateUserAccessUseCase";
-import { IUpdateUserAddressUseCase } from "../../application/interfaces/address/IUpdateUserAddressUseCase";
 import { IUpdateUserProfileUseCase } from "../../application/interfaces/user/IUpdateUserProfileUseCase";
 import { IUpdateUserSkillsUseCase } from "../../application/interfaces/user/IUpdateUserSkillsUseCase";
 import { IUpdateVerificationStatusUseCase } from "../../application/interfaces/admin/IUpdateVerificationStatusUseCase";
@@ -43,7 +42,6 @@ import { UpdateCategoryStatusUseCase } from "../../application/use-cases/categor
 import { UpdateCategoryUseCase } from "../../application/use-cases/category/UpdateCategoryUseCase";
 import { ChangeUserRoleUseCase } from "../../application/use-cases/user/ChangeUserRoleUseCase";
 import { GetCurrentUserUseCase } from "../../application/use-cases/user/GetCurrentUserUseCase";
-import { UpdateUserAddressUseCase } from "../../application/use-cases/address/AddUserAddressUseCase";
 import { UpdateUserProfileUseCase } from "../../application/use-cases/user/UpdateUserProfileUseCase";
 import { UpdateUserSkillsUseCase } from "../../application/use-cases/user/UpdateUserSkillsUseCase";
 import { UpdateWorkerCategoriesUseCase } from "../../application/use-cases/worker/profile/UpdateWorkerCategoriesUseCase";
@@ -65,6 +63,12 @@ import { IGetServiceRequestByIdUseCase } from "../../application/interfaces/serv
 import { GetServiceRequestByIdUseCase } from "../../application/use-cases/service-requests/GetServiceRequestByIdUseCase";
 import { IGetAllServiceRequestsUseCase } from "../../application/interfaces/service-requests/admin/IGetAllServiceRequestsUseCase";
 import { GetAllServiceRequestsUseCase } from "../../application/use-cases/service-requests/admin/GetAllServiceRequestsUseCase";
+import { IAddUserAddressUseCase } from "../../application/interfaces/address/IUpdateUserAddressUseCase";
+import { IEditUserAddressUseCase } from "../../application/interfaces/address/IEditUserAddressUseCase";
+import { IDeleteUserAddressUseCase } from "../../application/interfaces/address/IDeleteUserAddressUseCase";
+import { AddUserAddressUseCase } from "../../application/use-cases/address/AddUserAddressUseCase";
+import { EditUserAddressUseCase } from "../../application/use-cases/address/EditUserAddressUseCase";
+import { DeleteUserAddressUseCase } from "../../application/use-cases/address/DeleteUserAddressUseCase";
 
 
 
@@ -98,13 +102,14 @@ export class UseCaseDI {
   private _updateUserProfileUseCase?: IUpdateUserProfileUseCase;
   private _updateVerificationStatusUseCase?: IUpdateVerificationStatusUseCase;
   private _updateUserSkillUseCase?: IUpdateUserSkillsUseCase;
-  private _updateUserAddressUseCase?: IUpdateUserAddressUseCase;
-
   private _createCategoryUseCase?: ICreateCategoryUseCase;
   private _getAllCategoriesUseCase?: IGetAllCategoriesUseCase;
   private _updateCategoryStatusUseCase?: IUpdateCategoryStatusUseCase;
   private _updateCategoryUseCase?: IUpdateCategoryUseCase;
   private _updateWorkerCategoriesUseCase?: IUpdateWorkerCategoriesUseCase;
+  private _addUserAddressUseCase?: IAddUserAddressUseCase;
+  private _editUserAddressUseCase?: IEditUserAddressUseCase;
+  private _deleteUserAddressUseCase?: IDeleteUserAddressUseCase;
 
   private _createServiceRequestUseCase?: ICreateServiceRequestUseCase;
   private _getOpenServiceRequestsUseCase?: IGetOpenServiceRequestsUseCase;
@@ -317,13 +322,31 @@ export class UseCaseDI {
     return this._updateUserSkillUseCase;
   }
 
-  get updateUserAddressUseCase(): IUpdateUserAddressUseCase {
-    if (!this._updateUserAddressUseCase) {
-      this._updateUserAddressUseCase = new UpdateUserAddressUseCase(
+  get addUserAddressUseCase(): IAddUserAddressUseCase {
+    if (!this._addUserAddressUseCase) {
+      this._addUserAddressUseCase = new AddUserAddressUseCase(
         this.infra.userRepositoryFactory
       )
     }
-    return this._updateUserAddressUseCase;
+    return this._addUserAddressUseCase;
+  }
+
+  get editUserAddressUseCase(): IEditUserAddressUseCase {
+    if (!this._editUserAddressUseCase) {
+      this._editUserAddressUseCase = new EditUserAddressUseCase(
+        this.infra.userRepositoryFactory
+      )
+    }
+    return this._editUserAddressUseCase;
+  }
+
+  get deleteUserAddressUseCase(): IDeleteUserAddressUseCase {
+    if (!this._deleteUserAddressUseCase) {
+      this._deleteUserAddressUseCase = new DeleteUserAddressUseCase(
+        this.infra.userRepositoryFactory
+      )
+    }
+    return this._deleteUserAddressUseCase;
   }
 
   get createCategoryUseCase(): ICreateCategoryUseCase {

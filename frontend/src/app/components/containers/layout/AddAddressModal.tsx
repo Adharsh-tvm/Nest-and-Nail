@@ -22,12 +22,16 @@ interface AddAddressModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (address: Address) => Promise<void>;
+  initialData?: Address | null;
+  mode?: "add" | "edit";
 }
 
 export const AddAddressModal: React.FC<AddAddressModalProps> = ({
   isOpen,
   onClose,
   onSave,
+  initialData,
+  mode = "add",
 }) => {
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -47,20 +51,24 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
   // Reset form when modal opens
   useEffect(() => {
     if (isOpen) {
-      setFormData({
-        label: "HOME",
-        street: "",
-        city: "",
-        state: "",
-        country: "",
-        zip: "",
-        lat: 0,
-        lng: 0,
-        isDefault: false,
-      });
+      if (mode === "edit" && initialData) {
+        setFormData(initialData);
+      } else {
+        setFormData({
+          label: "HOME",
+          street: "",
+          city: "",
+          state: "",
+          country: "",
+          zip: "",
+          lat: 0,
+          lng: 0,
+          isDefault: false,
+        });
+      }
       setShowMap(false);
     }
-  }, [isOpen]);
+  }, [isOpen, initialData, mode]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -182,16 +190,7 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
     setIsSaving(true);
 
     try {
-      const response = await addUSerAddressAction(user.id, formData as Address);
-
-      if (!response.success) {
-        toast.error(response.message);
-        return;
-      }
-
-      setUser(response.payload);
-      toast.success("Address added successfully");
-
+      await onSave(formData as Address);
       onClose();
     } catch (error: any) {
       console.error("Failed to save address: ", error);
@@ -214,7 +213,7 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-white z-10">
           <h3 className="font-bold text-gray-900 flex items-center gap-2">
             <MapPin size={20} className="text-[#1B4332]" />
-            Add New Address
+            {mode === "edit" ? "Edit Address" : "Add New Address"}
           </h3>
           <button
             onClick={onClose}
@@ -247,8 +246,8 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
               type="button"
               onClick={() => setShowMap(!showMap)}
               className={`flex flex-col items-center justify-center gap-2 py-4 rounded-xl font-bold transition-colors border text-sm ${showMap
-                  ? "bg-[#1B4332] text-white border-[#1B4332]"
-                  : "bg-gray-50 text-gray-700 hover:bg-gray-100 border-gray-200"
+                ? "bg-[#1B4332] text-white border-[#1B4332]"
+                : "bg-gray-50 text-gray-700 hover:bg-gray-100 border-gray-200"
                 }`}
             >
               <MapIcon size={24} />
@@ -395,7 +394,7 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
             ) : (
               <Save size={16} />
             )}
-            Save Address
+            {mode === "edit" ? "Update Address" : "Save Address"}
           </button>
         </div>
       </div>

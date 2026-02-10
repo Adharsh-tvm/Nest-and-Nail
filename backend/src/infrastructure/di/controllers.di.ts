@@ -109,8 +109,10 @@ export class ControllerDI {
             this._userProfileController = new UserProfileController(
                 this._useCases.updateUserProfileUseCase,
                 this._useCases.updateUserSkillsUseCase,
-                this._useCases.updateUserAddressUseCase,
-                this._useCases.updateWorkerCategoriesUseCase
+                this._useCases.updateWorkerCategoriesUseCase,
+                this._useCases.addUserAddressUseCase,
+                this._useCases.editUserAddressUseCase,
+                this._useCases.deleteUserAddressUseCase
             );
         }
         return this._userProfileController
