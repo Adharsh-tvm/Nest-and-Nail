@@ -53,6 +53,13 @@ export const authApi = {
   logout: () =>
     axiosInstance.post<ApiResponse<null>>("/api/auth/logout"),
 
+  validate: () =>
+    axiosInstance.get<ApiResponse<{
+      id: string;
+      role: string;
+      isBlocked: boolean;
+    }>>("/api/auth/validate"),
+
   sendOtp: (payload: { email_address: string; role?: string }) =>
     axiosInstance.post<ApiResponse<null>>(
       "/api/auth/send-otp",

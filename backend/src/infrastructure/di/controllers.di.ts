@@ -49,7 +49,8 @@ export class ControllerDI {
                 this._useCases.verifyOtpUseCase,
                 this._useCases.refreshTokenUseCase,
                 this._useCases.forgotPasswordUseCase,
-                this._useCases.resetPasswordUseCase
+                this._useCases.resetPasswordUseCase,
+                this._useCases.validateUserUseCase
             );
         }
         return this._authController;

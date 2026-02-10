@@ -42,6 +42,21 @@ export async function middleware(req: NextRequest) {
     }
   }
 
+  // 3️⃣ Validate user status from backend
+  if (userRole) {
+    const { validateUser } = await import("./app/actions/authentication/session-actions");
+    const validation = await validateUser();
+
+    if (!validation || !validation.success) {
+      const response = NextResponse.redirect(new URL("/login", req.url));
+
+      response.cookies.delete("accessToken");
+      response.cookies.delete("refreshToken");
+
+      return response;
+    }
+  }
+
   if (userRole && isPublicRoute) {
     return NextResponse.redirect(new URL(`/${userRole}`, req.url));
   }

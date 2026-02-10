@@ -442,9 +442,6 @@ export default function ServicesPage() {
             <h1 className="text-4xl font-extrabold text-[#1B4332] tracking-tight">
               Service Requests
             </h1>
-            <p className="text-gray-500 mt-2 text-lg">
-              Manage detailed requests for your home projects.
-            </p>
           </div>
           <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
             <DialogTrigger asChild>
