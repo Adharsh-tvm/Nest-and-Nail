@@ -4,17 +4,22 @@ import { IUserProfileController } from "../interfaces/IUserProfileController";
 import { ResponseHandler } from "../../shared/responses/ApiResponse";
 import { RESPONSE_MESSAGES } from "../../shared/responses/ResponseMessages";
 import { IUpdateUserSkillsUseCase } from "../../application/interfaces/user/IUpdateUserSkillsUseCase";
-import { IUpdateUserAddressUseCase } from "../../application/interfaces/user/IUpdateUserAddressUseCase";
 import { IUpdateWorkerCategoriesUseCase } from "../../application/interfaces/worker/profile/IUpdateWorkerCategoriesUseCase";
 import { IUpdateUserProfileUseCase } from "../../application/interfaces/user/IUpdateUserProfileUseCase";
+import { IAddUserAddressUseCase } from "../../application/interfaces/address/IUpdateUserAddressUseCase";
+import { IEditUserAddressUseCase } from "../../application/interfaces/address/IEditUserAddressUseCase";
+import { IDeleteUserAddressUseCase } from "../../application/interfaces/address/IDeleteUserAddressUseCase";
 
 export class UserProfileController implements IUserProfileController {
 
     constructor(
         private readonly _updateUserProfileUseCase: IUpdateUserProfileUseCase,
         private readonly _updateUserSkillsUseCase: IUpdateUserSkillsUseCase,
-        private readonly _updatUserAddressUseCase: IUpdateUserAddressUseCase,
-        private readonly _updateWorkerCategoriesUseCase: IUpdateWorkerCategoriesUseCase
+        private readonly _updateWorkerCategoriesUseCase: IUpdateWorkerCategoriesUseCase,
+        private readonly _addUserAddressUseCase: IAddUserAddressUseCase,
+        private readonly _editUserAddressUseCase: IEditUserAddressUseCase,
+        private readonly _deleteUserAddressUseCase: IDeleteUserAddressUseCase,
+
     ) { }
 
     updateProfile = async (req: Request, res: Response): Promise<Response> => {
@@ -84,29 +89,6 @@ export class UserProfileController implements IUserProfileController {
         }
     }
 
-    updateAddress = async (req: Request, res: Response): Promise<Response> => {
-        try {
-            const { userId } = req.params;
-            const data = req.body;
-
-            const result = await this._updatUserAddressUseCase.execute(
-                userId,
-                data
-            );
-
-            return res.status(HttpStatusCode.OK).json(
-                ResponseHandler.success(
-                    result,
-                    RESPONSE_MESSAGES.ADDRESS_UPDATED
-                )
-            )
-        } catch (error: unknown) {
-            return res.status(HttpStatusCode.BAD_REQUEST).json(
-                ResponseHandler.error(RESPONSE_MESSAGES.FAILED, error)
-            )
-        }
-    }
-
     updateCategories = async (req: Request, res: Response): Promise<void> => {
         const userId = req.params.userId;
         const { categoryIds } = req.body;
@@ -130,4 +112,74 @@ export class UserProfileController implements IUserProfileController {
             )
         );
     }
+
+    addAddress = async (req: Request, res: Response): Promise<Response> => {
+        try {
+            const { userId } = req.params;
+            const data = req.body;
+
+            const result = await this._addUserAddressUseCase.execute(
+                userId,
+                data
+            );
+
+            return res.status(HttpStatusCode.CREATED).json(
+                ResponseHandler.success(
+                    result,
+                    RESPONSE_MESSAGES.ADDRESS_UPDATED
+                )
+            );
+        } catch (error: unknown) {
+            return res.status(HttpStatusCode.BAD_REQUEST).json(
+                ResponseHandler.error(RESPONSE_MESSAGES.FAILED, error)
+            );
+        }
+    };
+
+    editAddress = async (req: Request, res: Response): Promise<Response> => {
+        try {
+            const { userId, addressId } = req.params;
+            const data = req.body;
+
+            const result = await this._editUserAddressUseCase.execute(
+                userId,
+                addressId,
+                data
+            );
+
+            return res.status(HttpStatusCode.OK).json(
+                ResponseHandler.success(
+                    result,
+                    RESPONSE_MESSAGES.ADDRESS_UPDATED
+                )
+            );
+        } catch (error: unknown) {
+            return res.status(HttpStatusCode.BAD_REQUEST).json(
+                ResponseHandler.error(RESPONSE_MESSAGES.FAILED, error)
+            );
+        }
+    };
+
+    deleteAddress = async (req: Request, res: Response): Promise<Response> => {
+        try {
+            const { userId, addressId } = req.params;
+
+            const result = await this._deleteUserAddressUseCase.execute(
+                userId,
+                addressId
+            );
+
+            return res.status(HttpStatusCode.OK).json(
+                ResponseHandler.success(
+                    result,
+                    RESPONSE_MESSAGES.ADDRESS_UPDATED
+                )
+            );
+        } catch (error: unknown) {
+            return res.status(HttpStatusCode.BAD_REQUEST).json(
+                ResponseHandler.error(RESPONSE_MESSAGES.FAILED, error)
+            );
+        }
+    };
+
 }

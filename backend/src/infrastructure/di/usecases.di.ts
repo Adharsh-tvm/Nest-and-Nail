@@ -15,7 +15,7 @@ import { ISendOtpUseCase } from "../../application/interfaces/auth/ISendOtpUseCa
 import { IUpdateCategoryStatusUseCase } from "../../application/interfaces/category/IUpdateCategoryStatusUseCase";
 import { IUpdateCategoryUseCase } from "../../application/interfaces/category/IUpdateCategoryUseCase";
 import { IUpdateUserAccessUseCase } from "../../application/interfaces/admin/IUpdateUserAccessUseCase";
-import { IUpdateUserAddressUseCase } from "../../application/interfaces/user/IUpdateUserAddressUseCase";
+import { IUpdateUserAddressUseCase } from "../../application/interfaces/address/IUpdateUserAddressUseCase";
 import { IUpdateUserProfileUseCase } from "../../application/interfaces/user/IUpdateUserProfileUseCase";
 import { IUpdateUserSkillsUseCase } from "../../application/interfaces/user/IUpdateUserSkillsUseCase";
 import { IUpdateVerificationStatusUseCase } from "../../application/interfaces/admin/IUpdateVerificationStatusUseCase";
@@ -43,7 +43,7 @@ import { UpdateCategoryStatusUseCase } from "../../application/use-cases/categor
 import { UpdateCategoryUseCase } from "../../application/use-cases/category/UpdateCategoryUseCase";
 import { ChangeUserRoleUseCase } from "../../application/use-cases/user/ChangeUserRoleUseCase";
 import { GetCurrentUserUseCase } from "../../application/use-cases/user/GetCurrentUserUseCase";
-import { UpdateUserAddressUseCase } from "../../application/use-cases/user/UpdateUserAddressUseCase";
+import { UpdateUserAddressUseCase } from "../../application/use-cases/address/AddUserAddressUseCase";
 import { UpdateUserProfileUseCase } from "../../application/use-cases/user/UpdateUserProfileUseCase";
 import { UpdateUserSkillsUseCase } from "../../application/use-cases/user/UpdateUserSkillsUseCase";
 import { UpdateWorkerCategoriesUseCase } from "../../application/use-cases/worker/profile/UpdateWorkerCategoriesUseCase";

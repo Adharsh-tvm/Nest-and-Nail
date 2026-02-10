@@ -2,6 +2,10 @@ import mongoose from "mongoose";
 
 export const AddressSchema = new mongoose.Schema(
     {
+        addressId: {
+            type: String,
+            required: true,
+        },
         label: {
             type: String,
             enum: ["HOME", "WORK", "OTHER"],

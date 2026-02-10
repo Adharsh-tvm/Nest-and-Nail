@@ -1,14 +1,14 @@
 import { IUserRepositoryFactory } from "../../../domain/repositories/IUserRepositoryFactory";
 import { Role } from "../../../shared/enums/authEnums";
-import { IUpdateUserAddressUseCase } from "../../interfaces/user/IUpdateUserAddressUseCase";
+import { AddAddressDTO } from "../../dtos/AddressDTO";
+import { IAddUserAddressUseCase } from "../../interfaces/address/IUpdateUserAddressUseCase";
 import { UserMapper } from "../../mappers/UserMapper";
+import { randomUUID } from "crypto";
 
-export class UpdateUserAddressUseCase implements IUpdateUserAddressUseCase {
-    constructor(
-        private readonly userRepoFactory: IUserRepositoryFactory
-    ) { }
+export class AddUserAddressUseCase implements IAddUserAddressUseCase {
+    constructor(private readonly userRepoFactory: IUserRepositoryFactory) { }
 
-    async execute(userId: string, data: any) {
+    async execute(userId: string, data: AddAddressDTO) {
         const clientRepo = this.userRepoFactory.getRepository(Role.CLIENT);
         const workerRepo = this.userRepoFactory.getRepository(Role.WORKER);
 
@@ -20,21 +20,16 @@ export class UpdateUserAddressUseCase implements IUpdateUserAddressUseCase {
             repo = workerRepo;
         }
 
-        if (!user) {
-            throw new Error("User not found");
-        }
+        if (!user) throw new Error("User not found");
 
-        if (!user.address) {
-            user.address = [];
-        }
+        user.address ??= [];
 
-        if (data.isDefault === true) {
-            user.address.forEach(addr => {
-                addr.isDefault = false;
-            });
+        if (data.isDefault) {
+            user.address.forEach(a => (a.isDefault = false));
         }
 
         user.address.push({
+            addressId: randomUUID(),
             label: data.label,
             street: data.street,
             city: data.city,
@@ -46,6 +41,8 @@ export class UpdateUserAddressUseCase implements IUpdateUserAddressUseCase {
                 type: "Point",
                 coordinates: [data.lng, data.lat],
             },
+            createdAt: new Date(),
+            updatedAt: new Date(),
         });
 
         const updatedUser = await repo.updateById(userId, {
@@ -56,6 +53,8 @@ export class UpdateUserAddressUseCase implements IUpdateUserAddressUseCase {
             throw new Error("Failed to add address");
         }
 
+
         return UserMapper.toResponseDTO(updatedUser);
     }
 }
+
