@@ -39,7 +39,7 @@ export class ServiceRequestController implements IServiceRequestController {
             )
         } catch (error: any) {
             return res.status(HttpStatusCode.BAD_REQUEST).json(
-                ResponseHandler.error(RESPONSE_MESSAGES.BAD_REQUEST, error.message)
+                ResponseHandler.error(error.message, RESPONSE_MESSAGES.BAD_REQUEST)
             )
         }
     };
