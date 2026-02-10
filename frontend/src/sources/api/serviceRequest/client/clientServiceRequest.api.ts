@@ -41,3 +41,12 @@ export async function getServiceRequestByIdApi(
   );
   return res.data;
 }
+
+export async function deleteServiceRequestApi(
+  requestId: string
+): Promise<ApiResponse<null>> {
+  const res = await axiosInstance.delete<ApiResponse<null>>(
+    `/api/service-requests/${requestId}`
+  );
+  return res.data;
+}

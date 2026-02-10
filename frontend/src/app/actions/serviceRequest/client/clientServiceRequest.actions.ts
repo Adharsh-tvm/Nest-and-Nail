@@ -1,7 +1,23 @@
 import { ApiResponse } from "@/shared/types/responseTypes";
 import { ServiceRequestResponse } from "@/shared/types/ServiceRequestResponse";
 import { CreateServiceRequestDTO } from "@/shared/types/serviceTypes";
-import { createServiceRequestApi, getMyServiceRequestsApi, getServiceRequestByIdApi } from "@/sources/api/serviceRequest/client/clientServiceRequest.api";
+import { createServiceRequestApi, getMyServiceRequestsApi, getServiceRequestByIdApi, deleteServiceRequestApi } from "@/sources/api/serviceRequest/client/clientServiceRequest.api";
+
+// ... existing code ...
+
+export async function deleteServiceRequestAction(
+    requestId: string
+): Promise<ApiResponse<null>> {
+    try {
+        return await deleteServiceRequestApi(requestId);
+    } catch (error: any) {
+        return {
+            success: false,
+            message: error.normalizedMessage ?? "Failed to delete service request",
+            error: error.serverData ?? error.message,
+        };
+    }
+}
 
 export async function createServiceRequestAction(
     payload: CreateServiceRequestDTO

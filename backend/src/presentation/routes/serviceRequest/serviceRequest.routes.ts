@@ -51,5 +51,11 @@ export function createServiceRequestRoutes(
         (req, res) => serviceRequestController.getAllForAdmin(req, res)
     );
 
+    router.delete(
+        "/:requestId",
+        authMiddleware.verify.bind(authMiddleware),
+        (req, res) => serviceRequestController.delete(req, res)
+    );
+
     return router;
 }

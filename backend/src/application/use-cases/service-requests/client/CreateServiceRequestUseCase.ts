@@ -18,11 +18,11 @@ export class CreateServiceRequestUseCase implements ICreateServiceRequestUseCase
         data: CreateServiceRequestDTO & { clientId: string }
     ): Promise<ServiceRequest> {
 
-        if (!data.title || data.title.trim().split(/\s+/).length <= 5) {
+        if (!data.title || data.title.trim().length <= 5) {
             throw new Error("Title must have more than 5 words.");
         }
 
-        if (!data.description || data.description.trim().split(/\s+/).length <= 5) {
+        if (!data.description || data.description.trim().length <= 5) {
             throw new Error("Description must have more than 5 words.");
         }
 

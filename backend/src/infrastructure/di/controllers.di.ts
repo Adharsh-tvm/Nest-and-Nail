@@ -139,7 +139,8 @@ export class ControllerDI {
                 this._useCases.releaseServiceRequestUseCase,
                 this._useCases.getMyServiceRequestsUseCase,
                 this._useCases.getServiceRequestByIdUseCase,
-                this._useCases.getAllServiceRequestsUseCase
+                this._useCases.getAllServiceRequestsUseCase,
+                this._useCases.deleteServiceRequestUseCase
             )
         }
         return this._serviceRequestController;

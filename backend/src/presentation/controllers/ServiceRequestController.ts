@@ -12,6 +12,8 @@ import { IGetMyServiceRequestsUseCase } from "../../application/interfaces/servi
 import { IGetServiceRequestByIdUseCase } from "../../application/interfaces/service-requests/IGetServiceRequestByIdUseCase";
 import { IGetAllServiceRequestsUseCase } from "../../application/interfaces/service-requests/admin/IGetAllServiceRequestsUseCase";
 
+import { IDeleteServiceRequestUseCase } from "../../application/interfaces/service-requests/client/IDeleteServiceRequestUseCase";
+
 export class ServiceRequestController implements IServiceRequestController {
     constructor(
         private readonly _createServiceRequestUseCase: ICreateServiceRequestUseCase,
@@ -20,8 +22,29 @@ export class ServiceRequestController implements IServiceRequestController {
         private readonly _releaseServiceRequestUseCase: IReleaseServiceRequestUseCase,
         private readonly _getMyServiceRequestsUseCase: IGetMyServiceRequestsUseCase,
         private readonly _getServiceRequestByIdUseCase: IGetServiceRequestByIdUseCase,
-        private readonly _getAllServiceRequestsUseCase: IGetAllServiceRequestsUseCase
+        private readonly _getAllServiceRequestsUseCase: IGetAllServiceRequestsUseCase,
+        private readonly _deleteServiceRequestUseCase: IDeleteServiceRequestUseCase
     ) { }
+
+    // ... existing methods ...
+
+    delete = async (req: Request, res: Response): Promise<Response> => {
+        try {
+            const { requestId } = req.params;
+            const clientId = req.user.id;
+
+            await this._deleteServiceRequestUseCase.execute(requestId, clientId);
+
+            return res.status(HttpStatusCode.OK).json(
+                ResponseHandler.success(null, "Service request deleted successfully")
+            );
+        } catch (error: any) {
+            return res.status(HttpStatusCode.BAD_REQUEST).json(
+                ResponseHandler.error("Failed to delete request", error.message)
+            );
+        }
+    };
+
 
     create = async (req: Request, res: Response): Promise<Response> => {
         try {
