@@ -21,6 +21,7 @@ import { VerificationStatus } from "@/shared/enums/authEnums";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import SwitchRoleConfirmationModal from "./SwitchRoleConfirmationModal";
+import { Spinner } from "@/app/components/ui/spinner";
 
 const ClientHeader: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -34,7 +35,7 @@ const ClientHeader: React.FC = () => {
   const [isWorkerFlowOpen, setIsWorkerFlowOpen] = useState(false);
 
   const userMenuRef = useRef<HTMLDivElement>(null);
-  const { user: currentUser, setUser } = useUserStore();
+  const { user: currentUser, setUser, _hasHydrated } = useUserStore();
 
   const userMode = (currentUser?.role as "client" | "worker") || "client";
 
@@ -145,148 +146,162 @@ const ClientHeader: React.FC = () => {
             </Link>
 
             {/* CENTER: Navigation Links */}
-            <div className="hidden md:flex items-center gap-8 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-              <Link
-                href={userMode === "worker" ? "/worker/find-works" : "/client/service-requests"}
-                className="text-gray-500 font-medium hover:text-[#1B4332] transition-colors text-sm"
-              >
-                {userMode === "worker" ? "Find Works" : "Services"}
-              </Link>
+            {!_hasHydrated ? (
+              <div className="hidden md:flex items-center justify-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                {/* Optional: Skeleton for links or just empty to avoid flicker */}
+              </div>
+            ) : (
+              <div className="hidden md:flex items-center gap-8 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                <Link
+                  href={userMode === "worker" ? "/worker/find-works" : "/client/service-requests"}
+                  className="text-gray-500 font-medium hover:text-[#1B4332] transition-colors text-sm"
+                >
+                  {userMode === "worker" ? "Find Works" : "Services"}
+                </Link>
 
-              <Link
-                href="/client/payments"
-                className="text-gray-500 font-medium hover:text-[#1B4332] transition-colors text-sm"
-              >
-                Payments
-              </Link>
-              <Link
-                href="/client/meetings"
-                className="text-gray-500 font-medium hover:text-[#1B4332] transition-colors text-sm"
-              >
-                Meetings
-              </Link>
-            </div>
+                <Link
+                  href="/client/payments"
+                  className="text-gray-500 font-medium hover:text-[#1B4332] transition-colors text-sm"
+                >
+                  Payments
+                </Link>
+                <Link
+                  href="/client/meetings"
+                  className="text-gray-500 font-medium hover:text-[#1B4332] transition-colors text-sm"
+                >
+                  Meetings
+                </Link>
+              </div>
+            )}
 
             {/* RIGHT: Toggle + User Menu */}
-            <div className="hidden md:flex items-center gap-4 flex-shrink-0">
-              {/* If NOT verified -> show Become a Worker button */}
-              {!isVerified && !isPending && (
-                <button
-                  type="button"
-                  onClick={() => setIsWorkerFlowOpen(true)}
-                  className="flex items-center gap-2 bg-[#1B4332] text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-[#153426] transition-colors shadow-sm"
-                >
-                  {buttonPlaceHolder}
-                </button>
-              )}
+            {!_hasHydrated ? (
+              <div className="hidden md:flex items-center gap-4 flex-shrink-0">
+                <Spinner className="text-[#1B4332]" />
+              </div>
+            ) : (
+              <div className="hidden md:flex items-center gap-4 flex-shrink-0">
+                {/* If NOT verified -> show Become a Worker button */}
+                {!isVerified && !isPending && (
+                  <button
+                    type="button"
+                    onClick={() => setIsWorkerFlowOpen(true)}
+                    className="flex items-center gap-2 bg-[#1B4332] text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-[#153426] transition-colors shadow-sm"
+                  >
+                    {buttonPlaceHolder}
+                  </button>
+                )}
 
-              {/* If verification is PENDING -> show disabled status */}
-              {isPending && (
-                <button
-                  type="button"
-                  disabled
-                  className="flex items-center gap-2 bg-amber-50 text-amber-700 px-4 py-2 rounded-full text-xs font-semibold border border-amber-200 cursor-not-allowed"
-                >
-                  <Hammer size={14} />
-                  Verification Pending
-                </button>
-              )}
+                {/* If verification is PENDING -> show disabled status */}
+                {isPending && (
+                  <button
+                    type="button"
+                    disabled
+                    className="flex items-center gap-2 bg-amber-50 text-amber-700 px-4 py-2 rounded-full text-xs font-semibold border border-amber-200 cursor-not-allowed"
+                  >
+                    <Hammer size={14} />
+                    Verification Pending
+                  </button>
+                )}
 
-              {/* If VERIFIED -> show client/worker toggle */}
-              {isVerified && (
-                <div
-                  onClick={toggleUserMode}
-                  className={`relative flex items-center bg-gray-100 rounded-full p-1 w-32 h-10 border border-gray-200 shadow-inner ${isTogglingRole ? "opacity-50 cursor-wait" : "cursor-pointer"
-                    }`}
-                >
+                {/* If VERIFIED -> show client/worker toggle */}
+                {isVerified && (
                   <div
-                    className={`absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-full shadow-sm transition-all duration-300 ease-out ${userMode === "client"
-                      ? "left-1 bg-[#1B4332]"
-                      : "left-[calc(50%)] bg-[#DC2626]"
-                      }`}
-                  />
-                  <div
-                    className={`flex-1 z-10 text-center text-xs font-bold ${userMode === "client" ? "text-white" : "text-gray-500"
+                    onClick={toggleUserMode}
+                    className={`relative flex items-center bg-gray-100 rounded-full p-1 w-32 h-10 border border-gray-200 shadow-inner ${isTogglingRole ? "opacity-50 cursor-wait" : "cursor-pointer"
                       }`}
                   >
-                    Client
-                  </div>
-                  <div
-                    className={`flex-1 z-10 text-center text-xs font-bold ${userMode === "worker" ? "text-white" : "text-gray-500"
-                      }`}
-                  >
-                    Worker
-                  </div>
-                </div>
-              )}
-              <div className="h-6 w-px bg-gray-200 mx-2" />
-
-              {/* User dropdown */}
-              <div className="relative" ref={userMenuRef}>
-                <button
-                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                  className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-full border border-gray-200 hover:border-[#1B4332] hover:bg-gray-50 transition-all group"
-                >
-                  <div className="w-8 h-8 rounded-full bg-[#1B4332] text-white flex items-center justify-center shadow-sm">
-                    <User size={18} />
-                  </div>
-                  <span className="text-sm font-semibold text-gray-700 group-hover:text-[#1B4332] max-w-[100px] truncate">
-                    {currentUser?.name}
-                  </span>
-                  <ChevronDown
-                    size={16}
-                    className={`text-gray-400 transition-transform duration-200 ${isUserMenuOpen ? "rotate-180" : ""
-                      }`}
-                  />
-                </button>
-
-                {isUserMenuOpen && (
-                  <div className="absolute right-0 mt-3 w-60 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden animate-in fade-in zoom-in-95 duration-200 origin-top-right ring-1 ring-black/5">
-                    <div className="px-4 py-3 border-b border-gray-50 bg-gray-50/50">
-                      <p className="text-sm font-bold text-gray-800">
-                        {currentUser?.name}
-                      </p>
-                      <p className="text-xs text-gray-500 truncate capitalize">
-                        {currentUser?.role}
-                      </p>
+                    <div
+                      className={`absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-full shadow-sm transition-all duration-300 ease-out ${userMode === "client"
+                        ? "left-1 bg-[#1B4332]"
+                        : "left-[calc(50%)] bg-[#DC2626]"
+                        }`}
+                    />
+                    <div
+                      className={`flex-1 z-10 text-center text-xs font-bold ${userMode === "client" ? "text-white" : "text-gray-500"
+                        }`}
+                    >
+                      Client
                     </div>
-
-                    <div className="p-1.5 space-y-0.5">
-                      <Link href={profileHref} className="block">
-                        <div className="w-full flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-[#1B4332] rounded-lg transition-colors text-left group cursor-pointer">
-                          <User
-                            size={16}
-                            className="text-gray-400 group-hover:text-[#1B4332]"
-                          />
-                          Profile
-                        </div>
-                      </Link>
-                    </div>
-
-                    <div className="border-t border-gray-100 p-1.5">
-                      <button
-                        onClick={handleLogout}
-                        className="w-full flex items-center gap-2 px-3 py-2 text-sm font-medium text-[#DC2626] hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors text-left group"
-                      >
-                        <LogOut
-                          size={16}
-                          className="group-hover:text-red-700"
-                        />
-                        Log Out
-                      </button>
+                    <div
+                      className={`flex-1 z-10 text-center text-xs font-bold ${userMode === "worker" ? "text-white" : "text-gray-500"
+                        }`}
+                    >
+                      Worker
                     </div>
                   </div>
                 )}
+                <div className="h-6 w-px bg-gray-200 mx-2" />
+
+                {/* User dropdown */}
+                <div className="relative" ref={userMenuRef}>
+                  <button
+                    onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                    className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-full border border-gray-200 hover:border-[#1B4332] hover:bg-gray-50 transition-all group"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-[#1B4332] text-white flex items-center justify-center shadow-sm">
+                      <User size={18} />
+                    </div>
+                    <span className="text-sm font-semibold text-gray-700 group-hover:text-[#1B4332] max-w-[100px] truncate">
+                      {currentUser?.name}
+                    </span>
+                    <ChevronDown
+                      size={16}
+                      className={`text-gray-400 transition-transform duration-200 ${isUserMenuOpen ? "rotate-180" : ""
+                        }`}
+                    />
+                  </button>
+
+                  {isUserMenuOpen && (
+                    <div className="absolute right-0 mt-3 w-60 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden animate-in fade-in zoom-in-95 duration-200 origin-top-right ring-1 ring-black/5">
+                      <div className="px-4 py-3 border-b border-gray-50 bg-gray-50/50">
+                        <p className="text-sm font-bold text-gray-800">
+                          {currentUser?.name}
+                        </p>
+                        <p className="text-xs text-gray-500 truncate capitalize">
+                          {currentUser?.role}
+                        </p>
+                      </div>
+
+                      <div className="p-1.5 space-y-0.5">
+                        <Link href={profileHref} className="block">
+                          <div className="w-full flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-[#1B4332] rounded-lg transition-colors text-left group cursor-pointer">
+                            <User
+                              size={16}
+                              className="text-gray-400 group-hover:text-[#1B4332]"
+                            />
+                            Profile
+                          </div>
+                        </Link>
+                      </div>
+
+                      <div className="border-t border-gray-100 p-1.5">
+                        <button
+                          onClick={handleLogout}
+                          className="w-full flex items-center gap-2 px-3 py-2 text-sm font-medium text-[#DC2626] hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors text-left group"
+                        >
+                          <LogOut
+                            size={16}
+                            className="group-hover:text-red-700"
+                          />
+                          Log Out
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Mobile Menu Button */}
-            <button
-              className="md:hidden text-[#1B4332] p-2 hover:bg-gray-100 rounded-lg transition-colors ml-auto"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            >
-              {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
-            </button>
+            {!_hasHydrated ? null : (
+              <button
+                className="md:hidden text-[#1B4332] p-2 hover:bg-gray-100 rounded-lg transition-colors ml-auto"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              >
+                {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+              </button>
+            )}
           </div>
         </div>
 
