@@ -1,11 +1,11 @@
 import { ILogger } from "../../../infrastructure/logger/ILogger";
 import { Role } from "../../../shared/enums/authEnums";
-import { IUpdateUserProfileUseCase } from "../../interfaces/IUpdateUserProfileUseCase";
 import { UserResponseDTO } from "../../dtos/UserDTO";
 import { UserMapper } from "../../mappers/UserMapper";
 import { User } from "../../../domain/entities/User";
 import { IUploadProfilePictureUseCase } from "../../interfaces/user/IUploadProfilePictureUseCase";
 import { IUserRepositoryFactory } from "../../../domain/repositories/IUserRepositoryFactory";
+import { IUpdateUserProfileUseCase } from "../../interfaces/user/IUpdateUserProfileUseCase";
 
 export class UpdateUserProfileUseCase implements IUpdateUserProfileUseCase {
 

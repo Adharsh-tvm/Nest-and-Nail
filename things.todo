@@ -116,12 +116,12 @@ NEW PENDINGS...
 ✔ check interface is given as type inside all private variables @done (1/13/2026, 11:05:51 PM)
 ☐ loader for header and all other pages
 
-☐ add proper validations
+✔ add proper validations @done (2/10/2026, 10:18:24 AM)
 ☐ show correct messages to users
-☐ fix the refresh issues
+✔ fix the refresh issues @done (2/10/2026, 10:18:28 AM)
 ✔ option for admin to add reason for rejection @done (2/8/2026, 12:56:25 PM)
 ✔ option to re-apply @done (1/13/2026, 11:06:12 PM)
-☐ ask for confirmation
+✔ ask for confirmation @done (2/10/2026, 10:18:30 AM)
 ✔ user block / unblock - bug @done (1/13/2026, 11:06:20 PM)
 ☐ avoid using any/void
 ✔ types of inheritance @done (1/13/2026, 11:07:50 PM)
@@ -132,11 +132,11 @@ NEW PENDINGS...
 ☐ logout blocked user
 ✔ add toast in profile update @done (1/13/2026, 11:33:42 PM)
 ✔ profile name correction @done (1/13/2026, 11:33:47 PM)
-☐ axios call api services in one file
+✔ axios call api services in one file @done (2/10/2026, 10:18:36 AM)
 ☐ ui stability
 ✔ toast for otp login @done (1/13/2026, 11:34:57 PM)
 ☐ after applicatin send for approval page immediate refresh to show pending button
-☐ worker profile ui along with sidebar 
+✔ worker profile ui along with sidebar @done (2/10/2026, 10:18:49 AM)
 ✔ client profile ui along with sidebar @done (1/13/2026, 11:35:11 PM)
 ✔ change landing page @done (1/13/2026, 11:35:13 PM)
 ✔ text for all files creating code @done (1/13/2026, 11:35:17 PM)
@@ -149,34 +149,34 @@ NEW PENDINGS...
 ✔ document upload front side and back side @done (1/13/2026, 11:35:36 PM)
 ✔ re-apply option enable prefectly @done (1/13/2026, 11:35:37 PM)
 ☐ remove the existing user details when re applied
-☐ fix logout time
+✔ fix logout time @done (2/10/2026, 10:19:00 AM)
 ✔ rejection reason by mail @done (1/28/2026, 8:10:02 PM)
 ☐ Add more reusable components
 ☐ Add optimizations in frontend (Error boundaries, Lazy loading, memoization)
 ☐ Add more reusable components
 ☐ option for admin to add reason for rejection - highlight the doc need to be uploaded again for reapply.
-☐ ask for confirmation - logout
+✔ ask for confirmation - logout @done (2/10/2026, 10:20:23 AM)
 ☐ user block / unblock - session handling  in already logged in user
-☐ when the role is switched correct page should be shown using auto refresh
+✔ when the role is switched correct page should be shown using auto refresh @done (2/10/2026, 10:20:36 AM)
 ☐ make document upload to cloudinary from frontend
 ☐ address edit and delete and also make default option
 ☐ make the google login button responsive
-☐ adding category in admin side
+✔ adding category in admin side @done (2/10/2026, 10:20:49 AM)
 ☐ duplicate category error fix 
-☐ fix category toggle error
-☐ error handling interceptor
-☐ 400 ,500 pages
+✔ fix category toggle error @done (2/10/2026, 10:20:54 AM)
+✔ error handling interceptor @done (2/10/2026, 10:20:56 AM)
+✔ 400 ,500 pages @done (2/10/2026, 10:20:57 AM)
 ☐ blocking of logged in user
 ✔ confirmation modal- ask for confirmation @done (1/28/2026, 8:08:18 PM)
 ☐ s3 and signed url
 ✔ profile need proper validation @done (1/31/2026, 12:59:48 PM)
-☐ reservation for workers
+✔ reservation for workers @done (2/10/2026, 10:21:06 AM)
 ☐ archived stage for service request after one day
-☐ service request photos
-☐ custom id for service request
+✔ service request photos @done (2/10/2026, 10:21:37 AM)
+✔ custom id for service request @done (2/10/2026, 10:21:46 AM)
 ☐ 1 hour status changer
 ☐ apply filter in service request page
-☐ need to add custom location while adding address
+✔ need to add custom location while adding address @done (2/10/2026, 10:25:42 AM)
 ☐ auto logout after token expire
 ☐ address delete option 
 ☐ add service delete option
@@ -187,6 +187,8 @@ NEW PENDINGS...
 ☐ list all the service requests in admin side
 ☐ show category name instead of id in service requests
 ☐ analyse how search and filters are done in admin side
+☐ back button issue after otp logged in 
+☐ how debouncing works
 
 
 
