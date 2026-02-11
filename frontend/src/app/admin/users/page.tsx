@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import {
   Mail,
   Phone,
@@ -111,29 +112,47 @@ import BlockConfirmationModal from "./BlockConfirmationModal";
  * ----------------------------------------------------------------------------
  */
 const UsersView = () => {
-  // State for filters and pagination
-  const [page, setPage] = useState(1);
-  const [limit] = useState(10);
-  const [search, setSearch] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [isBlocked, setIsBlocked] = useState<boolean | undefined>(undefined);
-  const [isVerified, setIsVerified] = useState<VerificationStatus | undefined>(
-    undefined
-  );
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-  // Debounce search
+  // Get state from URL params
+  const page = Number(searchParams.get("page")) || 1;
+  const search = searchParams.get("search") || "";
+  const isBlockedParam = searchParams.get("isBlocked");
+  const isBlocked = isBlockedParam === "true" ? true : isBlockedParam === "false" ? false : undefined;
+  const isVerifiedParam = searchParams.get("isVerified");
+  const isVerified = isVerifiedParam && isVerifiedParam !== "ALL" ? (isVerifiedParam as VerificationStatus) : undefined;
+
+  // Hardcoded limit
+  const limit = 5;
+
+  // Local state for search input to handle debouncing
+  const [searchTerm, setSearchTerm] = useState(searchParams.get("search") || "");
+
+  // Sync local search term with URL params (e.g. on back/forward navigation)
   useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedSearch(search);
-      setPage(1); // Reset to page 1 on search
+    const urlSearch = searchParams.get("search") || "";
+    if (urlSearch !== searchTerm) {
+      setSearchTerm(urlSearch);
+    }
+  }, [searchParams]);
+
+  // Debounce URL update
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const urlSearch = searchParams.get("search") || "";
+      if (searchTerm !== urlSearch) {
+        updateUrl("search", searchTerm || null);
+      }
     }, 500);
-    return () => clearTimeout(handler);
-  }, [search]);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   const { users, loading, error, total, totalPages } = useUsers({
     page,
     limit,
-    search: debouncedSearch,
+    search: search, // The hook uses the URL param directly, which is updated after debounce
     isBlocked,
     isVerified,
     sortBy: "createdAt",
@@ -146,18 +165,34 @@ const UsersView = () => {
   const [blockConfirmOpen, setBlockConfirmOpen] = useState(false);
   const [userToBlock, setUserToBlock] = useState<any>(null);
 
+  // Helper to update URL params
+  const updateUrl = (key: string, value: string | null) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (value === null) {
+      params.delete(key);
+    } else {
+      params.set(key, value);
+    }
+
+    // When filtering or searching, reset to page 1
+    if (key !== "page") {
+      params.set("page", "1");
+    }
+
+    router.replace(`${pathname}?${params.toString()}`);
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+  };
+
+  const handlePageChange = (newPage: number) => {
+    updateUrl("page", String(newPage));
+  };
+
   useEffect(() => {
     if (users) setLocalUsers(users);
   }, [users]);
-
-  // Derive stats (Note: these might be partial if we only fetch one page, 
-  // but for now we display what we have or we might need a separate stats API if we want global stats)
-  // For now, we'll keep the stats cards but note that they reflect the current view or we might want to fetch stats separately.
-  // Actually, let's keep them as is, but they will only count what's on the page which is misleading.
-  // Ideally, the API should return global stats.
-  // As a compromise, I will remove the "verifiedUsers" and "blockedUsers" counts from client side calculation if they are misleading,
-  // or just leave them as "Visible Users" stats.
-  // Let's rely on the `total` from the API for Total Users.
 
   const handleBlockToggle = (row: any) => {
     setUserToBlock(row);
@@ -385,20 +420,19 @@ const UsersView = () => {
           data={localUsers}
           isLoading={loading}
           searchPlaceholder="Search by name, email..."
-          searchValue={search}
-          onSearchChange={setSearch}
+          searchValue={searchTerm}
+          onSearchChange={handleSearchChange}
           page={page}
           totalPages={totalPages}
-          onPageChange={setPage}
+          onPageChange={handlePageChange}
           actions={
             <div className="flex gap-2">
               <select
                 className="p-3 bg-gray-50 border border-gray-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#1B4332]/10"
-                value={isVerified ?? "ALL"}
+                value={isVerifiedParam || "ALL"}
                 onChange={(e) => {
                   const val = e.target.value;
-                  setIsVerified(val === "ALL" ? undefined : val as VerificationStatus);
-                  setPage(1);
+                  updateUrl("isVerified", val === "ALL" ? null : val);
                 }}
               >
                 <option value="ALL">All Verification</option>
@@ -409,11 +443,10 @@ const UsersView = () => {
 
               <select
                 className="p-3 bg-gray-50 border border-gray-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#1B4332]/10"
-                value={isBlocked === undefined ? "ALL" : String(isBlocked)}
+                value={isBlockedParam === null ? "ALL" : isBlockedParam}
                 onChange={(e) => {
                   const val = e.target.value;
-                  setIsBlocked(val === "ALL" ? undefined : val === "true");
-                  setPage(1);
+                  updateUrl("isBlocked", val === "ALL" ? null : val);
                 }}
               >
                 <option value="ALL">All Status</option>

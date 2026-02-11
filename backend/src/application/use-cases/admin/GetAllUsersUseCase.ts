@@ -12,7 +12,7 @@ export class GetAllUsersUseCase implements IGetAllUsersUseCase {
         private readonly _logger: ILogger
     ) { }
 
-    async execute(query: ListUsersQuery): Promise<UserResponseDTO[]> {
+    async execute(query: ListUsersQuery): Promise<{ users: UserResponseDTO[]; total: number; totalPages: number }> {
         this._logger.info("Fetching users with filters");
 
         const {
@@ -25,18 +25,23 @@ export class GetAllUsersUseCase implements IGetAllUsersUseCase {
             limit = 20,
         } = query;
 
-        const clientRepo = this._repoFactory.getRepository(Role.CLIENT);
-        const workerRepo = this._repoFactory.getRepository(Role.WORKER);
+        const userRepo = this._repoFactory.getRepository("USER" as any);
 
-        const filter = { isBlocked, isVerified, search };
+        const filter = {
+            isBlocked,
+            isVerified,
+            search,
+            role: { $ne: Role.ADMIN }
+        };
         const options = { sortBy, sortOrder, page, limit };
 
-        const [clients, workers] = await Promise.all([
-            clientRepo.findWithQuery(filter, options),
-            workerRepo.findWithQuery(filter, options),
-        ]);
+        const result = await userRepo.findWithPagination(filter, options);
 
-        return [...clients, ...workers].map(UserMapper.toResponseDTO);
+        return {
+            users: result.users.map(UserMapper.toResponseDTO),
+            total: result.total,
+            totalPages: result.totalPages
+        };
     }
 
 }

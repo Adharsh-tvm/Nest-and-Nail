@@ -38,10 +38,10 @@ export class AdminController implements IAdminController {
                 limit: req.query.limit ? Number(req.query.limit) : 20,
             };
 
-            const users = await this._getAllUsersUseCase.execute(query);
+            const result = await this._getAllUsersUseCase.execute(query);
 
             res.status(HttpStatusCode.OK).json(
-                ResponseHandler.success(users, RESPONSE_MESSAGES.USERS_FETCHED)
+                ResponseHandler.success(result, RESPONSE_MESSAGES.USERS_FETCHED)
             );
         } catch (error) {
             console.error(error);

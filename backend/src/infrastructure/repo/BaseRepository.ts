@@ -119,6 +119,7 @@ export abstract class BaseRepository<T extends User> implements IBaseRepository<
             isBlocked?: boolean;
             isVerified?: any;
             search?: string;
+            role?: any;
         },
         options: {
             sortBy: string;
@@ -136,6 +137,10 @@ export abstract class BaseRepository<T extends User> implements IBaseRepository<
 
         if (filter.isVerified) {
             mongoFilter.isVerified = filter.isVerified;
+        }
+
+        if (filter.role) {
+            mongoFilter.role = filter.role;
         }
 
         if (filter.search) {
@@ -163,6 +168,70 @@ export abstract class BaseRepository<T extends User> implements IBaseRepository<
             const { _id, __v, ...rest } = doc as any;
             return rest as T;
         });
+    }
+
+    async findWithPagination(
+        filter: {
+            isBlocked?: boolean;
+            isVerified?: any;
+            search?: string;
+            role?: any;
+        },
+        options: {
+            sortBy: string;
+            sortOrder: "asc" | "desc";
+            page: number;
+            limit: number;
+        }
+    ): Promise<{ users: T[]; total: number; totalPages: number }> {
+        const mongoFilter: any = {};
+
+        if (typeof filter.isBlocked === "boolean") {
+            mongoFilter.isBlocked = filter.isBlocked;
+        }
+
+        if (filter.isVerified) {
+            mongoFilter.isVerified = filter.isVerified;
+        }
+
+        if (filter.role) {
+            mongoFilter.role = filter.role;
+        }
+
+        if (filter.search) {
+            mongoFilter.$or = [
+                { name: { $regex: filter.search, $options: "i" } },
+                { email: { $regex: filter.search, $options: "i" } },
+            ];
+        }
+
+        const sort: Record<string, 1 | -1> = {
+            [options.sortBy]: options.sortOrder === "asc" ? 1 : -1,
+        };
+
+        const skip = (options.page - 1) * options.limit;
+
+        const [users, total] = await Promise.all([
+            this.model
+                .find(mongoFilter)
+                .sort(sort)
+                .skip(skip)
+                .limit(options.limit)
+                .lean()
+                .exec(),
+            this.model.countDocuments(mongoFilter),
+        ]);
+
+        const totalPages = Math.ceil(total / options.limit);
+
+        return {
+            users: users.map(doc => {
+                const { _id, __v, ...rest } = doc as any;
+                return { id: _id.toString(), ...rest } as T;
+            }),
+            total,
+            totalPages,
+        };
     }
 
 
