@@ -11,11 +11,13 @@ import { IOtpRepository } from "../../domain/repositories/IOtpRepository";
 import { IUserRepositoryFactory } from "../../domain/repositories/IUserRepositoryFactory";
 import { IWorkerRepository } from "../../domain/repositories/IWorkerRepository";
 import { loggerInstance } from "../logger/Logger";
+import { IBaseRepository } from "../../domain/repositories/IBaseRepository";
 import { AdminRepository } from "../repo/AdminRepository";
 import { CategoryRepository } from "../repo/CategoryRepository";
 import { ClientRepository } from "../repo/ClientRepository";
 import { OtpRepository } from "../repo/OtpRepository";
 import { UserRepositoryFactory } from "../repo/UserRepositoryFactory";
+import { UserRepository } from "../repo/UserRepository";
 import { WorkerRepository } from "../repo/WorkerRepository";
 import { BcryptPasswordHasher } from "../adapters/BcryptPasswordHasher";
 import { JwtTokenService } from "../adapters/JwtTokenService";
@@ -33,6 +35,7 @@ export class InfrastructureDI {
   private _workerRepository?: IWorkerRepository;
   private _otpRepository?: IOtpRepository;
   private _adminRepository?: IAdminRepository;
+  private _userRepository?: IBaseRepository<any>;
 
 
   private _passwordHasher?: IPasswordHasher;
@@ -55,10 +58,18 @@ export class InfrastructureDI {
       this._userRepositoryFactory = new UserRepositoryFactory(
         this.clientRepository,
         this.workerRepository,
-        this.adminRepository
+        this.adminRepository,
+        this.userRepository
       );
     }
     return this._userRepositoryFactory;
+  }
+
+  get userRepository(): IBaseRepository<any> {
+    if (!this._userRepository) {
+      this._userRepository = new UserRepository();
+    }
+    return this._userRepository;
   }
 
   get clientRepository(): IClientRepository {

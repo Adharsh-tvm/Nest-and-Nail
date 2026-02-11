@@ -12,6 +12,7 @@ export interface IBaseRepository<T> {
             isBlocked?: boolean;
             isVerified?: any;
             search?: string;
+            role?: any;
         },
         options: {
             sortBy: string;
@@ -20,4 +21,18 @@ export interface IBaseRepository<T> {
             limit: number;
         }
     ): Promise<T[]>;
+    findWithPagination(
+        filter: {
+            isBlocked?: boolean;
+            isVerified?: any;
+            search?: string;
+            role?: any;
+        },
+        options: {
+            sortBy: string;
+            sortOrder: "asc" | "desc";
+            page: number;
+            limit: number;
+        }
+    ): Promise<{ users: T[]; total: number; totalPages: number }>;
 }
