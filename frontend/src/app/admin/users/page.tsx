@@ -130,7 +130,6 @@ const UsersView = () => {
   // Local state for search input to handle debouncing
   const [searchTerm, setSearchTerm] = useState(searchParams.get("search") || "");
 
-  // Sync local search term with URL params (e.g. on back/forward navigation)
   useEffect(() => {
     const urlSearch = searchParams.get("search") || "";
     if (urlSearch !== searchTerm) {
