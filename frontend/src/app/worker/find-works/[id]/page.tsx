@@ -181,19 +181,7 @@ export default function ServiceRequestDetailsPage() {
                 </h3>
               </div>
               <div className="h-64 relative z-0">
-                {/* Note: In a real implementation, we would pass props to the Map component to show a marker. 
-                        Since LocationPicker might be built for selecting, we might need a read-only mode or a separate MapView component.
-                        For now utilizing a placeholder if Map component doesn't support read-only view directly or assuming it can handle coordinates.
-                        
-                        If LocationPicker is strictly for picking, we should use a MapContainer from leaflet directly here or a wrapper.
-                        Assuming for now we can't easily reuse LocationPicker for read-only without checking its implementation details.
-                        I will check LocationPicker implementation in a moment or use a simple placeholder if needed.
-                        
-                        Wait, I should check LocationPicker.tsx first to see if it accepts props for initial position and read-only.
-                        I'll use a simple iframe for generic map or valid leaflet text if not.
-                        Actually, let's just assume for this step we display coordinates or a static map if possible, 
-                        or better yet, just a simple "Open in Maps" button if we can't render the map easily.
-                    */}
+
                 <div className="w-full h-full bg-slate-100 flex items-center justify-center">
                   <div className="text-center">
                     <p className="text-slate-500 font-medium mb-2">
