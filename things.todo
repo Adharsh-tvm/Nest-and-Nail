@@ -192,6 +192,13 @@ NEW PENDINGS...
 ☐ CUSTOMER DETAILS ON REVEIW REQUEST
 ☐ show proper error message in add service request validation
 ☐ confirmation for approve verification 
+☐ 1 MB error should be displayed properly
+☐ crop profile image
+☐ profile 1 MB error
+☐ otp wrong error display
+☐ address add error display
+☐ front and back id is same
+☐ prevent multiple click in buttons
 
 
 ⁡⁢⁣⁢​‌‌‌SECOND WEEK​⁡
@@ -201,8 +208,27 @@ Next week:
 ☐ Complete the worker profile module with all required details
 ☐ Complete client and worker profile sections, including location information
 ☐ Implement online/offline mode functionality for workers.
-Add an issue-raising feature for clients.
-Show client-raised issues to workers based on their location.
-Build the issue detail page with full information about the required work.
-Implement location UI using a Street Map API.
-Add admin-side filters for workers
+☐ Add an issue-raising feature for clients.
+☐ Show client-raised issues to workers based on their location.
+☐ Build the issue detail page with full information about the required work.
+☐ Implement location UI using a Street Map API.
+☐ Add admin-side filters for workers
+
+
+
+
+⁡⁢⁣⁢​‌‌‌𝗧𝗛𝗜𝗥𝗗 𝗪𝗘𝗘𝗞​⁡
+
+
+
+☐ DI
+☐ openclosed principle
+☐ env validation
+☐ retention period
+☐ cloudstorage
+
+Next 
+ ☐ - slot
+ ☐ - map
+ ☐ - video call
+ ☐ - payment
