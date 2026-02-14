@@ -28,6 +28,7 @@ import { IServiceRequestRepository } from "../../domain/repositories/IServiceReq
 import { ServiceRequestRepository } from "../repo/ServiceRequestRepository";
 import { IGenerateServiceRequestId } from "../../application/contracts/IGenerateServiceRequestId";
 import { ServiceRequestIdGenerator } from "../adapters/ServiceRequestIdGenerator";
+import { S3Service } from "../adapters/S3service";
 
 export class InfrastructureDI {
   private _userRepositoryFactory?: IUserRepositoryFactory;
@@ -50,6 +51,8 @@ export class InfrastructureDI {
 
   private _serviceRequestRepository?: IServiceRequestRepository;
   private _serviceRequestIdGenerator?: IGenerateServiceRequestId;
+
+  private _s3Service?: S3Service;
 
 
 
@@ -163,5 +166,11 @@ export class InfrastructureDI {
     }
     return this._serviceRequestIdGenerator;
   }
-}
 
+  get s3Service(): S3Service {
+    if (!this._s3Service) {
+      this._s3Service = new S3Service();
+    }
+    return this._s3Service;
+  }
+}

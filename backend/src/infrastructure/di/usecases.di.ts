@@ -73,6 +73,8 @@ import { EditUserAddressUseCase } from "../../application/use-cases/address/Edit
 import { DeleteUserAddressUseCase } from "../../application/use-cases/address/DeleteUserAddressUseCase";
 import { IDeleteServiceRequestUseCase } from "../../application/interfaces/service-requests/client/IDeleteServiceRequestUseCase";
 import { DeleteServiceRequestUseCase } from "../../application/use-cases/service-requests/client/DeleteServiceRequestUseCase";
+import { IGetS3UploadUrlUseCase } from "../../application/interfaces/media/IGetS3UploadUrlUseCase";
+import { GetS3UploadUrlUseCase } from "../../application/use-cases/media/GetS3UploadUrlUseCase";
 
 
 export class UseCaseDI {
@@ -124,6 +126,7 @@ export class UseCaseDI {
   private _deleteServiceRequestUseCase?: IDeleteServiceRequestUseCase;
 
   private _getCloudinaryUploadSignatureUseCase?: IGetCloudinaryUploadSignatureUseCase;
+  private _getS3UploadUrlUseCase?: IGetS3UploadUrlUseCase;
 
 
   constructor(private infra: InfrastructureDI) { }
@@ -487,5 +490,14 @@ export class UseCaseDI {
       )
     }
     return this._deleteServiceRequestUseCase
+  }
+
+  get getS3UploadUrlUseCase(): IGetS3UploadUrlUseCase {
+    if (!this._getS3UploadUrlUseCase) {
+      this._getS3UploadUrlUseCase = new GetS3UploadUrlUseCase(
+        this.infra.s3Service
+      );
+    }
+    return this._getS3UploadUrlUseCase;
   }
 }

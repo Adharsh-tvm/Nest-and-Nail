@@ -7,8 +7,8 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 export function createMediaRoutes(controller: MediaController) {
   router.get(
-    "/cloudinary/signature",
-    controller.getCloudinarySignature
+    "/s3-upload-url",
+    controller.getS3UploadUrl
   );
 
   return router;
