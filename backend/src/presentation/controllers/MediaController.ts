@@ -2,26 +2,32 @@ import { Request, Response } from "express";
 import { IGetCloudinaryUploadSignatureUseCase } from "../../application/interfaces/media/IGetCloudinaryUploadSignatureUseCase";
 import { ResponseHandler } from "../../shared/responses/ApiResponse";
 import { HttpStatusCode } from "../../shared/enums/httpCodes";
+import { IGetS3UploadUrlUseCase } from "../../application/interfaces/media/IGetS3UploadUrlUseCase";
 
 export class MediaController {
   constructor(
-    private readonly _getSignatureUseCase: IGetCloudinaryUploadSignatureUseCase
-  ) {}
+    private readonly _getS3UploadUrlUseCase: IGetS3UploadUrlUseCase
+  ) { }
 
-  getCloudinarySignature = async (_req: Request, res: Response) => {
+  getS3UploadUrl = async (req: Request, res: Response) => {
     try {
-      const signature = this._getSignatureUseCase.execute();
+      const { fileName, contentType } = req.body;
 
-      return res.json(
-        ResponseHandler.success(
-          signature,
-          "Cloudinary upload signature generated"
-        )
+      const result = await this._getS3UploadUrlUseCase.execute(
+        fileName,
+        contentType
       );
+
+      return res.status(200).json({
+        success: true,
+        payload: result,
+      });
     } catch (error: any) {
-      return res.status(HttpStatusCode.INTERNAL_SERVER).json(
-        ResponseHandler.error(error.message)
-      );
+      return res.status(500).json({
+        success: false,
+        message: error.message,
+      });
     }
   };
+
 }
