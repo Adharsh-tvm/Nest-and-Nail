@@ -27,11 +27,3 @@ export async function fetchCategoriesAction() {
     }
 }
 
-export async function fetchWorkerCategoriesAction( userId: string,) {
-    try {
-        return await userApi.getWorkerCategories(userId)
-    } catch (error: any) {
-        console.error("Fetch categories error:", error);
-        return [];
-    }
-}

@@ -24,10 +24,11 @@ export class UploadController implements IUploadController {
 
       const result = await this._uploadProfilePictureUseCase.execute(
         workerId,
-        filePath
+        filePath,
+        req.file!.mimetype
       );
 
-      return res.status(HttpStatusCode.INTERNAL_SERVER).json(ResponseHandler.success(result.url, RESPONSE_MESSAGES.PROFILE_UPDATED))
+      return res.status(HttpStatusCode.OK).json(ResponseHandler.success(result.url, RESPONSE_MESSAGES.PROFILE_UPDATED))
     } catch (error: any) {
 
       return res.status(HttpStatusCode.INTERNAL_SERVER).json(ResponseHandler.error(RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR, error))
@@ -46,7 +47,8 @@ export class UploadController implements IUploadController {
 
       const result = await this._uploadDocumentUseCase.execute(
         workerId,
-        filePath
+        filePath,
+        req.file!.mimetype
       );
 
       return res.status(HttpStatusCode.OK).json(ResponseHandler.success(result, RESPONSE_MESSAGES.DOCUMENT_UPLOADED));

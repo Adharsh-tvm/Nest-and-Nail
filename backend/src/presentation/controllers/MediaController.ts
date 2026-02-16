@@ -1,7 +1,4 @@
 import { Request, Response } from "express";
-import { IGetCloudinaryUploadSignatureUseCase } from "../../application/interfaces/media/IGetCloudinaryUploadSignatureUseCase";
-import { ResponseHandler } from "../../shared/responses/ApiResponse";
-import { HttpStatusCode } from "../../shared/enums/httpCodes";
 import { IGetS3UploadUrlUseCase } from "../../application/interfaces/media/IGetS3UploadUrlUseCase";
 
 export class MediaController {
@@ -11,7 +8,7 @@ export class MediaController {
 
   getS3UploadUrl = async (req: Request, res: Response) => {
     try {
-      const { fileName, contentType } = req.body;
+      const { fileName, contentType } = req.query as { fileName: string; contentType: string };
 
       const result = await this._getS3UploadUrlUseCase.execute(
         fileName,

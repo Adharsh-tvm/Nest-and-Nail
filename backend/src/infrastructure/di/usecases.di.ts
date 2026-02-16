@@ -59,8 +59,7 @@ import { ReserveServiceRequestUseCase } from "../../application/use-cases/servic
 import { ReleaseServiceRequestUseCase } from "../../application/use-cases/service-requests/client/ReleaseServiceRequestUseCase";
 import { IGetMyServiceRequestsUseCase } from "../../application/interfaces/service-requests/client/IGetMyServiceRequestsUseCase";
 import { GetMyServiceRequestsUseCase } from "../../application/use-cases/service-requests/client/GetMyServiceRequestsUseCase";
-import { IGetCloudinaryUploadSignatureUseCase } from "../../application/interfaces/media/IGetCloudinaryUploadSignatureUseCase";
-import { GetCloudinaryUploadSignatureUseCase } from "../../application/use-cases/media/GetCloudinaryUploadSignatureUseCase";
+
 import { IGetServiceRequestByIdUseCase } from "../../application/interfaces/service-requests/IGetServiceRequestByIdUseCase";
 import { GetServiceRequestByIdUseCase } from "../../application/use-cases/service-requests/GetServiceRequestByIdUseCase";
 import { IGetAllServiceRequestsUseCase } from "../../application/interfaces/service-requests/admin/IGetAllServiceRequestsUseCase";
@@ -125,7 +124,7 @@ export class UseCaseDI {
   private _getAllServiceRequestsUseCase?: IGetAllServiceRequestsUseCase;
   private _deleteServiceRequestUseCase?: IDeleteServiceRequestUseCase;
 
-  private _getCloudinaryUploadSignatureUseCase?: IGetCloudinaryUploadSignatureUseCase;
+
   private _getS3UploadUrlUseCase?: IGetS3UploadUrlUseCase;
 
 
@@ -261,7 +260,8 @@ export class UseCaseDI {
     if (!this._getCurrentUserUseCase) {
       this._getCurrentUserUseCase = new GetCurrentUserUseCase(
         this.infra.userRepositoryFactory,
-        this.infra.logger
+        this.infra.logger,
+        this.infra.s3Service
       );
     }
     return this._getCurrentUserUseCase;
@@ -271,7 +271,8 @@ export class UseCaseDI {
     if (!this._uploadProfilePictureUseCase) {
       this._uploadProfilePictureUseCase = new UploadProfilePictureUseCase(
         this.infra.userRepositoryFactory,
-        this.infra.logger
+        this.infra.logger,
+        this.infra.s3Service
       );
     }
     return this._uploadProfilePictureUseCase;
@@ -281,7 +282,8 @@ export class UseCaseDI {
     if (!this._uploadWorkerDocumentUseCase) {
       this._uploadWorkerDocumentUseCase = new UploadWorkerDocumentUseCase(
         this.infra.userRepositoryFactory,
-        this.infra.logger
+        this.infra.logger,
+        this.infra.s3Service
       );
     }
     return this._uploadWorkerDocumentUseCase;
@@ -458,12 +460,7 @@ export class UseCaseDI {
     return this._getMyServiceRequestsUseCase;
   }
 
-  get getCloudinaryUploadSignatureUseCase(): IGetCloudinaryUploadSignatureUseCase {
-    if (!this._getCloudinaryUploadSignatureUseCase) {
-      this._getCloudinaryUploadSignatureUseCase = new GetCloudinaryUploadSignatureUseCase()
-    }
-    return this._getCloudinaryUploadSignatureUseCase
-  }
+
 
   get getServiceRequestByIdUseCase(): IGetServiceRequestByIdUseCase {
     if (!this._getServiceRequestByIdUseCase) {

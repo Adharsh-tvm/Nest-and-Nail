@@ -44,7 +44,6 @@ import {
 import {
   updateUserCategoriesAction,
   fetchCategoriesAction,
-  fetchWorkerCategoriesAction,
 } from "@/app/actions/users/user-categories-action";
 import toast from "react-hot-toast";
 import { VerificationStatus } from "@/shared/enums/authEnums";
@@ -230,22 +229,8 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
       .catch((err) => console.error("Failed to fetch categories", err));
   }, []);
 
-  useEffect(() => {
-    if (user.id) {
-      fetchWorkerCategoriesAction(user.id)
-        .then((res: any) => {
-          if (res && res.success && res.payload) {
-            // Merge fetched categories into current user state
-            // Assuming payload is the User object with updated categories
-            const fetchedUser = res.payload;
-            setUser({ ...user, categories: fetchedUser.categories || [] });
-          }
-        })
-        .catch((err) =>
-          console.error("Failed to fetch worker categories", err),
-        );
-    }
-  }, [user.id, setUser]); // Added setUser to deps, though it's likely stable
+  // Removed redundant fetchWorkerCategoriesAction as categories are now loaded with user details
+
 
   // Sync formData when user prop updates (e.g. after image upload in parent)
   useEffect(() => {
