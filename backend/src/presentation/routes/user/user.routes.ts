@@ -58,5 +58,7 @@ export function createUserRoutes(
         userProfileController.updateCategories
     );
 
+
+
     return router;
 }

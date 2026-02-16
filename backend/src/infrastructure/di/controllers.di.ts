@@ -150,7 +150,7 @@ export class ControllerDI {
     get mediaController(): MediaController {
         if (!this._mediaController) {
             this._mediaController = new MediaController(
-                this._useCases.getCloudinaryUploadSignatureUseCase
+                this._useCases.getS3UploadUrlUseCase
             )
         }
         return this._mediaController;

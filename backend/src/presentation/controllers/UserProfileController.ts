@@ -26,6 +26,7 @@ export class UserProfileController implements IUserProfileController {
         try {
             const userId = req.params.userId;
             const profilePictureFilePath = req.file?.path;
+            const mimetype = req.file?.mimetype;
 
             const updates: any = {
                 ...req.body,
@@ -38,7 +39,8 @@ export class UserProfileController implements IUserProfileController {
             const updatedUser = await this._updateUserProfileUseCase.execute(
                 userId,
                 updates,
-                profilePictureFilePath
+                profilePictureFilePath,
+                mimetype
             );
 
             return res.status(HttpStatusCode.OK).json(

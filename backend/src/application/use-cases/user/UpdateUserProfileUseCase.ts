@@ -18,7 +18,8 @@ export class UpdateUserProfileUseCase implements IUpdateUserProfileUseCase {
     async execute(
         userId: string,
         updates: Partial<User>,
-        profilePictureFilePath?: string
+        profilePictureFilePath?: string,
+        mimetype?: string
     ): Promise<UserResponseDTO> {
 
         this._logger.info(`[UpdateUserProfileUseCase] Updating profile for user ${userId}`);
@@ -39,9 +40,11 @@ export class UpdateUserProfileUseCase implements IUpdateUserProfileUseCase {
 
         let updatedUser: any = { ...user, ...updates };
 
-        if (profilePictureFilePath) {
-            const { url } = await this._uploadProfilePictureUseCase.execute(userId, profilePictureFilePath);
+        if (profilePictureFilePath && mimetype) {
+            const { url } = await this._uploadProfilePictureUseCase.execute(userId, profilePictureFilePath, mimetype);
             updatedUser.profilePictureUrl = url;
+        } else if (profilePictureFilePath) {
+            throw new Error("Mimetype is required when uploading a profile picture");
         }
 
         updatedUser.role = user.role;

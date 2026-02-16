@@ -5,11 +5,13 @@ import { ILogger } from "../../../infrastructure/logger/ILogger";
 import { UserMapper } from "../../mappers/UserMapper";
 import { Role } from "../../../shared/enums/authEnums";
 import { IUserRepositoryFactory } from "../../../domain/repositories/IUserRepositoryFactory";
+import { S3Service } from "../../../infrastructure/adapters/S3service";
 
 export class GetCurrentUserUseCase implements IGetCurrentUserUseCase {
     constructor(
         private readonly _repositoryFactory: IUserRepositoryFactory,
         private readonly _logger: ILogger,
+        private readonly _s3Service: S3Service
     ) { }
 
     async execute(email: string | null): Promise<UserResponseDTO> {
@@ -64,6 +66,14 @@ export class GetCurrentUserUseCase implements IGetCurrentUserUseCase {
         if (user.isBlocked) {
             this._logger.warn(`[GetCurrentUserUseCase] User is blocked: ${email}`);
             throw new UserBlockedError();
+        }
+
+        // Generate Presigned URL for profile picture
+        if (user.profilePictureUrl) {
+            // Check if it's already a full URL (legacy) or a key
+            if (!user.profilePictureUrl.startsWith("http")) {
+                user.profilePictureUrl = await this._s3Service.getPresignedDownloadUrl(user.profilePictureUrl);
+            }
         }
 
         return UserMapper.toResponseDTO(user);

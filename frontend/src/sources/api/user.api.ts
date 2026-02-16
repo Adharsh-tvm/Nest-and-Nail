@@ -72,15 +72,7 @@ const userApi = {
     return response.data;
   },
 
-  getWorkerCategories: async (
-    userId: string,
-  ): Promise<ApiResponse<User>> => {
-    const response = await axiosInstance.get<ApiResponse<User>>(
-      `/api/users/${userId}/categories`,
-      { withCredentials: true }
-    );
-    return response.data
-  },
+
 
   editUserAddressApi: async (
     userId: string,

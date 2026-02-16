@@ -1,3 +1,3 @@
 export interface IUploadProfilePictureUseCase {
-    execute(workerId: string, filePath: string): Promise<{ url: string }>;
+    execute(workerId: string, filePath: string, mimetype: string): Promise<{ url: string }>;
 }

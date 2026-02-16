@@ -46,8 +46,8 @@ import {
 } from "@/app/actions/serviceRequest/client/clientServiceRequest.actions";
 import { getAllCategoriesAction } from "@/app/actions/admin/category-actions";
 import { ServiceRequestResponse } from "@/shared/types/ServiceRequestResponse";
-import { getCloudinarySignatureAction } from "@/app/actions/media/cloudinaryUpload.actions";
-import { uploadToCloudinary } from "@/lib/uploadToCloudinary";
+import { getMediaUploadUrlAction } from "@/app/actions/media/mediaUpload.actions";
+import { uploadToS3 } from "@/lib/uploadToS3";
 
 // --- Multi-File Uploader Component ---
 interface FileUploaderProps {
@@ -317,19 +317,25 @@ export default function ServicesPage() {
       let uploadedPhotos: string[] = [];
 
       if (selectedImages.length > 0) {
-        const signatureRes = await getCloudinarySignatureAction();
+        const uploadPromises = selectedImages.map(async (file) => {
+          const res = await getMediaUploadUrlAction(file.name, file.type);
+          if (!res.success) {
+            throw new Error(res.message || "Failed to get upload URL");
+          }
+          const { uploadUrl, fileUrl } = res.payload;
+          const success = await uploadToS3(file, uploadUrl);
+          if (!success) {
+            throw new Error("Failed to upload to S3");
+          }
+          return fileUrl;
+        });
 
-        if (!signatureRes.success) {
-          toast.error(signatureRes.message || "Failed to prepare image upload");
+        try {
+          uploadedPhotos = await Promise.all(uploadPromises);
+        } catch (error: any) {
+          toast.error(error.message);
           return;
         }
-
-        const uploaded = await uploadToCloudinary(
-          selectedImages,
-          signatureRes.payload,
-        );
-
-        uploadedPhotos = uploaded.map((img) => img.url);
       }
 
       const res = await createServiceRequestAction({
