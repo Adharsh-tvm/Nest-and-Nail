@@ -10,6 +10,7 @@ export async function getMediaUploadUrlAction(
     ApiResponse<{
         uploadUrl: string;
         fileUrl: string;
+        signedUrl: string;
     }>
 > {
     try {
