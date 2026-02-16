@@ -165,7 +165,10 @@ export class UseCaseDI {
 
   get getAllWorkersUseCase(): IGetAllWorkersUseCase {
     if (!this._getAllWorkersUseCase) {
-      this._getAllWorkersUseCase = new GetAllWorkersUseCase(this.infra.workerRepository);
+      this._getAllWorkersUseCase = new GetAllWorkersUseCase(
+        this.infra.workerRepository,
+        this.infra.s3Service
+      );
     }
     return this._getAllWorkersUseCase;
   }
@@ -304,7 +307,8 @@ export class UseCaseDI {
     if (!this._getAllUsersUseCase) {
       this._getAllUsersUseCase = new GetAllUsersUseCase(
         this.infra.userRepositoryFactory,
-        this.infra.logger
+        this.infra.logger,
+        this.infra.s3Service
       )
     }
     return this._getAllUsersUseCase;
@@ -427,7 +431,8 @@ export class UseCaseDI {
   get getOpenServiceRequestsUseCase(): IGetOpenServiceRequestsUseCase {
     if (!this._getOpenServiceRequestsUseCase) {
       this._getOpenServiceRequestsUseCase = new GetOpenServiceRequestsUseCase(
-        this.infra.serviceRequestRepository
+        this.infra.serviceRequestRepository,
+        this.infra.s3Service
       )
     }
     return this._getOpenServiceRequestsUseCase
@@ -454,7 +459,8 @@ export class UseCaseDI {
   get getMyServiceRequestsUseCase(): IGetMyServiceRequestsUseCase {
     if (!this._getMyServiceRequestsUseCase) {
       this._getMyServiceRequestsUseCase = new GetMyServiceRequestsUseCase(
-        this.infra.serviceRequestRepository
+        this.infra.serviceRequestRepository,
+        this.infra.s3Service
       )
     }
     return this._getMyServiceRequestsUseCase;
@@ -465,7 +471,8 @@ export class UseCaseDI {
   get getServiceRequestByIdUseCase(): IGetServiceRequestByIdUseCase {
     if (!this._getServiceRequestByIdUseCase) {
       this._getServiceRequestByIdUseCase = new GetServiceRequestByIdUseCase(
-        this.infra.serviceRequestRepository
+        this.infra.serviceRequestRepository,
+        this.infra.s3Service
       )
     }
     return this._getServiceRequestByIdUseCase
@@ -474,7 +481,8 @@ export class UseCaseDI {
   get getAllServiceRequestsUseCase(): IGetAllServiceRequestsUseCase {
     if (!this._getAllServiceRequestsUseCase) {
       this._getAllServiceRequestsUseCase = new GetAllServiceRequestsUseCase(
-        this.infra.serviceRequestRepository
+        this.infra.serviceRequestRepository,
+        this.infra.s3Service
       )
     }
     return this._getAllServiceRequestsUseCase;

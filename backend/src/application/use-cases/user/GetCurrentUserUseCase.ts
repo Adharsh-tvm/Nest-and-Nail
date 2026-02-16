@@ -76,6 +76,27 @@ export class GetCurrentUserUseCase implements IGetCurrentUserUseCase {
             }
         }
 
+        // Generate Presigned URLs for documents
+        if (user.documents && user.documents.length > 0) {
+            user.documents = await Promise.all(user.documents.map(async (doc) => {
+                return !doc.startsWith("http") ? await this._s3Service.getPresignedDownloadUrl(doc) : doc;
+            }));
+        }
+
+        // Generate Presigned URLs for certificates
+        if (user.certificates && user.certificates.length > 0) {
+            user.certificates = await Promise.all(user.certificates.map(async (cert) => {
+                return !cert.startsWith("http") ? await this._s3Service.getPresignedDownloadUrl(cert) : cert;
+            }));
+        }
+
+        // Generate Presigned URLs for workPhotos
+        if (user.workPhotos && user.workPhotos.length > 0) {
+            user.workPhotos = await Promise.all(user.workPhotos.map(async (photo) => {
+                return !photo.startsWith("http") ? await this._s3Service.getPresignedDownloadUrl(photo) : photo;
+            }));
+        }
+
         return UserMapper.toResponseDTO(user);
     }
 }
