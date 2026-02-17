@@ -1,5 +1,6 @@
 import { S3Client, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { env } from "../../config/env";
 import fs from "fs";
 
 export class S3Service {
@@ -7,10 +8,10 @@ export class S3Service {
 
   constructor() {
     this.s3 = new S3Client({
-      region: process.env.AWS_REGION!,
+      region: env.AWS_REGION,
       credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+        accessKeyId: env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: env.AWS_SECRET_ACCESS_KEY,
       },
     });
   }
@@ -20,7 +21,7 @@ export class S3Service {
     contentType: string
   ): Promise<string> {
     const command = new PutObjectCommand({
-      Bucket: process.env.AWS_BUCKET_NAME!,
+      Bucket: env.AWS_BUCKET_NAME,
       Key: key,
       ContentType: contentType,
     });
@@ -31,13 +32,13 @@ export class S3Service {
   }
 
   getFileUrl(key: string): string {
-    return `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
+    return `https://${env.AWS_BUCKET_NAME}.s3.${env.AWS_REGION}.amazonaws.com/${key}`;
   }
 
   async uploadFile(filePath: string, key: string, contentType: string): Promise<string> {
     const fileContent = fs.readFileSync(filePath);
     const command = new PutObjectCommand({
-      Bucket: process.env.AWS_BUCKET_NAME!,
+      Bucket: env.AWS_BUCKET_NAME,
       Key: key,
       Body: fileContent,
       ContentType: contentType,
@@ -52,12 +53,12 @@ export class S3Service {
       console.error("Error deleting local file:", error);
     }
 
-    return `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
+    return `https://${env.AWS_BUCKET_NAME}.s3.${env.AWS_REGION}.amazonaws.com/${key}`;
   }
 
   async getPresignedDownloadUrl(key: string): Promise<string> {
     const command = new GetObjectCommand({
-      Bucket: process.env.AWS_BUCKET_NAME!,
+      Bucket: env.AWS_BUCKET_NAME,
       Key: key,
     });
 

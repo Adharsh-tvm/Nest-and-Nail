@@ -1,6 +1,7 @@
 import nodemailer from "nodemailer";
 
 import { IEmailService } from "../../application/contracts/IEmailService";
+import { env } from "../../config/env";
 
 export class NodemailerEmailService implements IEmailService {
 
@@ -9,8 +10,8 @@ export class NodemailerEmailService implements IEmailService {
         port: 465,
         secure: true,
         auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
+            user: env.EMAIL_USER,
+            pass: env.EMAIL_PASS,
         },
         tls: {
             rejectUnauthorized: false
@@ -19,7 +20,7 @@ export class NodemailerEmailService implements IEmailService {
 
     async sendEmail(to: string, subject: string, html: string): Promise<void> {
         await this.transporter.sendMail({
-            from: process.env.EMAIL_USER,
+            from: env.EMAIL_USER,
             to,
             subject,
             html
