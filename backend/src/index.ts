@@ -1,5 +1,5 @@
 import express from "express";
-import dotenv from "dotenv";
+import { env } from "./config/env";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { connectDB } from "./infrastructure/database/connection";
@@ -14,7 +14,7 @@ import { createUploadRoutes } from "./presentation/routes/user/upload.routes";
 import { createServiceRequestRoutes } from "./presentation/routes/serviceRequest/serviceRequest.routes";
 import { createMediaRoutes } from "./presentation/routes/user/media.routes";
 
-dotenv.config();
+
 
 async function bootstrap() {
   const app = express();
@@ -35,7 +35,7 @@ async function bootstrap() {
   app.use(RequestLogger);
 
   // Connect to MongoDB
-  await connectDB(process.env.MONGO_URI ?? "mongodb://localhost:27017/MEND-WAY");
+  await connectDB(env.MONGO_URI);
 
   // Initialize Dependency Injection Container
   const container = new DIContainer();
@@ -61,7 +61,7 @@ async function bootstrap() {
   app.use(errorHandler);
 
   // Start server
-  const PORT = process.env.PORT ?? 4000;
+  const PORT = env.PORT;
   app.listen(PORT, () => {
     container.infra.logger.info(`Server running on http://localhost:${PORT}`);
   });

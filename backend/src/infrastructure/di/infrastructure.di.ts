@@ -29,6 +29,7 @@ import { ServiceRequestRepository } from "../repo/ServiceRequestRepository";
 import { IGenerateServiceRequestId } from "../../application/contracts/IGenerateServiceRequestId";
 import { ServiceRequestIdGenerator } from "../adapters/ServiceRequestIdGenerator";
 import { S3Service } from "../adapters/S3service";
+import { env } from "../../config/env";
 
 export class InfrastructureDI {
   private _userRepositoryFactory?: IUserRepositoryFactory;
@@ -126,10 +127,12 @@ export class InfrastructureDI {
 
   get tokenService(): ITokenService {
     if (!this._tokenService) {
+
       this._tokenService = new JwtTokenService(
-        process.env.ACCESS_TOKEN_SECRET ?? "default-access-secret",
-        process.env.REFRESH_TOKEN_SECRET ?? "default-refresh-secret"
+        env.ACCESS_TOKEN_SECRET,
+        env.REFRESH_TOKEN_SECRET
       );
+
     }
     return this._tokenService;
   }
