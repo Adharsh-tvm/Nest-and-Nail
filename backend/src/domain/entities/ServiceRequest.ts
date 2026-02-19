@@ -15,6 +15,8 @@ export interface ServiceRequest {
     coordinates: [number, number];
   };
 
+  serviceDate: Date;
+
   budget?: number;
 
   servicePhotos?: string[];

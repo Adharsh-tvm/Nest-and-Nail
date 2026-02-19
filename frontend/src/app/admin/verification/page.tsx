@@ -489,11 +489,11 @@ const VerificationsPendingView: React.FC = () => {
       cell: (row) => (
         <div className="flex items-center gap-2 text-xs">
           <Clock size={14} className="text-gray-400" />
-          {new Date(row.createdAt).toLocaleDateString(undefined, {
+          {row.createdAt ? new Date(row.createdAt).toLocaleDateString(undefined, {
             year: "numeric",
             month: "short",
             day: "numeric",
-          })}
+          }) : "N/A"}
         </div>
       ),
     },

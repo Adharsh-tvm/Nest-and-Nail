@@ -14,6 +14,7 @@ import {
   Search,
   ArrowUpRight,
   IndianRupee,
+  Clock,
 } from "lucide-react";
 import { useUserStore } from "@/store/userStore";
 import {
@@ -228,6 +229,7 @@ export default function ServicesPage() {
     category: "",
     location: { lat: 0, lng: 0 },
     budget: undefined,
+    serviceDate: "",
   });
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [selectedAddressIndex, setSelectedAddressIndex] =
@@ -292,13 +294,14 @@ export default function ServicesPage() {
       category: "",
       location: { lat: 0, lng: 0 },
       budget: undefined,
+      serviceDate: "",
     });
     setSelectedImages([]);
     setSelectedAddressIndex("custom");
   };
 
   const handleCreate = async () => {
-    if (!formData.title || !formData.description || !formData.category) {
+    if (!formData.title || !formData.description || !formData.category || !formData.serviceDate) {
       toast.error("Please fill in all required fields");
       return;
     }
@@ -344,6 +347,7 @@ export default function ServicesPage() {
         category: formData.category,
         location: formData.location,
         budget: formData.budget,
+        serviceDate: formData.serviceDate,
         servicePhotos: uploadedPhotos,
       });
 
@@ -566,6 +570,28 @@ export default function ServicesPage() {
 
                       <div className="space-y-1.5">
                         <Label className="text-sm font-medium text-gray-900">
+                          Date <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          type="date"
+                          className="h-11 bg-gray-50 border-gray-200"
+                          min={new Date().toISOString().split("T")[0]}
+                          value={
+                            formData.serviceDate instanceof Date
+                              ? formData.serviceDate.toISOString().split("T")[0]
+                              : formData.serviceDate
+                          }
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              serviceDate: e.target.value,
+                            })
+                          }
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <Label className="text-sm font-medium text-gray-900">
                           Location <span className="text-red-500">*</span>
                         </Label>
                         <div className="flex flex-col gap-2">
@@ -750,10 +776,15 @@ export default function ServicesPage() {
                   </p>
 
                   <div className="flex items-center flex-wrap gap-4 pt-4 mt-auto border-t border-gray-50">
-                    <div className="flex items-center gap-1.5 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      <Calendar size={14} className="text-gray-400" />
-                      <span>
-                        {new Date(request.createdAt).toLocaleDateString()}
+                    <div className="flex items-center gap-1.5 mt-1 bg-green-50 px-2 py-1 rounded-md w-fit">
+                      <Calendar size={14} className="text-[#1B4332]" />
+                      <span className="text-xs font-bold text-[#1B4332]">
+                        Service Date: {request.serviceDate ? new Date(request.serviceDate).toLocaleDateString(undefined, {
+                          weekday: 'short',
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric'
+                        }) : "Date not specified"}
                       </span>
                     </div>
                     {request.budget && (
@@ -765,8 +796,12 @@ export default function ServicesPage() {
                   </div>
                 </CardContent>
 
-                <CardFooter className="p-4 bg-gray-50/50">
-                  <div className="flex justify-end gap-2 w-full">
+                <CardFooter className="p-4 bg-gray-50/50 flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
+                    <Clock size={14} className="text-gray-400" />
+                    <span>Posted {new Date(request.createdAt).toLocaleDateString()}</span>
+                  </div>
+                  <div className="flex justify-end gap-2">
                     <Link
                       href={`/client/service-requests/${request.requestId}`}
                     >
