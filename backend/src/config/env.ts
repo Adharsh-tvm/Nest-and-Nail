@@ -8,6 +8,9 @@ const envSchema = z.object({
 
   PORT: z.coerce.number().default(4000),
 
+  // Logging
+  LOG_RETENTION_DAYS: z.coerce.number().int().positive().default(14),
+
   // Database
   MONGO_URI: z.string().min(1, "MONGO_URI is required"),
 
@@ -38,6 +41,8 @@ const envSchema = z.object({
   AWS_BUCKET_NAME: z.string().min(1),
   AWS_ACCESS_KEY_ID: z.string().min(1),
   AWS_SECRET_ACCESS_KEY: z.string().min(1),
+
+
 });
 
 const parsed = envSchema.safeParse(process.env);
