@@ -215,6 +215,9 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
   // Sync formData when user prop updates (e.g. after image upload in parent)
   useEffect(() => {
     setFormData(user);
+    if (user.profileImageUrl) {
+      setProfilePicPreview(user.profileImageUrl);
+    }
   }, [user]);
 
   const handleInputChange = (
@@ -383,6 +386,7 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
                         src={profilePicPreview}
                         alt="Profile"
                         className="w-full h-full object-cover"
+                        onError={() => setProfilePicPreview(null)}
                       />
                     ) : (
                       <div className="w-full h-full bg-[#1B4332] flex items-center justify-center text-white text-3xl font-bold">

@@ -40,9 +40,12 @@ export class UpdateUserProfileUseCase implements IUpdateUserProfileUseCase {
 
         let updatedUser: any = { ...user, ...updates };
 
+        let signedUrl: string | undefined;
+
         if (profilePictureFilePath && mimetype) {
-            const { url } = await this._uploadProfilePictureUseCase.execute(userId, profilePictureFilePath, mimetype);
-            updatedUser.profilePictureUrl = url;
+            const { url, key } = await this._uploadProfilePictureUseCase.execute(userId, profilePictureFilePath, mimetype);
+            updatedUser.profilePictureUrl = key;
+            signedUrl = url;
         } else if (profilePictureFilePath) {
             throw new Error("Mimetype is required when uploading a profile picture");
         }
@@ -53,6 +56,13 @@ export class UpdateUserProfileUseCase implements IUpdateUserProfileUseCase {
 
         if (!saved) throw new Error("Failed to update user profile");
 
-        return UserMapper.toResponseDTO(saved);
+        const response = UserMapper.toResponseDTO(saved);
+
+        // If we uploaded a new picture, ensure the response has the signed URL so frontend can display it
+        if (signedUrl) {
+            response.profileImageUrl = signedUrl;
+        }
+
+        return response;
     }
 }

@@ -235,6 +235,9 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
   // Sync formData when user prop updates (e.g. after image upload in parent)
   useEffect(() => {
     setFormData(user);
+    if (user.profileImageUrl) {
+      setProfilePicPreview(user.profileImageUrl);
+    }
   }, [user]);
 
   const handleInputChange = (
@@ -351,8 +354,8 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
         categories: currentCats.filter((c) => c !== catId),
       }));
     } else {
-      if (currentCats.length >= 10) {
-        toast.error("You can select up to 10 categories");
+      if (currentCats.length >= 3) {
+        toast.error("You can select up to 3 categories");
         return;
       }
       setFormData((prev) => ({
@@ -449,6 +452,7 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
                         src={profilePicPreview}
                         alt="Profile"
                         className="w-full h-full object-cover"
+                        onError={() => setProfilePicPreview(null)}
                       />
                     ) : (
                       <div className="w-full h-full bg-[#1B4332] flex items-center justify-center text-white text-3xl font-bold">
@@ -641,7 +645,7 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
               onClose={() => setIsCategorySaveConfirmOpen(false)}
               onConfirm={confirmSaveCategories}
               title="Save Categories"
-              message="Are you sure you want to save these categories? You can select up to 10 categories."
+              message="Are you sure you want to save these categories? You can select up to 3 categories."
             />
             <div className="p-8">
               <div className="flex flex-wrap gap-3 mb-6">
