@@ -29,6 +29,7 @@ const ClientHeader: React.FC = () => {
   const [isTogglingRole, setIsTogglingRole] = useState(false);
   const [isSwitchRoleModalOpen, setIsSwitchRoleModalOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   const router = useRouter();
 
@@ -240,14 +241,17 @@ const ClientHeader: React.FC = () => {
                     className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-full border border-gray-200 hover:border-[#1B4332] hover:bg-gray-50 transition-all group"
                   >
                     <div className="w-8 h-8 rounded-full bg-[#1B4332] text-white flex items-center justify-center shadow-sm overflow-hidden">
-                      {currentUser?.profileImageUrl ? (
+                      {currentUser?.profileImageUrl && !imageError ? (
                         <img
                           src={currentUser.profileImageUrl}
                           alt={currentUser.name || "User"}
                           className="w-full h-full object-cover"
+                          onError={() => setImageError(true)}
                         />
                       ) : (
-                        <User size={18} />
+                        <span className="font-bold text-xs">
+                          {currentUser?.name?.charAt(0).toUpperCase()}
+                        </span>
                       )}
                     </div>
                     <span className="text-sm font-semibold text-gray-700 group-hover:text-[#1B4332] max-w-[100px] truncate">

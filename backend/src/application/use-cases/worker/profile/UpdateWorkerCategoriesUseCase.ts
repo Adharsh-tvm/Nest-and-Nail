@@ -16,7 +16,7 @@ export class UpdateWorkerCategoriesUseCase implements IUpdateWorkerCategoriesUse
             throw new Error("Categories must be an array");
         }
 
-        if (categoryIds.length > 10) {
+        if (categoryIds.length > 3) {
             throw new Error("Maximun 3 categories allowed");
         }
 

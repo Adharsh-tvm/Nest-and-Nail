@@ -38,7 +38,7 @@ export class UploadProfilePictureUseCase implements IUploadProfilePictureUseCase
         // Return a signed URL so the frontend can display it immediately
         const signedUrl = await this._s3Service.getPresignedDownloadUrl(key);
 
-        return { url: signedUrl };
+        return { url: signedUrl, key };
     }
 }
 
