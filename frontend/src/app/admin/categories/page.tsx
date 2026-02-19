@@ -212,7 +212,7 @@ const CategoriesPage = () => {
       cell: (row) => (
         <div className="flex items-center gap-2 text-xs text-gray-500">
           <Calendar size={14} className="text-gray-400" />
-          {new Date(row.updatedAt).toLocaleDateString()}
+          {row.updatedAt ? new Date(row.updatedAt).toLocaleDateString() : "N/A"}
         </div>
       ),
     },
@@ -236,11 +236,10 @@ const CategoriesPage = () => {
               e.stopPropagation();
               handleToggleStatus(row);
             }}
-            className={`p-2 hover:bg-gray-100 rounded-lg transition-colors ${
-              row.isActive
+            className={`p-2 hover:bg-gray-100 rounded-lg transition-colors ${row.isActive
                 ? "text-gray-500 hover:text-red-600"
                 : "text-red-500 hover:text-emerald-600"
-            }`}
+              }`}
             title={row.isActive ? "Block" : "Unblock"}
           >
             {row.isActive ? <Trash2 size={16} /> : <CheckCircle size={16} />}

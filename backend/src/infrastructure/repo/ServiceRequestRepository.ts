@@ -17,6 +17,7 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
             category: doc.category,
 
             location: doc.location,
+            serviceDate: doc.serviceDate,
             budget: doc.budget,
             servicePhotos: doc.servicePhotos ?? [],
 

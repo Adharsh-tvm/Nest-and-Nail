@@ -168,6 +168,18 @@ export default function ServiceDetailPage() {
                                 <span>Posted {new Date(request.createdAt).toLocaleDateString()}</span>
                             </div>
                             <div className="hidden sm:block h-1 w-1 rounded-full bg-gray-300" />
+                            <div className="flex items-center gap-1.5 bg-[#1B4332]/10 px-3 py-1.5 rounded-full border border-[#1B4332]/20">
+                                <Calendar size={16} className="text-[#1B4332]" />
+                                <span className="font-bold text-[#1B4332]">
+                                    Service Date: {request.serviceDate ? new Date(request.serviceDate).toLocaleDateString(undefined, {
+                                        weekday: 'long',
+                                        year: 'numeric',
+                                        month: 'long',
+                                        day: 'numeric'
+                                    }) : "Not specified"}
+                                </span>
+                            </div>
+                            <div className="hidden sm:block h-1 w-1 rounded-full bg-gray-300" />
                             <div className="flex items-center gap-1.5">
                                 <Briefcase size={16} className="text-gray-400" />
                                 {/* Note: In a real app, you might want to fetch category name properly here too */}

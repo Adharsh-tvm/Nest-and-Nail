@@ -42,6 +42,7 @@ export class CreateServiceRequestUseCase implements ICreateServiceRequestUseCase
             title: data.title,
             description: data.description,
             category: data.category,
+            serviceDate: data.serviceDate,
             location: {
                 type: "Point",
                 coordinates: [data.location.lng, data.location.lat]

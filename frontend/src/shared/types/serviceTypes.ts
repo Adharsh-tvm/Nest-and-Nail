@@ -11,6 +11,7 @@ export interface ServiceRequest {
     };
     budget?: number;
     servicePhotos?: string[];
+    serviceDate: Date | string;
     status: ServiceStatus;
     createdAt: string;
 }
@@ -24,5 +25,6 @@ export interface CreateServiceRequestDTO {
         lng: number;
     };
     budget?: number;
+    serviceDate: Date | string;
     servicePhotos?: string[];
 }

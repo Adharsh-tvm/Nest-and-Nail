@@ -8,6 +8,7 @@ export interface CreateServiceRequestDTO {
     lat: number;
     lng: number;
   };
+  serviceDate: Date;
   budget?: number;
   servicePhotos?: string[];
 }
@@ -17,6 +18,7 @@ export interface ServiceRequestResponseDTO {
   title: string;
   description: string;
   category: string;
+  serviceDate: Date;
 
   location: {
     lat: number;

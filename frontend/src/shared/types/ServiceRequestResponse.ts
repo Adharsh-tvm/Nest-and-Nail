@@ -15,6 +15,7 @@ export type ServiceRequestResponse = {
 
   budget?: number;
   servicePhotos?: string[];
+  serviceDate: string | Date;
 
   status: ServiceRequestStatus;
   reservedBy?: string;

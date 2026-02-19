@@ -27,6 +27,11 @@ const ServiceRequestSchema = new mongoose.Schema(
             }
         },
 
+        serviceDate: {
+            type: Date,
+            required: true
+        },
+
         budget: Number,
 
         servicePhotos: {

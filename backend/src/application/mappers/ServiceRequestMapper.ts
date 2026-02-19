@@ -10,6 +10,7 @@ export class ServiceRequestMapper {
             title: entity.title,
             description: entity.description,
             category: entity.category,
+            serviceDate: entity.serviceDate,
 
             location: {
                 lat: entity.location.coordinates[1],
