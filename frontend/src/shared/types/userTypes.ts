@@ -21,6 +21,11 @@ export type User = {
   createdAt?: string;
   updatedAt?: string;
 
+  rating?: number;
+  totalRatings?: number;
+  totalCompletedJobs?: number;
+  currentActiveRequestId?: string;
+
   iat?: number;
   exp?: number;
 };

@@ -24,10 +24,15 @@ export function mapUserFromApi(raw: any): User {
     address: Array.isArray(raw.address) ? raw.address : [],
     documents: Array.isArray(raw.documents) ? raw.documents : [],
     certificates: Array.isArray(raw.certificates) ? raw.certificates : [],
-    categories: Array.isArray(raw.categories) ? raw.categories: [],
+    categories: Array.isArray(raw.categories) ? raw.categories : [],
     workPhotos: Array.isArray(raw.workPhotos) ? raw.workPhotos : [],
 
     createdAt: raw.createdAt || undefined,
     updatedAt: raw.updatedAt || undefined,
+
+    rating: raw.rating ?? 0,
+    totalRatings: raw.totalRatings ?? 0,
+    totalCompletedJobs: raw.totalCompletedJobs ?? 0,
+    currentActiveRequestId: raw.currentActiveRequestId ?? null,
   };
 }

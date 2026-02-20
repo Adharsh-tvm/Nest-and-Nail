@@ -93,7 +93,7 @@ const Carousel = React.forwardRef<
     return (
         <CarouselContext.Provider
             value={{
-                carouselRef,
+                carouselRef: carouselRef as unknown as React.RefObject<HTMLDivElement>,
                 scrollNext,
                 scrollPrev,
                 canScrollNext,

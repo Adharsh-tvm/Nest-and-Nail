@@ -51,6 +51,11 @@ const UserSchema = new Schema<User>({
     }],
 
     workPhotos: [String],
+
+    rating: { type: Number, default: 0 },
+    totalRatings: { type: Number, default: 0 },
+    totalCompletedJobs: { type: Number, default: 0 },
+    currentActiveRequestId: { type: String, default: null },
 }, {
     timestamps: true,
     discriminatorKey: 'role'

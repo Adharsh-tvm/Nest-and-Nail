@@ -24,4 +24,9 @@ export interface User {
     certificates?: string[];
     categories?: string[];
     workPhotos?: string[];
+
+    rating?: number;
+    totalRatings?: number;
+    totalCompletedJobs?: number;
+    currentActiveRequestId?: string;
 }

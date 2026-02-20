@@ -29,6 +29,11 @@ export type Worker = {
   profileImageUrl?: string;
   isBlocked: boolean;
   isVerified: VerificationStatus;
+
+  rating?: number;
+  totalRatings?: number;
+  totalCompletedJobs?: number;
+  currentActiveRequestId?: string;
 };
 
 

@@ -129,7 +129,7 @@ NEW PENDINGS...
 ✔ make the profile pages perfect @done (2/8/2026, 12:56:33 PM)
 ✔ add taost for google login @done (1/13/2026, 11:07:58 PM)
 ✔ prevent blocked user form google login @done (1/13/2026, 11:33:40 PM)
-☐ logout blocked user
+✔ logout blocked user @done (2/20/2026, 10:40:17 AM)
 ✔ add toast in profile update @done (1/13/2026, 11:33:42 PM)
 ✔ profile name correction @done (1/13/2026, 11:33:47 PM)
 ✔ axios call api services in one file @done (2/10/2026, 10:18:36 AM)
@@ -153,43 +153,40 @@ NEW PENDINGS...
 ✔ rejection reason by mail @done (1/28/2026, 8:10:02 PM)
 ☐ Add more reusable components
 ☐ Add optimizations in frontend (Error boundaries, Lazy loading, memoization)
-☐ Add more reusable components
-☐ option for admin to add reason for rejection - highlight the doc need to be uploaded again for reapply.
+✔ option for admin to add reason for rejection - highlight the doc need to be uploaded again for reapply. @done (2/20/2026, 12:16:34 PM)
 ✔ ask for confirmation - logout @done (2/10/2026, 10:20:23 AM)
-☐ user block / unblock - session handling  in already logged in user
+✔ user block / unblock - session handling  in already logged in user @done (2/20/2026, 12:16:39 PM)
 ✔ when the role is switched correct page should be shown using auto refresh @done (2/10/2026, 10:20:36 AM)
-☐ make document upload to cloudinary from frontend
-☐ address edit and delete and also make default option
+✔ make document upload to cloudinary from frontend @done (2/20/2026, 12:16:43 PM)
+✔ address edit and delete and also make default option @done (2/20/2026, 12:16:47 PM)
 ☐ make the google login button responsive
 ✔ adding category in admin side @done (2/10/2026, 10:20:49 AM)
 ☐ duplicate category error fix 
 ✔ fix category toggle error @done (2/10/2026, 10:20:54 AM)
 ✔ error handling interceptor @done (2/10/2026, 10:20:56 AM)
 ✔ 400 ,500 pages @done (2/10/2026, 10:20:57 AM)
-☐ blocking of logged in user
+✔ blocking of logged in user @done (2/20/2026, 12:18:20 PM)
 ✔ confirmation modal- ask for confirmation @done (1/28/2026, 8:08:18 PM)
-☐ s3 and signed url
+✔ s3 and signed url @done (2/20/2026, 12:18:22 PM)
 ✔ profile need proper validation @done (1/31/2026, 12:59:48 PM)
 ✔ reservation for workers @done (2/10/2026, 10:21:06 AM)
-☐ archived stage for service request after one day
 ✔ service request photos @done (2/10/2026, 10:21:37 AM)
 ✔ custom id for service request @done (2/10/2026, 10:21:46 AM)
-☐ 1 hour status changer
 ☐ apply filter in service request page
 ✔ need to add custom location while adding address @done (2/10/2026, 10:25:42 AM)
 ☐ auto logout after token expire
 ☐ address delete option 
-☐ add service delete option
+✔ add service delete option @done (2/20/2026, 12:18:46 PM)
 ☐ meeting ui set up
 ☐ fetch services based on categories 
 ☐ admin only middleware for admin access
 ☐ implement exact middlewares in authorization backend
-☐ list all the service requests in admin side
-☐ show category name instead of id in service requests
-☐ analyse how search and filters are done in admin side
+✔ list all the service requests in admin side @done (2/20/2026, 12:20:10 PM)
+✔ show category name instead of id in service requests @done (2/20/2026, 12:20:13 PM)
+✔ analyse how search and filters are done in admin side @done (2/20/2026, 12:20:17 PM)
 ☐ back button issue after otp logged in 
-☐ how debouncing works
-☐ CUSTOMER DETAILS ON REVEIW REQUEST
+✔ how debouncing works @done (2/20/2026, 12:20:25 PM)
+✔ CUSTOMER DETAILS ON REVEIW REQUEST @done (2/20/2026, 12:20:27 PM)
 ☐ show proper error message in add service request validation
 ☐ confirmation for approve verification 
 ☐ 1 MB error should be displayed properly
@@ -197,10 +194,10 @@ NEW PENDINGS...
 ☐ profile 1 MB error
 ☐ otp wrong error display
 ☐ address add error display
-☐ front and back id is same
+☐ front and back id image is same
 ☐ prevent multiple click in buttons
 ☐ suggestion to workers
-☐ flag
+☐ flag 
 ☐ working hours and same day multiple works 
 ☐ booking policy
 ☐ Reassign logic
@@ -209,6 +206,9 @@ NEW PENDINGS...
 ☐ market place and direct booking
 ☐ subscription
 ☐ set up category flow
+☐ swiggy flow
+☐ fetching the best worker using the filters and adding the count of jobs done
+☐ 
 
 
 
@@ -216,20 +216,20 @@ NEW PENDINGS...
 
 
 Next week:
-☐ Complete the worker profile module with all required details
-☐ Complete client and worker profile sections, including location information
-☐ Implement online/offline mode functionality for workers.
-☐ Add an issue-raising feature for clients.
-☐ Show client-raised issues to workers based on their location.
-☐ Build the issue detail page with full information about the required work.
-☐ Implement location UI using a Street Map API.
-☐ Add admin-side filters for workers
+✔ Complete the worker profile module with all required details @done (2/20/2026, 12:20:34 PM)
+✔ Complete client and worker profile sections, including location information @done (2/20/2026, 12:20:35 PM)
+✔ Implement online/offline mode functionality for workers. @done (2/20/2026, 12:20:37 PM)
+✔ Add an issue-raising feature for clients. @done (2/20/2026, 12:20:36 PM)
+✔ Show client-raised issues to workers based on their location. @done (2/20/2026, 12:20:37 PM)
+✔ Build the issue detail page with full information about the required work. @done (2/20/2026, 12:20:38 PM)
+✔ Implement location UI using a Street Map API. @done (2/20/2026, 12:20:39 PM)
+✔ Add admin-side filters for workers @done (2/20/2026, 12:20:40 PM)
 
 
 
 
 ⁡⁢⁣⁢​‌‌‌𝗧𝗛𝗜𝗥𝗗 𝗪𝗘𝗘𝗞​⁡
-
+ 
 
 
 ☐ DI

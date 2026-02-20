@@ -16,6 +16,9 @@ export class UserMapper {
             isOnline: true,
             loginMethod: LoginMethod.EMAIL_PASSWORD,
             profilePictureUrl: '',
+            rating: 0,
+            totalRatings: 0,
+            totalCompletedJobs: 0,
             createdAt: new Date(),
             lastLoginAt: new Date(),
             updatedAt: new Date()
@@ -53,6 +56,11 @@ export class UserMapper {
             certificates: userData.certificates ?? [],
             categories: userData.categories ?? [],
             workPhotos: userData.workPhotos ?? [],
+
+            rating: userData.rating ?? 0,
+            totalRatings: userData.totalRatings ?? 0,
+            totalCompletedJobs: userData.totalCompletedJobs ?? 0,
+            currentActiveRequestId: userData.currentActiveRequestId,
 
             createdAt: userData.createdAt?.toISOString?.() ?? "",
             updatedAt: userData.updatedAt?.toISOString?.() ?? "",
