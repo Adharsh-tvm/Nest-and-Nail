@@ -45,7 +45,6 @@ export default function ServicesPage() {
     // Stats
     const totalRequests = data.length;
     const openRequests = data.filter((r) => r.status === ServiceRequestStatus.OPEN).length;
-    const reservedRequests = data.filter((r) => r.status === ServiceRequestStatus.RESERVED).length;
     const acceptedRequests = data.filter((r) => r.status === ServiceRequestStatus.ACCEPTED).length;
 
     const handleRowClick = (row: ServiceRequestResponse) => {
@@ -79,12 +78,6 @@ export default function ServicesPage() {
                         return (
                             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-bold border border-blue-100">
                                 <AlertCircle size={12} /> Open
-                            </span>
-                        );
-                    case ServiceRequestStatus.RESERVED:
-                        return (
-                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 text-amber-600 text-xs font-bold border border-amber-100">
-                                <Clock size={12} /> Reserved
                             </span>
                         );
                     case ServiceRequestStatus.ACCEPTED:
@@ -138,7 +131,15 @@ export default function ServicesPage() {
         },
     ];
 
-    const StatCard = ({ title, value, icon: Icon, color, iconColor }: any) => (
+    interface StatCardProps {
+        title: string;
+        value: string | number;
+        icon: React.ElementType;
+        color: string;
+        iconColor: string;
+    }
+
+    const StatCard = ({ title, value, icon: Icon, color, iconColor }: StatCardProps) => (
         <div className={`p-6 rounded-2xl shadow-sm flex items-center justify-between group hover:shadow-md transition-all ${color} border border-transparent hover:border-emerald-100`}>
             <div>
                 <p className={`text-xs font-bold uppercase tracking-wider mb-1 ${color.includes('text-white') ? 'text-white/70' : 'text-gray-400'}`}>
@@ -189,13 +190,6 @@ export default function ServicesPage() {
                     icon={AlertCircle}
                     color="bg-white text-gray-900"
                     iconColor="text-blue-500"
-                />
-                <StatCard
-                    title="Reserved"
-                    value={loading ? "-" : reservedRequests}
-                    icon={Clock}
-                    color="bg-white text-gray-900"
-                    iconColor="text-amber-500"
                 />
                 <StatCard
                     title="Accepted"

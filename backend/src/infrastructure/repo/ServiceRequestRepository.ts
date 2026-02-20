@@ -47,70 +47,6 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
         return this.toDomain(doc);
     }
 
-    async findOpenNearby(
-        coordinates: [number, number],
-        workerId: string,
-        radiusMeters?: number
-    ): Promise<ServiceRequest[]> {
-
-        const now = new Date();
-        const maxDistance = radiusMeters ?? 10000;
-
-        const results = await ServiceRequestModel.find({
-            $and: [
-                { clientId: { $ne: workerId } },
-                {
-                    $or: [
-                        { status: ServiceRequestStatus.OPEN },
-                        {
-                            status: ServiceRequestStatus.RESERVED,
-                            reservationExpiresAt: { $lt: now }
-                        }
-                    ]
-                },
-                {
-                    location: {
-                        $near: {
-                            $geometry: {
-                                type: "Point",
-                                coordinates
-                            },
-                            $maxDistance: maxDistance
-                        }
-                    }
-                }
-            ]
-        }).lean();
-
-        // Extract client IDs
-        const clientIds = [...new Set(results.map(r => r.clientId))];
-
-        // Fetch user details
-        const users = await UserModel.find({ userId: { $in: clientIds } })
-            .select("userId name email phone profilePictureUrl")
-            .lean();
-
-        // Create a map for quick lookup
-        const userMap = new Map(users.map(u => [u.userId, u]));
-
-        return results.map(doc => {
-            const domainEntity = this.toDomain(doc);
-            const user = userMap.get(doc.clientId);
-
-            if (user) {
-                domainEntity.client = {
-                    name: user.name,
-                    email: user.email,
-                    phone: user.phone,
-                    profilePictureUrl: user.profilePictureUrl
-                };
-            }
-
-            return domainEntity;
-        });
-    }
-
-
     async findByRequestId(requestId: string): Promise<ServiceRequest | null> {
         const result = await ServiceRequestModel.findOne({ requestId }).lean();
 
@@ -137,49 +73,7 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
         return domainEntity;
     }
 
-    async reserveByRequestId(requestId: string, workerId: string, expiresAt: Date): Promise<boolean> {
 
-        const now = new Date();
-        const updated = await ServiceRequestModel.findOneAndUpdate(
-            {
-                requestId,
-                $or: [
-                    { status: ServiceRequestStatus.OPEN },
-                    {
-                        status: ServiceRequestStatus.RESERVED,
-                        reservationExpiresAt: { $lt: now }
-                    }
-                ]
-            },
-            {
-                $set: {
-                    status: ServiceRequestStatus.RESERVED,
-                    reservedBy: workerId,
-                    reservationExpiresAt: expiresAt
-                }
-            },
-            { new: true }
-        );
-        return !!updated;
-    }
-
-    async releaseReservationByRequestId(requestId: string): Promise<void> {
-        await ServiceRequestModel.updateOne(
-            {
-                requestId,
-                status: ServiceRequestStatus.RESERVED
-            },
-            {
-                $set: {
-                    status: ServiceRequestStatus.OPEN
-                },
-                $unset: {
-                    reservedBy: "",
-                    reservationExpiresAt: ""
-                }
-            }
-        )
-    }
 
     async findByClientId(clientId: string): Promise<ServiceRequest[]> {
         const docs = await ServiceRequestModel.find({ clientId })
