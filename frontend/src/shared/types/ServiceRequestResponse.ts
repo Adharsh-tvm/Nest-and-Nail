@@ -18,6 +18,10 @@ export type ServiceRequestResponse = {
   serviceDate: string | Date;
 
   status: ServiceRequestStatus;
+
+  assignedTo?: string;
+  triedWorkers?: string[];
+
   reservedBy?: string;
   reservationExpiresAt?: Date;
 

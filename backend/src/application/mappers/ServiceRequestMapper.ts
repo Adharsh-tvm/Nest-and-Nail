@@ -22,6 +22,10 @@ export class ServiceRequestMapper {
             servicePhotos: entity.servicePhotos ?? [],
 
             status: entity.status,
+
+            assignedTo: entity.assignedTo,
+            triedWorkers: entity.triedWorkers ?? [],
+
             reservedBy: entity.reservedBy,
             reservationExpiresAt: entity.reservationExpiresAt,
             createdAt: entity.createdAt,

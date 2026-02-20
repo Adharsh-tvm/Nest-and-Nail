@@ -27,7 +27,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { useWorkers } from "@/hooks/useWorkers";
-import { VerificationStatus } from "@/shared/enums/authEnums"; 
+import { VerificationStatus } from "@/shared/enums/authEnums";
 
 // --- Types ---
 
@@ -136,7 +136,7 @@ const WorkersView = () => {
   if (loading) return <p className="p-6">Loading customers...</p>;
   if (error) return <p className="p-6 text-red-600">{error}</p>;
 
-    if (!workers || workers.length === 0) {
+  if (!workers || workers.length === 0) {
     return <p className="p-6 text-slate-500">No workers found.</p>;
   }
 
@@ -159,7 +159,11 @@ const WorkersView = () => {
           </div>
           <div>
             <p className="text-xs text-slate-500 font-medium">Avg Rating</p>
-            <p className="text-lg font-bold text-slate-800">0</p>
+            <p className="text-lg font-bold text-slate-800">
+              {workers.length > 0
+                ? (workers.reduce((acc, curr) => acc + (curr.rating || 0), 0) / workers.length).toFixed(1)
+                : 0}
+            </p>
           </div>
         </div>
       </div>
@@ -280,39 +284,39 @@ const WorkersView = () => {
                     <div className="flex items-center gap-1 mb-1">
                       <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
                       <span className="font-bold text-slate-800">
-                        {0}
+                        {worker.rating?.toFixed(1) || "0.0"}
                       </span>
                     </div>
-                    {/* <p className="text-xs text-slate-500">
-                      {worker.servicesCompleted} services
-                    </p> */}
+                    <p className="text-xs text-slate-500">
+                      {worker.totalCompletedJobs || 0} services
+                    </p>
                   </td>
 
                   {/* Status */}
                   <td className="p-5 text-slate-600">
-                      {worker.isBlocked ? (
-                        <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 text-red-600 text-xs font-medium">
-                          Blocked
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-50 text-green-600 text-xs font-medium">
-                          Active
-                        </span>
-                      )}
-                    </td>
+                    {worker.isBlocked ? (
+                      <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 text-red-600 text-xs font-medium">
+                        Blocked
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-50 text-green-600 text-xs font-medium">
+                        Active
+                      </span>
+                    )}
+                  </td>
 
                   {/* Verification */}
-<td className="p-5 text-slate-600">
-                      {worker.isVerified === VerificationStatus.VERIFIED ? (
-                        <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 text-red-600 text-xs font-medium">
-                          Not Verified
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-50 text-green-600 text-xs font-medium">
-                          Verified
-                        </span>
-                      )}
-                    </td>
+                  <td className="p-5 text-slate-600">
+                    {worker.isVerified === VerificationStatus.VERIFIED ? (
+                      <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 text-red-600 text-xs font-medium">
+                        Not Verified
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-50 text-green-600 text-xs font-medium">
+                        Verified
+                      </span>
+                    )}
+                  </td>
 
                   {/* Earnings */}
                   <td className="p-5 font-semibold text-slate-700">

@@ -13,6 +13,10 @@ export interface ServiceRequest {
     servicePhotos?: string[];
     serviceDate: Date | string;
     status: ServiceStatus;
+
+    assignedTo?: string;
+    triedWorkers?: string[];
+
     createdAt: string;
 }
 

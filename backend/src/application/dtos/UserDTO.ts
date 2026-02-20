@@ -28,6 +28,10 @@ export interface UserResponseDTO {
     workPhotos?: string[];
     createdAt?: string;
     updatedAt?: string;
+    rating?: number;
+    totalRatings?: number;
+    totalCompletedJobs?: number;
+    currentActiveRequestId?: string;
 }
 
 
@@ -49,6 +53,10 @@ export interface LoginResponseDTO {
         isOnline: boolean;
         isVerified: VerificationStatus;
         categories?: string[];
+        rating?: number;
+        totalRatings?: number;
+        totalCompletedJobs?: number;
+        currentActiveRequestId?: string;
     };
     accessToken: string;
     refreshToken: string;

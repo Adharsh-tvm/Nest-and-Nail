@@ -45,6 +45,9 @@ const ServiceRequestSchema = new mongoose.Schema(
             default: ServiceRequestStatus.OPEN
         },
 
+        assignedTo: { type: String },
+        triedWorkers: { type: [String], default: [] },
+
         reservedBy: { type: String },
         reservationExpiresAt: { type: Date },
 

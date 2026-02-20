@@ -23,6 +23,9 @@ export interface ServiceRequest {
 
   status: ServiceRequestStatus;
 
+  assignedTo?: string;
+  triedWorkers?: string[];
+
   reservedBy?: string;
   reservationExpiresAt?: Date;
 
