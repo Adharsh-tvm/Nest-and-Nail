@@ -135,9 +135,6 @@ export class ControllerDI {
         if (!this._serviceRequestController) {
             this._serviceRequestController = new ServiceRequestController(
                 this._useCases.createServiceRequestUseCase,
-                this._useCases.getOpenServiceRequestsUseCase,
-                this._useCases.reserveServiceRequestUseCase,
-                this._useCases.releaseServiceRequestUseCase,
                 this._useCases.getMyServiceRequestsUseCase,
                 this._useCases.getServiceRequestByIdUseCase,
                 this._useCases.getAllServiceRequestsUseCase,

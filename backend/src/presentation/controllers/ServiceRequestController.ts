@@ -1,8 +1,5 @@
 import { Request, Response } from "express";
 import { ICreateServiceRequestUseCase } from "../../application/interfaces/service-requests/client/ICreateServiceRequestUseCase ";
-import { IGetOpenServiceRequestsUseCase } from "../../application/interfaces/service-requests/worker/IGetOpenServiceRequestsUseCase";
-import { IReleaseServiceRequestUseCase } from "../../application/interfaces/service-requests/client/IReleaseServiceRequestUseCase";
-import { IReserveServiceRequestUseCase } from "../../application/interfaces/service-requests/worker/IReserveServiceRequestUseCase ";
 import { IServiceRequestController } from "../interfaces/IServiceRequestController";
 import { ServiceRequestMapper } from "../../application/mappers/ServiceRequestMapper";
 import { HttpStatusCode } from "../../shared/enums/httpCodes";
@@ -17,9 +14,6 @@ import { IDeleteServiceRequestUseCase } from "../../application/interfaces/servi
 export class ServiceRequestController implements IServiceRequestController {
     constructor(
         private readonly _createServiceRequestUseCase: ICreateServiceRequestUseCase,
-        private readonly _getOpenServiceRequestsUseCase: IGetOpenServiceRequestsUseCase,
-        private readonly _reserveServiceRequestUseCase: IReserveServiceRequestUseCase,
-        private readonly _releaseServiceRequestUseCase: IReleaseServiceRequestUseCase,
         private readonly _getMyServiceRequestsUseCase: IGetMyServiceRequestsUseCase,
         private readonly _getServiceRequestByIdUseCase: IGetServiceRequestByIdUseCase,
         private readonly _getAllServiceRequestsUseCase: IGetAllServiceRequestsUseCase,
@@ -64,85 +58,6 @@ export class ServiceRequestController implements IServiceRequestController {
             return res.status(HttpStatusCode.BAD_REQUEST).json(
                 ResponseHandler.error(error.message, RESPONSE_MESSAGES.BAD_REQUEST)
             )
-        }
-    };
-
-    getOpenRequests = async (req: Request, res: Response): Promise<Response> => {
-        try {
-            console.log("ojhsdujol h-------------------------------------------------------------------------", req.user)
-            const workerId = req.user.id;
-            const { lat, lng, radius } = req.query;
-
-            const latNum = Number(lat);
-            const lngNum = Number(lng);
-
-            if (
-                Number.isNaN(latNum) ||
-                Number.isNaN(lngNum)
-            ) {
-                return res.status(HttpStatusCode.BAD_REQUEST).json(
-                    ResponseHandler.error("Invalid latitude or longitude")
-                );
-            }
-
-            const MAX_RADIUS = 10_000;
-            const radiusMeters = Math.min(Number(radius) || MAX_RADIUS, MAX_RADIUS);
-
-            const requests = await this._getOpenServiceRequestsUseCase.execute(
-                workerId,
-                [lngNum, latNum],
-                radiusMeters ? Number(radiusMeters) : undefined
-            );
-
-            return res.status(HttpStatusCode.OK).json(
-                ResponseHandler.success(
-                    requests.map(ServiceRequestMapper.toResponseDTO),
-                    RESPONSE_MESSAGES.SUCCESS
-                )
-            );
-        } catch (error: any) {
-            return res.status(HttpStatusCode.BAD_REQUEST).json(
-                ResponseHandler.error(RESPONSE_MESSAGES.BAD_REQUEST, error.message)
-            );
-        }
-    };
-
-    reserve = async (req: Request, res: Response): Promise<Response> => {
-        try {
-            const workerId = req.user.id;
-            const { requestId } = req.params;
-
-            const result = await this._reserveServiceRequestUseCase.execute(
-                requestId,
-                workerId
-            );
-
-            return res.status(HttpStatusCode.OK).json(
-                ResponseHandler.success(
-                    result,
-                    RESPONSE_MESSAGES.SUCCESS
-                )
-            );
-        } catch (error: any) {
-            return res.status(HttpStatusCode.CONFLICT).json(
-                ResponseHandler.error("Request not available", error.message)
-            );
-        }
-    };
-
-    release = async (req: Request, res: Response): Promise<Response> => {
-        try {
-            const { requestId } = req.params;
-
-            await this._releaseServiceRequestUseCase.execute(requestId);
-
-            return res.status(HttpStatusCode.OK).json(
-                ResponseHandler.success(null, RESPONSE_MESSAGES.SUCCESS)
-            );
-        } catch (error: any) {
-            return res.status(HttpStatusCode.BAD_REQUEST).json(
-                ResponseHandler.error(RESPONSE_MESSAGES.BAD_REQUEST, error.message)
-            );
         }
     };
 

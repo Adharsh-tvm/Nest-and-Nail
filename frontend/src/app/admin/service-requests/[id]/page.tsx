@@ -91,12 +91,6 @@ export default function ServiceRequestDetailPage() {
                         <AlertCircle size={14} /> Open
                     </span>
                 );
-            case ServiceRequestStatus.RESERVED:
-                return (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 text-amber-700 text-sm font-bold border border-amber-100">
-                        <Clock size={14} /> Reserved
-                    </span>
-                );
             case ServiceRequestStatus.ACCEPTED:
                 return (
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-sm font-bold border border-emerald-100">
@@ -251,7 +245,7 @@ export default function ServiceRequestDetailPage() {
                     </Card>
 
                     {/* Allocation Info */}
-                    {(request.reservedBy || request.status === ServiceRequestStatus.ACCEPTED) && (
+                    {request.status === ServiceRequestStatus.ACCEPTED && (
                         <Card className="border-gray-100 shadow-sm overflow-hidden">
                             <CardHeader className="bg-gray-50/50 border-b border-gray-100 pb-4">
                                 <CardTitle className="text-sm font-bold uppercase tracking-wider text-gray-500">
@@ -259,28 +253,6 @@ export default function ServiceRequestDetailPage() {
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="pt-6 space-y-4">
-                                {request.reservedBy && (
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-3 text-gray-600">
-                                            <User size={16} />
-                                            <span className="font-medium text-sm">Worker ID</span>
-                                        </div>
-                                        <span className="font-mono text-xs text-gray-900 bg-gray-50 px-2 py-0.5 rounded">
-                                            {request.reservedBy}
-                                        </span>
-                                    </div>
-                                )}
-                                {request.reservationExpiresAt && (
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-3 text-gray-600">
-                                            <Clock size={16} />
-                                            <span className="font-medium text-sm">Expires</span>
-                                        </div>
-                                        <span className="text-xs text-amber-600 font-bold">
-                                            {new Date(request.reservationExpiresAt).toLocaleTimeString()}
-                                        </span>
-                                    </div>
-                                )}
                             </CardContent>
                         </Card>
                     )}

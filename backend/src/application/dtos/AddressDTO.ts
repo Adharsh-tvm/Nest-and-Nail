@@ -13,3 +13,5 @@ export interface AddressDTO {
 
 export interface UpdateAddressDTO extends Partial<AddressDTO> { }
 
+export interface AddAddressDTO extends Omit<AddressDTO, "addressId"> { }
+
