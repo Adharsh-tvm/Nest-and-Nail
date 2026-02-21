@@ -23,7 +23,7 @@ export type User = {
 
   rating?: number;
   totalRatings?: number;
-  totalCompletedJobs?: number;
+  weeklyJobCount?: number;
   currentActiveRequestId?: string;
 
   iat?: number;

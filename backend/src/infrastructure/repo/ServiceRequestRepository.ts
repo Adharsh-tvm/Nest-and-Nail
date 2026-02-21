@@ -91,6 +91,39 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
         return docs.map(doc => this.toDomain(doc));
     }
 
+    async updateByRequestId(
+        requestId: string,
+        updateData: Partial<ServiceRequest>
+    ): Promise<ServiceRequest | null> {
+
+        const updatedDoc = await ServiceRequestModel.findOneAndUpdate(
+            { requestId },
+            { $set: updateData },
+            { new: true } 
+        ).lean();
+
+        if (!updatedDoc) return null;
+
+        const domainEntity = this.toDomain(updatedDoc);
+
+        if (!domainEntity.client) {
+            const user = await UserModel.findOne({ userId: updatedDoc.clientId })
+                .select("name email phone profilePictureUrl")
+                .lean();
+
+            if (user) {
+                domainEntity.client = {
+                    name: user.name,
+                    email: user.email,
+                    phone: user.phone,
+                    profilePictureUrl: user.profilePictureUrl
+                };
+            }
+        }
+
+        return domainEntity;
+    }
+
     async delete(requestId: string): Promise<boolean> {
         const result = await ServiceRequestModel.deleteOne({ requestId });
         return result.deletedCount === 1;

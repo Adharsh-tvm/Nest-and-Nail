@@ -91,10 +91,10 @@ export default function ServiceRequestDetailPage() {
                         <AlertCircle size={14} /> Open
                     </span>
                 );
-            case ServiceRequestStatus.ACCEPTED:
+            case ServiceRequestStatus.CONFIRMED:
                 return (
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-sm font-bold border border-emerald-100">
-                        <CheckCircle size={14} /> Accepted
+                        <CheckCircle size={14} /> Confirmed
                     </span>
                 );
             default:
@@ -245,7 +245,7 @@ export default function ServiceRequestDetailPage() {
                     </Card>
 
                     {/* Allocation Info */}
-                    {request.status === ServiceRequestStatus.ACCEPTED && (
+                    {request.status === ServiceRequestStatus.CONFIRMED && (
                         <Card className="border-gray-100 shadow-sm overflow-hidden">
                             <CardHeader className="bg-gray-50/50 border-b border-gray-100 pb-4">
                                 <CardTitle className="text-sm font-bold uppercase tracking-wider text-gray-500">

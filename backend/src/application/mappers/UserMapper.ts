@@ -18,7 +18,7 @@ export class UserMapper {
             profilePictureUrl: '',
             rating: 0,
             totalRatings: 0,
-            totalCompletedJobs: 0,
+            weeklyJobCount: 0,
             createdAt: new Date(),
             lastLoginAt: new Date(),
             updatedAt: new Date()
@@ -59,7 +59,7 @@ export class UserMapper {
 
             rating: userData.rating ?? 0,
             totalRatings: userData.totalRatings ?? 0,
-            totalCompletedJobs: userData.totalCompletedJobs ?? 0,
+            weeklyJobCount: userData.weeklyJobCount ?? 0,
             currentActiveRequestId: userData.currentActiveRequestId,
 
             createdAt: userData.createdAt?.toISOString?.() ?? "",

@@ -161,7 +161,10 @@ const WorkersView = () => {
             <p className="text-xs text-slate-500 font-medium">Avg Rating</p>
             <p className="text-lg font-bold text-slate-800">
               {workers.length > 0
-                ? (workers.reduce((acc, curr) => acc + (curr.rating || 0), 0) / workers.length).toFixed(1)
+                ? (
+                    workers.reduce((acc, curr) => acc + (curr.rating || 0), 0) /
+                    workers.length
+                  ).toFixed(1)
                 : 0}
             </p>
           </div>
@@ -288,7 +291,7 @@ const WorkersView = () => {
                       </span>
                     </div>
                     <p className="text-xs text-slate-500">
-                      {worker.totalCompletedJobs || 0} services
+                      {worker.weeklyJobCount || 0} services
                     </p>
                   </td>
 
@@ -319,9 +322,7 @@ const WorkersView = () => {
                   </td>
 
                   {/* Earnings */}
-                  <td className="p-5 font-semibold text-slate-700">
-                    {0}
-                  </td>
+                  <td className="p-5 font-semibold text-slate-700">{0}</td>
 
                   {/* Actions */}
                   <td className="p-5 text-right">

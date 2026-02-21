@@ -21,7 +21,7 @@ export type PendingVerificationUser = {
 
   rating?: number;
   totalRatings?: number;
-  totalCompletedJobs?: number;
+  weeklyJobCount?: number;
   currentActiveRequestId?: string;
 };
 
@@ -46,6 +46,6 @@ export interface WorkerUser {
 
   rating?: number;
   totalRatings?: number;
-  totalCompletedJobs?: number;
+  weeklyJobCount?: number;
   currentActiveRequestId?: string;
 }

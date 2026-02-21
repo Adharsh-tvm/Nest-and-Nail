@@ -32,7 +32,7 @@ export type Worker = {
 
   rating?: number;
   totalRatings?: number;
-  totalCompletedJobs?: number;
+  weeklyJobCount?: number;
   currentActiveRequestId?: string;
 };
 

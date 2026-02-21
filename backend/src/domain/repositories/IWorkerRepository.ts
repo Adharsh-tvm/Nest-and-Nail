@@ -3,4 +3,15 @@ import { IBaseRepository } from "./IBaseRepository";
 
 export interface IWorkerRepository extends IBaseRepository<Worker> {
 
+    findEligibleWorkers(
+        category: string,
+        coordinates: [number, number],
+        maxDistance: number
+    ): Promise<Worker[]>;
+
+    reserveWorker(workerId: string): Promise<Worker | null>;
+
+    releaseWorker(workerId: string): Promise<void>;
+
+    incrementWeeklyJobCount(workerId: string): Promise<void>;
 }

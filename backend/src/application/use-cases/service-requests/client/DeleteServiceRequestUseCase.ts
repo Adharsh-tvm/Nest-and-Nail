@@ -4,7 +4,7 @@ import { IDeleteServiceRequestUseCase } from "../../../interfaces/service-reques
 
 
 export class DeleteServiceRequestUseCase implements IDeleteServiceRequestUseCase {
- constructor(private _serviceRequestRepository: IServiceRequestRepository) { }
+    constructor(private _serviceRequestRepository: IServiceRequestRepository) { }
 
     async execute(requestId: string, clientId: string): Promise<boolean> {
         const request = await this._serviceRequestRepository.findByRequestId(requestId);
@@ -17,8 +17,8 @@ export class DeleteServiceRequestUseCase implements IDeleteServiceRequestUseCase
             throw new Error("Unauthorized to delete this request");
         }
 
-        if (request.status === ServiceRequestStatus.ACCEPTED || request.status === ServiceRequestStatus.RESERVED || request.status === ServiceRequestStatus.ARCHIVED) {
-            throw new Error("Cannot delete a request that is accepted, in progress, or completed.");
+        if (request.status === ServiceRequestStatus.CONFIRMED || request.status === ServiceRequestStatus.RESERVED || request.status === ServiceRequestStatus.ARCHIVED) {
+            throw new Error("Cannot delete a request that is confirmed, in progress, or completed.");
         }
 
         return await this._serviceRequestRepository.delete(requestId);
