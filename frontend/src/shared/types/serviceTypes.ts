@@ -1,4 +1,4 @@
-export type ServiceStatus = 'pending' | 'accepted' | 'in_progress' | 'completed' | 'cancelled';
+import { ServiceRequestStatus } from "../enums/ServiceRequestStatus";
 
 export interface ServiceRequest {
     id: string;
@@ -12,7 +12,7 @@ export interface ServiceRequest {
     budget?: number;
     servicePhotos?: string[];
     serviceDate: Date | string;
-    status: ServiceStatus;
+    status: ServiceRequestStatus;
 
     assignedTo?: string;
     triedWorkers?: string[];

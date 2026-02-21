@@ -30,7 +30,7 @@ export interface UserResponseDTO {
     updatedAt?: string;
     rating?: number;
     totalRatings?: number;
-    totalCompletedJobs?: number;
+    weeklyJobCount?: number;
     currentActiveRequestId?: string;
 }
 
@@ -55,7 +55,7 @@ export interface LoginResponseDTO {
         categories?: string[];
         rating?: number;
         totalRatings?: number;
-        totalCompletedJobs?: number;
+        weeklyJobCount?: number;
         currentActiveRequestId?: string;
     };
     accessToken: string;

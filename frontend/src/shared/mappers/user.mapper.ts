@@ -32,7 +32,7 @@ export function mapUserFromApi(raw: any): User {
 
     rating: raw.rating ?? 0,
     totalRatings: raw.totalRatings ?? 0,
-    totalCompletedJobs: raw.totalCompletedJobs ?? 0,
+    weeklyJobCount: raw.weeklyJobCount ?? 0,
     currentActiveRequestId: raw.currentActiveRequestId ?? null,
   };
 }

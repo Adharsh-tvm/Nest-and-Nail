@@ -13,6 +13,11 @@ export interface IServiceRequestRepository {
 
   findAll(): Promise<ServiceRequest[]>;
 
+  updateByRequestId(
+    requestId: string,
+    updateData: Partial<ServiceRequest>
+  ): Promise<ServiceRequest | null>;
+
   delete(requestId: string): Promise<boolean>;
 
 }

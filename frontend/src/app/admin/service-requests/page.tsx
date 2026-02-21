@@ -45,7 +45,7 @@ export default function ServicesPage() {
     // Stats
     const totalRequests = data.length;
     const openRequests = data.filter((r) => r.status === ServiceRequestStatus.OPEN).length;
-    const acceptedRequests = data.filter((r) => r.status === ServiceRequestStatus.ACCEPTED).length;
+    const confirmedRequests = data.filter((r) => r.status === ServiceRequestStatus.CONFIRMED).length;
 
     const handleRowClick = (row: ServiceRequestResponse) => {
         router.push(`/admin/service-requests/${row.requestId}`);
@@ -80,10 +80,10 @@ export default function ServicesPage() {
                                 <AlertCircle size={12} /> Open
                             </span>
                         );
-                    case ServiceRequestStatus.ACCEPTED:
+                    case ServiceRequestStatus.CONFIRMED:
                         return (
                             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-600 text-xs font-bold border border-emerald-100">
-                                <CheckCircle size={12} /> Accepted
+                                <CheckCircle size={12} /> Confirmed
                             </span>
                         );
                     default:
@@ -192,8 +192,8 @@ export default function ServicesPage() {
                     iconColor="text-blue-500"
                 />
                 <StatCard
-                    title="Accepted"
-                    value={loading ? "-" : acceptedRequests}
+                    title="Confirmed"
+                    value={loading ? "-" : confirmedRequests}
                     icon={CheckCircle}
                     color="bg-white text-gray-900"
                     iconColor="text-emerald-500"
