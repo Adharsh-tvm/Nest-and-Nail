@@ -54,6 +54,10 @@ const UserSchema = new Schema<User>({
 
     rating: { type: Number, default: 0 },
     totalRatings: { type: Number, default: 0 },
+    isAvailable: {
+        type: Boolean,
+        default: true
+    },
     weeklyJobCount: { type: Number, default: 0 },
     currentActiveRequestId: { type: String, default: null },
 }, {

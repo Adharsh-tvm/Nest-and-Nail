@@ -10,6 +10,7 @@ import { IGetServiceRequestByIdUseCase } from "../../application/interfaces/serv
 import { IGetAllServiceRequestsUseCase } from "../../application/interfaces/service-requests/admin/IGetAllServiceRequestsUseCase";
 
 import { IDeleteServiceRequestUseCase } from "../../application/interfaces/service-requests/client/IDeleteServiceRequestUseCase";
+import { IDispatchServiceRequestUseCase } from "../../application/interfaces/service-requests/IDispatchServiceRequestUseCase";
 
 export class ServiceRequestController implements IServiceRequestController {
     constructor(
@@ -17,10 +18,9 @@ export class ServiceRequestController implements IServiceRequestController {
         private readonly _getMyServiceRequestsUseCase: IGetMyServiceRequestsUseCase,
         private readonly _getServiceRequestByIdUseCase: IGetServiceRequestByIdUseCase,
         private readonly _getAllServiceRequestsUseCase: IGetAllServiceRequestsUseCase,
-        private readonly _deleteServiceRequestUseCase: IDeleteServiceRequestUseCase
+        private readonly _deleteServiceRequestUseCase: IDeleteServiceRequestUseCase,
+        private readonly _dispatchServiceRequestUseCase: IDispatchServiceRequestUseCase
     ) { }
-
-    // ... existing methods ...
 
     delete = async (req: Request, res: Response): Promise<Response> => {
         try {
@@ -120,5 +120,16 @@ export class ServiceRequestController implements IServiceRequestController {
         }
     };
 
+    async dispatch(req: Request, res: Response) {
 
+        const { requestId } = req.params;
+
+        const result = await this._dispatchServiceRequestUseCase.execute(requestId);
+
+        return res.status(HttpStatusCode.OK).json(
+            ResponseHandler.success(
+                result, "Dispatch process executed"
+            )
+        );
+    }
 } 

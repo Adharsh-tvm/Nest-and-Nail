@@ -68,6 +68,8 @@ import { IDeleteServiceRequestUseCase } from "../../application/interfaces/servi
 import { DeleteServiceRequestUseCase } from "../../application/use-cases/service-requests/client/DeleteServiceRequestUseCase";
 import { IGetS3UploadUrlUseCase } from "../../application/interfaces/media/IGetS3UploadUrlUseCase";
 import { GetS3UploadUrlUseCase } from "../../application/use-cases/media/GetS3UploadUrlUseCase";
+import { IDispatchServiceRequestUseCase } from "../../application/interfaces/service-requests/IDispatchServiceRequestUseCase";
+import { DispatchServiceRequestUseCase } from "../../application/use-cases/service-requests/DispatchServiceRequestUseCase";
 
 
 export class UseCaseDI {
@@ -114,6 +116,7 @@ export class UseCaseDI {
   private _getServiceRequestByIdUseCase?: IGetServiceRequestByIdUseCase;
   private _getAllServiceRequestsUseCase?: IGetAllServiceRequestsUseCase;
   private _deleteServiceRequestUseCase?: IDeleteServiceRequestUseCase;
+  private _dispatchServiceRequestUseCase?: IDispatchServiceRequestUseCase
 
 
   private _getS3UploadUrlUseCase?: IGetS3UploadUrlUseCase;
@@ -467,5 +470,15 @@ export class UseCaseDI {
       );
     }
     return this._getS3UploadUrlUseCase;
+  }
+
+  get dispatchServiceRequestUseCase(): IDispatchServiceRequestUseCase {
+    if (!this._dispatchServiceRequestUseCase) {
+      this._dispatchServiceRequestUseCase = new DispatchServiceRequestUseCase(
+        this.infra.workerRepository,
+        this.infra.serviceRequestRepository
+      );
+    }
+    return this._dispatchServiceRequestUseCase
   }
 }
