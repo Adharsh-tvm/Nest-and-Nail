@@ -32,4 +32,55 @@ export class WorkerRepository extends BaseRepository<Worker> implements IWorkerR
             workPhotos: worker.workPhotos || []
         }));
     }
+
+    async findEligibleWorkers(
+        category: string,
+        coordinates: [number, number],
+        maxDistance: number
+    ): Promise<Worker[]> {
+
+        return await WorkerModel.find({
+            role: "WORKER",
+            isOnline: true,
+            isBlocked: false,
+            isAvailable: true,
+            categories: category,
+            "address.location": {
+                $near: {
+                    $geometry: {
+                        type: "Point",
+                        coordinates
+                    },
+                    $maxDistance: maxDistance
+                }
+            }
+        }).lean();
+    }
+
+    async reserveWorker(workerId: string): Promise<boolean> {
+
+        const updated = await WorkerModel.findOneAndUpdate(
+            { userId: workerId, isAvailable: true },
+            { isAvailable: false },
+            { new: true }
+        );
+
+        return !!updated;
+    }
+
+    async releaseWorker(workerId: string): Promise<void> {
+
+        await WorkerModel.updateOne(
+            { userId: workerId },
+            { isAvailable: true }
+        );
+    }
+
+    async incrementWeeklyJobCount(workerId: string): Promise<void> {
+
+        await WorkerModel.updateOne(
+            { userId: workerId },
+            { $inc: { weeklyJobCount: 1 } }
+        );
+    }
 }

@@ -39,5 +39,11 @@ export function createServiceRequestRoutes(
         (req, res) => serviceRequestController.delete(req, res)
     );
 
+    router.post(
+        "/dispatch/:requestId",
+        authMiddleware.verify.bind(authMiddleware),
+        (req,res) => serviceRequestController.dispatch(req,res)
+    )
+
     return router;
 }

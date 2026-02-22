@@ -9,7 +9,7 @@ export interface IWorkerRepository extends IBaseRepository<Worker> {
         maxDistance: number
     ): Promise<Worker[]>;
 
-    reserveWorker(workerId: string): Promise<Worker | null>;
+    reserveWorker(workerId: string): Promise<boolean>;
 
     releaseWorker(workerId: string): Promise<void>;
 
