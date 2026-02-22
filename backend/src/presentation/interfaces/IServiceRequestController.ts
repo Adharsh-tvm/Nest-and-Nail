@@ -6,4 +6,5 @@ export interface IServiceRequestController {
     getById(req: Request, res: Response): Promise<Response>;
     getAllForAdmin(req: Request, res: Response): Promise<Response>;
     delete(req: Request, res: Response): Promise<Response>;
+    dispatch(req: Request, res: Response): Promise<Response>;
 }

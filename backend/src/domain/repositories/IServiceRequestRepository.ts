@@ -18,6 +18,18 @@ export interface IServiceRequestRepository {
     updateData: Partial<ServiceRequest>
   ): Promise<ServiceRequest | null>;
 
-  delete(requestId: string): Promise<boolean>;
+  reserveRequest(
+    requestId: string,
+    workerId: string,
+    expiresAt: Date
+  ): Promise<boolean>;
 
+  addTriedWorker(
+    requestId: string,
+    workerId: string
+  ): Promise<void>;
+
+  markNoWorkersAvailable(requestId: string): Promise<void>;
+
+  delete(requestId: string): Promise<boolean>;
 }

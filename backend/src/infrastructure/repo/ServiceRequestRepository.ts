@@ -54,7 +54,6 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
 
         const domainEntity = this.toDomain(result);
 
-        // Fallback for old records where client details are not persisted
         if (!domainEntity.client) {
             const user = await UserModel.findOne({ userId: result.clientId })
                 .select("name email phone profilePictureUrl")
@@ -72,8 +71,6 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
 
         return domainEntity;
     }
-
-
 
     async findByClientId(clientId: string): Promise<ServiceRequest[]> {
         const docs = await ServiceRequestModel.find({ clientId })
@@ -99,7 +96,7 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
         const updatedDoc = await ServiceRequestModel.findOneAndUpdate(
             { requestId },
             { $set: updateData },
-            { new: true } 
+            { new: true }
         ).lean();
 
         if (!updatedDoc) return null;
@@ -122,6 +119,45 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
         }
 
         return domainEntity;
+    }
+
+    async reserveRequest(
+        requestId: string,
+        workerId: string,
+        expiresAt: Date
+    ): Promise<boolean> {
+
+        const updated = await ServiceRequestModel.findOneAndUpdate(
+            {
+                requestId,
+                status: ServiceRequestStatus.OPEN,
+                reservedBy: null
+            },
+            {
+                reservedBy: workerId,
+                reservationExpiresAt: expiresAt,
+                status: ServiceRequestStatus.RESERVED
+            },
+            { new: true }
+        );
+
+        return !!updated;
+    }
+
+    async addTriedWorker(requestId: string, workerId: string): Promise<void> {
+
+        await ServiceRequestModel.updateOne(
+            { requestId },
+            { $addToSet: { triedWorkers: workerId } }
+        );
+    }
+
+    async markNoWorkersAvailable(requestId: string): Promise<void> {
+
+        await ServiceRequestModel.updateOne(
+            { requestId },
+            { status: ServiceRequestStatus.NO_WORKERS_AVAILABLE }
+        );
     }
 
     async delete(requestId: string): Promise<boolean> {
