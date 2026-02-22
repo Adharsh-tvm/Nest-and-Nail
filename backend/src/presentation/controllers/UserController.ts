@@ -1,24 +1,23 @@
 import { Request, Response } from "express";
 import { HttpStatusCode } from "../../shared/enums/httpCodes";
 import { IUserController } from "../interfaces/IUserController";
-import { IChangeUserRoleUseCase } from "../../application/interfaces/IChangeUserRoleUseCase";
-import { IGetCurrentUserUseCase } from "../../application/interfaces/IGetCurrentUserUseCase";
+import { IChangeUserRoleUseCase } from "../../application/interfaces/user/IChangeUserRoleUseCase";
+import { IGetCurrentUserUseCase } from "../../application/interfaces/user/IGetCurrentUserUseCase";
 import {
     AuthenticationError,
     UserBlockedError,
     UserNotFoundError
 } from "../../domain/errors/DomainError";
-import { IGetAllUsersUseCase } from "../../application/interfaces/IGetAllUsersUseCase";
-import { ResponseHandler } from "../responses/ApiResponse";
+import { IGetAllUsersUseCase } from "../../application/interfaces/admin/IGetAllUsersUseCase";
+import { ResponseHandler } from "../../shared/responses/ApiResponse";
 import { LoginResponseDTO } from "../../application/dtos/UserDTO";
-import { RESPONSE_MESSAGES } from "../responses/ResponseMessages";
+import { RESPONSE_MESSAGES } from "../../shared/responses/ResponseMessages";
 
 export class UserController implements IUserController {
 
     constructor(
         private readonly _changeUserRoleUseCase: IChangeUserRoleUseCase,
         private readonly _getCurrentUserUseCase: IGetCurrentUserUseCase,
-        private readonly _getAllUsersUseCase: IGetAllUsersUseCase
     ) { }
 
     changeRole = async (req: Request, res: Response): Promise<Response> => {
@@ -84,20 +83,4 @@ export class UserController implements IUserController {
         }
     };
 
-    getAllUsers = async (req: Request, res: Response): Promise<Response> => {
-        try {
-            const users = await this._getAllUsersUseCase.execute();
-
-            return res.status(HttpStatusCode.OK).json(
-                ResponseHandler.success(users, RESPONSE_MESSAGES.USERS_FETCHED)
-            );
-
-        } catch (error: unknown) {
-            console.error("Error fetching all users:", error);
-
-            return res.status(HttpStatusCode.INTERNAL_SERVER).json(
-                ResponseHandler.error(RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR, error)
-            );
-        }
-    }
 }

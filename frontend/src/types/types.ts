@@ -14,9 +14,15 @@ export type PendingVerificationUser = {
   phone?: string;
   documents: string[];
   certificates: string[];
+  categories: string[];
   workPhotos: string[];
-  createdAt: string;  
+  createdAt: string;
   updatedAt: string;
+
+  rating?: number;
+  totalRatings?: number;
+  weeklyJobCount?: number;
+  currentActiveRequestId?: string;
 };
 
 export interface WorkerUser {
@@ -33,7 +39,13 @@ export interface WorkerUser {
   createdAt?: string;
 
   skills?: string[];
+  categories: string[];
   workPhotos?: string[];
   certificates?: string[];
   documents?: string[];
+
+  rating?: number;
+  totalRatings?: number;
+  weeklyJobCount?: number;
+  currentActiveRequestId?: string;
 }

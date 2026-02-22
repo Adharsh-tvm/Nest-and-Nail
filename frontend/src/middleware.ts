@@ -32,11 +32,28 @@ export async function middleware(req: NextRequest) {
     }
   }
 
-  // 2️⃣ No access token but refresh exists → refresh & retry
-  if (!userRole && !accessToken && refreshToken) {
+  // access token missing OR expired → refresh
+  if (!userRole && refreshToken) {
     const refreshed = await refreshTokens(refreshToken);
+
     if (refreshed) {
+      // force new request with fresh access token
       return NextResponse.redirect(req.nextUrl);
+    }
+  }
+
+  // 3️⃣ Validate user status from backend
+  if (userRole) {
+    const { validateUser } = await import("./app/actions/authentication/session-actions");
+    const validation = await validateUser();
+
+    if (!validation || !validation.success) {
+      const response = NextResponse.redirect(new URL("/login", req.url));
+
+      response.cookies.delete("accessToken");
+      response.cookies.delete("refreshToken");
+
+      return response;
     }
   }
 

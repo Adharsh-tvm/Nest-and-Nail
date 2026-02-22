@@ -13,8 +13,12 @@ export class UserMapper {
             role: userData.user_role,
             isBlocked: false,
             isVerified: VerificationStatus.NOT_VERIFIED,
+            isOnline: true,
             loginMethod: LoginMethod.EMAIL_PASSWORD,
             profilePictureUrl: '',
+            rating: 0,
+            totalRatings: 0,
+            weeklyJobCount: 0,
             createdAt: new Date(),
             lastLoginAt: new Date(),
             updatedAt: new Date()
@@ -30,21 +34,36 @@ export class UserMapper {
             user_role: userData.role,
             profileImageUrl: userData.profilePictureUrl,
             isBlocked: userData.isBlocked ?? false,
+            isOnline: userData.isOnline ?? false,
             isVerified: userData.isVerified ?? VerificationStatus.NOT_VERIFIED,
 
             skills: userData.skills ?? [],
-            address: userData.address ?? [],
+            address: userData.address?.map(addr => ({
+                addressId: addr.addressId,
+                label: addr.label,
+                street: addr.street,
+                city: addr.city,
+                state: addr.state,
+                country: addr.country,
+                zip: addr.zip,
+                lat: addr.location.coordinates[1],
+                lng: addr.location.coordinates[0],
+                isDefault: addr.isDefault,
+            })) ?? [],
+
 
             documents: userData.documents ?? [],
             certificates: userData.certificates ?? [],
+            categories: userData.categories ?? [],
             workPhotos: userData.workPhotos ?? [],
+
+            rating: userData.rating ?? 0,
+            totalRatings: userData.totalRatings ?? 0,
+            weeklyJobCount: userData.weeklyJobCount ?? 0,
+            currentActiveRequestId: userData.currentActiveRequestId,
 
             createdAt: userData.createdAt?.toISOString?.() ?? "",
             updatedAt: userData.updatedAt?.toISOString?.() ?? "",
         };
     }
-
-
-
-
 }

@@ -1,9 +1,9 @@
 import { Role } from "../../../shared/enums/authEnums";
 import { UserResponseDTO } from "../../dtos/UserDTO";
-import { IChangeUserRoleUseCase } from "../../interfaces/IChangeUserRoleUseCase";
-import { ILogger } from "../../interfaces/ILogger";
+import { IChangeUserRoleUseCase } from "../../interfaces/user/IChangeUserRoleUseCase";
+import { ILogger } from "../../../infrastructure/logger/ILogger";
 import { UserMapper } from "../../mappers/UserMapper";
-import { ITokenService } from "../../services/ITokenService";
+import { ITokenService } from "../../contracts/ITokenService";
 import { IUserRepositoryFactory } from "../../../domain/repositories/IUserRepositoryFactory";
 
 export class ChangeUserRoleUseCase implements IChangeUserRoleUseCase {

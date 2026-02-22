@@ -1,8 +1,11 @@
 "use server";
 
+import userApi from "@/sources/api/user.api";
+import { Address } from "@/shared/types/addressType";
+import { ApiResponse } from "@/shared/types/responseTypes";
+import { User } from "@/shared/types/userTypes";
 import axios from "axios";
 import { cookies } from "next/headers";
-import { success } from "zod";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -12,9 +15,55 @@ export async function updateUserProfileAction(userId: string, updates: any) {
 
   const fd = new FormData();
 
-  if (updates.name) fd.append("name", updates.name);
-  if (updates.phone) fd.append("phone", updates.phone);
-  if (updates.address) fd.append("address", updates.address);
+  if (updates.name !== undefined) {
+    const name = updates.name.trim();
+
+    if (!name) {
+      return { success: false, message: "Name cannot be empty" };
+    }
+
+    if (name.length < 2 || name.length > 50) {
+      return {
+        success: false,
+        message: "Name must be between 2 and 50 characters",
+      };
+    }
+
+    if (!/^[A-Za-z\s]+$/.test(name)) {
+      return {
+        success: false,
+        message: "Name can only contain letters and spaces",
+      };
+    }
+
+    fd.append("name", name);
+  }
+
+  if (updates.phone !== undefined) {
+    const phone = String(updates.phone).trim();
+
+    if (!/^\d{10}$/.test(phone)) {
+      return {
+        success: false,
+        message: "Phone number must be a valid 10-digit number",
+      };
+    }
+
+    fd.append("phone", phone);
+  }
+
+  if (updates.address) {
+    fd.append(
+      "address",
+      typeof updates.address === "object"
+        ? JSON.stringify(updates.address)
+        : updates.address
+    );
+  }
+
+  if (typeof updates.isOnline === "boolean") {
+    fd.append("isOnline", String(updates.isOnline));
+  }
 
   if (updates.profilePicture instanceof File) {
     fd.append("profilePicture", updates.profilePicture);
@@ -35,17 +84,15 @@ export async function updateUserProfileAction(userId: string, updates: any) {
     return {
       success: true,
       message: "Profile Updated successfully",
-      user: res.data.user
-    }
-
+      user: res.data.user,
+    };
   } catch (err: any) {
     console.error("Profile update failed", err.response?.data || err);
-    // throw new Error(err.response?.data?.message || "Profile update failed");
 
     return {
       success: false,
-      message: err.response?.data?.message || "Profile update failed"
-    }
+      message: err.response?.data?.message || "Profile update failed",
+    };
   }
 }
 
@@ -69,4 +116,93 @@ export async function uploadDocumentAction(userId: string, file: File) {
 
   return res.data.url;
 }
+
+
+export async function addUSerAddressAction(
+  userId: string,
+  address: Address
+): Promise<ApiResponse<User>> {
+  try {
+    return await userApi.addUserAddressApi(userId, address);
+  } catch (error: any) {
+    return {
+      success: false,
+      message:
+        error?.response?.data?.message ||
+        error?.message ||
+        "Failed to add address",
+      error: {
+        status: error?.response?.status,
+        data: error?.response?.data,
+      },
+    };
+  }
+}
+
+export async function editUserAddressAction(
+  userId: string,
+  addressId: string,
+  address: Address
+): Promise<ApiResponse<User>> {
+  try {
+    return await userApi.editUserAddressApi(userId, addressId, address);
+  } catch (error: any) {
+    return {
+      success: false,
+      message:
+        error?.response?.data?.message ||
+        error?.message ||
+        "Failed to edit address",
+      error: {
+        status: error?.response?.status,
+        data: error?.response?.data,
+      },
+    };
+  }
+}
+
+export async function deleteUserAddressAction(
+  userId: string,
+  addressId: string
+): Promise<ApiResponse<User>> {
+  try {
+    return await userApi.deleteUserAddressApi(userId, addressId);
+  } catch (error: any) {
+    return {
+      success: false,
+      message:
+        error?.response?.data?.message ||
+        error?.message ||
+        "Failed to delete address",
+      error: {
+        status: error?.response?.status,
+        data: error?.response?.data,
+      },
+    };
+  }
+}
+
+
+export async function reverseGeocode(lat: number, lng: number) {
+  const res = await fetch(
+    `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
+  );
+
+  if (!res.ok) {
+    throw new Error("Failed to reverse geocode");
+  }
+
+  const data = await res.json();
+
+  const address = data.address;
+
+  return {
+    street: address.road || "",
+    city: address.city || address.town || address.village || "",
+    state: address.state || "",
+    country: address.country || "",
+    zip: address.postcode || "",
+  };
+}
+
 

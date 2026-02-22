@@ -1,16 +1,17 @@
-import { ILogger } from "../../interfaces/ILogger";
+import { ILogger } from "../../../infrastructure/logger/ILogger";
 import { Role, VerificationStatus } from "../../../shared/enums/authEnums";
-import { CloudinaryUploadService } from "../../../infrastructure/services/CloudinaryUploadService";
-import { IUploadWorkerDocumentUseCase } from "../../interfaces/IUploadWorkerDocumentUseCase";
+import { IUploadWorkerDocumentUseCase } from "../../interfaces/user/IUploadWorkerDocumentUseCase";
 import { IUserRepositoryFactory } from "../../../domain/repositories/IUserRepositoryFactory";
+import { S3Service } from "../../../infrastructure/adapters/S3service";
 
 export class UploadWorkerDocumentUseCase implements IUploadWorkerDocumentUseCase {
     constructor(
         private readonly _repositoryFactory: IUserRepositoryFactory,
-        private readonly _logger: ILogger
+        private readonly _logger: ILogger,
+        private readonly _s3Service: S3Service
     ) { }
 
-    async execute(userId: string, filePath: string) {
+    async execute(userId: string, filePath: string, mimetype: string) {
         this._logger.info(`[UploadWorkerDocumentUseCase] Uploading document for user: ${userId}`);
 
         const workerRepo = this._repositoryFactory.getRepository(Role.WORKER);
@@ -26,19 +27,16 @@ export class UploadWorkerDocumentUseCase implements IUploadWorkerDocumentUseCase
 
         if (!user) throw new Error("User not found");
 
-        // Upload to Cloudinary
-        const url = await CloudinaryUploadService.upload(filePath, "users/documents");
+        const key = `users/documents/${userId}-${Date.now()}`;
+        await this._s3Service.uploadFile(filePath, key, mimetype);
 
-        // Always append documents
         user.documents = user.documents || [];
-        user.documents.push(url);
+        user.documents.push(key);
 
-        // 🔥 Mark verification status as PENDING
         user.isVerified = VerificationStatus.PENDING;
 
-        // Save changes
         await repo.updateById(userId, user);
 
-        return { url };
+        return { url: key };
     }
 }

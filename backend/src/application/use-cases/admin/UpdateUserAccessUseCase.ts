@@ -1,7 +1,7 @@
 import { UserMapper } from "../../mappers/UserMapper";
-import { ILogger } from "../../interfaces/ILogger";
+import { ILogger } from "../../../infrastructure/logger/ILogger";
 import { Role } from "../../../shared/enums/authEnums";
-import { IUpdateUserAccessUseCase } from "../../interfaces/IUpdateUserAccessUseCase";
+import { IUpdateUserAccessUseCase } from "../../interfaces/admin/IUpdateUserAccessUseCase";
 import { IUserRepositoryFactory } from "../../../domain/repositories/IUserRepositoryFactory";
 
 export class UpdateUserAccessUseCase implements IUpdateUserAccessUseCase {

@@ -7,8 +7,8 @@ import {
   rejectVerification,
   toggleUserAccess,
   fetchAllUsers,
-} from "@/services/api/admin.api";
-import { User } from "@/shared/types/userTypes";
+} from "@/sources/api/admin.api";
+import { User, UserQueryParams } from "@/shared/types/userTypes";
 
 
 export async function getAllClientsAction() {
@@ -23,8 +23,8 @@ export async function approveUserAction(userId: string) {
   return await approveVerification(userId);
 }
 
-export async function rejectUserAction(userId: string) {
-  return await rejectVerification(userId);
+export async function rejectUserAction(userId: string, reason: string) {
+  return await rejectVerification(userId, reason);
 }
 
 export async function toggleUserAccessAction(
@@ -33,6 +33,6 @@ export async function toggleUserAccessAction(
   return await toggleUserAccess(userId);
 }
 
-export async function getAllUsers() {
-  return await fetchAllUsers();
+export async function getAllUsers(params: UserQueryParams = {}) {
+  return await fetchAllUsers(params);
 }

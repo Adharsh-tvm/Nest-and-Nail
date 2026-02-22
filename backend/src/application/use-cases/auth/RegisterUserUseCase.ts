@@ -1,12 +1,12 @@
 import { UserAlreadyExistsError } from "../../../domain/errors/DomainError";
 import { LoginMethod } from "../../../shared/enums/authEnums";
 import { UserRequestDTO, UserResponseDTO } from "../../dtos/UserDTO";
-import { ILogger } from "../../interfaces/ILogger";
-import { IRegisterUserUseCase } from "../../interfaces/IRegisterUserUseCase";
+import { ILogger } from "../../../infrastructure/logger/ILogger";
+import { IRegisterUserUseCase } from "../../interfaces/auth/IRegisterUserUseCase";
 import { UserMapper } from "../../mappers/UserMapper";
-import { IGenerateUserID } from "../../services/IGenerateUserID";
-import { IPasswordHasher } from "../../services/IPasswordHasher";
-import { ITokenService } from "../../services/ITokenService";
+import { IGenerateUserID } from "../../contracts/IGenerateUserID";
+import { IPasswordHasher } from "../../contracts/IPasswordHasher";
+import { ITokenService } from "../../contracts/ITokenService";
 import { AuthValidator } from "../../validators/AuthValidator";
 import { IUserRepositoryFactory } from "../../../domain/repositories/IUserRepositoryFactory";
 

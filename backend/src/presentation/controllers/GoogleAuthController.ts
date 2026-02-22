@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import { IGoogleSignUpUseCase } from "../../application/interfaces/IGoogleSignUpUseCase";
+import { IGoogleSignUpUseCase } from "../../application/interfaces/auth/IGoogleSignUpUseCase";
 import { HttpStatusCode } from "../../shared/enums/httpCodes";
 import { IGoogleAuthController } from "../interfaces/IGoogleAuthController";
-import { ResponseHandler } from "../responses/ApiResponse";
-import { RESPONSE_MESSAGES } from "../responses/ResponseMessages";
+import { ResponseHandler } from "../../shared/responses/ApiResponse";
+import { RESPONSE_MESSAGES } from "../../shared/responses/ResponseMessages";
 import { LoginResponseDTO } from "../../application/dtos/UserDTO";
 
 export class GoogleAuthController implements IGoogleAuthController {

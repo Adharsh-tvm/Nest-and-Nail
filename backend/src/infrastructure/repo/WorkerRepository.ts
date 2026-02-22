@@ -20,6 +20,7 @@ export class WorkerRepository extends BaseRepository<Worker> implements IWorkerR
             createdAt: worker.createdAt,
             updatedAt: worker.updatedAt,
             isBlocked: worker.isBlocked,
+            isOnline: worker.isOnline,
             isVerified: worker.isVerified,
             profilePictureUrl: worker.profilePictureUrl,
             role: worker.role,
@@ -27,6 +28,7 @@ export class WorkerRepository extends BaseRepository<Worker> implements IWorkerR
             loginMethod: worker.loginMethod,
             documents: worker.documents || [],
             certificates: worker.certificates || [],
+            categories: worker.categories || [],
             workPhotos: worker.workPhotos || []
         }));
     }

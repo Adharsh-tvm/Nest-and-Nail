@@ -1,8 +1,11 @@
 import mongoose, { Model, Schema } from "mongoose";
 import { User } from "../../../domain/entities/User";
 import { LoginMethod, Role, VerificationStatus } from "../../../shared/enums/authEnums";
+import { AddressSchema } from "./AddressModel";
 
-const userSchema = new Schema<User>({
+
+
+const UserSchema = new Schema<User>({
     userId: { type: String, required: true, unique: true },
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
@@ -11,6 +14,7 @@ const userSchema = new Schema<User>({
     passwordhash: { type: String, default: null },
 
     isBlocked: { type: Boolean, default: false },
+    isOnline: { type: Boolean, default: false },
     isVerified: {
         type: String,
         enum: Object.values(VerificationStatus),
@@ -32,7 +36,7 @@ const userSchema = new Schema<User>({
     },
 
     skills: { type: [String], default: [] },
-    address: { type: [String], default: [] },
+    address: { type: [AddressSchema], default: [] },
 
     lastLoginAt: { type: Date, default: Date.now },
     createdAt: { type: Date, default: Date.now },
@@ -40,11 +44,23 @@ const userSchema = new Schema<User>({
 
     documents: [String],
     certificates: [String],
+    categories: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Category",
+        default: []
+    }],
+
     workPhotos: [String],
+
+    rating: { type: Number, default: 0 },
+    totalRatings: { type: Number, default: 0 },
+    weeklyJobCount: { type: Number, default: 0 },
+    currentActiveRequestId: { type: String, default: null },
 }, {
     timestamps: true,
     discriminatorKey: 'role'
 });
 
+UserSchema.index({ "address.location": "2dsphere" });
 
-export const UserModel: Model<User> = mongoose.model<User>('User', userSchema);
+export const UserModel: Model<User> = mongoose.model<User>('User', UserSchema);
