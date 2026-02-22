@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import {
   Mail,
   Phone,
@@ -14,7 +15,9 @@ import {
   Shield,
   TrendingUp,
   Users,
+  CheckCircle,
 } from "lucide-react";
+import toast from "react-hot-toast";
 
 import DataTable from "@/app/components/containers/widgets/DataTable";
 import type { Column } from "@/app/components/containers/widgets/DataTable";
@@ -80,9 +83,8 @@ const ActionMenu = ({
                 setIsOpen(false);
                 onBlockToggle(row);
               }}
-              className={`w-full text-left px-4 py-3 text-sm flex items-center gap-3 hover:bg-gray-50 transition-colors ${
-                row.isBlocked ? "text-emerald-600" : "text-amber-600"
-              }`}
+              className={`w-full text-left px-4 py-3 text-sm flex items-center gap-3 hover:bg-gray-50 transition-colors ${row.isBlocked ? "text-emerald-600" : "text-amber-600"
+                }`}
             >
               {row.isBlocked ? (
                 <>
@@ -101,33 +103,106 @@ const ActionMenu = ({
   );
 };
 
+import UserDetailsModal from "./UserDetailsModal";
+import BlockConfirmationModal from "./BlockConfirmationModal";
+
 /**
  * ----------------------------------------------------------------------------
  * MAIN CLIENTS VIEW COMPONENT
  * ----------------------------------------------------------------------------
  */
 const UsersView = () => {
-  const { users, loading, error } = useUsers();
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  // Get state from URL params
+  const page = Number(searchParams.get("page")) || 1;
+  const search = searchParams.get("search") || "";
+  const isBlockedParam = searchParams.get("isBlocked");
+  const isBlocked = isBlockedParam === "true" ? true : isBlockedParam === "false" ? false : undefined;
+  const isVerifiedParam = searchParams.get("isVerified");
+  const isVerified = isVerifiedParam && isVerifiedParam !== "ALL" ? (isVerifiedParam as VerificationStatus) : undefined;
+
+  // Hardcoded limit
+  const limit = 5;
+
+  // Local state for search input to handle debouncing
+  const [searchTerm, setSearchTerm] = useState(searchParams.get("search") || "");
+
+  useEffect(() => {
+    const urlSearch = searchParams.get("search") || "";
+    if (urlSearch !== searchTerm) {
+      setSearchTerm(urlSearch);
+    }
+  }, [searchParams]);
+
+  // Debounce URL update
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const urlSearch = searchParams.get("search") || "";
+      if (searchTerm !== urlSearch) {
+        updateUrl("search", searchTerm || null);
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  const { users, loading, error, total, totalPages } = useUsers({
+    page,
+    limit,
+    search: search, // The hook uses the URL param directly, which is updated after debounce
+    isBlocked,
+    isVerified,
+    sortBy: "createdAt",
+    sortOrder: "desc",
+  });
+
   const [localUsers, setLocalUsers] = useState<any[]>([]);
+  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [blockConfirmOpen, setBlockConfirmOpen] = useState(false);
+  const [userToBlock, setUserToBlock] = useState<any>(null);
+
+  // Helper to update URL params
+  const updateUrl = (key: string, value: string | null) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (value === null) {
+      params.delete(key);
+    } else {
+      params.set(key, value);
+    }
+
+    // When filtering or searching, reset to page 1
+    if (key !== "page") {
+      params.set("page", "1");
+    }
+
+    router.replace(`${pathname}?${params.toString()}`);
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+  };
+
+  const handlePageChange = (newPage: number) => {
+    updateUrl("page", String(newPage));
+  };
 
   useEffect(() => {
     if (users) setLocalUsers(users);
   }, [users]);
 
-  useEffect(() => {
-    console.log("These are the users", users);
-  });
+  const handleBlockToggle = (row: any) => {
+    setUserToBlock(row);
+    setBlockConfirmOpen(true);
+  };
 
-  // Derive stats
-  const totalUsers = localUsers.length;
-  const verifiedUsers = localUsers.filter(
-    (u) => u.isVerified === VerificationStatus.VERIFIED
-  ).length;
-  const blockedUsers = localUsers.filter((u) => u.isBlocked).length;
+  const onConfirmBlock = async () => {
+    if (!userToBlock) return;
 
-  async function handleBlockToggle(row: any) {
     try {
-      const updatedUser = await toggleUserAccessAction(row.id);
+      const updatedUser = await toggleUserAccessAction(userToBlock.id);
 
       setLocalUsers((prev) =>
         prev.map((u) =>
@@ -136,13 +211,22 @@ const UsersView = () => {
             : u
         )
       );
+      setBlockConfirmOpen(false);
+      setUserToBlock(null);
+      toast.success(
+        updatedUser.isBlocked
+          ? "User blocked successfully"
+          : "User unblocked successfully"
+      );
     } catch (err) {
       console.error(err);
+      toast.error("Failed to update user status");
     }
-  }
+  };
 
   const handleViewDetails = (row: any) => {
-    alert(`Viewing details for: ${row.name || row.email}`);
+    setSelectedUser(row);
+    setIsModalOpen(true);
   };
 
   type ClientRow = (typeof users)[number];
@@ -203,16 +287,9 @@ const UsersView = () => {
       ),
     },
     {
-      header: "Status",
+      header: "Verification",
       accessorKey: "isVerified",
       cell: (row) => {
-        if (row.isBlocked) {
-          return (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-red-600 text-xs font-bold border border-red-100">
-              <Ban size={14} /> Blocked
-            </span>
-          );
-        }
         if (row.isVerified === VerificationStatus.VERIFIED) {
           return (
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-bold border border-blue-100">
@@ -235,13 +312,22 @@ const UsersView = () => {
       },
     },
     {
-      header: "Role",
-      accessorKey: "role",
-      cell: (row) => (
-        <span className="font-medium text-gray-600 text-sm bg-gray-50 px-3 py-1 rounded-lg border border-gray-100">
-          {row.role}
-        </span>
-      ),
+      header: "Active Status",
+      accessorKey: "isBlocked",
+      cell: (row) => {
+        if (row.isBlocked) {
+          return (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-red-600 text-xs font-bold border border-red-100">
+              <Ban size={14} /> Blocked
+            </span>
+          );
+        }
+        return (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 text-xs font-bold border border-emerald-100">
+            <CheckCircle size={14} /> Active
+          </span>
+        );
+      },
     },
     {
       header: "",
@@ -270,25 +356,40 @@ const UsersView = () => {
     );
   }
 
-  const StatCard = ({ title, value, icon: Icon, color, trend }: any) => (
-    <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between group hover:shadow-md transition-all">
+  const StatCard = ({
+    title,
+    value,
+    icon: Icon,
+    color,
+    iconColor,
+    trend,
+  }: any) => (
+    <div
+      className={`p-6 rounded-2xl shadow-sm flex items-center justify-between group hover:shadow-md transition-all ${color}`}
+    >
       <div>
-        <p className="text-gray-500 text-xs font-bold uppercase tracking-wider mb-1">
+        <p
+          className={`text-xs font-bold uppercase tracking-wider mb-1 ${color.includes("text-white") ? "text-white/70" : "text-gray-400"}`}
+        >
           {title}
         </p>
-        <h3 className="text-2xl font-black text-gray-900 group-hover:text-[#1B4332] transition-colors">
+        <h3
+          className={`text-3xl font-black ${color.includes("text-white") ? "text-white" : "text-gray-900"}`}
+        >
           {value}
         </h3>
         {trend && (
-          <p className="text-green-600 text-xs font-bold flex items-center gap-1 mt-2">
+          <p
+            className={`text-xs font-bold flex items-center gap-1 mt-2 ${color.includes("text-white") ? "text-white/90" : "text-emerald-600"}`}
+          >
             <TrendingUp size={12} /> {trend}
           </p>
         )}
       </div>
       <div
-        className={`w-12 h-12 rounded-xl flex items-center justify-center ${color} group-hover:scale-110 transition-transform`}
+        className={`w-14 h-14 rounded-2xl flex items-center justify-center ${color.includes("text-white") ? "bg-white/20" : "bg-gray-50"} group-hover:scale-110 transition-transform ${iconColor}`}
       >
-        <Icon size={24} />
+        <Icon size={28} />
       </div>
     </div>
   );
@@ -296,44 +397,82 @@ const UsersView = () => {
   return (
     <div className="max-w-[1600px] mx-auto space-y-8 pb-10">
       {/* Header Stats */}
+      {/* Note: Showing verified/blocked counts based on current page might be confusing, so we just show available stats or placeholders */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
         <StatCard
           title="Total Users"
-          value={totalUsers}
+          value={total}
           icon={Users}
-          color="bg-emerald-50 text-emerald-600"
-          trend="+12% this month"
+          color="bg-gradient-to-br from-emerald-500 to-emerald-600 text-white shadow-emerald-200"
+          iconColor="text-white/80"
+          trend=""
         />
-        <StatCard
-          title="Verified"
-          value={verifiedUsers}
-          icon={BadgeCheck}
-          color="bg-blue-50 text-blue-600"
-        />
-        <StatCard
-          title="Active Now"
-          value={Math.round(totalUsers * 0.8)}
-          icon={User}
-          color="bg-purple-50 text-purple-600"
-        />
-        <StatCard
-          title="Blocked"
-          value={blockedUsers}
-          icon={Ban}
-          color="bg-red-50 text-red-600"
-        />
+        {/* We could fetch global stats for these, but for now let's hide or keep them standard */}
+        {/* <StatCard ... /> */}
       </div>
 
       {/* Main Table */}
-      <div className="h-[600px] lg:h-[700px]">
+      <div className="h-[750px] bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden flex flex-col">
         <DataTable<ClientRow>
           title="User Management"
           columns={columns}
           data={localUsers}
           isLoading={loading}
-          searchPlaceholder="Search by name, email or role..."
+          searchPlaceholder="Search by name, email..."
+          searchValue={searchTerm}
+          onSearchChange={handleSearchChange}
+          page={page}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+          actions={
+            <div className="flex gap-2">
+              <select
+                className="p-3 bg-gray-50 border border-gray-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#1B4332]/10"
+                value={isVerifiedParam || "ALL"}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  updateUrl("isVerified", val === "ALL" ? null : val);
+                }}
+              >
+                <option value="ALL">All Verification</option>
+                <option value={VerificationStatus.VERIFIED}>Verified</option>
+                <option value={VerificationStatus.PENDING}>Pending</option>
+                <option value={VerificationStatus.NOT_VERIFIED}>Unverified</option>
+              </select>
+
+              <select
+                className="p-3 bg-gray-50 border border-gray-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#1B4332]/10"
+                value={isBlockedParam === null ? "ALL" : isBlockedParam}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  updateUrl("isBlocked", val === "ALL" ? null : val);
+                }}
+              >
+                <option value="ALL">All Status</option>
+                <option value="false">Active</option>
+                <option value="true">Blocked</option>
+              </select>
+            </div>
+          }
         />
       </div>
+
+      <UserDetailsModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        user={selectedUser}
+      />
+
+      <BlockConfirmationModal
+        isOpen={blockConfirmOpen}
+        onClose={() => {
+          setBlockConfirmOpen(false);
+          setUserToBlock(null);
+        }}
+        onConfirm={onConfirmBlock}
+        userName={userToBlock?.name || "User"}
+        isBlocked={userToBlock?.isBlocked || false}
+      />
     </div>
   );
 };

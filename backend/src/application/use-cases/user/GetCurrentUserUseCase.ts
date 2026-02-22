@@ -1,15 +1,17 @@
 import { AuthenticationError, UserBlockedError, UserNotFoundError } from "../../../domain/errors/DomainError";
 import { UserResponseDTO } from "../../dtos/UserDTO";
-import { IGetCurrentUserUseCase } from "../../interfaces/IGetCurrentUserUseCase";
-import { ILogger } from "../../interfaces/ILogger";
+import { IGetCurrentUserUseCase } from "../../interfaces/user/IGetCurrentUserUseCase";
+import { ILogger } from "../../../infrastructure/logger/ILogger";
 import { UserMapper } from "../../mappers/UserMapper";
 import { Role } from "../../../shared/enums/authEnums";
 import { IUserRepositoryFactory } from "../../../domain/repositories/IUserRepositoryFactory";
+import { S3Service } from "../../../infrastructure/adapters/S3service";
 
 export class GetCurrentUserUseCase implements IGetCurrentUserUseCase {
     constructor(
         private readonly _repositoryFactory: IUserRepositoryFactory,
         private readonly _logger: ILogger,
+        private readonly _s3Service: S3Service
     ) { }
 
     async execute(email: string | null): Promise<UserResponseDTO> {
@@ -20,10 +22,8 @@ export class GetCurrentUserUseCase implements IGetCurrentUserUseCase {
 
         this._logger.info(`[GetCurrentUserUseCase] Finding user with ID: ${email}`);
 
-        // Try to find user across all repositories
         let user = null;
 
-        // Search in Client repository
         try {
             const clientRepo = this._repositoryFactory.getRepository(Role.CLIENT);
             user = await clientRepo.findByEmail(email);
@@ -35,7 +35,6 @@ export class GetCurrentUserUseCase implements IGetCurrentUserUseCase {
             // Continue to next repository
         }
 
-        // If not found, search in Worker repository
         if (!user) {
             try {
                 const workerRepo = this._repositoryFactory.getRepository(Role.WORKER);
@@ -44,7 +43,6 @@ export class GetCurrentUserUseCase implements IGetCurrentUserUseCase {
                     this._logger.info(`[GetCurrentUserUseCase] User found as WORKER`);
                 }
             } catch (error) {
-                // Continue
             }
         }
 
@@ -68,6 +66,35 @@ export class GetCurrentUserUseCase implements IGetCurrentUserUseCase {
         if (user.isBlocked) {
             this._logger.warn(`[GetCurrentUserUseCase] User is blocked: ${email}`);
             throw new UserBlockedError();
+        }
+
+        // Generate Presigned URL for profile picture
+        if (user.profilePictureUrl) {
+            // Check if it's already a full URL (legacy) or a key
+            if (!user.profilePictureUrl.startsWith("http")) {
+                user.profilePictureUrl = await this._s3Service.getPresignedDownloadUrl(user.profilePictureUrl);
+            }
+        }
+
+        // Generate Presigned URLs for documents
+        if (user.documents && user.documents.length > 0) {
+            user.documents = await Promise.all(user.documents.map(async (doc) => {
+                return !doc.startsWith("http") ? await this._s3Service.getPresignedDownloadUrl(doc) : doc;
+            }));
+        }
+
+        // Generate Presigned URLs for certificates
+        if (user.certificates && user.certificates.length > 0) {
+            user.certificates = await Promise.all(user.certificates.map(async (cert) => {
+                return !cert.startsWith("http") ? await this._s3Service.getPresignedDownloadUrl(cert) : cert;
+            }));
+        }
+
+        // Generate Presigned URLs for workPhotos
+        if (user.workPhotos && user.workPhotos.length > 0) {
+            user.workPhotos = await Promise.all(user.workPhotos.map(async (photo) => {
+                return !photo.startsWith("http") ? await this._s3Service.getPresignedDownloadUrl(photo) : photo;
+            }));
         }
 
         return UserMapper.toResponseDTO(user);

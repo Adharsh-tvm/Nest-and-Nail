@@ -24,6 +24,7 @@ import {
   rejectUserAction,
 } from "@/app/actions/admin/admin-actions";
 import { VerificationStatus } from "@/shared/enums/authEnums";
+import toast from "react-hot-toast";
 
 /* ---------------------------------------------------------------------------
  * TABLE TYPES
@@ -50,7 +51,7 @@ type VerificationModalProps = {
   request: PendingVerificationUser | null;
   onClose: () => void;
   onApprove: (request: PendingVerificationUser) => void;
-  onReject: (request: PendingVerificationUser) => void;
+  onReject: (request: PendingVerificationUser, reason?: string) => void;
 };
 
 const VerificationModal: React.FC<VerificationModalProps> = ({
@@ -59,6 +60,9 @@ const VerificationModal: React.FC<VerificationModalProps> = ({
   onApprove,
   onReject,
 }) => {
+  const [isRejecting, setIsRejecting] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState("");
+
   if (!request) return null;
 
   const submittedDate = request.createdAt
@@ -69,6 +73,17 @@ const VerificationModal: React.FC<VerificationModalProps> = ({
   const idFront = documents[0];
   const idBack = documents[1];
   const extraDocs = documents.slice(2);
+
+  const handleConfirmReject = () => {
+    if (!rejectionReason.trim()) return;
+    onReject(request, rejectionReason);
+    toast.success("Verification Request Rejected Successfully")
+  };
+
+  const handleApproveVerification = () => {
+    onApprove(request)
+    toast.success("Verification Approved")
+  }
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 sm:p-6">
@@ -283,24 +298,63 @@ const VerificationModal: React.FC<VerificationModalProps> = ({
                   })}
                 </div>
               </section>
+
+              {/* Rejection Reason Input */}
+              {isRejecting && (
+                <div className="mt-8 p-6 bg-red-50 rounded-2xl border border-red-100 animate-in fade-in slide-in-from-bottom-2">
+                  <h4 className="text-red-800 font-bold mb-3 flex items-center gap-2">
+                    <ShieldAlert size={18} /> Rejection Reason
+                  </h4>
+                  <textarea
+                    value={rejectionReason}
+                    onChange={(e) => setRejectionReason(e.target.value)}
+                    placeholder="Please explain why this request is being rejected..."
+                    className="w-full p-4 rounded-xl border border-red-200 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 outline-none text-sm min-h-[100px] resize-none bg-white"
+                    autoFocus
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>
 
         {/* Footer */}
         <div className="px-8 py-5 border-t border-gray-100 bg-gray-50 flex justify-end gap-4">
-          <button
-            onClick={() => onReject(request)}
-            className="px-6 py-3 bg-white border border-gray-200 text-gray-700 font-bold rounded-xl hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors flex items-center gap-2 text-sm"
-          >
-            <XCircle size={18} /> Reject Request
-          </button>
-          <button
-            onClick={() => onApprove(request)}
-            className="px-6 py-3 bg-[#1B4332] text-white font-bold rounded-xl hover:bg-[#143225] shadow-lg shadow-green-900/20 active:scale-95 transition-all flex items-center gap-2 text-sm"
-          >
-            <CheckCircle2 size={18} /> Approve Verification
-          </button>
+          {isRejecting ? (
+            <>
+              <button
+                onClick={() => {
+                  setIsRejecting(false);
+                  setRejectionReason("");
+                }}
+                className="px-6 py-3 bg-white border border-gray-200 text-gray-600 font-bold rounded-xl hover:bg-gray-50 transition-colors text-sm"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmReject}
+                disabled={!rejectionReason.trim()}
+                className="px-6 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 shadow-lg shadow-red-500/20 active:scale-95 transition-all flex items-center gap-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <XCircle size={18} /> Confirm Rejection
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={() => setIsRejecting(true)}
+                className="px-6 py-3 bg-white border border-gray-200 text-gray-700 font-bold rounded-xl hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors flex items-center gap-2 text-sm"
+              >
+                <XCircle size={18} /> Reject Request
+              </button>
+              <button
+                onClick={handleApproveVerification}
+                className="px-6 py-3 bg-[#1B4332] text-white font-bold rounded-xl hover:bg-[#143225] shadow-lg shadow-green-900/20 active:scale-95 transition-all flex items-center gap-2 text-sm"
+              >
+                <CheckCircle2 size={18} /> Approve Verification
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>
@@ -342,7 +396,7 @@ const VerificationsPendingView: React.FC = () => {
           documents: u.documents ?? [],
           certificates: u.certificates ?? [],
           workPhotos: u.workPhotos ?? [],
-
+          categories: u.categories ?? [],
           address: Array.isArray(u.address)
             ? u.address.map((a) => a.street).join(", ")
             : undefined,
@@ -371,10 +425,17 @@ const VerificationsPendingView: React.FC = () => {
     }
   };
 
-  const handleReject = async (req: PendingVerificationUser) => {
+  const handleReject = async (
+    req: PendingVerificationUser,
+    reason?: string
+  ) => {
     try {
       if (!req.userId) return;
-      const response = await rejectUserAction(req.userId);
+      if (!reason) {
+        alert("Rejection reason is required.");
+        return;
+      }
+      const response = await rejectUserAction(req.userId, reason);
       console.log("Rejected:", response);
       setSelectedRequest(null);
       window.location.reload();
@@ -428,11 +489,11 @@ const VerificationsPendingView: React.FC = () => {
       cell: (row) => (
         <div className="flex items-center gap-2 text-xs">
           <Clock size={14} className="text-gray-400" />
-          {new Date(row.createdAt).toLocaleDateString(undefined, {
+          {row.createdAt ? new Date(row.createdAt).toLocaleDateString(undefined, {
             year: "numeric",
             month: "short",
             day: "numeric",
-          })}
+          }) : "N/A"}
         </div>
       ),
     },

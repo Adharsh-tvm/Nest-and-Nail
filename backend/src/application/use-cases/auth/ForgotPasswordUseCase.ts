@@ -1,8 +1,8 @@
-import { IEmailService } from "../../services/IEmailService";
-import { IOtpService } from "../../services/IOtpService";
-import { ILogger } from "../../interfaces/ILogger";
+import { IEmailService } from "../../contracts/IEmailService";
+import { IOtpService } from "../../contracts/IOtpService";
+import { ILogger } from "../../../infrastructure/logger/ILogger";
 import { Role } from "../../../shared/enums/authEnums";
-import { IForgotPasswordUseCase } from "../../interfaces/IForgotPasswordUseCase";
+import { IForgotPasswordUseCase } from "../../interfaces/auth/IForgotPasswordUseCase";
 import { UserNotFoundError } from "../../../domain/errors/DomainError";
 import { IUserRepositoryFactory } from "../../../domain/repositories/IUserRepositoryFactory";
 import { IOtpRepository } from "../../../domain/repositories/IOtpRepository";

@@ -1,4 +1,5 @@
-// services/lib/axiosInstance.ts (or wherever your axiosInstance file is)
+"use server"
+
 import axios from "axios";
 import { cookies } from "next/headers";
 
@@ -34,7 +35,6 @@ axiosInstance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// RESPONSE INTERCEPTOR — normalizes server message + data
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {

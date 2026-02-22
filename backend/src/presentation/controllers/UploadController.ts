@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
 import { HttpStatusCode } from "../../shared/enums/httpCodes";
-import { IUploadProfilePictureUseCase } from "../../application/interfaces/IUploadProfilePictureUseCase";
-import { IUploadWorkerDocumentUseCase } from "../../application/interfaces/IUploadWorkerDocumentUseCase";
+import { IUploadProfilePictureUseCase } from "../../application/interfaces/user/IUploadProfilePictureUseCase";
+import { IUploadWorkerDocumentUseCase } from "../../application/interfaces/user/IUploadWorkerDocumentUseCase";
 import { IUploadController } from "../interfaces/IUploadController";
-import { ResponseHandler } from "../responses/ApiResponse";
-import { RESPONSE_MESSAGES } from "../responses/ResponseMessages";
+import { ResponseHandler } from "../../shared/responses/ApiResponse";
+import { RESPONSE_MESSAGES } from "../../shared/responses/ResponseMessages";
 
 export class UploadController implements IUploadController {
   constructor(
@@ -24,10 +24,11 @@ export class UploadController implements IUploadController {
 
       const result = await this._uploadProfilePictureUseCase.execute(
         workerId,
-        filePath
+        filePath,
+        req.file!.mimetype
       );
 
-      return res.status(HttpStatusCode.INTERNAL_SERVER).json(ResponseHandler.success(result.url, RESPONSE_MESSAGES.PROFILE_UPDATED))
+      return res.status(HttpStatusCode.OK).json(ResponseHandler.success(result.url, RESPONSE_MESSAGES.PROFILE_UPDATED))
     } catch (error: any) {
 
       return res.status(HttpStatusCode.INTERNAL_SERVER).json(ResponseHandler.error(RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR, error))
@@ -46,7 +47,8 @@ export class UploadController implements IUploadController {
 
       const result = await this._uploadDocumentUseCase.execute(
         workerId,
-        filePath
+        filePath,
+        req.file!.mimetype
       );
 
       return res.status(HttpStatusCode.OK).json(ResponseHandler.success(result, RESPONSE_MESSAGES.DOCUMENT_UPLOADED));

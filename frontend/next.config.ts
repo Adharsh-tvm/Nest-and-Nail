@@ -4,6 +4,14 @@ const nextConfig = {
 
   experimental: {
     isrMemoryCacheSize: 0,
+    serverActions: {
+      allowedOrigins: [
+        "localhost:3000",
+        "https://d2wls0qw-3000.inc1.devtunnels.ms/"
+        // Add your forwarded URL host here, e.g., "glowing-space-...-3000.app.github.dev"
+        // "192.168.1.13:3000", 
+      ],
+    },
   },
   // Allow cookies to be set from your backend
   async headers() {

@@ -6,6 +6,7 @@ import {
   UserNotFoundError
 } from "../../domain/errors/DomainError";
 import { ValidationError } from "../../application/validators/AuthValidator";
+import { env } from "../../config/env";
 
 export class AppError extends Error {
   public statusCode: number;
@@ -74,7 +75,7 @@ export function errorHandler(
   // Unknown errors
   res.status(HttpStatusCode.INTERNAL_SERVER).json({
     status: "error",
-    message: process.env.NODE_ENV === "production"
+    message: env.NODE_ENV === "production"
       ? "Internal server error"
       : err.message,
   });

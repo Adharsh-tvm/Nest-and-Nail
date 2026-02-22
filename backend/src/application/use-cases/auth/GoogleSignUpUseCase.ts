@@ -1,10 +1,10 @@
 import { User } from "../../../domain/entities/User";
 import { LoginMethod, Role } from "../../../shared/enums/authEnums";
-import { IGoogleSignUpUseCase } from "../../interfaces/IGoogleSignUpUseCase";
+import { IGoogleSignUpUseCase } from "../../interfaces/auth/IGoogleSignUpUseCase";
 import { UserMapper } from "../../mappers/UserMapper";
-import { IGenerateUserID } from "../../services/IGenerateUserID";
-import { IPasswordHasher } from "../../services/IPasswordHasher";
-import { ITokenService } from "../../services/ITokenService";
+import { IGenerateUserID } from "../../contracts/IGenerateUserID";
+import { IPasswordHasher } from "../../contracts/IPasswordHasher";
+import { ITokenService } from "../../contracts/ITokenService";
 import { IUserRepositoryFactory } from "../../../domain/repositories/IUserRepositoryFactory";
 import { UserBlockedError } from "../../../domain/errors/DomainError";
 
@@ -43,6 +43,7 @@ export class GoogleSignUpUseCase implements IGoogleSignUpUseCase {
                     passwordhash: hashedPassword,
                     role: role as Role,
                     isBlocked: false,
+                    isOnline: true,
                     loginMethod: LoginMethod.GOOGLE,
                     createdAt: new Date(),
                     updatedAt: new Date(),
@@ -50,7 +51,7 @@ export class GoogleSignUpUseCase implements IGoogleSignUpUseCase {
                 });
                 user = newUser
             }
-            if(user.isBlocked){
+            if (user.isBlocked) {
                 throw new UserBlockedError()
             }
 

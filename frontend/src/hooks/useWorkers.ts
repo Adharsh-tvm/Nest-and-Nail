@@ -1,11 +1,11 @@
 "use client";
 
-import { fetchAllWorkers, Worker } from "@/services/api/admin.api";
+import { fetchAllWorkers, Worker } from "@/sources/api/admin.api";
 import { useEffect, useState } from "react";
 
 
 type UseWorkersResult = {
-    workers: Worker[]; 
+    workers: Worker[];
     loading: boolean;
     error: string | null;
 };

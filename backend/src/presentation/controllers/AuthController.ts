@@ -2,15 +2,16 @@ import { Request, Response } from "express";
 import { HttpStatusCode } from "../../shared/enums/httpCodes";
 import { loggerInstance } from "../../infrastructure/logger/Logger";
 import { IAuthController } from "../interfaces/IAuthController";
-import { IRegisterUserUseCase } from "../../application/interfaces/IRegisterUserUseCase";
-import { ILoginUserUseCase } from "../../application/interfaces/ILoginUserUseCase";
-import { ISendOtpUseCase } from "../../application/interfaces/ISendOtpUseCase";
-import { IVerifyOtpUseCase } from "../../application/interfaces/IVerifyOtpUseCase";
-import { IForgotPasswordUseCase } from "../../application/interfaces/IForgotPasswordUseCase";
-import { IResetPasswordUseCase } from "../../application/interfaces/IResetPasswordUseCase";
-import { IRefreshTokenUseCase } from "../../application/interfaces/IRefreshTokenUseCase";
-import { ResponseHandler } from "../responses/ApiResponse";
-import { RESPONSE_MESSAGES } from "../responses/ResponseMessages";
+import { IRegisterUserUseCase } from "../../application/interfaces/auth/IRegisterUserUseCase";
+import { ILoginUserUseCase } from "../../application/interfaces/auth/ILoginUserUseCase";
+import { ISendOtpUseCase } from "../../application/interfaces/auth/ISendOtpUseCase";
+import { IVerifyOtpUseCase } from "../../application/interfaces/auth/IVerifyOtpUseCase";
+import { IForgotPasswordUseCase } from "../../application/interfaces/auth/IForgotPasswordUseCase";
+import { IResetPasswordUseCase } from "../../application/interfaces/auth/IResetPasswordUseCase";
+import { IRefreshTokenUseCase } from "../../application/interfaces/auth/IRefreshTokenUseCase";
+import { IValidateUserUseCase } from "../../application/interfaces/auth/IValidateUserUseCase";
+import { ResponseHandler } from "../../shared/responses/ApiResponse";
+import { RESPONSE_MESSAGES } from "../../shared/responses/ResponseMessages";
 
 export class AuthController implements IAuthController {
 
@@ -21,7 +22,8 @@ export class AuthController implements IAuthController {
     private readonly _verifyOtpUseCase: IVerifyOtpUseCase,
     private readonly _refreshTokenUseCase: IRefreshTokenUseCase,
     private readonly _forgotPasswordUseCase: IForgotPasswordUseCase,
-    private readonly _resetPasswordUseCase: IResetPasswordUseCase
+    private readonly _resetPasswordUseCase: IResetPasswordUseCase,
+    private readonly _validateUserUseCase: IValidateUserUseCase
   ) { }
 
   // ---------------- REGISTER ----------------
@@ -246,6 +248,47 @@ export class AuthController implements IAuthController {
     } catch (error: unknown) {
       res.status(HttpStatusCode.UNAUTHORIZED).json(
         ResponseHandler.error(RESPONSE_MESSAGES.INVALID_REFRESH_TOKEN, error)
+      );
+    }
+  }
+
+  // ---------------- VALIDATE ----------------
+  async validate(req: Request, res: Response): Promise<void> {
+    try {
+      // Assuming AuthMiddleware has already attached the user payload to req.user
+      // or we decode it here. Since middleware is used, req.user should be available.
+      // However, to be safe and consistent with the plan, we might extracting from token 
+      // or relying on middleware. 
+      // The plan says "GET /validate", and middleware will start implementing it.
+      // Let's assume the route is protected and req.user.id is available.
+
+      const userId = req.user?.id;
+
+      if (!userId) {
+        res.status(HttpStatusCode.UNAUTHORIZED).json(
+          ResponseHandler.error("Unauthorized")
+        );
+        return;
+      }
+
+      const result = await this._validateUserUseCase.execute(userId);
+
+      if (!result.success) {
+        res.status(HttpStatusCode.OK).json({ // Return 200 even if blocked, frontend handles logic
+          success: false,
+          message: result.message
+        });
+        return;
+      }
+
+      res.status(HttpStatusCode.OK).json({
+        success: true,
+        payload: result.payload
+      });
+
+    } catch (error: unknown) {
+      res.status(HttpStatusCode.INTERNAL_SERVER).json(
+        ResponseHandler.error("Internal Server Error", error)
       );
     }
   }

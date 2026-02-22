@@ -1,8 +1,9 @@
-import { IOtpService } from "../../services/IOtpService";
-import { ILogger } from "../../interfaces/ILogger";
+import { IOtpService } from "../../contracts/IOtpService";
+import { ILogger } from "../../../infrastructure/logger/ILogger";
 import { IOtpRepository } from "../../../domain/repositories/IOtpRepository";
+import { IVerifyOtpUseCase } from "../../interfaces/auth/IVerifyOtpUseCase";
 
-export class VerifyOtpUseCase {
+export class VerifyOtpUseCase implements IVerifyOtpUseCase {
     constructor(
         private readonly _otpService: IOtpService,
         private readonly _otpRepo: IOtpRepository,

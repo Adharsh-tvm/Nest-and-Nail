@@ -1,8 +1,8 @@
-import { ISendOtpUseCase } from "../../interfaces/ISendOtpUseCase";
-import { IEmailService } from "../../services/IEmailService";
-import { IOtpService } from "../../services/IOtpService";
+import { ISendOtpUseCase } from "../../interfaces/auth/ISendOtpUseCase";
+import { IEmailService } from "../../contracts/IEmailService";
+import { IOtpService } from "../../contracts/IOtpService";
 import { OtpRepository } from "../../../infrastructure/repo/OtpRepository";
-import { ILogger } from "../../interfaces/ILogger";
+import { ILogger } from "../../../infrastructure/logger/ILogger";
 import { Role } from "../../../shared/enums/authEnums";
 import { IUserRepositoryFactory } from "../../../domain/repositories/IUserRepositoryFactory";
 

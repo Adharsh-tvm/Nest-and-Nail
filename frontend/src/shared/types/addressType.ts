@@ -1,9 +1,18 @@
-export type Address = {
-  id: string;
-  label: string;        
+export type AddressLabel = "HOME" | "WORK" | "OTHER";
+
+export interface Address {
+  label: AddressLabel;
   street: string;
   city: string;
+  state: string;
+  country: string;
   zip: string;
-  isDefault: boolean;
-};
 
+  lat: number;
+  lng: number;
+
+  isDefault?: boolean;
+  addressId?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+}

@@ -1,7 +1,7 @@
 "use server"
 
 import axiosInstance from "@/lib/axiosInstance";
-import authApi from "@/services/api/auth.api";
+import authApi from "@/sources/api/auth.api";
 import { JwtPayload } from "@/shared/types/JwtPayload";
 import { jwtVerify } from "jose";
 import { cookies } from "next/headers";
@@ -78,6 +78,15 @@ export async function refreshTokens(refreshToken: string): Promise<boolean> {
     return true;
   } catch (error) {
     return false;
+  }
+}
+
+export async function validateUser() {
+  try {
+    const res = await authApi.validate();
+    return res.data;
+  } catch {
+    return null;
   }
 }
 

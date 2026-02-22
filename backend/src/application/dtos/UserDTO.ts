@@ -1,4 +1,5 @@
 import { Role, VerificationStatus } from "../../shared/enums/authEnums";
+import { AddressDTO } from "./AddressDTO";
 
 export interface UserRequestDTO {
     user_name: string;
@@ -16,15 +17,21 @@ export interface UserResponseDTO {
     user_role: Role;
     profileImageUrl?: string;
     isBlocked: boolean;
+    isOnline: boolean;
     isVerified: VerificationStatus;
 
     skills?: string[];
-    address?: string[];
+    address?: AddressDTO[];
     documents?: string[];
     certificates?: string[];
+    categories?: string[];
     workPhotos?: string[];
     createdAt?: string;
     updatedAt?: string;
+    rating?: number;
+    totalRatings?: number;
+    weeklyJobCount?: number;
+    currentActiveRequestId?: string;
 }
 
 
@@ -43,8 +50,15 @@ export interface LoginResponseDTO {
         phone_number?: number;
         profileImageUrl?: string | undefined;
         isBlocked: boolean;
+        isOnline: boolean;
         isVerified: VerificationStatus;
+        categories?: string[];
+        rating?: number;
+        totalRatings?: number;
+        weeklyJobCount?: number;
+        currentActiveRequestId?: string;
     };
     accessToken: string;
     refreshToken: string;
 }
+

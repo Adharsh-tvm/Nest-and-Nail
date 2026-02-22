@@ -11,7 +11,8 @@ export class UserRepositoryFactory implements IUserRepositoryFactory {
   constructor(
     private readonly _clientRepository: IBaseRepository<Client>,
     private readonly _workerRepository: IBaseRepository<Worker>,
-    private readonly _adminRepository: IBaseRepository<Admin>
+    private readonly _adminRepository: IBaseRepository<Admin>,
+    private readonly _userRepository: IBaseRepository<User>
   ) { }
 
   getRepository<T extends User>(role: Role): IBaseRepository<T> {
@@ -22,6 +23,8 @@ export class UserRepositoryFactory implements IUserRepositoryFactory {
         return this._workerRepository as IBaseRepository<T>;
       case Role.ADMIN:
         return this._adminRepository as IBaseRepository<T>;
+      case 'USER' as any: // Special case for all users
+        return this._userRepository as IBaseRepository<T>;
       default:
         throw new Error(`Unknown role: ${role}`);
     }
