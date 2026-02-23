@@ -1,7 +1,35 @@
-import mongoose from "mongoose";
+import mongoose, { Document } from "mongoose";
 import { ServiceRequestStatus } from "../../../shared/enums/serviceEnums";
 
-const ServiceRequestSchema = new mongoose.Schema(
+export interface IServiceRequestDocument extends Document {
+    requestId: string;
+    clientId: string;
+    title?: string;
+    description?: string;
+    category?: string;
+    location: {
+        type: string;
+        coordinates: [number, number];
+    };
+    serviceDate: Date;
+    budget?: number;
+    servicePhotos: string[];
+    status: ServiceRequestStatus;
+    assignedTo?: string;
+    triedWorkers: string[];
+    reservedBy?: string;
+    reservationExpiresAt?: Date;
+    client: {
+        name: string;
+        email: string;
+        phone?: number;
+        profilePictureUrl?: string;
+    };
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+const ServiceRequestSchema = new mongoose.Schema<IServiceRequestDocument>(
     {
         requestId: {
             type: String,
@@ -63,7 +91,7 @@ const ServiceRequestSchema = new mongoose.Schema(
 
 ServiceRequestSchema.index({ location: "2dsphere" });
 
-export const ServiceRequestModel = mongoose.model(
+export const ServiceRequestModel = mongoose.model<IServiceRequestDocument>(
     "ServiceRequest",
     ServiceRequestSchema
 )

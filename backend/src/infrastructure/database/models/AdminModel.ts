@@ -1,7 +1,11 @@
-import mongoose from "mongoose";
-import { Admin } from "../../../domain/entities/Admin";
-import { UserModel } from "./UserModel";
+import mongoose, { Document } from "mongoose";
+import { UserModel, IUserDocument } from "./UserModel";
 
-const adminSchema = new mongoose.Schema<Admin>({}, {});
+export interface IAdminDocument extends IUserDocument { }
 
-export const AdminModel = UserModel.discriminator<Admin>("admin", adminSchema);
+const adminSchema = new mongoose.Schema<IAdminDocument>(
+    {},
+    { _id: false }
+);
+
+export const AdminModel = UserModel.discriminator<IAdminDocument>("admin", adminSchema);

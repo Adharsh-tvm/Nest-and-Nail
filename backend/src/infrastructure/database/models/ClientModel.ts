@@ -1,9 +1,15 @@
-import mongoose from "mongoose";
-import { Client } from "../../../domain/entities/Client";
-import { UserModel } from "./UserModel";
+import { Schema } from "mongoose";
+import { IUserDocument, UserModel } from "./UserModel";
 
-const clientSchema = new mongoose.Schema<Client>({
-});
+export interface IClientDocument extends IUserDocument {}
 
+const clientSchema = new Schema<IClientDocument>(
+  {},
+  { _id: false }
+);
 
-export const ClientModel = UserModel.discriminator<Client>('client', clientSchema);
+export const ClientModel =
+  UserModel.discriminator<IClientDocument>(
+    "client",
+    clientSchema
+  );

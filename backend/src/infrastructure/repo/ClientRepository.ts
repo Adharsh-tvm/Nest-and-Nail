@@ -1,9 +1,9 @@
 import { Client } from "../../domain/entities/Client";
 import { IClientRepository } from "../../domain/repositories/IClientRepository";
-import { ClientModel } from "../database/models/ClientModel";
+import { ClientModel, IClientDocument } from "../database/models/ClientModel";
 import { BaseRepository } from "./BaseRepository";
 
-export class ClientRepository extends BaseRepository<Client> implements IClientRepository {
+export class ClientRepository extends BaseRepository<Client, IClientDocument> implements IClientRepository {
     constructor() {
         super(ClientModel);
     }
