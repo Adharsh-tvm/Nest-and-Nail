@@ -4,12 +4,12 @@ import { ServiceRequestStatus } from "../../../shared/enums/serviceEnums";
 import { IDispatchServiceRequestUseCase } from "../../interfaces/service-requests/IDispatchServiceRequestUseCase";
 
 
-export class DispatchServiceRequestUseCase implements IDispatchServiceRequestUseCase{
+export class DispatchServiceRequestUseCase implements IDispatchServiceRequestUseCase {
 
   constructor(
     private readonly workerRepo: IWorkerRepository,
     private readonly requestRepo: IServiceRequestRepository
-  ) {}
+  ) { }
 
   async execute(requestId: string): Promise<void> {
 

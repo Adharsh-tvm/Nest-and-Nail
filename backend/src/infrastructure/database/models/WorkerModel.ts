@@ -1,9 +1,15 @@
-import mongoose from "mongoose";
-import { Worker } from "../../../domain/entities/Worker";
-import { UserModel } from "./UserModel";
+import { Schema } from "mongoose";
+import { IUserDocument, UserModel } from "./UserModel";
 
-const workerSchema = new mongoose.Schema<Worker>({
+export interface IWorkerDocument extends IUserDocument {}
 
-});
+const workerSchema = new Schema<IWorkerDocument>(
+  {},
+  { _id: false }
+);
 
-export const WorkerModel = UserModel.discriminator<Worker>('worker', workerSchema);
+export const WorkerModel =
+  UserModel.discriminator<IWorkerDocument>(
+    "worker",
+    workerSchema
+  );

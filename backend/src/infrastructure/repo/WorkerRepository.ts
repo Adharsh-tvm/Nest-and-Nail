@@ -1,9 +1,9 @@
 import { Worker } from "../../domain/entities/Worker";
 import { IWorkerRepository } from "../../domain/repositories/IWorkerRepository";
-import { WorkerModel } from "../database/models/WorkerModel";
+import { WorkerModel, IWorkerDocument } from "../database/models/WorkerModel";
 import { BaseRepository } from "./BaseRepository";
 
-export class WorkerRepository extends BaseRepository<Worker> implements IWorkerRepository {
+export class WorkerRepository extends BaseRepository<Worker, IWorkerDocument> implements IWorkerRepository {
     constructor() {
         super(WorkerModel);
     }
@@ -54,7 +54,7 @@ export class WorkerRepository extends BaseRepository<Worker> implements IWorkerR
                     $maxDistance: maxDistance
                 }
             }
-        }).lean();
+        }).lean() as unknown as Worker[];
     }
 
     async reserveWorker(workerId: string): Promise<boolean> {
