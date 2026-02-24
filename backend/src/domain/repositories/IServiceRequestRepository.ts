@@ -31,5 +31,7 @@ export interface IServiceRequestRepository {
 
   markNoWorkersAvailable(requestId: string): Promise<void>;
 
+  findExpiredReservations(currentTime: Date): Promise<ServiceRequest[]>;
+
   delete(requestId: string): Promise<boolean>;
 }

@@ -23,7 +23,7 @@ export class AcceptServiceRequestUseCase implements IAcceptServiceRequestUseCase
             throw new DomainError("Service request not found", "REQUEST_NOT_FOUND");
         }
 
-        if (request.status !== ServiceRequestStatus.OPEN) {
+        if (request.status !== ServiceRequestStatus.RESERVED) {
             throw new DomainError(
                 "Service request is not open",
                 "INVALID_REQUEST_STATUS"
