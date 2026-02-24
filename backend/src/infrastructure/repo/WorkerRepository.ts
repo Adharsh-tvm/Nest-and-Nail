@@ -60,7 +60,7 @@ export class WorkerRepository extends BaseRepository<Worker, IWorkerDocument> im
     async reserveWorker(workerId: string): Promise<boolean> {
 
         const updated = await WorkerModel.findOneAndUpdate(
-            { userId: workerId, isAvailable: true },
+            { userId: workerId, isAvailable: true, currentActiveRequestId: null },
             { isAvailable: false },
             { new: true }
         );
