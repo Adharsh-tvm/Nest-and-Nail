@@ -13,6 +13,8 @@ import { createUserRoutes } from "./presentation/routes/user/user.routes";
 import { createUploadRoutes } from "./presentation/routes/user/upload.routes";
 import { createServiceRequestRoutes } from "./presentation/routes/serviceRequest/serviceRequest.routes";
 import { createMediaRoutes } from "./presentation/routes/user/media.routes";
+import http from "http";
+import { SocketServer } from "./infrastructure/socket/socketServer";
 
 
 
@@ -59,6 +61,10 @@ async function bootstrap() {
 
   // Error Handler
   app.use(errorHandler);
+
+  const server = http.createServer(app);
+
+  SocketServer.init(server);
 
   // Start server
   const PORT = env.PORT;

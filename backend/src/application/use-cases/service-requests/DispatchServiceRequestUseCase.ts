@@ -2,6 +2,7 @@ import { ServiceRequest } from "../../../domain/entities/ServiceRequest";
 import { Worker } from "../../../domain/entities/Worker";
 import { IServiceRequestRepository } from "../../../domain/repositories/IServiceRequestRepository";
 import { IWorkerRepository } from "../../../domain/repositories/IWorkerRepository";
+import { SocketServer } from "../../../infrastructure/socket/socketServer";
 import { ServiceRequestStatus } from "../../../shared/enums/serviceEnums";
 import { IDispatchServiceRequestUseCase } from "../../interfaces/service-requests/IDispatchServiceRequestUseCase";
 
@@ -56,6 +57,12 @@ export class DispatchServiceRequestUseCase implements IDispatchServiceRequestUse
       }
 
       await this._requestRepo.addTriedWorker(requestId, worker.userId);
+
+      SocketServer.getIO().to(worker.userId).emit("new-service-request", {
+        requestId,
+        expiresAt,
+      });
+
       return;
     }
 
@@ -104,4 +111,4 @@ export class DispatchServiceRequestUseCase implements IDispatchServiceRequestUse
       .sort((a, b) => b.score - a.score)
       .map(x => x.worker);
   }
-}
+} 
