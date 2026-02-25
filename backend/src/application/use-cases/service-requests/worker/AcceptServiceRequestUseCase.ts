@@ -7,6 +7,7 @@ import { IServiceRepository } from "../../../../domain/repositories/IServiceRepo
 import { DomainError } from "../../../../domain/errors/DomainError";
 import { ServiceRequestStatus } from "../../../../shared/enums/serviceEnums";
 import { PaymentStatus } from "../../../../shared/enums/paymentStatus";
+import { SocketServer } from "../../../../infrastructure/socket/socketServer";
 
 export class AcceptServiceRequestUseCase implements IAcceptServiceRequestUseCase {
     constructor(
@@ -72,6 +73,11 @@ export class AcceptServiceRequestUseCase implements IAcceptServiceRequestUseCase
             status: ServiceRequestStatus.CONFIRMED,
             reservedBy: undefined,
             reservationExpiresAt: undefined,
+        });
+
+        SocketServer.getIO().to(request.clientId).emit("service-confirmed", { 
+            requestId,
+            workerId
         });
 
         await this._workerRepo.updateById(workerId, {

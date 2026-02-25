@@ -14,5 +14,10 @@ export interface IServiceRepository {
     updateData: Partial<Service>
   ): Promise<Service | null>;
 
+  confirmReservation(
+    requestId: string,
+    workerId: string
+  ): Promise<boolean>;
+
   delete(serviceId: string): Promise<boolean>;
 }
