@@ -2,6 +2,7 @@
 import { Request, Response, NextFunction, RequestHandler } from "express";
 import { ITokenService } from "../../application/contracts/ITokenService";
 import { HttpStatusCode } from "../../shared/enums/httpCodes";
+import { Role } from "../../shared/enums/authEnums";
 
 declare global {
   namespace Express {
@@ -39,5 +40,17 @@ export class AuthMiddleware {
         .status(HttpStatusCode.FORBIDDEN)
         .json({ message: "Invalid or expired token" });
     }
+  };
+
+  public adminOnly: RequestHandler = (req: Request, res: Response, next: NextFunction) => {
+    this.verify(req, res, () => {
+      if (req.user && req.user.role === Role.ADMIN) {
+        next();
+      } else {
+        return res
+          .status(HttpStatusCode.FORBIDDEN)
+          .json({ message: "Admin access required" });
+      }
+    });
   };
 }
