@@ -3,7 +3,6 @@ import { AuthController } from "../../presentation/controllers/AuthController";
 import { CategoryController } from "../../presentation/controllers/CategoryController";
 import { GoogleAuthController } from "../../presentation/controllers/GoogleAuthController";
 import { MediaController } from "../../presentation/controllers/MediaController";
-import { ServiceRequestController } from "../../presentation/controllers/ServiceRequestController";
 import { UploadController } from "../../presentation/controllers/UploadController";
 import { UserController } from "../../presentation/controllers/UserController";
 import { UserProfileController } from "../../presentation/controllers/UserProfileController";
@@ -11,7 +10,6 @@ import { IAdminController } from "../../presentation/interfaces/IAdminController
 import { IAuthController } from "../../presentation/interfaces/IAuthController";
 import { ICategoryController } from "../../presentation/interfaces/ICategoryController";
 import { IGoogleAuthController } from "../../presentation/interfaces/IGoogleAuthController";
-import { IServiceRequestController } from "../../presentation/interfaces/IServiceRequestController";
 import { IUploadController } from "../../presentation/interfaces/IUploadController";
 import { IUserController } from "../../presentation/interfaces/IUserController";
 import { IUserProfileController } from "../../presentation/interfaces/IUserProfileController";
@@ -32,7 +30,6 @@ export class ControllerDI {
 
     private _categoryController?: ICategoryController;
 
-    private _serviceRequestController?: IServiceRequestController;
     private _mediaController?: MediaController;
 
     constructor(
@@ -129,20 +126,6 @@ export class ControllerDI {
             )
         }
         return this._categoryController
-    }
-
-    get serviceRequestController(): IServiceRequestController {
-        if (!this._serviceRequestController) {
-            this._serviceRequestController = new ServiceRequestController(
-                this._useCases.createServiceRequestUseCase,
-                this._useCases.getMyServiceRequestsUseCase,
-                this._useCases.getServiceRequestByIdUseCase,
-                this._useCases.getAllServiceRequestsUseCase,
-                this._useCases.deleteServiceRequestUseCase,
-                this._useCases.dispatchServiceRequestUseCase
-            )
-        }
-        return this._serviceRequestController;
     }
 
     get mediaController(): MediaController {

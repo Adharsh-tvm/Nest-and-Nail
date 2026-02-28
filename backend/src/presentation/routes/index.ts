@@ -5,7 +5,6 @@ import { createGoogleAuthRoutes } from "./auth/GoogleAuthRoutes";
 import { createAdminRoutes } from "./admin/adminRoutes";
 import { createUserRoutes } from "./user/user.routes";
 import { createUploadRoutes } from "./user/upload.routes";
-import { createServiceRequestRoutes } from "./serviceRequest/serviceRequest.routes";
 import { createMediaRoutes } from "./user/media.routes";
 
 export const createRoutes = (container: DIContainer): Router => {
@@ -22,8 +21,6 @@ export const createRoutes = (container: DIContainer): Router => {
   router.use("/api/upload", createUploadRoutes(container.controllers.uploadController, container.controllers.authMiddleware));
   
   router.use("/api/users", createUserRoutes(container.controllers.userController, container.controllers.userProfileController, container.controllers.authMiddleware));
-  
-  router.use("/api/service-requests", createServiceRequestRoutes(container.controllers.serviceRequestController, container.controllers.authMiddleware));
   
   router.use("/api/media", createMediaRoutes(container.controllers.mediaController));
 
