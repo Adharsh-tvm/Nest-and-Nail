@@ -24,8 +24,6 @@ import { JwtTokenService } from "../adapters/JwtTokenService";
 import { NodemailerEmailService } from "../adapters/NodemailerEmailService";
 import { OtpService } from "../adapters/OtpService";
 import { UUIDGenerator } from "../adapters/UUIDGenerator";
-import { IGenerateServiceRequestId } from "../../application/contracts/IGenerateServiceRequestId";
-import { ServiceRequestIdGenerator } from "../adapters/ServiceRequestIdGenerator";
 import { S3Service } from "../adapters/S3service";
 import { env } from "../../config/env";
 
@@ -47,8 +45,6 @@ export class InfrastructureDI {
   private _emailService?: IEmailService;
 
   private _categoryRepository?: ICategoryRepository;
-
-  private _serviceRequestIdGenerator?: IGenerateServiceRequestId;
 
   private _s3Service?: S3Service;
 
@@ -151,13 +147,6 @@ export class InfrastructureDI {
       this._emailService = new NodemailerEmailService();
     }
     return this._emailService;
-  }
-
-  get serviceRequestIdGenerator(): IGenerateServiceRequestId {
-    if (!this._serviceRequestIdGenerator) {
-      this._serviceRequestIdGenerator = new ServiceRequestIdGenerator();
-    }
-    return this._serviceRequestIdGenerator;
   }
 
   get s3Service(): S3Service {

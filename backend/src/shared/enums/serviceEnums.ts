@@ -1,4 +1,4 @@
-export enum ServiceRequestStatus {
+export enum ServiceStatus {
     OPEN = "OPEN",
     RESERVED = "RESERVED",
     CONFIRMED = "CONFIRMED",
