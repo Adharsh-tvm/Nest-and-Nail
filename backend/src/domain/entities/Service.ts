@@ -1,12 +1,9 @@
 import { PaymentStatus } from "../../shared/enums/paymentStatus";
-import { ServiceRequestStatus } from "../../shared/enums/serviceEnums";
+import { ServiceStatus } from "../../shared/enums/serviceEnums";
 
 export interface Service {
   id: string;
   serviceId: string;
-
-  // Relation
-  serviceRequestId: string;
 
   clientId: string;
   workerId: string;
@@ -25,7 +22,7 @@ export interface Service {
 
   agreedBudget?: number;
 
-  status: ServiceRequestStatus;
+  status: ServiceStatus;
 
   paymentStatus: PaymentStatus;
 
