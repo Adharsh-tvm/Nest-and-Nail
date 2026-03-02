@@ -9,6 +9,8 @@ export interface IWorkerRepository extends IBaseRepository<Worker> {
         maxDistance: number
     ): Promise<Worker[]>;
 
+    findOnlineWorkers(): Promise<Worker[]>;
+
     reserveWorker(workerId: string): Promise<boolean>;
 
     releaseWorker(workerId: string): Promise<void>;

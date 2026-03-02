@@ -71,3 +71,36 @@ export async function validateUser() {
     return null;
   }
 }
+
+export async function fetchOnlineWorkers(): Promise<User[]> {
+  try {
+    const data = await userApi.getOnlineWorkers();
+    if (!data.success || !data.payload) return [];
+
+    // Normalizing the response payload using similar logic as getCurrentUser if needed
+    return data.payload.map((u: any) => ({
+      id: u.userId, // Based on WorkerRepository response mapping
+      name: u.name,
+      email: u.email,
+      role: u.role,
+      isBlocked: Boolean(u.isBlocked),
+      isOnline: Boolean(u.isOnline),
+      isVerified: normalizeIsVerified(u.isVerified),
+      profileImageUrl: u.profilePictureUrl || u.profileImageUrl || null,
+      phone_number: u.phone, // Or u.phone_number
+      skills: u.skills ?? [],
+      address: u.address ?? [],
+      documents: u.documents ?? [],
+      certificates: u.certificates ?? [],
+      categories: u.categories ?? [],
+      workPhotos: u.workPhotos ?? [],
+      rating: u.rating ?? 0,
+      totalRatings: u.totalRatings ?? 0,
+      createdAt: u.createdAt,
+      updatedAt: u.updatedAt,
+    })) as User[];
+  } catch (err) {
+    console.error("[fetchOnlineWorkers] failed:", err);
+    return [];
+  }
+}

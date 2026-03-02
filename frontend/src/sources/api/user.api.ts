@@ -36,6 +36,15 @@ const userApi = {
     return response.data;
   },
 
+  getOnlineWorkers: async (): Promise<ApiResponse<User[]>> => {
+    const response = await axiosInstance.get<ApiResponse<User[]>>(
+      "/api/users/workers/online",
+      { withCredentials: true }
+    );
+    return response.data;
+  },
+
+
 
   updateSkills: async (
     userId: string,
