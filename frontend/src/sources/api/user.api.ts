@@ -65,7 +65,7 @@ const userApi = {
     categories: string[]
   ): Promise<ApiResponse<User>> => {
     const response = await axiosInstance.patch<ApiResponse<User>>(
-      `/api/users/${userId}/categories`,
+      `/api/users/categories/${userId}`,
       { categoryIds: categories },
       { withCredentials: true }
     );

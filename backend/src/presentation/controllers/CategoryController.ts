@@ -7,13 +7,16 @@ import { ResponseHandler } from "../../shared/responses/ApiResponse";
 import { RESPONSE_MESSAGES } from "../../shared/responses/ResponseMessages";
 import { HttpStatusCode } from "../../shared/enums/httpCodes";
 import { IUpdateCategoryStatusUseCase } from "../../application/interfaces/category/IUpdateCategoryStatusUseCase";
+import { IUpdateWorkerCategoriesUseCase } from "../../application/interfaces/worker/profile/IUpdateWorkerCategoriesUseCase";
+
 
 export class CategoryController implements ICategoryController {
     constructor(
         private readonly _createCategoryUseCase: ICreateCategoryUseCase,
         private readonly _getAllCategoriesUseCase: IGetAllCategoriesUseCase,
         private readonly _updateCategoryUseCase: IUpdateCategoryUseCase,
-        private readonly _updateCategoryStatusUseCase: IUpdateCategoryStatusUseCase
+        private readonly _updateCategoryStatusUseCase: IUpdateCategoryStatusUseCase,
+        private readonly _updateWorkerCategoriesUseCase: IUpdateWorkerCategoriesUseCase
     ) { }
 
     create = async (req: Request, res: Response) => {
@@ -61,4 +64,28 @@ export class CategoryController implements ICategoryController {
             ResponseHandler.success(updatedCategory, RESPONSE_MESSAGES.UPDATED)
         );
     };
+
+    updateUserCategories = async (req: Request, res: Response): Promise<void> => {
+        const userId = req.params.userId;
+        const { categoryIds } = req.body;
+
+        if (!Array.isArray(categoryIds)) {
+            res.status(HttpStatusCode.BAD_REQUEST).json(
+                ResponseHandler.error("categoryIds must be an array")
+            );
+            return;
+        }
+
+        const updatedUser = await this._updateWorkerCategoriesUseCase.execute(
+            userId,
+            categoryIds
+        );
+
+        res.status(HttpStatusCode.OK).json(
+            ResponseHandler.success(
+                updatedUser,
+                RESPONSE_MESSAGES.UPDATED
+            )
+        );
+    }
 }
