@@ -80,6 +80,7 @@ export class ControllerDI {
             this._userController = new UserController(
                 this._useCases.changeUserRoleUseCase,
                 this._useCases.getCurrentUserUseCase,
+                this._useCases.getOnlineWorkersUseCase
             )
         }
         return this._userController;

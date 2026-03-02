@@ -57,6 +57,14 @@ export class WorkerRepository extends BaseRepository<Worker, IWorkerDocument> im
         }).lean() as unknown as Worker[];
     }
 
+    async findOnlineWorkers(): Promise<Worker[]> {
+        return await WorkerModel.find({
+            role: "WORKER",
+            isOnline: true,
+            isBlocked: false
+        }).lean() as unknown as Worker[];
+    }
+
     async reserveWorker(workerId: string): Promise<boolean> {
 
         const updated = await WorkerModel.findOneAndUpdate(
