@@ -107,7 +107,6 @@ export class ControllerDI {
             this._userProfileController = new UserProfileController(
                 this._useCases.updateUserProfileUseCase,
                 this._useCases.updateUserSkillsUseCase,
-                this._useCases.updateWorkerCategoriesUseCase,
                 this._useCases.addUserAddressUseCase,
                 this._useCases.editUserAddressUseCase,
                 this._useCases.deleteUserAddressUseCase
@@ -123,6 +122,7 @@ export class ControllerDI {
                 this._useCases.getAllCategoriesUseCase,
                 this._useCases.updateCategoryUseCase,
                 this._useCases.updateCategoryStatusUseCase,
+                this._useCases.updateWorkerCategoriesUseCase
             )
         }
         return this._categoryController

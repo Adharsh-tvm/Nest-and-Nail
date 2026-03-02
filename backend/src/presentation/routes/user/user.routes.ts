@@ -52,13 +52,5 @@ export function createUserRoutes(
         userProfileController.deleteAddress
     );
 
-    router.patch(
-        "/:userId/categories",
-        authMiddleware.verify,
-        userProfileController.updateCategories
-    );
-
-
-
     return router;
 }
