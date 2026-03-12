@@ -30,5 +30,5 @@ export interface User {
     isAvailable?: boolean;
     weeklyJobCount?: number;
     lastAssignedAt?: Date;
-    currentActiveRequestId?: string;
+    currentActiveRequestId?: string | null;
 }

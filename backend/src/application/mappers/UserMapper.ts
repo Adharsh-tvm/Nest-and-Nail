@@ -60,7 +60,7 @@ export class UserMapper {
             rating: userData.rating ?? 0,
             totalRatings: userData.totalRatings ?? 0,
             weeklyJobCount: userData.weeklyJobCount ?? 0,
-            currentActiveRequestId: userData.currentActiveRequestId,
+            currentActiveRequestId: userData.currentActiveRequestId ?? undefined,
 
             createdAt: userData.createdAt?.toISOString?.() ?? "",
             updatedAt: userData.updatedAt?.toISOString?.() ?? "",

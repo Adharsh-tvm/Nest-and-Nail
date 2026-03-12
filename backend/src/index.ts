@@ -3,16 +3,12 @@ import { env } from "./config/env";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { connectDB } from "./infrastructure/database/connection";
-import { createAuthRoutes } from "./presentation/routes/auth/authRoutes";
 import { errorHandler } from "./presentation/middlewares/ErrorHandler";
 import { RequestLogger } from "./presentation/middlewares/RequestLogger";
 import { DIContainer } from "./infrastructure/di/DIContainer";
-import { createGoogleAuthRoutes } from "./presentation/routes/auth/GoogleAuthRoutes";
-import { createAdminRoutes } from "./presentation/routes/admin/adminRoutes";
-import { createUserRoutes } from "./presentation/routes/user/user.routes";
-import { createUploadRoutes } from "./presentation/routes/user/upload.routes";
-import { createServiceRequestRoutes } from "./presentation/routes/serviceRequest/serviceRequest.routes";
-import { createMediaRoutes } from "./presentation/routes/user/media.routes";
+import { createRoutes } from "./presentation/routes";
+import http from "http";
+import { SocketServer } from "./infrastructure/socket/socketServer";
 
 
 
@@ -41,24 +37,14 @@ async function bootstrap() {
   const container = new DIContainer();
 
   // Routes
-  app.use("/api/auth", createAuthRoutes(container.controllers.authController, container.controllers.authMiddleware));
-
-  app.use("/api/auth", createGoogleAuthRoutes(container.controllers.googleAuthController));
-
-  app.use("/api/auth", createUserRoutes(container.controllers.userController, container.controllers.userProfileController, container.controllers.authMiddleware));
-
-  app.use("/api/admin", createAdminRoutes(container.controllers.adminController, container.controllers.categoryController, container.controllers.authMiddleware));
-
-  app.use("/api/upload", createUploadRoutes(container.controllers.uploadController, container.controllers.authMiddleware));
-
-  app.use("/api/users", createUserRoutes(container.controllers.userController, container.controllers.userProfileController, container.controllers.authMiddleware))
-
-  app.use("/api/service-requests", createServiceRequestRoutes(container.controllers.serviceRequestController, container.controllers.authMiddleware))
-
-  app.use("/api/media", createMediaRoutes(container.controllers.mediaController))
+  app.use("/", createRoutes(container));
 
   // Error Handler
   app.use(errorHandler);
+
+  const server = http.createServer(app);
+
+  SocketServer.init(server);
 
   // Start server
   const PORT = env.PORT;

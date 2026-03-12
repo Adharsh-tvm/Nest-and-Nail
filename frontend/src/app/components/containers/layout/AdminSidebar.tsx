@@ -40,7 +40,7 @@ const navItems = [
     icon: ShieldCheck,
     href: "/admin/verification",
   },
-  { id: "service-requests", label: "Services", icon: Wrench, href: "/admin/service-requests" },
+
   {
     id: "payments",
     label: "Payments",
@@ -116,8 +116,8 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
               </div>
               <div
                 className={`transition-all duration-300 ${isOpen
-                    ? "opacity-100 translate-x-0"
-                    : "opacity-0 -translate-x-4 lg:hidden"
+                  ? "opacity-100 translate-x-0"
+                  : "opacity-0 -translate-x-4 lg:hidden"
                   }`}
               >
                 <h1 className="text-[#1B4332] font-black text-xl tracking-tight whitespace-nowrap">
@@ -149,8 +149,8 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
                     >
                       <div
                         className={`group relative flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-300 cursor-pointer overflow-hidden ${isActive
-                            ? "bg-[#1B4332] text-white shadow-lg shadow-[#1B4332]/25"
-                            : "hover:bg-emerald-50 text-gray-500 hover:text-[#1B4332]"
+                          ? "bg-[#1B4332] text-white shadow-lg shadow-[#1B4332]/25"
+                          : "hover:bg-emerald-50 text-gray-500 hover:text-[#1B4332]"
                           } ${!isOpen ? "lg:justify-center lg:px-0" : ""}`}
                         title={!isOpen ? item.label : ""}
                       >
@@ -161,14 +161,14 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
 
                         <Icon
                           className={`w-5 h-5 flex-shrink-0 transition-transform duration-300 ${isActive
-                              ? "text-white"
-                              : "text-gray-400 group-hover:text-[#1B4332] group-hover:scale-110"
+                            ? "text-white"
+                            : "text-gray-400 group-hover:text-[#1B4332] group-hover:scale-110"
                             }`}
                         />
                         <span
                           className={`font-semibold text-sm whitespace-nowrap transition-all duration-300 ${isOpen
-                              ? "opacity-100 translate-x-0"
-                              : "opacity-0 -translate-x-4 lg:hidden"
+                            ? "opacity-100 translate-x-0"
+                            : "opacity-0 -translate-x-4 lg:hidden"
                             }`}
                         >
                           {item.label}
@@ -200,21 +200,21 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
                     >
                       <div
                         className={`group flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-300 cursor-pointer ${isActive
-                            ? "bg-[#1B4332] text-white shadow-lg shadow-[#1B4332]/25"
-                            : "hover:bg-emerald-50 text-gray-500 hover:text-[#1B4332]"
+                          ? "bg-[#1B4332] text-white shadow-lg shadow-[#1B4332]/25"
+                          : "hover:bg-emerald-50 text-gray-500 hover:text-[#1B4332]"
                           } ${!isOpen ? "lg:justify-center lg:px-0" : ""}`}
                         title={!isOpen ? item.label : ""}
                       >
                         <Icon
                           className={`w-5 h-5 flex-shrink-0 transition-transform duration-300 ${isActive
-                              ? "text-white"
-                              : "text-gray-400 group-hover:text-[#1B4332] group-hover:scale-110"
+                            ? "text-white"
+                            : "text-gray-400 group-hover:text-[#1B4332] group-hover:scale-110"
                             }`}
                         />
                         <span
                           className={`font-semibold text-sm whitespace-nowrap transition-all duration-300 ${isOpen
-                              ? "opacity-100 translate-x-0"
-                              : "opacity-0 -translate-x-4 lg:hidden"
+                            ? "opacity-100 translate-x-0"
+                            : "opacity-0 -translate-x-4 lg:hidden"
                             }`}
                         >
                           {item.label}
@@ -233,8 +233,8 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
                   <LogOut className="w-5 h-5 flex-shrink-0 text-gray-400 group-hover:text-red-600 group-hover:-translate-x-1 transition-transform" />
                   <span
                     className={`font-semibold text-sm whitespace-nowrap transition-all duration-300 ${isOpen
-                        ? "opacity-100 translate-x-0"
-                        : "opacity-0 -translate-x-4 lg:hidden"
+                      ? "opacity-100 translate-x-0"
+                      : "opacity-0 -translate-x-4 lg:hidden"
                       }`}
                   >
                     Logout
@@ -247,8 +247,8 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
           {/* Premium Card for Sidebar (Only visible when open) */}
           <div
             className={`p-4 transition-all duration-300 ${isOpen
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-10 lg:hidden"
+              ? "opacity-100 translate-y-0"
+              : "opacity-0 translate-y-10 lg:hidden"
               }`}
           ></div>
         </div>

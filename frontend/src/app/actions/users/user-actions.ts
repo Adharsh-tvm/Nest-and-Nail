@@ -2,6 +2,7 @@
 
 import { cookies } from "next/headers";
 import userApi from "@/sources/api/user.api";
+import { fetchAllCategories } from "@/sources/api/category.api";
 import { VerificationStatus } from "@/shared/enums/authEnums";
 import { ApiResponse } from "@/shared/types/responseTypes";
 import { User } from "@/shared/types/userTypes";
@@ -69,5 +70,52 @@ export async function validateUser() {
     return res.data;
   } catch {
     return null;
+  }
+}
+
+export async function fetchOnlineWorkers(): Promise<User[]> {
+  try {
+    const data = await userApi.getOnlineWorkers();
+    if (!data.success || !data.payload) return [];
+
+    // Fetch categories to map IDs to names
+    let categoryMap: Record<string, string> = {};
+    try {
+      const categories = await fetchAllCategories();
+      categoryMap = categories.reduce((acc, cat) => {
+        if (cat.id) acc[cat.id.toLowerCase()] = cat.name;
+        // In case id is returned as `_id` instead
+        if ((cat as any)._id) acc[(cat as any)._id.toLowerCase()] = cat.name;
+        return acc;
+      }, {} as Record<string, string>);
+    } catch (e) {
+      console.error("[fetchOnlineWorkers] Failed to fetch categories for mapping", e);
+    }
+
+    // Normalizing the response payload using similar logic as getCurrentUser if needed
+    return data.payload.map((u: any) => ({
+      id: u.userId, // Based on WorkerRepository response mapping
+      name: u.name,
+      email: u.email,
+      role: u.role,
+      isBlocked: Boolean(u.isBlocked),
+      isOnline: Boolean(u.isOnline),
+      isVerified: normalizeIsVerified(u.isVerified),
+      profileImageUrl: u.profileImageUrl || u.profilePictureUrl || u.profilePicture || u.profile_image_url || u.profile_picture || null,
+      phone_number: u.phone, // Or u.phone_number
+      skills: u.skills ?? [],
+      address: u.address ?? [],
+      documents: u.documents ?? [],
+      certificates: u.certificates ?? [],
+      categories: (u.categories ?? []).map((catId: string) => categoryMap[catId.toLowerCase()] || catId),
+      workPhotos: u.workPhotos ?? [],
+      rating: u.rating ?? 0,
+      totalRatings: u.totalRatings ?? 0,
+      createdAt: u.createdAt,
+      updatedAt: u.updatedAt,
+    })) as User[];
+  } catch (err) {
+    console.error("[fetchOnlineWorkers] failed:", err);
+    return [];
   }
 }

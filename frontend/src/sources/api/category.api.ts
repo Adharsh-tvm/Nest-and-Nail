@@ -3,7 +3,7 @@ import { ApiResponse } from "@/shared/types/responseTypes";
 import { Category, CategoryInput } from "@/shared/types/categoryTypes";
 
 export async function fetchAllCategories(): Promise<Category[]> {
-    const res = await axiosInstance.get<ApiResponse<Category[]>>("/api/admin/categories");
+    const res = await axiosInstance.get<ApiResponse<Category[]>>("/api/users/categories");
     if (!res.data.success) {
         throw new Error(res.data.message || "Failed to fetch categories");
     }

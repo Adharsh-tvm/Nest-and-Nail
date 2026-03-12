@@ -17,6 +17,8 @@ export function createUserRoutes(
         (req, res) => userController.changeRole(req, res)
     );
 
+    router.get("/workers/online", (req, res) => userController.getOnlineWorkers(req, res));
+
     router.get("/current/:email", (req, res) =>
         userController.getCurrentUser(req, res)
     );
@@ -51,14 +53,6 @@ export function createUserRoutes(
         authMiddleware.verify,
         userProfileController.deleteAddress
     );
-
-    router.patch(
-        "/:userId/categories",
-        authMiddleware.verify,
-        userProfileController.updateCategories
-    );
-
-
 
     return router;
 }
