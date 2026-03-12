@@ -19,6 +19,8 @@ import { IUpdateUserProfileUseCase } from "../../application/interfaces/user/IUp
 import { IUpdateUserSkillsUseCase } from "../../application/interfaces/user/IUpdateUserSkillsUseCase";
 import { IUpdateVerificationStatusUseCase } from "../../application/interfaces/admin/IUpdateVerificationStatusUseCase";
 import { IUpdateWorkerCategoriesUseCase } from "../../application/interfaces/worker/profile/IUpdateWorkerCategoriesUseCase";
+import { IGetOnlineWorkersUseCase } from "../../application/interfaces/worker/IGetOnlineWorkersUseCase";
+
 import { IUploadProfilePictureUseCase } from "../../application/interfaces/user/IUploadProfilePictureUseCase";
 import { IUploadWorkerDocumentUseCase } from "../../application/interfaces/user/IUploadWorkerDocumentUseCase";
 import { IValidateUserUseCase } from "../../application/interfaces/auth/IValidateUserUseCase";
@@ -47,29 +49,19 @@ import { GetCurrentUserUseCase } from "../../application/use-cases/user/GetCurre
 import { UpdateUserProfileUseCase } from "../../application/use-cases/user/UpdateUserProfileUseCase";
 import { UpdateUserSkillsUseCase } from "../../application/use-cases/user/UpdateUserSkillsUseCase";
 import { UpdateWorkerCategoriesUseCase } from "../../application/use-cases/worker/profile/UpdateWorkerCategoriesUseCase";
+import { GetOnlineWorkersUseCase } from "../../application/use-cases/worker/GetOnlineWorkersUseCase";
+
 import { UploadWorkerDocumentUseCase } from "../../application/use-cases/user/UploadWorkerDocumentUseCase";
 import { InfrastructureDI } from "./infrastructure.di";
-import { ICreateServiceRequestUseCase } from "../../application/interfaces/service-requests/client/ICreateServiceRequestUseCase ";
-import { CreateServiceRequestUseCase } from "../../application/use-cases/service-requests/client/CreateServiceRequestUseCase";
-import { IGetMyServiceRequestsUseCase } from "../../application/interfaces/service-requests/client/IGetMyServiceRequestsUseCase";
-import { GetMyServiceRequestsUseCase } from "../../application/use-cases/service-requests/client/GetMyServiceRequestsUseCase";
 
-import { IGetServiceRequestByIdUseCase } from "../../application/interfaces/service-requests/IGetServiceRequestByIdUseCase";
-import { GetServiceRequestByIdUseCase } from "../../application/use-cases/service-requests/GetServiceRequestByIdUseCase";
-import { IGetAllServiceRequestsUseCase } from "../../application/interfaces/service-requests/admin/IGetAllServiceRequestsUseCase";
-import { GetAllServiceRequestsUseCase } from "../../application/use-cases/service-requests/admin/GetAllServiceRequestsUseCase";
 import { IAddUserAddressUseCase } from "../../application/interfaces/address/IUpdateUserAddressUseCase";
 import { IEditUserAddressUseCase } from "../../application/interfaces/address/IEditUserAddressUseCase";
 import { IDeleteUserAddressUseCase } from "../../application/interfaces/address/IDeleteUserAddressUseCase";
 import { AddUserAddressUseCase } from "../../application/use-cases/address/AddUserAddressUseCase";
 import { EditUserAddressUseCase } from "../../application/use-cases/address/EditUserAddressUseCase";
 import { DeleteUserAddressUseCase } from "../../application/use-cases/address/DeleteUserAddressUseCase";
-import { IDeleteServiceRequestUseCase } from "../../application/interfaces/service-requests/client/IDeleteServiceRequestUseCase";
-import { DeleteServiceRequestUseCase } from "../../application/use-cases/service-requests/client/DeleteServiceRequestUseCase";
 import { IGetS3UploadUrlUseCase } from "../../application/interfaces/media/IGetS3UploadUrlUseCase";
 import { GetS3UploadUrlUseCase } from "../../application/use-cases/media/GetS3UploadUrlUseCase";
-import { IDispatchServiceRequestUseCase } from "../../application/interfaces/service-requests/IDispatchServiceRequestUseCase";
-import { DispatchServiceRequestUseCase } from "../../application/use-cases/service-requests/DispatchServiceRequestUseCase";
 
 
 export class UseCaseDI {
@@ -111,15 +103,10 @@ export class UseCaseDI {
   private _editUserAddressUseCase?: IEditUserAddressUseCase;
   private _deleteUserAddressUseCase?: IDeleteUserAddressUseCase;
 
-  private _createServiceRequestUseCase?: ICreateServiceRequestUseCase;
-  private _getMyServiceRequestsUseCase?: IGetMyServiceRequestsUseCase;
-  private _getServiceRequestByIdUseCase?: IGetServiceRequestByIdUseCase;
-  private _getAllServiceRequestsUseCase?: IGetAllServiceRequestsUseCase;
-  private _deleteServiceRequestUseCase?: IDeleteServiceRequestUseCase;
-  private _dispatchServiceRequestUseCase?: IDispatchServiceRequestUseCase
-
 
   private _getS3UploadUrlUseCase?: IGetS3UploadUrlUseCase;
+  private _getOnlineWorkersUseCase?: IGetOnlineWorkersUseCase;
+
 
 
   constructor(private infra: InfrastructureDI) { }
@@ -411,58 +398,6 @@ export class UseCaseDI {
     return this._updateWorkerCategoriesUseCase
   }
 
-  get createServiceRequestUseCase(): ICreateServiceRequestUseCase {
-    if (!this._createServiceRequestUseCase) {
-      this._createServiceRequestUseCase = new CreateServiceRequestUseCase(
-        this.infra.serviceRequestRepository,
-        this.infra.serviceRequestIdGenerator,
-        this.infra.clientRepository
-      )
-    }
-    return this._createServiceRequestUseCase
-  }
-
-  get getMyServiceRequestsUseCase(): IGetMyServiceRequestsUseCase {
-    if (!this._getMyServiceRequestsUseCase) {
-      this._getMyServiceRequestsUseCase = new GetMyServiceRequestsUseCase(
-        this.infra.serviceRequestRepository,
-        this.infra.s3Service
-      )
-    }
-    return this._getMyServiceRequestsUseCase;
-  }
-
-
-
-  get getServiceRequestByIdUseCase(): IGetServiceRequestByIdUseCase {
-    if (!this._getServiceRequestByIdUseCase) {
-      this._getServiceRequestByIdUseCase = new GetServiceRequestByIdUseCase(
-        this.infra.serviceRequestRepository,
-        this.infra.s3Service
-      )
-    }
-    return this._getServiceRequestByIdUseCase
-  }
-
-  get getAllServiceRequestsUseCase(): IGetAllServiceRequestsUseCase {
-    if (!this._getAllServiceRequestsUseCase) {
-      this._getAllServiceRequestsUseCase = new GetAllServiceRequestsUseCase(
-        this.infra.serviceRequestRepository,
-        this.infra.s3Service
-      )
-    }
-    return this._getAllServiceRequestsUseCase;
-  }
-
-  get deleteServiceRequestUseCase(): IDeleteServiceRequestUseCase {
-    if (!this._deleteServiceRequestUseCase) {
-      this._deleteServiceRequestUseCase = new DeleteServiceRequestUseCase(
-        this.infra.serviceRequestRepository
-      )
-    }
-    return this._deleteServiceRequestUseCase
-  }
-
   get getS3UploadUrlUseCase(): IGetS3UploadUrlUseCase {
     if (!this._getS3UploadUrlUseCase) {
       this._getS3UploadUrlUseCase = new GetS3UploadUrlUseCase(
@@ -472,13 +407,13 @@ export class UseCaseDI {
     return this._getS3UploadUrlUseCase;
   }
 
-  get dispatchServiceRequestUseCase(): IDispatchServiceRequestUseCase {
-    if (!this._dispatchServiceRequestUseCase) {
-      this._dispatchServiceRequestUseCase = new DispatchServiceRequestUseCase(
-        this.infra.workerRepository,
-        this.infra.serviceRequestRepository
+  get getOnlineWorkersUseCase(): IGetOnlineWorkersUseCase {
+    if (!this._getOnlineWorkersUseCase) {
+      this._getOnlineWorkersUseCase = new GetOnlineWorkersUseCase(
+        this.infra.workerRepository
       );
     }
-    return this._dispatchServiceRequestUseCase
+    return this._getOnlineWorkersUseCase;
   }
+
 }

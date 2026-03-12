@@ -15,7 +15,6 @@ export class UserProfileController implements IUserProfileController {
     constructor(
         private readonly _updateUserProfileUseCase: IUpdateUserProfileUseCase,
         private readonly _updateUserSkillsUseCase: IUpdateUserSkillsUseCase,
-        private readonly _updateWorkerCategoriesUseCase: IUpdateWorkerCategoriesUseCase,
         private readonly _addUserAddressUseCase: IAddUserAddressUseCase,
         private readonly _editUserAddressUseCase: IEditUserAddressUseCase,
         private readonly _deleteUserAddressUseCase: IDeleteUserAddressUseCase,
@@ -89,30 +88,6 @@ export class UserProfileController implements IUserProfileController {
                 )
             )
         }
-    }
-
-    updateCategories = async (req: Request, res: Response): Promise<void> => {
-        const userId = req.params.userId;
-        const { categoryIds } = req.body;
-
-        if (!Array.isArray(categoryIds)) {
-            res.status(HttpStatusCode.BAD_REQUEST).json(
-                ResponseHandler.error("categoryIds must be an array")
-            );
-            return;
-        }
-
-        const updatedUser = await this._updateWorkerCategoriesUseCase.execute(
-            userId,
-            categoryIds
-        );
-
-        res.status(HttpStatusCode.OK).json(
-            ResponseHandler.success(
-                updatedUser,
-                RESPONSE_MESSAGES.UPDATED
-            )
-        );
     }
 
     addAddress = async (req: Request, res: Response): Promise<Response> => {

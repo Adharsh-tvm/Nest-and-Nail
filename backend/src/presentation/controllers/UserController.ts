@@ -3,12 +3,13 @@ import { HttpStatusCode } from "../../shared/enums/httpCodes";
 import { IUserController } from "../interfaces/IUserController";
 import { IChangeUserRoleUseCase } from "../../application/interfaces/user/IChangeUserRoleUseCase";
 import { IGetCurrentUserUseCase } from "../../application/interfaces/user/IGetCurrentUserUseCase";
+import { IGetOnlineWorkersUseCase } from "../../application/interfaces/worker/IGetOnlineWorkersUseCase";
+
 import {
     AuthenticationError,
     UserBlockedError,
     UserNotFoundError
 } from "../../domain/errors/DomainError";
-import { IGetAllUsersUseCase } from "../../application/interfaces/admin/IGetAllUsersUseCase";
 import { ResponseHandler } from "../../shared/responses/ApiResponse";
 import { LoginResponseDTO } from "../../application/dtos/UserDTO";
 import { RESPONSE_MESSAGES } from "../../shared/responses/ResponseMessages";
@@ -18,7 +19,9 @@ export class UserController implements IUserController {
     constructor(
         private readonly _changeUserRoleUseCase: IChangeUserRoleUseCase,
         private readonly _getCurrentUserUseCase: IGetCurrentUserUseCase,
+        private readonly _getOnlineWorkersUseCase: IGetOnlineWorkersUseCase,
     ) { }
+
 
     changeRole = async (req: Request, res: Response): Promise<Response> => {
         try {
@@ -44,8 +47,6 @@ export class UserController implements IUserController {
             );
         }
     };
-
-
 
     getCurrentUser = async (req: Request, res: Response): Promise<Response> => {
         try {
@@ -82,5 +83,19 @@ export class UserController implements IUserController {
             );
         }
     };
+
+    getOnlineWorkers = async (req: Request, res: Response): Promise<Response> => {
+        try {
+            const workers = await this._getOnlineWorkersUseCase.execute();
+            return res.status(HttpStatusCode.OK).json(
+                ResponseHandler.success(workers, "Online workers fetched successfully")
+            );
+        } catch (error: unknown) {
+            return res.status(HttpStatusCode.INTERNAL_SERVER).json(
+                ResponseHandler.error(RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR, error)
+            );
+        }
+    };
+
 
 }
