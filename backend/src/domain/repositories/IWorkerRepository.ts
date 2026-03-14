@@ -3,6 +3,6 @@ import { IBaseRepository } from "./IBaseRepository";
 
 export interface IWorkerRepository extends IBaseRepository<Worker> {
 
-    findOnlineWorkers(): Promise<Worker[]>;
+    
 
 }

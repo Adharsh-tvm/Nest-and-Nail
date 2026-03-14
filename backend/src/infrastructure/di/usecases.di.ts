@@ -49,7 +49,6 @@ import { GetCurrentUserUseCase } from "../../application/use-cases/user/GetCurre
 import { UpdateUserProfileUseCase } from "../../application/use-cases/user/UpdateUserProfileUseCase";
 import { UpdateUserSkillsUseCase } from "../../application/use-cases/user/UpdateUserSkillsUseCase";
 import { UpdateWorkerCategoriesUseCase } from "../../application/use-cases/worker/profile/UpdateWorkerCategoriesUseCase";
-import { GetOnlineWorkersUseCase } from "../../application/use-cases/worker/GetOnlineWorkersUseCase";
 
 import { UploadWorkerDocumentUseCase } from "../../application/use-cases/user/UploadWorkerDocumentUseCase";
 import { InfrastructureDI } from "./infrastructure.di";
@@ -405,15 +404,6 @@ export class UseCaseDI {
       );
     }
     return this._getS3UploadUrlUseCase;
-  }
-
-  get getOnlineWorkersUseCase(): IGetOnlineWorkersUseCase {
-    if (!this._getOnlineWorkersUseCase) {
-      this._getOnlineWorkersUseCase = new GetOnlineWorkersUseCase(
-        this.infra.workerRepository
-      );
-    }
-    return this._getOnlineWorkersUseCase;
   }
 
 }

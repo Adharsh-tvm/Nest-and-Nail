@@ -17,7 +17,6 @@ export function createUserRoutes(
         (req, res) => userController.changeRole(req, res)
     );
 
-    router.get("/workers/online", (req, res) => userController.getOnlineWorkers(req, res));
 
     router.get("/current/:email", (req, res) =>
         userController.getCurrentUser(req, res)

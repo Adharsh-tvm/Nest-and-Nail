@@ -3,7 +3,6 @@ import { HttpStatusCode } from "../../shared/enums/httpCodes";
 import { IUserController } from "../interfaces/IUserController";
 import { IChangeUserRoleUseCase } from "../../application/interfaces/user/IChangeUserRoleUseCase";
 import { IGetCurrentUserUseCase } from "../../application/interfaces/user/IGetCurrentUserUseCase";
-import { IGetOnlineWorkersUseCase } from "../../application/interfaces/worker/IGetOnlineWorkersUseCase";
 
 import {
     AuthenticationError,
@@ -19,7 +18,6 @@ export class UserController implements IUserController {
     constructor(
         private readonly _changeUserRoleUseCase: IChangeUserRoleUseCase,
         private readonly _getCurrentUserUseCase: IGetCurrentUserUseCase,
-        private readonly _getOnlineWorkersUseCase: IGetOnlineWorkersUseCase,
     ) { }
 
 
@@ -83,19 +81,4 @@ export class UserController implements IUserController {
             );
         }
     };
-
-    getOnlineWorkers = async (req: Request, res: Response): Promise<Response> => {
-        try {
-            const workers = await this._getOnlineWorkersUseCase.execute();
-            return res.status(HttpStatusCode.OK).json(
-                ResponseHandler.success(workers, "Online workers fetched successfully")
-            );
-        } catch (error: unknown) {
-            return res.status(HttpStatusCode.INTERNAL_SERVER).json(
-                ResponseHandler.error(RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR, error)
-            );
-        }
-    };
-
-
 }
