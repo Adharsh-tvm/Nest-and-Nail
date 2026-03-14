@@ -1,5 +1,6 @@
 import { PaymentStatus } from "../../shared/enums/paymentStatus";
 import { ServiceStatus } from "../../shared/enums/serviceEnums";
+import { SlotType } from "../../shared/enums/slotEnums";
 
 export interface Service {
   id: string;
@@ -19,6 +20,16 @@ export interface Service {
   };
 
   scheduledDate: Date;
+
+  slotType: SlotType;
+
+  numberOfDays: number;
+
+  advanceAmount?: number;
+
+  totalAmount?: number;
+
+  bufferDay?: boolean;
 
   agreedBudget?: number;
 

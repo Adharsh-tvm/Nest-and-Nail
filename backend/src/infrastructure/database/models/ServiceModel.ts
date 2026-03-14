@@ -2,6 +2,8 @@ import mongoose, { Schema, Document } from "mongoose";
 import { ServiceStatus } from "../../../shared/enums/serviceEnums";
 import { PaymentStatus } from "../../../shared/enums/paymentStatus";
 
+import { SlotType } from "../../../shared/enums/slotEnums";
+
 export interface IServiceDocument extends Document {
   serviceId: string;
 
@@ -19,6 +21,16 @@ export interface IServiceDocument extends Document {
   };
 
   scheduledDate: Date;
+
+  slotType: SlotType;
+
+  numberOfDays: number;
+
+  advanceAmount?: number;
+
+  totalAmount?: number;
+
+  bufferDay?: boolean;
 
   agreedBudget?: number;
 
@@ -65,7 +77,33 @@ const ServiceSchema = new Schema<IServiceDocument>(
 
     scheduledDate: { type: Date, required: true },
 
-    agreedBudget: { type: Number },
+    slotType: {
+      type: String,
+      enum: Object.values(SlotType),
+      required: true,
+    },
+
+    numberOfDays: {
+      type: Number,
+      default: 1,
+    },
+
+    advanceAmount: {
+      type: Number,
+    },
+
+    totalAmount: {
+      type: Number,
+    },
+
+    bufferDay: {
+      type: Boolean,
+      default: false,
+    },
+
+    agreedBudget: {
+      type: Number,
+    },
 
     status: {
       type: String,
@@ -93,7 +131,7 @@ const ServiceSchema = new Schema<IServiceDocument>(
 
 ServiceSchema.index({ location: "2dsphere" });
 
-ServiceSchema.index({ workerId: 1 });
+ServiceSchema.index({ workerId: 1, scheduledDate: 1 });
 ServiceSchema.index({ clientId: 1 });
 
 export const ServiceModel = mongoose.model<IServiceDocument>(
