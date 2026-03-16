@@ -1,6 +1,7 @@
 import { AdminController } from "../../presentation/controllers/AdminController";
 import { AuthController } from "../../presentation/controllers/AuthController";
 import { CategoryController } from "../../presentation/controllers/CategoryController";
+import { ClientController } from "../../presentation/controllers/ClientController";
 import { GoogleAuthController } from "../../presentation/controllers/GoogleAuthController";
 import { MediaController } from "../../presentation/controllers/MediaController";
 import { UploadController } from "../../presentation/controllers/UploadController";
@@ -20,10 +21,11 @@ import { UseCaseDI } from "./usecases.di";
 export class ControllerDI {
     private _authController?: IAuthController;
     private _authMiddleware?: AuthMiddleware;
-
     private _googleAuthController?: IGoogleAuthController;
+
     private _adminController?: IAdminController;
     private _userController?: IUserController;
+    private _clientController?: ClientController;
 
     private _uploadController?: IUploadController;
     private _userProfileController?: IUserProfileController;
@@ -135,6 +137,15 @@ export class ControllerDI {
             )
         }
         return this._mediaController;
+    }
+
+    get clientController(): ClientController {
+        if(!this._clientController) {
+            this._clientController = new ClientController(
+                this._useCases.getAvailableWorkersUseCase
+            )
+        }
+        return this._clientController
     }
 }
 

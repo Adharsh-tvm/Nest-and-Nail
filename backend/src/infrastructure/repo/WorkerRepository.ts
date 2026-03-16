@@ -33,13 +33,42 @@ export class WorkerRepository extends BaseRepository<Worker, IWorkerDocument> im
         }));
     }
 
-    async findOnlineWorkers(): Promise<Worker[]> {
-        return await WorkerModel.find({
-            role: "WORKER",
-            isOnline: true,
-            isBlocked: false
-        }).lean() as unknown as Worker[];
+    async findAvailableWorkers(
+        categoryId?: string,
+        lat?: number,
+        lng?: number
+    ): Promise<Worker[]> {
+
+        const query: any = {
+            role: "worker",
+            isBlocked: false,
+            isVerified: "VERIFIED",
+            isAvailable: true
+        };
+
+        if (categoryId) {
+            query.categories = categoryId;
+        }
+
+        if (lat && lng) {
+            query["address.location"] = {
+                $near: {
+                    $geometry: {
+                        type: "Point",
+                        coordinates: [lng, lat]
+                    },
+                    $maxDistance: 20000 // 10km
+                }
+            };
+        }
+
+        const workers = await WorkerModel.find(query)
+            .sort({ rating: -1 })
+            .lean();
+
+        return workers.map((doc: any) => {
+            const { _id, __v, ...rest } = doc;
+            return rest as Worker;
+        });
     }
-
-
 }

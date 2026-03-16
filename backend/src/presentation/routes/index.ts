@@ -7,6 +7,7 @@ import { createCategoryRoutes, createUserCategoryRoutes } from "./admin/category
 import { createUserRoutes } from "./user/user.routes";
 import { createUploadRoutes } from "./user/upload.routes";
 import { createMediaRoutes } from "./user/media.routes";
+import { createClientRoutes } from "./client/client.routes";
 
 export const createRoutes = (container: DIContainer): Router => {
   const router = Router();
@@ -28,6 +29,8 @@ export const createRoutes = (container: DIContainer): Router => {
   router.use("/api/users", createUserRoutes(container.controllers.userController, container.controllers.userProfileController, container.controllers.authMiddleware));
 
   router.use("/api/media", createMediaRoutes(container.controllers.mediaController));
+
+  router.use("/api/client", createClientRoutes(container.controllers.clientController, container.controllers.authMiddleware))
 
   return router;
 };
