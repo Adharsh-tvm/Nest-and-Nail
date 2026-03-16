@@ -8,6 +8,7 @@ export abstract class BaseRepository<T extends User, D extends Document = any> i
     async findByEmail(email: string): Promise<T | null> {
         const result = await this.model
             .findOne({ email } as FilterQuery<D>)
+            .populate('categories', 'name')
             .lean()
             .exec();
 
@@ -16,9 +17,10 @@ export abstract class BaseRepository<T extends User, D extends Document = any> i
             return null;
         }
 
-        const { _id, __v, ...cleanResult } = result as any;
+        const { _id, __v, categories, ...cleanResult } = result as any;
+        const mappedCategories = categories?.map((cat: any) => cat.name) || [];
 
-        return cleanResult as T;
+        return { ...cleanResult, categories: mappedCategories } as T;
     }
 
     async create(user: T): Promise<T> {
@@ -33,6 +35,7 @@ export abstract class BaseRepository<T extends User, D extends Document = any> i
     async findById(id: string): Promise<T | null> {
         const result = await this.model
             .findOne({ userId: id } as FilterQuery<D>)
+            .populate('categories', 'name')
             .lean()
             .exec();
 
@@ -42,9 +45,10 @@ export abstract class BaseRepository<T extends User, D extends Document = any> i
             return null;
         }
 
-        const { _id, __v, ...cleanResult } = result as any;
+        const { _id, __v, categories, ...cleanResult } = result as any;
+        const mappedCategories = categories?.map((cat: any) => cat.name) || [];
 
-        return cleanResult as T;
+        return { ...cleanResult, categories: mappedCategories } as T;
     }
 
     async findAll(): Promise<T[]> {

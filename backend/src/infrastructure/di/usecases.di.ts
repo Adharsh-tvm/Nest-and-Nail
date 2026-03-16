@@ -62,6 +62,8 @@ import { IGetS3UploadUrlUseCase } from "../../application/interfaces/media/IGetS
 import { GetS3UploadUrlUseCase } from "../../application/use-cases/media/GetS3UploadUrlUseCase";
 import { IGetAvailableWorkersUseCase } from "../../application/interfaces/client/IGetAvailableWorkersUseCase";
 import { GetAvailableWorkersUseCase } from "../../application/use-cases/client/GetAvailableWorkersUseCase";
+import { IGetWorkerByIdUseCase } from "../../application/interfaces/client/IGetWorkerByIdUseCase";
+import { GetWorkerByIdUseCase } from "../../application/use-cases/client/GetWorkerByIdUseCase";
 
 
 export class UseCaseDI {
@@ -106,6 +108,7 @@ export class UseCaseDI {
   private _getS3UploadUrlUseCase?: IGetS3UploadUrlUseCase;
 
   private _getAvailableWorkersUseCase ?: IGetAvailableWorkersUseCase;
+  private _getWorkerByIdUseCase ?: IGetWorkerByIdUseCase;
 
   constructor(private infra: InfrastructureDI) { }
 
@@ -413,5 +416,14 @@ export class UseCaseDI {
     }
     return this._getAvailableWorkersUseCase;
   } 
+
+  get getWorkerByIdUseCase(): IGetWorkerByIdUseCase {
+    if(!this._getWorkerByIdUseCase) {
+      this._getWorkerByIdUseCase = new GetWorkerByIdUseCase(
+        this.infra.workerRepository
+      );
+    }
+    return this._getWorkerByIdUseCase;
+  }
 
 }

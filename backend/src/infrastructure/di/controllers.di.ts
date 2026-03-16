@@ -142,7 +142,8 @@ export class ControllerDI {
     get clientController(): ClientController {
         if(!this._clientController) {
             this._clientController = new ClientController(
-                this._useCases.getAvailableWorkersUseCase
+                this._useCases.getAvailableWorkersUseCase,
+                this._useCases.getWorkerByIdUseCase
             )
         }
         return this._clientController
