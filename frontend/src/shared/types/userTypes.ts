@@ -3,6 +3,7 @@ import { Address } from "./addressType";
 
 export type User = {
   id: string;
+  userId?: string;
   name: string;
   email: string;
   role: string;
@@ -10,6 +11,7 @@ export type User = {
   isVerified: VerificationStatus;
   isOnline: boolean;
   profileImageUrl?: string | null;
+  profilePictureUrl?: string | null;
 
   phone_number?: number;
   skills?: string[];

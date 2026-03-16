@@ -63,12 +63,17 @@ export class WorkerRepository extends BaseRepository<Worker, IWorkerDocument> im
         }
 
         const workers = await WorkerModel.find(query)
+            .populate('categories', 'name')
             .sort({ rating: -1 })
             .lean();
 
         return workers.map((doc: any) => {
-            const { _id, __v, ...rest } = doc;
-            return rest as Worker;
+            const { _id, __v, categories, ...rest } = doc;
+            const mappedCategories = categories?.map((cat: any) => cat.name) || [];
+            return {
+                ...rest,
+                categories: mappedCategories
+            } as Worker;
         });
     }
 }

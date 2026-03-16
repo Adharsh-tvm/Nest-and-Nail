@@ -32,12 +32,12 @@ export default function WorkerCard({ worker, index }: WorkerCardProps) {
                 <div className="flex items-center gap-4 mb-5">
                     <div className="relative">
                         <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center border-2 border-white shadow-sm">
-                            {worker.profileImageUrl ? (
+                            {(worker.profileImageUrl || worker.profilePictureUrl) ? (
                                 <img
                                     src={
-                                        worker.profileImageUrl.startsWith('http') || worker.profileImageUrl.startsWith('blob:') || worker.profileImageUrl.startsWith('data:')
-                                            ? worker.profileImageUrl
-                                            : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/${worker.profileImageUrl.startsWith('/') ? worker.profileImageUrl.slice(1) : worker.profileImageUrl}`
+                                        (worker.profileImageUrl || worker.profilePictureUrl)?.startsWith('http') || (worker.profileImageUrl || worker.profilePictureUrl)?.startsWith('blob:') || (worker.profileImageUrl || worker.profilePictureUrl)?.startsWith('data:')
+                                            ? (worker.profileImageUrl || worker.profilePictureUrl || '')
+                                            : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/${(worker.profileImageUrl || worker.profilePictureUrl)?.startsWith('/') ? (worker.profileImageUrl || worker.profilePictureUrl)?.slice(1) : (worker.profileImageUrl || worker.profilePictureUrl)}`
                                     }
                                     alt={worker.name}
                                     className="object-cover w-full h-full"
@@ -52,7 +52,7 @@ export default function WorkerCard({ worker, index }: WorkerCardProps) {
                                     {worker.name.charAt(0).toUpperCase()}
                                 </span>
                             )}
-                            <span className={`w-full h-full flex items-center justify-center text-xl font-bold text-gray-400 bg-gray-100 ${worker.profileImageUrl ? 'hidden' : ''}`}>
+                            <span className={`w-full h-full flex items-center justify-center text-xl font-bold text-gray-400 bg-gray-100 ${(worker.profileImageUrl || worker.profilePictureUrl) ? 'hidden' : ''}`}>
                                 {worker.name.charAt(0).toUpperCase()}
                             </span>
                         </div>
@@ -139,7 +139,7 @@ export default function WorkerCard({ worker, index }: WorkerCardProps) {
                 )}
 
                 <Link
-                    href={`/client/workers/${worker.id}`}
+                    href={`/client/workers/${worker.userId || worker.id}`}
                     className="flex items-center justify-center w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-colors"
                 >
                     <ChevronRight className="w-4 h-4 hover:translate-x-0.5 transition-transform" />
