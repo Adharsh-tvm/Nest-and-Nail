@@ -19,7 +19,6 @@ import { IUpdateUserProfileUseCase } from "../../application/interfaces/user/IUp
 import { IUpdateUserSkillsUseCase } from "../../application/interfaces/user/IUpdateUserSkillsUseCase";
 import { IUpdateVerificationStatusUseCase } from "../../application/interfaces/admin/IUpdateVerificationStatusUseCase";
 import { IUpdateWorkerCategoriesUseCase } from "../../application/interfaces/worker/profile/IUpdateWorkerCategoriesUseCase";
-import { IGetOnlineWorkersUseCase } from "../../application/interfaces/worker/IGetOnlineWorkersUseCase";
 
 import { IUploadProfilePictureUseCase } from "../../application/interfaces/user/IUploadProfilePictureUseCase";
 import { IUploadWorkerDocumentUseCase } from "../../application/interfaces/user/IUploadWorkerDocumentUseCase";
@@ -61,6 +60,8 @@ import { EditUserAddressUseCase } from "../../application/use-cases/address/Edit
 import { DeleteUserAddressUseCase } from "../../application/use-cases/address/DeleteUserAddressUseCase";
 import { IGetS3UploadUrlUseCase } from "../../application/interfaces/media/IGetS3UploadUrlUseCase";
 import { GetS3UploadUrlUseCase } from "../../application/use-cases/media/GetS3UploadUrlUseCase";
+import { IGetAvailableWorkersUseCase } from "../../application/interfaces/client/IGetAvailableWorkersUseCase";
+import { GetAvailableWorkersUseCase } from "../../application/use-cases/client/GetAvailableWorkersUseCase";
 
 
 export class UseCaseDI {
@@ -102,11 +103,9 @@ export class UseCaseDI {
   private _editUserAddressUseCase?: IEditUserAddressUseCase;
   private _deleteUserAddressUseCase?: IDeleteUserAddressUseCase;
 
-
   private _getS3UploadUrlUseCase?: IGetS3UploadUrlUseCase;
-  private _getOnlineWorkersUseCase?: IGetOnlineWorkersUseCase;
 
-
+  private _getAvailableWorkersUseCase ?: IGetAvailableWorkersUseCase;
 
   constructor(private infra: InfrastructureDI) { }
 
@@ -405,5 +404,14 @@ export class UseCaseDI {
     }
     return this._getS3UploadUrlUseCase;
   }
+
+  get getAvailableWorkersUseCase(): IGetAvailableWorkersUseCase {
+    if(!this._getAvailableWorkersUseCase) {
+      this._getAvailableWorkersUseCase = new GetAvailableWorkersUseCase(
+        this.infra.workerRepository
+      );
+    }
+    return this._getAvailableWorkersUseCase;
+  } 
 
 }
