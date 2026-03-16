@@ -10,7 +10,7 @@ export function createClientRoutes(
     authMiddleware: AuthMiddleware
 ) {
 
-    router.get("/workers", (req, res) => clientController.getAvailableWorkers(req, res))
+    router.get("/workers", (req, res, next) => authMiddleware.verify(req, res, next), (req, res) => clientController.getAvailableWorkers(req, res))
 
     return router;
 }
