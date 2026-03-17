@@ -76,11 +76,23 @@ export default function WorkerCard({ worker, index }: WorkerCardProps) {
 
                     <div>
                         <h3 className="text-lg font-bold text-[#111827]">{worker.name}</h3>
-                        <div className="flex items-center text-sm text-gray-500 mt-0.5">
-                            <Briefcase className="w-3.5 h-3.5 mr-1.5" />
-                            <span className="truncate max-w-[150px] font-medium text-gray-700">
-                                {worker.categories && worker.categories.length > 0 ? worker.categories[0] : (worker.skills && worker.skills.length > 0 ? worker.skills[0] : 'Professional Worker')}
-                            </span>
+                        <div className="flex flex-col gap-1.5 mt-0.5">
+                            <div className="flex items-center text-sm text-gray-500">
+                                <Briefcase className="w-3.5 h-3.5 mr-1.5" />
+                                <span className="truncate max-w-[150px] font-medium text-gray-700">
+                                    {worker.categories && worker.categories.length > 0 ? worker.categories[0] : (worker.skills && worker.skills.length > 0 ? worker.skills[0] : 'Professional Worker')}
+                                </span>
+                            </div>
+                            {worker.distance !== undefined && (
+                                <div className="flex items-center">
+                                    <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-100 flex items-center">
+                                        <MapPin className="w-3 h-3 mr-1" />
+                                        {worker.distance < 1000 
+                                            ? `${Math.round(worker.distance)} m away`
+                                            : `${(worker.distance / 1000).toFixed(1)} km away`}
+                                    </span>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -95,13 +107,15 @@ export default function WorkerCard({ worker, index }: WorkerCardProps) {
                 </div>
 
                 {/* Location */}
-                <div className="flex items-center text-sm text-gray-500 mb-4">
-                    <MapPin className="w-4 h-4 mr-1.5 text-gray-400" />
-                    <span className="truncate">
-                        {worker.address && worker.address.length > 0
-                            ? `${worker.address[0].city || worker.address[0].street}, ${worker.address[0].state || ''}`
-                            : 'Location hidden'}
-                    </span>
+                <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                    <div className="flex items-center">
+                        <MapPin className="w-4 h-4 mr-1.5 text-gray-400" />
+                        <span className="truncate">
+                            {worker.address && worker.address.length > 0
+                                ? `${worker.address[0].city || worker.address[0].street}, ${worker.address[0].state || ''}`
+                                : 'Location hidden'}
+                        </span>
+                    </div>
                 </div>
 
                 {/* Categories */}

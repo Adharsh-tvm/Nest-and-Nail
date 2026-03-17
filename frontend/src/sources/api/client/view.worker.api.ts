@@ -6,12 +6,16 @@ import axios from 'axios';
 export async function getAvailableWorkersApi(
     category?: string,
     lat?: number,
-    lng?: number
+    lng?: number,
+    search?: string,
+    isOnline?: boolean
 ): Promise<ApiResponse<User[]>> {
     const params = new URLSearchParams();
     if (category) params.append('category', category);
     if (lat) params.append('lat', lat.toString());
     if (lng) params.append('lng', lng.toString());
+    if (search) params.append('search', search);
+    if (isOnline === true) params.append('isOnline', 'true');
     
     const queryStr = params.toString();
     const url = `/api/client/workers${queryStr ? `?${queryStr}` : ''}`;

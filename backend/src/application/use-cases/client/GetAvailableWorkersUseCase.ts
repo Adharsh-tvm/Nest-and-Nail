@@ -13,13 +13,17 @@ export class GetAvailableWorkersUseCase implements IGetAvailableWorkersUseCase{
   async execute(
     categoryId?: string,
     lat?: number,
-    lng?: number
+    lng?: number,
+    search?: string,
+    isOnline?: boolean
   ): Promise<Worker[]> {
 
     const workers = await this.workerRepository.findAvailableWorkers(
       categoryId,
       lat,
-      lng
+      lng,
+      search,
+      isOnline
     );
 
     // Map through workers and generate presigned URLs for their profile pictures

@@ -90,10 +90,21 @@ export default async function WorkerDetailPage({
                             </div>
 
                             <h1 className="text-2xl font-black text-gray-900 mb-1">{worker.name}</h1>
-                            <div className="flex items-center justify-center text-[#111827] mb-4">
+                            <div className="flex items-center justify-center text-[#111827] mb-2">
                                 <Briefcase className="w-4 h-4 mr-1.5 text-gray-400" />
                                 <span className="font-semibold text-gray-700 tracking-tight">{primaryRole}</span>
                             </div>
+
+                            {worker.distance !== undefined && (
+                                <div className="flex items-center justify-center text-sm mb-4">
+                                    <span className="inline-flex items-center px-3 py-1 rounded-md font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100 shadow-sm">
+                                        <MapPin className="w-4 h-4 mr-1.5" />
+                                        {worker.distance < 1000 
+                                            ? `${Math.round(worker.distance)} m away`
+                                            : `${(worker.distance / 1000).toFixed(1)} km away`}
+                                    </span>
+                                </div>
+                            )}
 
                             <div className="flex items-center justify-center gap-2 mb-6">
                                 <Star className="w-5 h-5 fill-emerald-500 text-emerald-500" />

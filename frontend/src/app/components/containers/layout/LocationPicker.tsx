@@ -85,7 +85,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
     const initialPosition = hasInitialValid ? new L.LatLng(centerLat, centerLng) : null;
 
     return (
-        <div className="h-[300px] w-full rounded-lg overflow-hidden border border-gray-200 shadow-sm z-0">
+        <div className="h-[300px] w-full rounded-lg overflow-hidden border border-gray-200 shadow-sm isolate" style={{ zIndex: 0, position: 'relative' }}>
             <MapContainer
                 center={[centerLat, centerLng]}
                 zoom={13}

@@ -1,14 +1,19 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { getAvailableWorkersAction } from '@/app/actions/client/view-worker-actions';
+import { getAllCategoriesAction } from '@/app/actions/admin/category-actions';
 import WorkerCard from './WorkerCard';
-import { Search, MapPin, Briefcase } from 'lucide-react';
+import WorkerSidebar from './WorkerSidebar';
+import WorkerSearchBar from './WorkerSearchBar';
+import { Briefcase } from 'lucide-react';
 import { User } from '@/shared/types/userTypes';
+import { Category } from '@/shared/types/categoryTypes';
 
-// Next.js page props for server components with searchParams
 interface SearchParams {
     category?: string;
     lat?: string;
     lng?: string;
+    search?: string;
+    isOnline?: string;
     [key: string]: string | string[] | undefined;
 }
 
@@ -17,68 +22,97 @@ export default async function WorkersPage({
 }: {
     searchParams: Promise<SearchParams>;
 }) {
-    const searchParamsObj = await searchParams;
-    // Extract query parameters
-    const category = Array.isArray(searchParamsObj.category) ? searchParamsObj.category[0] : searchParamsObj.category;
-    const latStr = Array.isArray(searchParamsObj.lat) ? searchParamsObj.lat[0] : searchParamsObj.lat;
-    const lngStr = Array.isArray(searchParamsObj.lng) ? searchParamsObj.lng[0] : searchParamsObj.lng;
+    const sp = await searchParams;
 
-    const lat = latStr ? parseFloat(latStr) : undefined;
-    const lng = lngStr ? parseFloat(lngStr) : undefined;
+    // Parse each param safely
+    const pick = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v);
+    const category = pick(sp.category);
+    const lat = sp.lat ? parseFloat(pick(sp.lat)!) : undefined;
+    const lng = sp.lng ? parseFloat(pick(sp.lng)!) : undefined;
+    const search = pick(sp.search);
+    const isOnline = pick(sp.isOnline) === 'true' ? true : undefined;
 
-    // Fetch available workers
-    const { success, data: workers, error } = await getAvailableWorkersAction(category, lat, lng);
+    // Fetch workers + categories in parallel
+    const [workersResult, categoriesResult] = await Promise.all([
+        getAvailableWorkersAction(category, lat, lng, search, isOnline),
+        getAllCategoriesAction(),
+    ]);
+
+    const { success, data: workers, error } = workersResult;
+    const categories: Category[] = categoriesResult.success && 'payload' in categoriesResult
+        ? (categoriesResult.payload || []).filter((c: Category) => c.isActive)
+        : [];
+
+    const activeFiltersCount = [category, lat, isOnline].filter(Boolean).length;
 
     return (
-        <div className="min-h-screen bg-gray-50 py-5">
-            <div className="container mx-auto px-4 max-w-7xl">
-                {/* Header section */}
-                {/* <div className="mb-10 text-center">
-                    <h1 className="text-4xl font-extrabold text-gray-900 mb-4 tracking-tight">
-                        Find Available Professionals
-                    </h1>
-                </div> */}
+        <div className="min-h-screen bg-gray-50">
+            <div className="max-w-7xl mx-auto px-4 py-6 flex flex-col gap-5">
 
-                {/* Optional Top Filter/Search Bar mock (for future implementations) */}
-                <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex flex-col md:flex-row gap-4 justify-between items-center mb-10 max-w-4xl mx-auto">
-                    <div className="flex w-full gap-2 text-sm">
-                        <div className="flex-1 flex items-center bg-gray-50 rounded-lg px-4 py-2.5 border border-gray-200">
-                           <Search className="w-5 h-5 text-gray-400 mr-2" />
-                           <input type="text" placeholder="Search by name or keyword..." className="bg-transparent border-none outline-none w-full text-gray-700 placeholder-gray-400" />
+                {/* ── Top Search Bar ── */}
+                <Suspense fallback={<div className="h-14 bg-white rounded-2xl animate-pulse border border-gray-100" />}>
+                    <WorkerSearchBar />
+                </Suspense>
+
+                {/* ── Main Layout: Sidebar + Content ── */}
+                <div className="flex flex-col lg:flex-row gap-5 items-start">
+
+                    {/* Left Sidebar */}
+                    <div className="w-full lg:w-64 shrink-0 sticky top-5">
+                        <Suspense fallback={<div className="h-96 bg-white rounded-2xl animate-pulse border border-gray-100" />}>
+                            <WorkerSidebar categories={categories} activeCategory={category} />
+                        </Suspense>
+                    </div>
+
+                    {/* Right Content: Results */}
+                    <div className="flex-1 flex flex-col gap-4">
+
+                        {/* Result count / active filter summary */}
+                        <div className="flex items-center justify-between">
+                            <p className="text-sm text-gray-500">
+                                {success && workers
+                                    ? <><span className="font-semibold text-gray-800">{workers.length}</span> worker{workers.length !== 1 ? 's' : ''} found</>
+                                    : 'Loading...'}
+                            </p>
+                            {activeFiltersCount > 0 && (
+                                <span className="text-xs bg-emerald-100 text-emerald-700 font-semibold px-2.5 py-1 rounded-full">
+                                    {activeFiltersCount} filter{activeFiltersCount > 1 ? 's' : ''} active
+                                </span>
+                            )}
                         </div>
-                        <div className="flex-1 flex items-center bg-gray-50 rounded-lg px-4 py-2.5 border border-gray-200">
-                           <MapPin className="w-5 h-5 text-gray-400 mr-2" />
-                           <input type="text" placeholder="Location..." className="bg-transparent border-none outline-none w-full text-gray-700 placeholder-gray-400" />
-                        </div>
-                        <button className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-6 flex items-center gap-2 rounded-lg transition-colors">
-                            Search
-                        </button>
+
+                        {/* Error state */}
+                        {(error || !success) && (
+                            <div className="bg-red-50 text-red-600 p-6 rounded-2xl border border-red-100 text-center flex flex-col items-center gap-2">
+                                <span className="text-4xl">⚠️</span>
+                                <h3 className="font-bold">Failed to load workers</h3>
+                                <p className="text-sm">{error || 'An unexpected error occurred.'}</p>
+                            </div>
+                        )}
+
+                        {/* Empty state */}
+                        {success && workers?.length === 0 && (
+                            <div className="bg-white rounded-2xl border border-gray-100 p-14 text-center flex flex-col items-center gap-4 shadow-sm">
+                                <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center">
+                                    <Briefcase className="w-8 h-8 text-gray-300" />
+                                </div>
+                                <div>
+                                    <h3 className="text-lg font-bold text-gray-700">No workers found</h3>
+                                    <p className="text-sm text-gray-400 mt-1">Try adjusting your filters or search term</p>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Worker Cards Grid */}
+                        {success && workers && workers.length > 0 && (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+                                {workers.map((worker: User, index: number) => (
+                                    <WorkerCard key={worker.userId || worker.id || index} worker={worker} index={index} />
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </div>
-
-                {/* Main Content */}
-                {error || !success ? (
-                    <div className="bg-red-50 text-red-600 p-6 rounded-xl border border-red-100 text-center max-w-2xl mx-auto flex flex-col items-center">
-                        <span className="text-5xl mb-3">⚠️</span>
-                        <h3 className="text-xl font-bold mb-1">Failed to Load Workers</h3>
-                        <p>{error || "An unexpected error occurred."}</p>
-                    </div>
-                ) : !workers || workers.length === 0 ? (
-                    <div className="bg-white rounded-[24px] border border-gray-200 p-16 text-center max-w-3xl mx-auto shadow-sm">
-                        <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <Briefcase className="w-10 h-10 text-gray-400" />
-                        </div>
-                        <h3 className="text-2xl font-bold text-gray-800 mb-2">No workers found</h3>
-                        <p className="text-gray-500 mb-6">We couldn't find any available professionals matching your criteria right now.</p>
-                        <button className="text-emerald-600 font-semibold hover:text-emerald-700">Clear filters</button>
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {workers.map((worker: User, index: number) => (
-                            <WorkerCard key={worker.userId || worker.id || index} worker={worker} index={index} />
-                        ))}
-                    </div>
-                )}
             </div>
         </div>
     );

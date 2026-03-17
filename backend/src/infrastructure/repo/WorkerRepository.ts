@@ -36,43 +36,76 @@ export class WorkerRepository extends BaseRepository<Worker, IWorkerDocument> im
     async findAvailableWorkers(
         categoryId?: string,
         lat?: number,
-        lng?: number
+        lng?: number,
+        search?: string,      // optional name keyword search
+        isOnline?: boolean    // optional online status filter
     ): Promise<Worker[]> {
 
-        const query: any = {
+        // Base filter conditions for all worker queries
+        const matchStage: any = {
             role: "worker",
             isBlocked: false,
             isVerified: "VERIFIED",
             isAvailable: true
         };
 
+        // Filter by category if provided
         if (categoryId) {
-            query.categories = categoryId;
+            matchStage.categories = categoryId;
         }
 
+        // Filter by online status if requested
+        if (isOnline === true) {
+            matchStage.isOnline = true;
+        }
+
+        // Search by worker name (case-insensitive partial match)
+        if (search && search.trim().length > 0) {
+            matchStage.name = { $regex: search.trim(), $options: 'i' };
+        }
+
+        const pipeline: any[] = [];
+
         if (lat && lng) {
-            query["address.location"] = {
-                $near: {
-                    $geometry: {
+            pipeline.push({
+                $geoNear: {
+                    near: {
                         type: "Point",
                         coordinates: [lng, lat]
                     },
-                    $maxDistance: 20000 // 10km
+                    distanceField: "distance",
+                    maxDistance: 30000, // 20km
+                    spherical: true
                 }
-            };
+            });
         }
 
-        const workers = await WorkerModel.find(query)
-            .populate('categories', 'name')
-            .sort({ rating: -1 })
-            .lean();
+        pipeline.push({ $match: matchStage });
+
+        pipeline.push(
+            {
+                $lookup: {
+                    from: "categories",
+                    localField: "categories",
+                    foreignField: "_id",
+                    as: "categoryDocs"
+                }
+            },
+            {
+                $sort: { rating: -1 }
+            }
+        );
+
+        const workers = await WorkerModel.aggregate(pipeline);
 
         return workers.map((doc: any) => {
-            const { _id, __v, categories, ...rest } = doc;
-            const mappedCategories = categories?.map((cat: any) => cat.name) || [];
+            const { _id, __v, categories, categoryDocs, ...rest } = doc;
+            const mappedCategories = categoryDocs?.map((cat: any) => cat.name) || [];
             return {
                 ...rest,
-                categories: mappedCategories
+                userId: rest.userId || _id.toString(), // ensure userId is present
+                categories: mappedCategories,
+                distance: rest.distance
             } as Worker;
         });
     }
