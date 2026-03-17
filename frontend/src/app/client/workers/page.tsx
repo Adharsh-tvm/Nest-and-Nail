@@ -30,7 +30,7 @@ export default async function WorkersPage({
     const { success, data: workers, error } = await getAvailableWorkersAction(category, lat, lng);
 
     return (
-        <div className="min-h-screen bg-gray-50 py-12">
+        <div className="min-h-screen bg-gray-50 py-5">
             <div className="container mx-auto px-4 max-w-7xl">
                 {/* Header section */}
                 {/* <div className="mb-10 text-center">
