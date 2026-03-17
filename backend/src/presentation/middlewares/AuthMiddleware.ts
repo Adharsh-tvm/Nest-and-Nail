@@ -20,7 +20,7 @@ export class AuthMiddleware {
 
     if (!token) {
       const authHeader = req.headers.authorization;
-      if (authHeader && authHeader.startsWith("Bearer ")) {
+      if (authHeader?.startsWith("Bearer ")) {
         token = authHeader.split(" ")[1];
       }
     }

@@ -21,7 +21,7 @@ export class DeleteUserAddressUseCase implements IDeleteUserAddressUseCase {
       repo = workerRepo;
     }
 
-    if (!user || !user.address) {
+    if (!user?.address) {
       throw new Error("User or address not found");
     }
 
