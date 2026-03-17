@@ -33,11 +33,11 @@ export default async function WorkersPage({
         <div className="min-h-screen bg-gray-50 py-12">
             <div className="container mx-auto px-4 max-w-7xl">
                 {/* Header section */}
-                <div className="mb-10 text-center">
+                {/* <div className="mb-10 text-center">
                     <h1 className="text-4xl font-extrabold text-gray-900 mb-4 tracking-tight">
                         Find Available Professionals
                     </h1>
-                </div>
+                </div> */}
 
                 {/* Optional Top Filter/Search Bar mock (for future implementations) */}
                 <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex flex-col md:flex-row gap-4 justify-between items-center mb-10 max-w-4xl mx-auto">
