@@ -22,7 +22,6 @@ export interface IUserDocument extends Document {
     workPhotos?: string[];
     rating: number;
     totalRatings: number;
-    isAvailable: boolean;
     weeklyJobCount: number;
     currentActiveRequestId?: string | null;
     createdAt: Date;
@@ -65,7 +64,6 @@ const UserSchema = new Schema<IUserDocument>(
         rating: { type: Number, default: 0 },
         totalRatings: { type: Number, default: 0 },
 
-        isAvailable: { type: Boolean, default: true },
         weeklyJobCount: { type: Number, default: 0 },
 
         currentActiveRequestId: { type: String, default: null }
