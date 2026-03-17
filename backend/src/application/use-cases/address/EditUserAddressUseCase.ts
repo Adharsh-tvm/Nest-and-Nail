@@ -25,7 +25,7 @@ export class EditUserAddressUseCase implements IEditUserAddressUseCase {
             repo = workerRepo;
         }
 
-        if (!user || !user.address) {
+        if (!user?.address) {
             throw new Error("User or address not found");
         }
 
