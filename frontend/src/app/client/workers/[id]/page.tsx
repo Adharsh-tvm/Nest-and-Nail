@@ -65,11 +65,20 @@ export default async function WorkerDetailPage({
                             <div className="w-32 h-32 mx-auto rounded-full overflow-hidden bg-gray-100 flex items-center justify-center border-4 border-white shadow-lg mb-4">
                                 {(worker.profileImageUrl || worker.profilePictureUrl) ? (
                                     <img
-                                        src={
-                                            (worker.profileImageUrl || worker.profilePictureUrl)?.startsWith('http') || (worker.profileImageUrl || worker.profilePictureUrl)?.startsWith('blob:') || (worker.profileImageUrl || worker.profilePictureUrl)?.startsWith('data:')
-                                                ? (worker.profileImageUrl || worker.profilePictureUrl || '')
-                                                : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/${(worker.profileImageUrl || worker.profilePictureUrl)?.startsWith('/') ? (worker.profileImageUrl || worker.profilePictureUrl)?.slice(1) : (worker.profileImageUrl || worker.profilePictureUrl)}`
-                                        }
+                                        src={(() => {
+                                            const url = worker.profileImageUrl || worker.profilePictureUrl;
+                                            if (!url) return '';
+                                            if (url.startsWith('http') || url.startsWith('blob:') || url.startsWith('data:')) {
+                                                return url;
+                                            }
+                                            // Fallback for S3 raw keys
+                                            if (!url.startsWith('/')) {
+                                                return `https://nestnail-storage-2026.s3.ap-south-1.amazonaws.com/${url}`;
+                                            }
+                                            
+                                            const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+                                            return `${baseUrl}/${url.replace(/^\//, '')}`;
+                                        })()}
                                         alt={worker.name}
                                         className="object-cover w-full h-full"
                                     />

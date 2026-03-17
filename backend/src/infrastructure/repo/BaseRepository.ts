@@ -18,7 +18,7 @@ export abstract class BaseRepository<T extends User, D extends Document = any> i
         }
 
         const { _id, __v, categories, ...cleanResult } = result as any;
-        const mappedCategories = categories?.map((cat: any) => cat.name) || [];
+        const mappedCategories = categories?.map((cat: any) => cat._id ? cat._id.toString() : cat.toString()) || [];
 
         return { ...cleanResult, categories: mappedCategories } as T;
     }
@@ -46,7 +46,7 @@ export abstract class BaseRepository<T extends User, D extends Document = any> i
         }
 
         const { _id, __v, categories, ...cleanResult } = result as any;
-        const mappedCategories = categories?.map((cat: any) => cat.name) || [];
+        const mappedCategories = categories?.map((cat: any) => cat._id ? cat._id.toString() : cat.toString()) || [];
 
         return { ...cleanResult, categories: mappedCategories } as T;
     }

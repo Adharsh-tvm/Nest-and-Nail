@@ -411,7 +411,8 @@ export class UseCaseDI {
   get getAvailableWorkersUseCase(): IGetAvailableWorkersUseCase {
     if(!this._getAvailableWorkersUseCase) {
       this._getAvailableWorkersUseCase = new GetAvailableWorkersUseCase(
-        this.infra.workerRepository
+        this.infra.workerRepository,
+        this.infra.s3Service
       );
     }
     return this._getAvailableWorkersUseCase;
@@ -420,7 +421,8 @@ export class UseCaseDI {
   get getWorkerByIdUseCase(): IGetWorkerByIdUseCase {
     if(!this._getWorkerByIdUseCase) {
       this._getWorkerByIdUseCase = new GetWorkerByIdUseCase(
-        this.infra.workerRepository
+        this.infra.workerRepository,
+        this.infra.s3Service
       );
     }
     return this._getWorkerByIdUseCase;

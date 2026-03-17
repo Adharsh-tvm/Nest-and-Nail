@@ -12,6 +12,9 @@ interface WorkerCardProps {
 }
 
 export default function WorkerCard({ worker, index }: WorkerCardProps) {
+
+    console.log("Worker :",worker)
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -30,15 +33,27 @@ export default function WorkerCard({ worker, index }: WorkerCardProps) {
             <div className="p-6 flex-grow">
                 {/* Header Row */}
                 <div className="flex items-center gap-4 mb-5">
-                    <div className="relative">
+                    <div className="relative shrink-0">
                         <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center border-2 border-white shadow-sm">
                             {(worker.profileImageUrl || worker.profilePictureUrl) ? (
                                 <img
-                                    src={
-                                        (worker.profileImageUrl || worker.profilePictureUrl)?.startsWith('http') || (worker.profileImageUrl || worker.profilePictureUrl)?.startsWith('blob:') || (worker.profileImageUrl || worker.profilePictureUrl)?.startsWith('data:')
-                                            ? (worker.profileImageUrl || worker.profilePictureUrl || '')
-                                            : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/${(worker.profileImageUrl || worker.profilePictureUrl)?.startsWith('/') ? (worker.profileImageUrl || worker.profilePictureUrl)?.slice(1) : (worker.profileImageUrl || worker.profilePictureUrl)}`
-                                    }
+                                    src={(() => {
+                                        const url = worker.profileImageUrl || worker.profilePictureUrl;
+                                        if (!url) return '';
+                                        if (url.startsWith('http') || url.startsWith('blob:') || url.startsWith('data:')) {
+                                            return url;
+                                        }
+                                        // If the backend returns raw S3 keys without presigning (e.g., 'users/profile/123.jpg')
+                                        // Fallback to directly fetching from bucket without signature if public, 
+                                        // Otherwise we must fetch it from our backend / API proxy.
+                                        // Based on the logs, S3 bucket structure is: https://nestnail-storage-2026.s3.ap-south-1.amazonaws.com/
+                                        if (!url.startsWith('/')) {
+                                            return `https://nestnail-storage-2026.s3.ap-south-1.amazonaws.com/${url}`;
+                                        }
+                                        
+                                        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+                                        return `${baseUrl}/${url.replace(/^\//, '')}`;
+                                    })()}
                                     alt={worker.name}
                                     className="object-cover w-full h-full"
                                     onError={(e) => {

@@ -39,17 +39,25 @@ interface ServiceCategory {
 
 interface Worker {
   id: number;
-  name: string;
-  email: string;
-  phone: string;
-  role: string;
-  specialties: string[];
-  rating: number;
-  servicesCompleted: number;
-  status: "Active" | "Suspended" | "Inactive";
-  verificationStatus: "Approved" | "Pending" | "Rejected";
-  earnings: string;
-  avatarColor: string;
+  user_id?: string;
+  user_name?: string;
+  email_address?: string;
+  phone?: string;
+  name?: string;
+  email?: string;
+  role?: string;
+  specialties?: string[];
+  rating?: number;
+  servicesCompleted?: number;
+  status?: "Active" | "Suspended" | "Inactive";
+  verificationStatus?: "Approved" | "Pending" | "Rejected" | string;
+  isVerified?: VerificationStatus;
+  earnings?: string;
+  avatarColor?: string;
+  profileImageUrl?: string | null;
+  profilePictureUrl?: string | null;
+  weeklyJobCount?: number;
+  isBlocked?: boolean;
 }
 
 interface SidebarProps {
@@ -247,6 +255,34 @@ const WorkersView = () => {
                   {/* Worker Column */}
                   <td className="p-5">
                     <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200 overflow-hidden shrink-0">
+                        {worker.profileImageUrl || worker.profilePictureUrl ? (
+                          <img 
+                            src={(() => {
+                              const url = worker.profileImageUrl || worker.profilePictureUrl;
+                              if (!url) return '';
+                              if (url.startsWith('http') || url.startsWith('blob:') || url.startsWith('data:')) {
+                                  return url;
+                              }
+                              // Fallback for S3 raw keys
+                              if (!url.startsWith('/')) {
+                                  return `https://nestnail-storage-2026.s3.ap-south-1.amazonaws.com/${url}`;
+                              }
+                              const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+                              return `${baseUrl}/${url.replace(/^\//, '')}`;
+                            })()}
+                            alt={worker.user_name}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.display = 'none';
+                              (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+                            }}
+                          />
+                        ) : null}
+                        <span className={`text-sm font-bold text-slate-400 uppercase ${(worker.profileImageUrl || worker.profilePictureUrl) ? 'hidden' : ''}`}>
+                          {worker.user_name?.charAt(0) || 'W'}
+                        </span>
+                      </div>
                       <div>
                         <p className="font-semibold text-slate-800">
                           {worker.user_name}
