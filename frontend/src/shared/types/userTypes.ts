@@ -30,6 +30,7 @@ export type User = {
 
   iat?: number;
   exp?: number;
+  distance?: number;
 };
 
 export type UserQueryParams = {

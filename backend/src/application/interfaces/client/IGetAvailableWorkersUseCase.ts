@@ -4,6 +4,8 @@ export interface IGetAvailableWorkersUseCase {
   execute(
     categoryId?: string,
     lat?: number,
-    lng?: number
+    lng?: number,
+    search?: string,    // name keyword
+    isOnline?: boolean  // availability filter
   ): Promise<Worker[]>;
 }

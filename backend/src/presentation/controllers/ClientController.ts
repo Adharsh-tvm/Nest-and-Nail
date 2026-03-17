@@ -12,12 +12,14 @@ export class ClientController {
 
   getAvailableWorkers = async (req: Request, res: Response) => {
 
-    const { category, lat, lng } = req.query;
+    const { category, lat, lng, search, isOnline } = req.query;
 
     const workers = await this.getAvailableWorkersUseCase.execute(
       category as string,
       Number(lat),
-      Number(lng)
+      Number(lng),
+      search as string | undefined,
+      isOnline === 'true' ? true : undefined  // only filter if explicitly "true"
     );
 
     res.json({

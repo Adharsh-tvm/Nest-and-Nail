@@ -6,10 +6,12 @@ import { User } from "@/shared/types/userTypes";
 export async function getAvailableWorkersAction(
     category?: string,
     lat?: number,
-    lng?: number
+    lng?: number,
+    search?: string,
+    isOnline?: boolean
 ): Promise<{ success: boolean; data?: User[]; error?: string }> {
     try {
-        const workerResponse = await getAvailableWorkersApi(category, lat, lng);
+        const workerResponse = await getAvailableWorkersApi(category, lat, lng, search, isOnline);
         if (!workerResponse.success) {
             return { success: false, error: workerResponse.message };
         }

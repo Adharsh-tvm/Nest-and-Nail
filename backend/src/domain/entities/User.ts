@@ -31,4 +31,5 @@ export interface User {
     weeklyJobCount?: number;
     lastAssignedAt?: Date;
     currentActiveRequestId?: string | null;
+    distance?: number;
 }
