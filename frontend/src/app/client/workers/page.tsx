@@ -37,9 +37,6 @@ export default async function WorkersPage({
                     <h1 className="text-4xl font-extrabold text-gray-900 mb-4 tracking-tight">
                         Find Available Professionals
                     </h1>
-                    <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                        Connect with top-rated experts in your area ready to help with your projects.
-                    </p>
                 </div>
 
                 {/* Optional Top Filter/Search Bar mock (for future implementations) */}
