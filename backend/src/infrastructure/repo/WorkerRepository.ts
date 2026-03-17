@@ -46,7 +46,6 @@ export class WorkerRepository extends BaseRepository<Worker, IWorkerDocument> im
             role: "worker",
             isBlocked: false,
             isVerified: "VERIFIED",
-            isAvailable: true
         };
 
         // Filter by category if provided
