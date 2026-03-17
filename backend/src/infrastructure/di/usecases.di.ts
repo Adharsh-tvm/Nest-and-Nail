@@ -422,6 +422,7 @@ export class UseCaseDI {
     if(!this._getWorkerByIdUseCase) {
       this._getWorkerByIdUseCase = new GetWorkerByIdUseCase(
         this.infra.workerRepository,
+        this.infra.categoryRepository,
         this.infra.s3Service
       );
     }
