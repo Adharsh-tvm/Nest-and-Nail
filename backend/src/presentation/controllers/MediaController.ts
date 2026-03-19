@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { IGetS3UploadUrlUseCase } from "../../application/interfaces/media/IGetS3UploadUrlUseCase";
+import { HttpStatusCode } from "../../shared/enums/httpCodes";
 
 export class MediaController {
   constructor(
@@ -15,12 +16,12 @@ export class MediaController {
         contentType
       );
 
-      return res.status(200).json({
+      return res.status(HttpStatusCode.OK).json({
         success: true,
         payload: result,
       });
     } catch (error: any) {
-      return res.status(500).json({
+      return res.status(HttpStatusCode.INTERNAL_SERVER).json({
         success: false,
         message: error.message,
       });
