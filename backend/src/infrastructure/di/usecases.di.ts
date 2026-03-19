@@ -64,6 +64,10 @@ import { IGetAvailableWorkersUseCase } from "../../application/interfaces/client
 import { GetAvailableWorkersUseCase } from "../../application/use-cases/client/GetAvailableWorkersUseCase";
 import { IGetWorkerByIdUseCase } from "../../application/interfaces/client/IGetWorkerByIdUseCase";
 import { GetWorkerByIdUseCase } from "../../application/use-cases/client/GetWorkerByIdUseCase";
+import { IGetWorkerAvailabilityUseCase } from "../../application/interfaces/client/IGetWorkerAvailabilityUseCase";
+import { GetWorkerAvailabilityUseCase } from "../../application/use-cases/client/GetWorkerAvailabilityUseCase";
+import { IBookWorkerUseCase } from "../../domain/repositories/IBookWorkerUseCase";
+import { BookWorkerUseCase } from "../repo/BookWorkerUseCase";
 
 
 export class UseCaseDI {
@@ -107,8 +111,10 @@ export class UseCaseDI {
 
   private _getS3UploadUrlUseCase?: IGetS3UploadUrlUseCase;
 
-  private _getAvailableWorkersUseCase ?: IGetAvailableWorkersUseCase;
-  private _getWorkerByIdUseCase ?: IGetWorkerByIdUseCase;
+  private _getAvailableWorkersUseCase?: IGetAvailableWorkersUseCase;
+  private _getWorkerByIdUseCase?: IGetWorkerByIdUseCase;
+  private _getWorkerAvailabilityUseCase?: IGetWorkerAvailabilityUseCase;
+  private _bookWorkerUseCase?: IBookWorkerUseCase;
 
   constructor(private infra: InfrastructureDI) { }
 
@@ -409,17 +415,17 @@ export class UseCaseDI {
   }
 
   get getAvailableWorkersUseCase(): IGetAvailableWorkersUseCase {
-    if(!this._getAvailableWorkersUseCase) {
+    if (!this._getAvailableWorkersUseCase) {
       this._getAvailableWorkersUseCase = new GetAvailableWorkersUseCase(
         this.infra.workerRepository,
         this.infra.s3Service
       );
     }
     return this._getAvailableWorkersUseCase;
-  } 
+  }
 
   get getWorkerByIdUseCase(): IGetWorkerByIdUseCase {
-    if(!this._getWorkerByIdUseCase) {
+    if (!this._getWorkerByIdUseCase) {
       this._getWorkerByIdUseCase = new GetWorkerByIdUseCase(
         this.infra.workerRepository,
         this.infra.categoryRepository,
@@ -429,4 +435,23 @@ export class UseCaseDI {
     return this._getWorkerByIdUseCase;
   }
 
+  get getWorkerAvailabilityUseCase(): IGetWorkerAvailabilityUseCase {
+    if (!this._getWorkerAvailabilityUseCase) {
+      this._getWorkerAvailabilityUseCase = new GetWorkerAvailabilityUseCase(
+        this.infra.workerScheduleRepo
+      )
+    }
+    return this._getWorkerAvailabilityUseCase;
+  }
+
+  get bookWorkerUseCase(): IBookWorkerUseCase {
+    if (!this._bookWorkerUseCase) {
+      this._bookWorkerUseCase = new BookWorkerUseCase(
+        this.infra.serviceRepository,
+        this.infra.workerRepository,
+        this.infra.workerScheduleRepo
+      )
+    }
+    return this._bookWorkerUseCase;
+  }
 }

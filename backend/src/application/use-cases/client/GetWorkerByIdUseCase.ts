@@ -12,7 +12,7 @@ export class GetWorkerByIdUseCase implements IGetWorkerByIdUseCase {
     private readonly workerRepository: IWorkerRepository,
     private readonly categoryRepository: ICategoryRepository,
     private readonly s3Service: S3Service
-  ) {}
+  ) { }
 
   async execute(id: string): Promise<Worker | null> {
     const worker = await this.workerRepository.findById(id);
