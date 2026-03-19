@@ -26,6 +26,10 @@ import { OtpService } from "../adapters/OtpService";
 import { UUIDGenerator } from "../adapters/UUIDGenerator";
 import { S3Service } from "../adapters/S3service";
 import { env } from "../../config/env";
+import { IWorkerScheduleRepository } from "../../domain/repositories/IWorkerScheduleRepository";
+import { WorkerScheduleRepository } from "../repo/WorkerScheduleRepository";
+import { IServiceRepository } from "../../domain/repositories/IServiceRepository";
+import { ServiceRepository } from "../repo/ServiceRepository";
 
 export class InfrastructureDI {
   private _userRepositoryFactory?: IUserRepositoryFactory;
@@ -34,7 +38,8 @@ export class InfrastructureDI {
   private _otpRepository?: IOtpRepository;
   private _adminRepository?: IAdminRepository;
   private _userRepository?: IBaseRepository<any>;
-
+  private _workerScheduleRepo?: IWorkerScheduleRepository;
+  private _serviceRepository?: IServiceRepository;
 
   private _passwordHasher?: IPasswordHasher;
   private _idGenerator?: IGenerateUserID;
@@ -83,6 +88,13 @@ export class InfrastructureDI {
     return this._workerRepository;
   }
 
+  get workerScheduleRepo(): IWorkerScheduleRepository {
+    if (!this._workerScheduleRepo) {
+      this._workerScheduleRepo = new WorkerScheduleRepository();
+    }
+    return this._workerScheduleRepo
+  }
+
   get adminRepository(): IAdminRepository {
     if (!this._adminRepository) {
       this._adminRepository = new AdminRepository();
@@ -99,9 +111,16 @@ export class InfrastructureDI {
 
   get categoryRepository(): ICategoryRepository {
     if (!this._categoryRepository) {
-      this._categoryRepository = new CategoryRepository()
+      this._categoryRepository = new CategoryRepository();
     }
     return this._categoryRepository;
+  }
+
+  get serviceRepository(): IServiceRepository {
+    if (!this._serviceRepository) {
+      this._serviceRepository = new ServiceRepository();
+    }
+    return this._serviceRepository;
   }
 
   get passwordHasher(): IPasswordHasher {

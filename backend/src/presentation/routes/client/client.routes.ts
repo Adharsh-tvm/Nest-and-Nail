@@ -14,5 +14,9 @@ export function createClientRoutes(
 
     router.get("/workers/:id", (req, res, next) => { authMiddleware.verify(req, res, next); }, (req, res) => clientController.getWorkerById(req, res))
 
+    router.get("/workers/:id/availability", (req, res, next) => { authMiddleware.verify(req, res, next); }, (req, res) => clientController.getWorkerAvailability(req, res));
+
+    router.post("/services/book", authMiddleware.verify, (req, res)=> clientController.bookWorker(req, res))
+
     return router;
 }

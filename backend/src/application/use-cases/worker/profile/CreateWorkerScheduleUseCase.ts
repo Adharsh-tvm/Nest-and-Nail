@@ -6,7 +6,7 @@ import { ICreateWorkerScheduleUseCase } from "../../../interfaces/worker/profile
 import { WorkerScheduleMapper } from "../../../mappers/WorkerScheduleMapper";
 
 export class CreateWorkerScheduleUseCase implements ICreateWorkerScheduleUseCase {
-  constructor(private workerScheduleRepository: IWorkerScheduleRepository) {}
+  constructor(private workerScheduleRepository: IWorkerScheduleRepository) { }
 
   async execute(dto: CreateWorkerScheduleDTO): Promise<WorkerScheduleDTO[]> {
     const { workerId, startDate, endDate } = dto;

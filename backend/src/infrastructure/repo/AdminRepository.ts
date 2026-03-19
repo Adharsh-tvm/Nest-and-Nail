@@ -7,4 +7,4 @@ export class AdminRepository extends BaseRepository<Admin, IAdminDocument> imple
     constructor() {
         super(AdminModel);
     }
-}
+}  

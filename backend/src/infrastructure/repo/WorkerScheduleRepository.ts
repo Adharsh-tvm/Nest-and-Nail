@@ -19,10 +19,87 @@ export class WorkerScheduleRepository implements IWorkerScheduleRepository {
     return schedules as WorkerSchedule[];
   }
 
+  async findByWorkerAndDate(workerId: string, date: Date): Promise<WorkerSchedule[]> {
+    const start = new Date(date);
+    start.setHours(0, 0, 0, 0);
+
+    const end = new Date(date);
+    end.setHours(23, 59, 59, 999);
+
+    const schedules = await WorkerScheduleModel.find({
+      workerId,
+      date: { $gte: start, $lte: end }
+    }).lean();
+
+    return schedules as WorkerSchedule[];
+  }
+
   async deleteByWorkerIdAndDateRange(workerId: string, startDate: Date, endDate: Date): Promise<void> {
     await WorkerScheduleModel.deleteMany({
       workerId,
       date: { $gte: startDate, $lte: endDate },
     });
+  }
+
+  async findByWorkerDateAndSlot(workerId: string, date: Date, slotType: string): Promise<WorkerSchedule | null> {
+    const start = new Date(date);
+    start.setHours(0, 0, 0, 0);
+
+    const end = new Date(date);
+    end.setHours(23, 59, 59, 999);
+
+    return await WorkerScheduleModel.findOne({
+      workerId,
+      slotType,
+      date: { $gte: start, $lte: end }
+    }).lean();
+  }
+
+  async markAsBooked(
+    workerId: string,
+    date: Date,
+    slotType: string,
+    serviceId: string
+  ): Promise<void> {
+
+    const start = new Date(date);
+    start.setHours(0, 0, 0, 0);
+
+    const end = new Date(date);
+    end.setHours(23, 59, 59, 999);
+
+    await WorkerScheduleModel.findOneAndUpdate(
+      {
+        workerId,
+        slotType,
+        date: { $gte: start, $lte: end }
+      },
+      {
+        isBooked: true,
+        serviceId
+      },
+      { upsert: true }
+    );
+  }
+
+  async unmarkAsBooked(workerId: string, date: Date, slotType: string): Promise<void> {
+
+    const start = new Date(date);
+    start.setHours(0, 0, 0, 0);
+
+    const end = new Date(date);
+    end.setHours(23, 59, 59, 999);
+
+    await WorkerScheduleModel.findOneAndUpdate(
+      {
+        workerId,
+        slotType,
+        date: { $gte: start, $lte: end }
+      },
+      {
+        isBooked: false,
+        serviceId: null
+      }
+    );
   }
 }

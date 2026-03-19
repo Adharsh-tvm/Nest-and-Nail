@@ -8,4 +8,4 @@ export interface IGetAvailableWorkersUseCase {
     search?: string,    // name keyword
     isOnline?: boolean  // availability filter
   ): Promise<Worker[]>;
-}
+} 

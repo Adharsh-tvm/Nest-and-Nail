@@ -3,12 +3,12 @@ import { IWorkerRepository } from "../../../domain/repositories/IWorkerRepositor
 import { IGetAvailableWorkersUseCase } from "../../interfaces/client/IGetAvailableWorkersUseCase";
 import { S3Service } from "../../../infrastructure/adapters/S3service";
 
-export class GetAvailableWorkersUseCase implements IGetAvailableWorkersUseCase{
+export class GetAvailableWorkersUseCase implements IGetAvailableWorkersUseCase {
 
   constructor(
     private readonly workerRepository: IWorkerRepository,
     private readonly s3Service: S3Service
-  ) {}
+  ) { }
 
   async execute(
     categoryId?: string,
