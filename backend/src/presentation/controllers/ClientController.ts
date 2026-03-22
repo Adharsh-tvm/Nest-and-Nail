@@ -84,9 +84,13 @@ export class ClientController {
 
   bookWorker = async (req: Request, res: Response) => {
 
-    const { workerId, category, date, slotType } = req.body;
+    const { workerId, category, date, slotType, numberOfDays, title, description } = req.body;
 
-    const clientId = (req as any).user.userId;
+    const clientId = (req as any).user?.id || (req as any).user?._id;
+
+    if (!clientId) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
 
     const result = await this.bookWorkerUseCase.execute({
       clientId,
@@ -94,6 +98,9 @@ export class ClientController {
       category,
       scheduledDate: new Date(date),
       slotType,
+      numberOfDays,
+      title,
+      description,
 
       location: {
         type: "Point",

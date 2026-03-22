@@ -112,9 +112,9 @@ export default async function WorkerDetailPage({
                                 <span className="text-sm font-medium text-gray-400">({worker.totalRatings || 0} reviews)</span>
                             </div>
 
-                            <button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 px-4 rounded-xl transition-all shadow-md hover:shadow-lg active:scale-[0.98] flex items-center justify-center gap-2">
-                                Request Service
-                            </button>
+                            <Link href={`/client/workers/${paramsObj.id}/book`} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 px-4 rounded-xl transition-all shadow-md hover:shadow-lg active:scale-[0.98] flex items-center justify-center gap-2">
+                                Book a Service
+                            </Link>
                         </div>
 
                         {/* Contact & Info Card */}
