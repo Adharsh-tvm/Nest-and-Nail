@@ -1,9 +1,9 @@
 import { AdminController } from "../../presentation/controllers/AdminController";
 import { AuthController } from "../../presentation/controllers/AuthController";
 import { CategoryController } from "../../presentation/controllers/CategoryController";
+import { ClientController } from "../../presentation/controllers/ClientController";
 import { GoogleAuthController } from "../../presentation/controllers/GoogleAuthController";
 import { MediaController } from "../../presentation/controllers/MediaController";
-import { ServiceRequestController } from "../../presentation/controllers/ServiceRequestController";
 import { UploadController } from "../../presentation/controllers/UploadController";
 import { UserController } from "../../presentation/controllers/UserController";
 import { UserProfileController } from "../../presentation/controllers/UserProfileController";
@@ -11,7 +11,6 @@ import { IAdminController } from "../../presentation/interfaces/IAdminController
 import { IAuthController } from "../../presentation/interfaces/IAuthController";
 import { ICategoryController } from "../../presentation/interfaces/ICategoryController";
 import { IGoogleAuthController } from "../../presentation/interfaces/IGoogleAuthController";
-import { IServiceRequestController } from "../../presentation/interfaces/IServiceRequestController";
 import { IUploadController } from "../../presentation/interfaces/IUploadController";
 import { IUserController } from "../../presentation/interfaces/IUserController";
 import { IUserProfileController } from "../../presentation/interfaces/IUserProfileController";
@@ -22,17 +21,17 @@ import { UseCaseDI } from "./usecases.di";
 export class ControllerDI {
     private _authController?: IAuthController;
     private _authMiddleware?: AuthMiddleware;
-
     private _googleAuthController?: IGoogleAuthController;
+
     private _adminController?: IAdminController;
     private _userController?: IUserController;
+    private _clientController?: ClientController;
 
     private _uploadController?: IUploadController;
     private _userProfileController?: IUserProfileController;
 
     private _categoryController?: ICategoryController;
 
-    private _serviceRequestController?: IServiceRequestController;
     private _mediaController?: MediaController;
 
     constructor(
@@ -110,7 +109,6 @@ export class ControllerDI {
             this._userProfileController = new UserProfileController(
                 this._useCases.updateUserProfileUseCase,
                 this._useCases.updateUserSkillsUseCase,
-                this._useCases.updateWorkerCategoriesUseCase,
                 this._useCases.addUserAddressUseCase,
                 this._useCases.editUserAddressUseCase,
                 this._useCases.deleteUserAddressUseCase
@@ -126,23 +124,10 @@ export class ControllerDI {
                 this._useCases.getAllCategoriesUseCase,
                 this._useCases.updateCategoryUseCase,
                 this._useCases.updateCategoryStatusUseCase,
+                this._useCases.updateWorkerCategoriesUseCase
             )
         }
         return this._categoryController
-    }
-
-    get serviceRequestController(): IServiceRequestController {
-        if (!this._serviceRequestController) {
-            this._serviceRequestController = new ServiceRequestController(
-                this._useCases.createServiceRequestUseCase,
-                this._useCases.getMyServiceRequestsUseCase,
-                this._useCases.getServiceRequestByIdUseCase,
-                this._useCases.getAllServiceRequestsUseCase,
-                this._useCases.deleteServiceRequestUseCase,
-                this._useCases.dispatchServiceRequestUseCase
-            )
-        }
-        return this._serviceRequestController;
     }
 
     get mediaController(): MediaController {
@@ -152,6 +137,18 @@ export class ControllerDI {
             )
         }
         return this._mediaController;
+    }
+
+    get clientController(): ClientController {
+        if(!this._clientController) {
+            this._clientController = new ClientController(
+                this._useCases.getAvailableWorkersUseCase,
+                this._useCases.getWorkerByIdUseCase,
+                this._useCases.getWorkerAvailabilityUseCase,
+                this._useCases.bookWorkerUseCase
+            )
+        }
+        return this._clientController
     }
 }
 

@@ -58,7 +58,7 @@ export class ValidateUserUseCase implements IValidateUserUseCase {
             success: true,
             payload: {
                 id: user.userId,
-                role: userRole!,
+                role: userRole,
                 isBlocked: !!user.isBlocked,
             },
         };

@@ -1,4 +1,4 @@
-export enum ServiceRequestStatus {
+export enum ServiceStatus {
     OPEN = "OPEN",
     RESERVED = "RESERVED",
     CONFIRMED = "CONFIRMED",
@@ -6,6 +6,7 @@ export enum ServiceRequestStatus {
     COMPLETED = "COMPLETED",
     CANCELLED_BY_CLIENT = "CANCELLED_BY_CLIENT",
     CANCELLED_BY_WORKER = "CANCELLED_BY_WORKER",
+    CANCELLED = "CANCELLED",
     EXPIRED = "EXPIRED",
     NO_WORKERS_AVAILABLE = "NO_WORKERS_AVAILABLE",
     ARCHIVED = "ARCHIVED"

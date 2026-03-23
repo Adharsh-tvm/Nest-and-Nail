@@ -3,15 +3,12 @@ import { IBaseRepository } from "./IBaseRepository";
 
 export interface IWorkerRepository extends IBaseRepository<Worker> {
 
-    findEligibleWorkers(
-        category: string,
-        coordinates: [number, number],
-        maxDistance: number
+    findAvailableWorkers(
+        categoryId?: string,
+        lat?: number,
+        lng?: number,
+        search?: string,      // filter by worker name (partial match)
+        isOnline?: boolean    // filter by online status
     ): Promise<Worker[]>;
 
-    reserveWorker(workerId: string): Promise<boolean>;
-
-    releaseWorker(workerId: string): Promise<void>;
-
-    incrementWeeklyJobCount(workerId: string): Promise<void>;
 }

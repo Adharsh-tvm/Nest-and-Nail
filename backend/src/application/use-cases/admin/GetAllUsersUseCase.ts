@@ -68,8 +68,6 @@ export class GetAllUsersUseCase implements IGetAllUsersUseCase {
         };
     }
 
-
-
     private async _signUrl(urlOrKey: string): Promise<string> {
         if (!urlOrKey) return urlOrKey;
 

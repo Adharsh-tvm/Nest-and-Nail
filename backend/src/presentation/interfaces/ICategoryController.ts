@@ -5,4 +5,5 @@ export interface ICategoryController {
   getAll(req: Request, res: Response): Promise<void>;
   update(req: Request, res: Response): Promise<void>;
   updateStatus(req: Request, res: Response): Promise<void>;
+  updateUserCategories(req: Request, res: Response): Promise<void>;
 }

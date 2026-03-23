@@ -39,7 +39,7 @@ import { updateUserSkillsAction } from "@/app/actions/users/user-skills-action";
 import {
   addUSerAddressAction,
   editUserAddressAction,
-  deleteUserAddressAction
+  deleteUserAddressAction,
 } from "@/app/actions/users/user-profile-actions";
 import toast from "react-hot-toast";
 import { VerificationStatus } from "@/shared/enums/authEnums";
@@ -228,10 +228,10 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
   };
 
   const [profilePicPreview, setProfilePicPreview] = useState<string | null>(
-    user.profileImageUrl || null
+    user.profileImageUrl || null,
   );
   const [selectedProfilePic, setSelectedProfilePic] = useState<File | null>(
-    null
+    null,
   );
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -378,8 +378,9 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
                 <div className="relative group">
                   <div
                     onClick={handleAvatarClick}
-                    className={`w-28 h-28 rounded-full overflow-hidden border-4 border-white shadow-lg relative ${isEditingDetails ? "cursor-pointer" : ""
-                      }`}
+                    className={`w-28 h-28 rounded-full overflow-hidden border-4 border-white shadow-lg relative ${
+                      isEditingDetails ? "cursor-pointer" : ""
+                    }`}
                   >
                     {profilePicPreview ? (
                       <img
@@ -499,10 +500,11 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
                   (skill, i) => (
                     <span
                       key={i}
-                      className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium border ${isEditingSkills
-                        ? "bg-white border-[#1B4332] text-[#1B4332]"
-                        : "bg-[#1B4332]/5 border-[#1B4332]/10 text-[#1B4332]"
-                        }`}
+                      className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium border ${
+                        isEditingSkills
+                          ? "bg-white border-[#1B4332] text-[#1B4332]"
+                          : "bg-[#1B4332]/5 border-[#1B4332]/10 text-[#1B4332]"
+                      }`}
                     >
                       {skill}
                       {isEditingSkills && (
@@ -601,7 +603,9 @@ const AddressesView: React.FC<ViewProps> = ({ user, setUser }) => {
     let updatedAddresses = [...(user.address || [])];
     if (isEditing && editingAddress) {
       updatedAddresses = updatedAddresses.map((addr) =>
-        addr.addressId === editingAddress.addressId ? { ...addressData, addressId: editingAddress.addressId } : addr
+        addr.addressId === editingAddress.addressId
+          ? { ...addressData, addressId: editingAddress.addressId }
+          : addr,
       );
     } else {
       updatedAddresses.push(addressData);
@@ -609,9 +613,11 @@ const AddressesView: React.FC<ViewProps> = ({ user, setUser }) => {
 
     // Handle default address logic locally for optimistic update
     if (addressData.isDefault) {
-      updatedAddresses = updatedAddresses.map(a => ({
+      updatedAddresses = updatedAddresses.map((a) => ({
         ...a,
-        isDefault: a === addressData || (isEditing && a.addressId === editingAddress?.addressId)
+        isDefault:
+          a === addressData ||
+          (isEditing && a.addressId === editingAddress?.addressId),
       }));
     }
 
@@ -620,7 +626,11 @@ const AddressesView: React.FC<ViewProps> = ({ user, setUser }) => {
     try {
       let response;
       if (isEditing && editingAddress?.addressId) {
-        response = await editUserAddressAction(user.id, editingAddress.addressId, addressData);
+        response = await editUserAddressAction(
+          user.id,
+          editingAddress.addressId,
+          addressData,
+        );
       } else {
         response = await addUSerAddressAction(user.id, addressData);
       }
@@ -632,7 +642,11 @@ const AddressesView: React.FC<ViewProps> = ({ user, setUser }) => {
       }
 
       setUser(response.payload || oldUser); // Use payload if available, else revert/keep
-      toast.success(isEditing ? "Address updated successfully" : "Address added successfully");
+      toast.success(
+        isEditing
+          ? "Address updated successfully"
+          : "Address added successfully",
+      );
       router.refresh();
     } catch (err: any) {
       setUser(oldUser);
@@ -657,7 +671,9 @@ const AddressesView: React.FC<ViewProps> = ({ user, setUser }) => {
     setIsDeleteConfirmOpen(false);
 
     const oldUser = user;
-    const updatedAddresses = user.address?.filter(a => a.addressId !== addressToDelete);
+    const updatedAddresses = user.address?.filter(
+      (a) => a.addressId !== addressToDelete,
+    );
     setUser({ ...user, address: updatedAddresses });
 
     try {
@@ -736,7 +752,9 @@ const AddressesView: React.FC<ViewProps> = ({ user, setUser }) => {
                       if (id) {
                         handleDeleteClick(id);
                       } else {
-                        toast.error("Cannot delete: Address ID missing. Please refresh.");
+                        toast.error(
+                          "Cannot delete: Address ID missing. Please refresh.",
+                        );
                       }
                     }}
                     className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
@@ -886,12 +904,14 @@ const SettingsView: React.FC = () => {
           </div>
           <button
             onClick={() => setIsAvailable(!isAvailable)}
-            className={`w-12 h-7 rounded-full relative transition-colors ${isAvailable ? "bg-[#1B4332]" : "bg-gray-200"
-              }`}
+            className={`w-12 h-7 rounded-full relative transition-colors ${
+              isAvailable ? "bg-[#1B4332]" : "bg-gray-200"
+            }`}
           >
             <span
-              className={`absolute top-1 left-1 bg-white w-5 h-5 rounded-full transition-transform ${isAvailable ? "translate-x-5" : "translate-x-0"
-                }`}
+              className={`absolute top-1 left-1 bg-white w-5 h-5 rounded-full transition-transform ${
+                isAvailable ? "translate-x-5" : "translate-x-0"
+              }`}
             />
           </button>
         </div>
@@ -1064,18 +1084,20 @@ const UserProfile = () => {
                   onClick={() => setActiveTab(tab.id as Tab)}
                   className={`
                                 group inline-flex items-center py-5 px-1 border-b-2 font-medium text-base transition-all
-                                ${isActive
-                      ? "border-[#1B4332] text-[#1B4332]"
-                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                    }
+                                ${
+                                  isActive
+                                    ? "border-[#1B4332] text-[#1B4332]"
+                                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                                }
                             `}
                 >
                   <Icon
                     size={18}
-                    className={`mr-2.5 ${isActive
-                      ? "text-[#1B4332]"
-                      : "text-gray-400 group-hover:text-gray-500"
-                      }`}
+                    className={`mr-2.5 ${
+                      isActive
+                        ? "text-[#1B4332]"
+                        : "text-gray-400 group-hover:text-gray-500"
+                    }`}
                   />
                   {tab.label}
                 </button>

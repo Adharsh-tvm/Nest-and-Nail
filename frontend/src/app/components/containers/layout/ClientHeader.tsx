@@ -19,7 +19,7 @@ import { changeRoleAction } from "@/app/actions/users/change-role-action";
 import WorkerVerificationFlow from "../../../client/(home)/DocumentsUpload";
 import { VerificationStatus } from "@/shared/enums/authEnums";
 import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import SwitchRoleConfirmationModal from "./SwitchRoleConfirmationModal";
 import { Spinner } from "@/app/components/ui/spinner";
 
@@ -32,6 +32,7 @@ const ClientHeader: React.FC = () => {
   const [imageError, setImageError] = useState(false);
 
   const router = useRouter();
+  const pathname = usePathname();
 
   const [isWorkerFlowOpen, setIsWorkerFlowOpen] = useState(false);
 
@@ -48,6 +49,10 @@ const ClientHeader: React.FC = () => {
 
   const profileHref =
     userMode === "worker" ? "/worker/profile" : "/client/profile";
+
+  useEffect(() => {
+    console.log("Worker Current:", currentUser);
+  });
 
   useEffect(() => {
     setIsLoggedIn(Boolean(currentUser && Object.keys(currentUser).length));
@@ -153,22 +158,47 @@ const ClientHeader: React.FC = () => {
               </div>
             ) : (
               <div className="hidden md:flex items-center gap-8 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-                <Link
-                  href={userMode === "worker" ? "/worker/find-works" : "/client/service-requests"}
-                  className="text-gray-500 font-medium hover:text-[#1B4332] transition-colors text-sm"
-                >
-                  {userMode === "worker" ? "Find Works" : "Services"}
-                </Link>
-
+                {userMode === "worker" && (
+                  <Link
+                    href="/worker/find-works"
+                    className={`text-sm font-medium transition-all ${
+                      pathname?.startsWith("/worker/find-works")
+                        ? "text-[#1B4332] border-b-2 border-[#1B4332] pb-1"
+                        : "text-gray-500 hover:text-[#1B4332]"
+                    }`}
+                  >
+                    Find Works
+                  </Link>
+                )}
+                {userMode !== "worker" && (
+                  <Link
+                    href="/client/workers"
+                    className={`text-sm font-medium transition-all ${
+                      pathname?.startsWith("/client/workers")
+                        ? "text-[#1B4332] border-b-2 border-[#1B4332] pb-1"
+                        : "text-gray-500 hover:text-[#1B4332]"
+                    }`}
+                  >
+                    Workers
+                  </Link>
+                )}
                 <Link
                   href="/client/payments"
-                  className="text-gray-500 font-medium hover:text-[#1B4332] transition-colors text-sm"
+                  className={`text-sm font-medium transition-all ${
+                    pathname?.startsWith("/client/payments")
+                      ? "text-[#1B4332] border-b-2 border-[#1B4332] pb-1"
+                      : "text-gray-500 hover:text-[#1B4332]"
+                  }`}
                 >
                   Payments
                 </Link>
                 <Link
                   href="/client/meetings"
-                  className="text-gray-500 font-medium hover:text-[#1B4332] transition-colors text-sm"
+                  className={`text-sm font-medium transition-all ${
+                    pathname?.startsWith("/client/meetings")
+                      ? "text-[#1B4332] border-b-2 border-[#1B4332] pb-1"
+                      : "text-gray-500 hover:text-[#1B4332]"
+                  }`}
                 >
                   Meetings
                 </Link>
@@ -209,24 +239,30 @@ const ClientHeader: React.FC = () => {
                 {isVerified && (
                   <div
                     onClick={toggleUserMode}
-                    className={`relative flex items-center bg-gray-100 rounded-full p-1 w-32 h-10 border border-gray-200 shadow-inner ${isTogglingRole ? "opacity-50 cursor-wait" : "cursor-pointer"
-                      }`}
+                    className={`relative flex items-center bg-gray-100 rounded-full p-1 w-32 h-10 border border-gray-200 shadow-inner ${
+                      isTogglingRole
+                        ? "opacity-50 cursor-wait"
+                        : "cursor-pointer"
+                    }`}
                   >
                     <div
-                      className={`absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-full shadow-sm transition-all duration-300 ease-out ${userMode === "client"
-                        ? "left-1 bg-[#1B4332]"
-                        : "left-[calc(50%)] bg-[#DC2626]"
-                        }`}
+                      className={`absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-full shadow-sm transition-all duration-300 ease-out ${
+                        userMode === "client"
+                          ? "left-1 bg-[#1B4332]"
+                          : "left-[calc(50%)] bg-[#DC2626]"
+                      }`}
                     />
                     <div
-                      className={`flex-1 z-10 text-center text-xs font-bold ${userMode === "client" ? "text-white" : "text-gray-500"
-                        }`}
+                      className={`flex-1 z-10 text-center text-xs font-bold ${
+                        userMode === "client" ? "text-white" : "text-gray-500"
+                      }`}
                     >
                       Client
                     </div>
                     <div
-                      className={`flex-1 z-10 text-center text-xs font-bold ${userMode === "worker" ? "text-white" : "text-gray-500"
-                        }`}
+                      className={`flex-1 z-10 text-center text-xs font-bold ${
+                        userMode === "worker" ? "text-white" : "text-gray-500"
+                      }`}
                     >
                       Worker
                     </div>
@@ -259,8 +295,9 @@ const ClientHeader: React.FC = () => {
                     </span>
                     <ChevronDown
                       size={16}
-                      className={`text-gray-400 transition-transform duration-200 ${isUserMenuOpen ? "rotate-180" : ""
-                        }`}
+                      className={`text-gray-400 transition-transform duration-200 ${
+                        isUserMenuOpen ? "rotate-180" : ""
+                      }`}
                     />
                   </button>
 

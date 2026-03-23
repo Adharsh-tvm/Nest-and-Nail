@@ -172,15 +172,12 @@ NEW PENDINGS...
 ✔ reservation for workers @done (2/10/2026, 10:21:06 AM)
 ✔ service request photos @done (2/10/2026, 10:21:37 AM)
 ✔ custom id for service request @done (2/10/2026, 10:21:46 AM)
-☐ apply filter in service request page
 ✔ need to add custom location while adding address @done (2/10/2026, 10:25:42 AM)
 ☐ auto logout after token expire
 ☐ address delete option 
 ✔ add service delete option @done (2/20/2026, 12:18:46 PM)
-☐ meeting ui set up
-☐ fetch services based on categories 
-☐ admin only middleware for admin access
-☐ implement exact middlewares in authorization backend
+✔ admin only middleware for admin access @done (3/17/2026, 9:31:11 AM)
+✔ implement exact middlewares in authorization backend @done (3/17/2026, 9:31:14 AM)
 ✔ list all the service requests in admin side @done (2/20/2026, 12:20:10 PM)
 ✔ show category name instead of id in service requests @done (2/20/2026, 12:20:13 PM)
 ✔ analyse how search and filters are done in admin side @done (2/20/2026, 12:20:17 PM)
@@ -196,19 +193,14 @@ NEW PENDINGS...
 ☐ address add error display
 ☐ front and back id image is same
 ☐ prevent multiple click in buttons
-☐ suggestion to workers
 ☐ flag 
-☐ working hours and same day multiple works 
 ☐ booking policy
-☐ Reassign logic
 ☐ category creation by worker
 ☐ Directly connecting flow
 ☐ market place and direct booking
 ☐ subscription
 ☐ set up category flow
-☐ swiggy flow
-☐ fetching the best worker using the filters and adding the count of jobs done
-☐ 
+☐ back button issue after login
 
 
 
@@ -239,7 +231,19 @@ Next week:
 ☐ cloudstorage
 
 Next 
- ☐ - slot
- ☐ - map
- ☐ - video call
- ☐ - payment
+☐ - slot
+☐ - map
+☐ - video call
+☐ - payment
+
+☐ Worker listing page ui set up
+☐ Worker detail page ui set up
+☐ sort and filter along with location in worker listing page
+☐ ditsance from house in worker listing and detail page
+☐ map inside worker detail page
+☐ slot
+☐ Worker booking
+☐ auto buffer date while booking and remove option
+☐ video vall assistance
+☐ payment
+☐ email service automation
