@@ -1,11 +1,11 @@
 
-export type SuccessResponse<T = any> = {
+export interface SuccessResponse<T = any> {
   success: true,
   message: string,
   payload: T,
 }
 
-export type FailedResponse = {
+export interface FailedResponse {
   success: false,
   message: string,
   error: any

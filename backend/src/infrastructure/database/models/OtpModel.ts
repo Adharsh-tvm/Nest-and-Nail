@@ -1,13 +1,18 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, Document } from "mongoose";
 
-const OtpSchema = new Schema({
+export interface IOtpDocument extends Document {
+  email: string;
+  otp: string;
+  expiresAt: Date;
+}
+
+const OtpSchema = new Schema<IOtpDocument>({
   email: { type: String, required: true },
   otp: { type: String, required: true },
-  expiresAt: {
-    type: Date,
-    required: true,
-    index: { expires: 120 }  // Auto-delete after 120 seconds (2 minutes)
-  }
+  expiresAt: { type: Date, required: true }
 });
 
-export const OtpModel = model("Otp", OtpSchema);
+OtpSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 120 });
+
+export const OtpModel =
+  model<IOtpDocument>("Otp", OtpSchema);

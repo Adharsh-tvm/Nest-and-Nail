@@ -27,8 +27,8 @@ export interface User {
 
     rating?: number;
     totalRatings?: number;
-    isAvailable?: boolean;
     weeklyJobCount?: number;
     lastAssignedAt?: Date;
-    currentActiveRequestId?: string;
+    currentActiveRequestId?: string | null;
+    distance?: number;
 }

@@ -13,7 +13,7 @@ export class VerifyOtpUseCase implements IVerifyOtpUseCase {
     async execute(email: string, otp: string): Promise<boolean> {
         const record = await this._otpRepo.findByEmail(email);
 
-        if (!record || !record.expiresAt || record.expiresAt < new Date()) {
+        if (!record?.expiresAt || record.expiresAt < new Date()) {
             this._logger?.warn(`OTP expired or missing for ${email}`);
             return false;
         }

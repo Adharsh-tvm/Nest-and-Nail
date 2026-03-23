@@ -26,9 +26,7 @@ export class GoogleAuthController implements IGoogleAuthController {
     } catch (error) {
       console.error("[GoogleAuthController] Error:", error);
 
-
       res.status(HttpStatusCode.INTERNAL_SERVER).json(ResponseHandler.error(RESPONSE_MESSAGES.GOOGLE_AUTH_FAILED, error))
-
 
     }
   }

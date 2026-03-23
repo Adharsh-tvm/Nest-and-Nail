@@ -36,6 +36,15 @@ const userApi = {
     return response.data;
   },
 
+  getOnlineWorkers: async (): Promise<ApiResponse<User[]>> => {
+    const response = await axiosInstance.get<ApiResponse<User[]>>(
+      "/api/users/workers/online",
+      { withCredentials: true }
+    );
+    return response.data;
+  },
+
+
 
   updateSkills: async (
     userId: string,
@@ -65,7 +74,7 @@ const userApi = {
     categories: string[]
   ): Promise<ApiResponse<User>> => {
     const response = await axiosInstance.patch<ApiResponse<User>>(
-      `/api/users/${userId}/categories`,
+      `/api/users/categories/${userId}`,
       { categoryIds: categories },
       { withCredentials: true }
     );

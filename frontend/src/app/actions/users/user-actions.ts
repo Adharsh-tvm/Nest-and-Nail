@@ -2,6 +2,7 @@
 
 import { cookies } from "next/headers";
 import userApi from "@/sources/api/user.api";
+import { fetchAllCategories } from "@/sources/api/category.api";
 import { VerificationStatus } from "@/shared/enums/authEnums";
 import { ApiResponse } from "@/shared/types/responseTypes";
 import { User } from "@/shared/types/userTypes";
@@ -71,3 +72,5 @@ export async function validateUser() {
     return null;
   }
 }
+
+

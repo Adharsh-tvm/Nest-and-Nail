@@ -24,12 +24,12 @@ import { JwtTokenService } from "../adapters/JwtTokenService";
 import { NodemailerEmailService } from "../adapters/NodemailerEmailService";
 import { OtpService } from "../adapters/OtpService";
 import { UUIDGenerator } from "../adapters/UUIDGenerator";
-import { IServiceRequestRepository } from "../../domain/repositories/IServiceRequestRepository";
-import { ServiceRequestRepository } from "../repo/ServiceRequestRepository";
-import { IGenerateServiceRequestId } from "../../application/contracts/IGenerateServiceRequestId";
-import { ServiceRequestIdGenerator } from "../adapters/ServiceRequestIdGenerator";
 import { S3Service } from "../adapters/S3service";
 import { env } from "../../config/env";
+import { IWorkerScheduleRepository } from "../../domain/repositories/IWorkerScheduleRepository";
+import { WorkerScheduleRepository } from "../repo/WorkerScheduleRepository";
+import { IServiceRepository } from "../../domain/repositories/IServiceRepository";
+import { ServiceRepository } from "../repo/ServiceRepository";
 
 export class InfrastructureDI {
   private _userRepositoryFactory?: IUserRepositoryFactory;
@@ -38,7 +38,8 @@ export class InfrastructureDI {
   private _otpRepository?: IOtpRepository;
   private _adminRepository?: IAdminRepository;
   private _userRepository?: IBaseRepository<any>;
-
+  private _workerScheduleRepo?: IWorkerScheduleRepository;
+  private _serviceRepository?: IServiceRepository;
 
   private _passwordHasher?: IPasswordHasher;
   private _idGenerator?: IGenerateUserID;
@@ -49,9 +50,6 @@ export class InfrastructureDI {
   private _emailService?: IEmailService;
 
   private _categoryRepository?: ICategoryRepository;
-
-  private _serviceRequestRepository?: IServiceRequestRepository;
-  private _serviceRequestIdGenerator?: IGenerateServiceRequestId;
 
   private _s3Service?: S3Service;
 
@@ -90,6 +88,13 @@ export class InfrastructureDI {
     return this._workerRepository;
   }
 
+  get workerScheduleRepo(): IWorkerScheduleRepository {
+    if (!this._workerScheduleRepo) {
+      this._workerScheduleRepo = new WorkerScheduleRepository();
+    }
+    return this._workerScheduleRepo
+  }
+
   get adminRepository(): IAdminRepository {
     if (!this._adminRepository) {
       this._adminRepository = new AdminRepository();
@@ -106,9 +111,16 @@ export class InfrastructureDI {
 
   get categoryRepository(): ICategoryRepository {
     if (!this._categoryRepository) {
-      this._categoryRepository = new CategoryRepository()
+      this._categoryRepository = new CategoryRepository();
     }
     return this._categoryRepository;
+  }
+
+  get serviceRepository(): IServiceRepository {
+    if (!this._serviceRepository) {
+      this._serviceRepository = new ServiceRepository();
+    }
+    return this._serviceRepository;
   }
 
   get passwordHasher(): IPasswordHasher {
@@ -154,20 +166,6 @@ export class InfrastructureDI {
       this._emailService = new NodemailerEmailService();
     }
     return this._emailService;
-  }
-
-  get serviceRequestRepository(): IServiceRequestRepository {
-    if (!this._serviceRequestRepository) {
-      this._serviceRequestRepository = new ServiceRequestRepository();
-    }
-    return this._serviceRequestRepository;
-  }
-
-  get serviceRequestIdGenerator(): IGenerateServiceRequestId {
-    if (!this._serviceRequestIdGenerator) {
-      this._serviceRequestIdGenerator = new ServiceRequestIdGenerator();
-    }
-    return this._serviceRequestIdGenerator;
   }
 
   get s3Service(): S3Service {

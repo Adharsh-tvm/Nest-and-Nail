@@ -1,13 +1,14 @@
-import { FilterQuery, Model } from "mongoose";
+import { FilterQuery, Model, Document } from "mongoose";
 import { IBaseRepository } from "../../domain/repositories/IBaseRepository";
 import { User } from "../../domain/entities/User";
 
-export abstract class BaseRepository<T extends User> implements IBaseRepository<T> {
-    constructor(protected readonly model: Model<T>) { }
+export abstract class BaseRepository<T extends User, D extends Document = any> implements IBaseRepository<T> {
+    constructor(protected readonly model: Model<D>) { }
 
     async findByEmail(email: string): Promise<T | null> {
         const result = await this.model
-            .findOne({ email } as FilterQuery<T>)
+            .findOne({ email } as FilterQuery<D>)
+            .populate('categories', 'name')
             .lean()
             .exec();
 
@@ -16,13 +17,14 @@ export abstract class BaseRepository<T extends User> implements IBaseRepository<
             return null;
         }
 
-        const { _id, __v, ...cleanResult } = result as any;
+        const { _id, __v, categories, ...cleanResult } = result as any;
+        const mappedCategories = categories?.map((cat: any) => cat._id ? cat._id.toString() : cat.toString()) || [];
 
-        return cleanResult as T;
+        return { ...cleanResult, categories: mappedCategories } as T;
     }
 
     async create(user: T): Promise<T> {
-        const created = await this.model.create(user);
+        const created = await this.model.create(user as any);
         const obj = created.toObject();
 
         const { _id, __v, ...cleanResult } = obj as any;
@@ -32,7 +34,8 @@ export abstract class BaseRepository<T extends User> implements IBaseRepository<
 
     async findById(id: string): Promise<T | null> {
         const result = await this.model
-            .findOne({ userId: id } as FilterQuery<T>)
+            .findOne({ userId: id } as FilterQuery<D>)
+            .populate('categories', 'name')
             .lean()
             .exec();
 
@@ -42,9 +45,10 @@ export abstract class BaseRepository<T extends User> implements IBaseRepository<
             return null;
         }
 
-        const { _id, __v, ...cleanResult } = result as any;
+        const { _id, __v, categories, ...cleanResult } = result as any;
+        const mappedCategories = categories?.map((cat: any) => cat._id ? cat._id.toString() : cat.toString()) || [];
 
-        return cleanResult as T;
+        return { ...cleanResult, categories: mappedCategories } as T;
     }
 
     async findAll(): Promise<T[]> {
@@ -59,8 +63,8 @@ export abstract class BaseRepository<T extends User> implements IBaseRepository<
     async update(email: string, updateData: Partial<T>): Promise<T | null> {
         const updated = await this.model
             .findOneAndUpdate(
-                { email } as FilterQuery<T>,
-                updateData,
+                { email } as FilterQuery<D>,
+                updateData as any,
                 { new: true }
             )
             .lean()
@@ -74,7 +78,7 @@ export abstract class BaseRepository<T extends User> implements IBaseRepository<
 
     async delete(email: string): Promise<boolean> {
         const result = await this.model
-            .deleteOne({ email } as FilterQuery<T>)
+            .deleteOne({ email } as FilterQuery<D>)
             .exec();
 
         return result.deletedCount > 0;
@@ -84,7 +88,7 @@ export abstract class BaseRepository<T extends User> implements IBaseRepository<
     async deleteByUserId(userId: string): Promise<boolean> {
         try {
             const result = await this.model
-                .deleteOne({ userId } as FilterQuery<T>)
+                .deleteOne({ userId } as FilterQuery<D>)
                 .exec();
 
             return result.deletedCount > 0;
@@ -98,8 +102,8 @@ export abstract class BaseRepository<T extends User> implements IBaseRepository<
 
         const updated = await this.model
             .findOneAndUpdate(
-                { userId } as FilterQuery<T>,
-                updateData,
+                { userId } as FilterQuery<D>,
+                updateData as any,
                 { new: true }
             )
             .lean()

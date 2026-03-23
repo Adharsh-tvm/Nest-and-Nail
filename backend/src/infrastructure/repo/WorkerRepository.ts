@@ -1,9 +1,9 @@
 import { Worker } from "../../domain/entities/Worker";
 import { IWorkerRepository } from "../../domain/repositories/IWorkerRepository";
-import { WorkerModel } from "../database/models/WorkerModel";
+import { WorkerModel, IWorkerDocument } from "../database/models/WorkerModel";
 import { BaseRepository } from "./BaseRepository";
 
-export class WorkerRepository extends BaseRepository<Worker> implements IWorkerRepository {
+export class WorkerRepository extends BaseRepository<Worker, IWorkerDocument> implements IWorkerRepository {
     constructor() {
         super(WorkerModel);
     }
@@ -33,54 +33,79 @@ export class WorkerRepository extends BaseRepository<Worker> implements IWorkerR
         }));
     }
 
-    async findEligibleWorkers(
-        category: string,
-        coordinates: [number, number],
-        maxDistance: number
+    async findAvailableWorkers(
+        categoryId?: string,
+        lat?: number,
+        lng?: number,
+        search?: string,      // optional name keyword search
+        isOnline?: boolean    // optional online status filter
     ): Promise<Worker[]> {
 
-        return await WorkerModel.find({
-            role: "WORKER",
-            isOnline: true,
+        // Base filter conditions for all worker queries
+        const matchStage: any = {
+            role: "worker",
             isBlocked: false,
-            isAvailable: true,
-            categories: category,
-            "address.location": {
-                $near: {
-                    $geometry: {
+            isVerified: "VERIFIED",
+        };
+
+        // Filter by category if provided
+        if (categoryId) {
+            matchStage.categories = categoryId;
+        }
+
+        // Filter by online status if requested
+        if (isOnline === true) {
+            matchStage.isOnline = true;
+        }
+
+        // Search by worker name (case-insensitive partial match)
+        if (search && search.trim().length > 0) {
+            matchStage.name = { $regex: search.trim(), $options: 'i' };
+        }
+
+        const pipeline: any[] = [];
+
+        if (lat && lng) {
+            pipeline.push({
+                $geoNear: {
+                    near: {
                         type: "Point",
-                        coordinates
+                        coordinates: [lng, lat]
                     },
-                    $maxDistance: maxDistance
+                    distanceField: "distance",
+                    maxDistance: 30000, // 20km
+                    spherical: true
                 }
+            });
+        }
+
+        pipeline.push({ $match: matchStage });
+
+        pipeline.push(
+            {
+                $lookup: {
+                    from: "categories",
+                    localField: "categories",
+                    foreignField: "_id",
+                    as: "categoryDocs"
+                }
+            },
+            {
+                $sort: { rating: -1 }
             }
-        }).lean();
-    }
-
-    async reserveWorker(workerId: string): Promise<boolean> {
-
-        const updated = await WorkerModel.findOneAndUpdate(
-            { userId: workerId, isAvailable: true },
-            { isAvailable: false },
-            { new: true }
         );
 
-        return !!updated;
-    }
+        const workers = await WorkerModel.aggregate(pipeline);
 
-    async releaseWorker(workerId: string): Promise<void> {
-
-        await WorkerModel.updateOne(
-            { userId: workerId },
-            { isAvailable: true }
-        );
-    }
-
-    async incrementWeeklyJobCount(workerId: string): Promise<void> {
-
-        await WorkerModel.updateOne(
-            { userId: workerId },
-            { $inc: { weeklyJobCount: 1 } }
-        );
+        return workers.map((doc: any) => {
+            const { _id, __v, categories, categoryDocs, ...rest } = doc;
+            const mappedCategories = categoryDocs?.map((cat: any) => cat.name) || [];
+            return {
+                ...rest,
+                userId: rest.userId || _id.toString(), // ensure userId is present
+                categories: mappedCategories,
+                distance: rest.distance
+            } as Worker;
+        });
     }
 }
