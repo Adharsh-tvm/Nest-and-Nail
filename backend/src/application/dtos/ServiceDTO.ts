@@ -8,7 +8,7 @@ export interface CreateServiceDTO {
   category: string;
 
   scheduledDate: Date;
-  slotType: SlotType;
+  selectedSlots: { date: Date; slotType: SlotType }[];
 
   numberOfDays?: number;
 
@@ -30,7 +30,7 @@ export interface ServiceResponseDTO {
   category: string;
 
   scheduledDate: Date;
-  slotType: SlotType;
+  selectedSlots: { date: Date; slotType: SlotType }[];
 
   status: ServiceStatus;
   paymentStatus: PaymentStatus;

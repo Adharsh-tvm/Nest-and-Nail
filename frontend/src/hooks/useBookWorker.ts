@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { bookWorkerAction } from "@/app/actions/client/service-actions";
-import { BookingPayload, BookingResult, SlotType } from "@/shared/types/serviceTypes";
+import { BookingPayload, BookingResult, SlotType, SlotAvailability } from "@/shared/types/serviceTypes";
 
 export type BookingState =
   | { status: "idle" }
@@ -20,6 +20,7 @@ export function useBookWorker(refetchAvailability: () => Promise<any>) {
       workerId,
       category,
       date,
+      selectedSlots,
       slotType,
       numberOfDays,
       title,
@@ -28,6 +29,7 @@ export function useBookWorker(refetchAvailability: () => Promise<any>) {
       workerId: string;
       category: string;
       date: string;
+      selectedSlots?: { date: string; slotType: SlotType }[];
       slotType: SlotType;
       numberOfDays?: number;
       title?: string;
@@ -39,8 +41,10 @@ export function useBookWorker(refetchAvailability: () => Promise<any>) {
       const freshAvail = await refetchAvailability();
 
       if (freshAvail) {
-        const slotKey =
-          slotType === SlotType.HALF_DAY ? "halfDayAvailable" : "fullDayAvailable";
+        let slotKey: keyof SlotAvailability = "fullDayAvailable";
+        if (slotType === SlotType.MORNING_HALF) slotKey = "morningAvailable";
+        if (slotType === SlotType.EVENING_HALF) slotKey = "eveningAvailable";
+
         if (!freshAvail[slotKey]) {
           setBookingState({
             status: "error",
@@ -51,7 +55,7 @@ export function useBookWorker(refetchAvailability: () => Promise<any>) {
       }
 
       const payload: BookingPayload = { 
-        workerId, category, date, slotType, numberOfDays, title, description 
+        workerId, category, date, selectedSlots, slotType, numberOfDays, title, description 
       };
       const res = await bookWorkerAction(payload);
 

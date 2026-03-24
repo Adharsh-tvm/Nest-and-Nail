@@ -6,7 +6,7 @@ import { SlotType } from "@/shared/types/serviceTypes";
 import { useWorkerAvailability } from "@/hooks/useWorkerAvailability";
 import { useBookWorker } from "@/hooks/useBookWorker";
 import { CalendarSelector } from "./CalendarSelector";
-import { SlotSelector } from "./SlotSelector";
+
 import { DaysSelectionStep } from "./DaysSelectionStep";
 import { ServiceDetailsStep } from "./ServiceDetailsStep";
 import { BookingSummaryStep } from "./BookingSummaryStep";
@@ -31,6 +31,7 @@ export function BookingSection({ worker }: BookingSectionProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>(categoriesPool[0]);
+  const [selectedSlots, setSelectedSlots] = useState<Record<string, SlotType>>({});
 
   const {
     selectedDate,
@@ -47,13 +48,10 @@ export function BookingSection({ worker }: BookingSectionProps) {
 
   const [viewYear, setViewYear] = useState(new Date().getFullYear());
   const [viewMonth, setViewMonth] = useState(new Date().getMonth());
-  const [selectedSlot, setSelectedSlot] = useState<SlotType | null>(null);
-
-  // Auto-clear slot when date changes
+  // Auto-clear error when dates change
   useEffect(() => {
-    setSelectedSlot(null);
     resetBookingError();
-  }, [selectedDate, resetBookingError]);
+  }, [selectedSlots, resetBookingError]);
 
   // Initial fetch for calendar dots
   useEffect(() => {
@@ -65,14 +63,17 @@ export function BookingSection({ worker }: BookingSectionProps) {
   }, [viewYear, viewMonth, prefetchDays]);
 
   const handleConfirm = () => {
-    if (!selectedDate) return;
-    const finalSlot = numberOfDays > 1 ? SlotType.FULL_DAY : selectedSlot;
-    if (!finalSlot) return;
+    const slotsArray = Object.entries(selectedSlots).map(([date, slotType]) => ({ date, slotType }));
+    if (slotsArray.length === 0) return;
+    
+    // finalSlot fallback for backend constraints if needed, but we pass selectedSlots anyway
+    const finalSlot = slotsArray[0].slotType;
 
     book({
       workerId: worker.userId || worker.id,
       category: selectedCategory,
-      date: selectedDate,
+      date: slotsArray[0].date,
+      selectedSlots: slotsArray,
       slotType: finalSlot,
       numberOfDays,
       title,
@@ -80,12 +81,13 @@ export function BookingSection({ worker }: BookingSectionProps) {
     });
   };
 
+  // Skip Step 3 entirely since slots are picked on the Calendar
   const nextStep = () => setCurrentStep((p) => {
-    if (p === 2 && numberOfDays > 1) return 4;
+    if (p === 2) return 4;
     return Math.min(p + 1, 5);
   });
   const prevStep = () => setCurrentStep((p) => {
-    if (p === 4 && numberOfDays > 1) return 2;
+    if (p === 4) return 2;
     return Math.max(p - 1, 1);
   });
 
@@ -157,16 +159,9 @@ export function BookingSection({ worker }: BookingSectionProps) {
           <div className="animate-in fade-in slide-in-from-right-4 duration-500">
             <h2 className="text-2xl font-black text-gray-900 mb-6 text-center">Select Start Date</h2>
             <CalendarSelector
-              selectedDate={selectedDate ? new Date(selectedDate) : null}
-              onDateSelect={(date) => {
-                const pad = (n: number) => n.toString().padStart(2, '0');
-                const localDateStr = `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
-                selectDate(localDateStr);
-                
-                // Only auto-advance if it's a 1-day booking. For multi-day, let them preview/edit the range.
-                if (numberOfDays === 1) {
-                  nextStep();
-                }
+              selectedSlots={selectedSlots}
+              onSlotChange={(newSlots) => {
+                setSelectedSlots(newSlots);
               }}
               availabilityData={Object.fromEntries(calendarHighlights.entries()) as any}
               isLoadingDate={isLoadingDate}
@@ -179,64 +174,39 @@ export function BookingSection({ worker }: BookingSectionProps) {
               }}
             />
 
-            {/* Selected Range Preview for Multi-Day Bookings */}
-            {numberOfDays > 1 && selectedDate && (
-              <div className="mt-8 bg-white border-2 border-emerald-100 rounded-3xl p-6 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-                  <div>
-                    <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Selected Range</h3>
-                    <p className="font-bold text-gray-900 text-lg flex items-center flex-wrap gap-2">
-                      {new Date(selectedDate).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
-                      <ChevronRight className="w-5 h-5 text-gray-300" />
-                      {new Date(new Date(selectedDate).setDate(new Date(selectedDate).getDate() + numberOfDays - 1)).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
-                    </p>
+            {/* Selected Range Preview */}
+            <div className="mt-8 bg-white border-2 border-emerald-100 rounded-3xl p-6 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                <div>
+                  <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Selected Dates</h3>
+                  <p className="font-bold text-gray-900 text-lg flex items-center flex-wrap gap-2">
+                     {Object.keys(selectedSlots).length} of {numberOfDays} days selected
+                  </p>
+                  {Object.keys(selectedSlots).length === numberOfDays ? (
                     <p className="text-sm font-medium text-emerald-600 mt-1 bg-emerald-50 inline-block px-2.5 py-1 rounded-lg">
-                      {numberOfDays} Days • Full Day Slots
+                      All required days selected
                     </p>
-                  </div>
-                  
-                  <button
-                    onClick={nextStep}
-                    className="w-full sm:w-auto bg-gray-900 hover:bg-black text-white font-bold py-4 px-8 rounded-2xl transition-all flex items-center justify-center gap-2 shadow-md hover:shadow-lg active:scale-95 group shrink-0"
-                  >
-                    Continue
-                    <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  </button>
+                  ) : (
+                    <p className="text-sm font-medium text-amber-600 mt-1 bg-amber-50 inline-block px-2.5 py-1 rounded-lg">
+                      Please select {numberOfDays - Object.keys(selectedSlots).length} more day(s)
+                    </p>
+                  )}
                 </div>
+                
+                <button
+                  onClick={nextStep}
+                  disabled={Object.keys(selectedSlots).length !== numberOfDays}
+                  className="w-full sm:w-auto bg-gray-900 hover:bg-black disabled:bg-gray-300 disabled:cursor-not-allowed disabled:text-gray-500 text-white font-bold py-4 px-8 rounded-2xl transition-all flex items-center justify-center gap-2 shadow-md hover:shadow-lg active:scale-95 group shrink-0"
+                >
+                  Continue
+                  <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </button>
               </div>
-            )}
+            </div>
           </div>
         )}
 
-        {/* Step 3: Slots */}
-        {currentStep === 3 && (
-          <div className="animate-in fade-in slide-in-from-right-4 duration-500 bg-white rounded-[24px] p-6 sm:p-8 shadow-sm border border-gray-100">
-             <div className="text-center mb-8">
-               <h2 className="text-2xl font-black text-gray-900 mb-2">Preferred Timeline</h2>
-               <p className="text-gray-500">
-                 Availability for <span className="font-bold text-gray-900">{new Date(selectedDate!).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}</span>
-               </p>
-             </div>
-             {dateError ? (
-                <div className="bg-red-50 text-red-600 p-4 rounded-xl font-medium text-center">{dateError}</div>
-             ) : (
-                <SlotSelector
-                  availability={currentAvailability || { halfDayAvailable: false, fullDayAvailable: false }}
-                  selectedSlot={selectedSlot}
-                  onSlotSelect={setSelectedSlot}
-                  isLoading={isLoadingDate}
-                />
-             )}
-             <button
-               onClick={nextStep}
-               disabled={!selectedSlot}
-               className="mt-8 w-full bg-gray-900 hover:bg-black disabled:bg-gray-200 disabled:text-gray-400 text-white font-bold py-4 px-6 rounded-2xl transition-all flex items-center justify-center gap-2 group"
-             >
-               Continue to Details
-               <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-             </button>
-          </div>
-        )}
+
 
         {/* Step 4: Details */}
         {currentStep === 4 && (
@@ -255,8 +225,9 @@ export function BookingSection({ worker }: BookingSectionProps) {
             title={title}
             description={description}
             numberOfDays={numberOfDays}
-            startDate={selectedDate ? new Date(selectedDate) : null}
-            slotType={numberOfDays > 1 ? SlotType.FULL_DAY : selectedSlot}
+            startDate={Object.keys(selectedSlots).length > 0 ? new Date(Object.keys(selectedSlots)[0]) : null}
+            selectedSlots={Object.entries(selectedSlots).map(([date, slotType]) => ({ date, slotType }))}
+            slotType={Object.keys(selectedSlots).length > 0 ? Object.values(selectedSlots)[0] : null}
             workerName={worker.name}
             category={selectedCategory}
             isBooking={bookingState.status === "loading"}

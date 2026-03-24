@@ -21,8 +21,10 @@ export interface IServiceDocument extends Document {
   };
 
   scheduledDate: Date;
-
-  slotType: SlotType;
+  selectedSlots: {
+    date: Date;
+    slotType: SlotType;
+  }[];
 
   numberOfDays: number;
 
@@ -76,11 +78,13 @@ const ServiceSchema = new Schema<IServiceDocument>(
     },
 
     scheduledDate: { type: Date, required: true },
-
-    slotType: {
-      type: String,
-      enum: Object.values(SlotType),
+    selectedSlots: {
+      type: [{
+        date: { type: Date, required: true },
+        slotType: { type: String, enum: Object.values(SlotType), required: true }
+      }],
       required: true,
+      default: []
     },
 
     numberOfDays: {

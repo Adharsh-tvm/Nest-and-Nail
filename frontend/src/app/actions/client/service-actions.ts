@@ -2,6 +2,7 @@
 
 import {
   getWorkerAvailabilityApi,
+  getWorkerAvailabilityBulkApi,
   bookWorkerApi,
 } from "@/sources/api/service.api";
 import {
@@ -23,6 +24,23 @@ export async function getWorkerAvailabilityAction(
   } catch (error: any) {
     console.error("getWorkerAvailabilityAction error:", error);
     return { success: false, error: error.message || "Failed to fetch availability" };
+  }
+}
+
+export async function getWorkerAvailabilityBulkAction(
+  workerId: string,
+  startDate: string,
+  endDate: string
+): Promise<{ success: boolean; data?: Record<string, SlotAvailability>; error?: string }> {
+  try {
+    const res = await getWorkerAvailabilityBulkApi(workerId, startDate, endDate);
+    if (!res.success) {
+      return { success: false, error: res.message };
+    }
+    return { success: true, data: res.payload };
+  } catch (error: any) {
+    console.error("getWorkerAvailabilityBulkAction error:", error);
+    return { success: false, error: error.message || "Failed to bulk fetch availability" };
   }
 }
 

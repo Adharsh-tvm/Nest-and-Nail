@@ -3,7 +3,13 @@ export interface IGetWorkerAvailabilityUseCase {
     workerId: string,
     date: Date
   ): Promise<{
-    halfDayAvailable: boolean;
+    morningAvailable: boolean;
+    eveningAvailable: boolean;
     fullDayAvailable: boolean;
   }>;
+  executeBulk?(
+    workerId: string,
+    startDate: Date,
+    endDate: Date
+  ): Promise<Record<string, { morningAvailable: boolean; eveningAvailable: boolean; fullDayAvailable: boolean; }>>;
 }

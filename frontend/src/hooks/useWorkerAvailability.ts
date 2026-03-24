@@ -1,21 +1,21 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
-import { getWorkerAvailabilityAction } from "@/app/actions/client/service-actions";
+import { getWorkerAvailabilityAction, getWorkerAvailabilityBulkAction } from "@/app/actions/client/service-actions";
 import {
   DateAvailabilitySummary,
   SlotAvailability,
 } from "@/shared/types/serviceTypes";
 
 function toDateKey(date: Date): string {
-  return date.toISOString().split("T")[0];
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 }
 
 function computeHighlight(
   avail: SlotAvailability
 ): DateAvailabilitySummary["highlight"] {
-  if (avail.halfDayAvailable && avail.fullDayAvailable) return "green";
-  if (!avail.halfDayAvailable && !avail.fullDayAvailable) return "red";
+  if (avail.morningAvailable && avail.eveningAvailable && avail.fullDayAvailable) return "green";
+  if (!avail.morningAvailable && !avail.eveningAvailable && !avail.fullDayAvailable) return "red";
   return "yellow";
 }
 
@@ -31,53 +31,44 @@ export function useWorkerAvailability(workerId: string) {
 
   // Pre-fetched highlights for 7 days (used by calendar)
   const [calendarHighlights, setCalendarHighlights] = useState<
-    Map<string, DateAvailabilitySummary["highlight"]>
+    Map<string, DateAvailabilitySummary>
   >(new Map());
   const [isPrefetching, setIsPrefetching] = useState(false);
 
-  /** Pre-fetch next N days availability for calendar highlights */
   const prefetchDays = useCallback(
-    async (fromDate: Date, days = 30) => {
+    async (fromDate: Date, days = 35) => {
       setIsPrefetching(true);
-      const dates: string[] = [];
-      for (let i = 0; i < days; i++) {
-        const d = new Date(fromDate);
-        d.setDate(d.getDate() + i);
-        const key = toDateKey(d);
-        if (!cache.current.has(key)) {
-          // Immediately mark as loading in cache to prevent duplicate queued requests
-          cache.current.set(key, { pending: true } as any);
-          dates.push(key);
-        }
-      }
 
-      // Fetch sequentially to avoid locking the dev server / browser connection pool
-      for (const date of dates) {
-         try {
-           const res = await getWorkerAvailabilityAction(workerId, date);
+      const startDate = new Date(fromDate);
+      const endDate = new Date(fromDate);
+      endDate.setDate(endDate.getDate() + days - 1);
+      
+      const startStr = toDateKey(startDate);
+      const endStr = toDateKey(endDate);
+
+      try {
+           const res = await getWorkerAvailabilityBulkAction(workerId, startStr, endStr);
            if (res.success && res.data) {
-              const avail = res.data;
-              const highlight = computeHighlight(avail);
-              const summary: DateAvailabilitySummary = {
-                date,
-                halfDayAvailable: avail.halfDayAvailable,
-                fullDayAvailable: avail.fullDayAvailable,
-                highlight,
-              };
-              cache.current.set(date, summary);
-              
+              const bulkData = res.data;
               setCalendarHighlights((prev) => {
-                const map = new Map(prev);
-                map.set(date, highlight);
-                return map;
+                 const map = new Map(prev);
+                 Object.entries(bulkData).forEach(([date, avail]) => {
+                    const highlight = computeHighlight(avail);
+                    const summary: DateAvailabilitySummary = {
+                      date,
+                      morningAvailable: avail.morningAvailable,
+                      eveningAvailable: avail.eveningAvailable,
+                      fullDayAvailable: avail.fullDayAvailable,
+                      highlight,
+                    };
+                    cache.current.set(date, summary);
+                    map.set(date, summary);
+                 });
+                 return map;
               });
-           } else {
-             // Cache as failed so we don't infinitely retry
-             cache.current.set(date, { failed: true } as any);
            }
-         } catch (e) {
-           cache.current.set(date, { failed: true } as any);
-         }
+      } catch (e) {
+          console.error("Bulk fetch error", e);
       }
 
       setIsPrefetching(false);
@@ -95,7 +86,8 @@ export function useWorkerAvailability(workerId: string) {
       if (cache.current.has(dateStr)) {
         const cached = cache.current.get(dateStr)!;
         setCurrentAvailability({
-          halfDayAvailable: cached.halfDayAvailable,
+          morningAvailable: cached.morningAvailable,
+          eveningAvailable: cached.eveningAvailable,
           fullDayAvailable: cached.fullDayAvailable,
         });
         return;
@@ -116,7 +108,8 @@ export function useWorkerAvailability(workerId: string) {
       const highlight = computeHighlight(avail);
       const summary: DateAvailabilitySummary = {
         date: dateStr,
-        halfDayAvailable: avail.halfDayAvailable,
+        morningAvailable: avail.morningAvailable,
+        eveningAvailable: avail.eveningAvailable,
         fullDayAvailable: avail.fullDayAvailable,
         highlight,
       };
@@ -125,7 +118,7 @@ export function useWorkerAvailability(workerId: string) {
       // Update calendar highlights too
       setCalendarHighlights((prev) => {
         const next = new Map(prev);
-        next.set(dateStr, highlight);
+        next.set(dateStr, summary);
         return next;
       });
 

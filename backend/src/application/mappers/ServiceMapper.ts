@@ -22,7 +22,7 @@ export class ServiceMapper {
       location: dto.location,
 
       scheduledDate: dto.scheduledDate,
-      slotType: dto.slotType,
+      selectedSlots: dto.selectedSlots,
 
       numberOfDays: dto.numberOfDays || 1,
 
@@ -41,7 +41,7 @@ export class ServiceMapper {
       workerId: service.workerId,
       category: service.category,
       scheduledDate: service.scheduledDate,
-      slotType: service.slotType,
+      selectedSlots: service.selectedSlots,
       status: service.status,
       paymentStatus: service.paymentStatus,
       createdAt: service.createdAt

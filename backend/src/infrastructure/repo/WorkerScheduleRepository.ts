@@ -21,10 +21,10 @@ export class WorkerScheduleRepository implements IWorkerScheduleRepository {
 
   async findByWorkerAndDate(workerId: string, date: Date): Promise<WorkerSchedule[]> {
     const start = new Date(date);
-    start.setHours(0, 0, 0, 0);
+    start.setUTCHours(0, 0, 0, 0);
 
     const end = new Date(date);
-    end.setHours(23, 59, 59, 999);
+    end.setUTCHours(23, 59, 59, 999);
 
     const schedules = await WorkerScheduleModel.find({
       workerId,
@@ -43,10 +43,10 @@ export class WorkerScheduleRepository implements IWorkerScheduleRepository {
 
   async findByWorkerDateAndSlot(workerId: string, date: Date, slotType: string): Promise<WorkerSchedule | null> {
     const start = new Date(date);
-    start.setHours(0, 0, 0, 0);
+    start.setUTCHours(0, 0, 0, 0);
 
     const end = new Date(date);
-    end.setHours(23, 59, 59, 999);
+    end.setUTCHours(23, 59, 59, 999);
 
     return await WorkerScheduleModel.findOne({
       workerId,
@@ -63,10 +63,10 @@ export class WorkerScheduleRepository implements IWorkerScheduleRepository {
   ): Promise<void> {
 
     const start = new Date(date);
-    start.setHours(0, 0, 0, 0);
+    start.setUTCHours(0, 0, 0, 0);
 
     const end = new Date(date);
-    end.setHours(23, 59, 59, 999);
+    end.setUTCHours(23, 59, 59, 999);
 
     await WorkerScheduleModel.findOneAndUpdate(
       {
@@ -75,8 +75,13 @@ export class WorkerScheduleRepository implements IWorkerScheduleRepository {
         date: { $gte: start, $lte: end }
       },
       {
-        isBooked: true,
-        serviceId
+        $set: {
+          isBooked: true,
+          serviceId
+        },
+        $setOnInsert: {
+          date: start
+        }
       },
       { upsert: true }
     );
@@ -85,10 +90,10 @@ export class WorkerScheduleRepository implements IWorkerScheduleRepository {
   async unmarkAsBooked(workerId: string, date: Date, slotType: string): Promise<void> {
 
     const start = new Date(date);
-    start.setHours(0, 0, 0, 0);
+    start.setUTCHours(0, 0, 0, 0);
 
     const end = new Date(date);
-    end.setHours(23, 59, 59, 999);
+    end.setUTCHours(23, 59, 59, 999);
 
     await WorkerScheduleModel.findOneAndUpdate(
       {

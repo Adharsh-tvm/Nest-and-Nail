@@ -16,11 +16,11 @@ interface SlotSelectorProps {
   isLoading?: boolean;
 }
 
-const ALL_SLOTS: SlotType[] = [SlotType.HALF_DAY, SlotType.FULL_DAY];
+const ALL_SLOTS: SlotType[] = [SlotType.MORNING_HALF, SlotType.FULL_DAY];
 
 function isSlotAvailable(slot: SlotType, avail: SlotAvailability): boolean {
-  return slot === SlotType.HALF_DAY
-    ? avail.halfDayAvailable
+  return slot === SlotType.MORNING_HALF
+    ? avail.morningAvailable
     : avail.fullDayAvailable;
 }
 
@@ -28,7 +28,7 @@ function getBadge(
   slot: SlotType,
   avail: SlotAvailability
 ): "recommended" | "limited" | null {
-  const halfFree = avail.halfDayAvailable;
+  const halfFree = avail.morningAvailable;
   const fullFree = avail.fullDayAvailable;
 
   if (halfFree && fullFree) {
@@ -37,7 +37,7 @@ function getBadge(
     return null;
   }
   if (halfFree && !fullFree) {
-    if (slot === SlotType.HALF_DAY) return "limited";
+    if (slot === SlotType.MORNING_HALF) return "limited";
     return null;
   }
   if (!halfFree && fullFree) {
