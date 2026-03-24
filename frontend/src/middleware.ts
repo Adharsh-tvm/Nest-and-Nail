@@ -44,16 +44,21 @@ export async function middleware(req: NextRequest) {
 
   // 3️⃣ Validate user status from backend
   if (userRole) {
-    const { validateUser } = await import("./app/actions/authentication/session-actions");
-    const validation = await validateUser();
+    // Skip validating against backend for Next.js Server Actions to prevent multiple redundant API calls
+    const isServerAction = req.headers.has("next-action");
 
-    if (!validation || !validation.success) {
-      const response = NextResponse.redirect(new URL("/login", req.url));
+    if (!isServerAction) {
+      const { validateUser } = await import("./app/actions/authentication/session-actions");
+      const validation = await validateUser();
 
-      response.cookies.delete("accessToken");
-      response.cookies.delete("refreshToken");
+      if (!validation || !validation.success) {
+        const response = NextResponse.redirect(new URL("/login", req.url));
 
-      return response;
+        response.cookies.delete("accessToken");
+        response.cookies.delete("refreshToken");
+
+        return response;
+      }
     }
   }
 

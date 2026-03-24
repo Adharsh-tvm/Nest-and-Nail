@@ -50,6 +50,53 @@ export async function getWorkerAvailabilityApi(
 }
 
 /**
+ * Fetch availability for a worker over a date range.
+ * GET /api/client/workers/:id/availability?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD
+ */
+export async function getWorkerAvailabilityBulkApi(
+  workerId: string,
+  startDate: string,
+  endDate: string
+): Promise<ApiResponse<Record<string, SlotAvailability>>> {
+  try {
+    const response = await axiosInstance.get<ApiResponse<Record<string, SlotAvailability>>>(
+      `/api/client/workers/${workerId}/availability`,
+      {
+        params: { startDate, endDate },
+        withCredentials: true,
+      }
+    );
+
+    if (!response.data.success) {
+      return {
+        success: false,
+        message: response.data.message || "Failed to fetch bulk availability",
+        error: null,
+      };
+    }
+
+    return {
+      success: true,
+      message: "Bulk availability fetched",
+      payload: response.data.payload,
+    };
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      return {
+        success: false,
+        message: error.response?.data?.message || "Failed to fetch bulk availability",
+        error: error.response?.data?.error || null,
+      };
+    }
+    return {
+      success: false,
+      message: "An unexpected error occurred",
+      error: null,
+    };
+  }
+}
+
+/**
  * Book a worker for a specific date and slot.
  * POST /api/client/services/book
  */

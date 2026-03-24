@@ -39,11 +39,13 @@ export class CancelServiceUseCase implements ICancelServiceUseCase {
             throw new Error("Failed to cancel service");
         }
 
-        await this.scheduleRepo.unmarkAsBooked(
-            service.workerId,
-            service.scheduledDate,
-            service.slotType
-        );
+        for (const slot of service.selectedSlots) {
+            await this.scheduleRepo.unmarkAsBooked(
+                service.workerId,
+                slot.date,
+                slot.slotType
+            );
+        }
 
         return ServiceMapper.toResponse(updated);
     }

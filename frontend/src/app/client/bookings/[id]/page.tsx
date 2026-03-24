@@ -111,7 +111,8 @@ export default async function BookingDetailPage({
                 <div>
                   <p className="text-sm font-medium text-gray-500">Time Slot</p>
                   <p className="font-bold text-gray-900">
-                    {booking.slotType === SlotType.HALF_DAY ? "Half Day (4-5 hrs)" : "Full Day (8-9 hrs)"}
+                    {booking.slotType === SlotType.MORNING_HALF ? "Morning (4-5 hrs)" :
+                     booking.slotType === SlotType.EVENING_HALF ? "Evening (4-5 hrs)" : "Full Day (8-9 hrs)"}
                   </p>
                 </div>
               </div>

@@ -53,12 +53,32 @@ export class ClientController {
   getWorkerAvailability = async (req: Request, res: Response) => {
 
     const { id } = req.params;
-    const { date } = req.query;
+    const { date, startDate, endDate } = req.query;
+
+    if (startDate && endDate) {
+      const parsedStart = new Date(startDate as string);
+      const parsedEnd = new Date(endDate as string);
+
+      if (isNaN(parsedStart.getTime()) || isNaN(parsedEnd.getTime())) {
+        return res.status(HttpStatusCode.BAD_REQUEST).json({
+          success: false,
+          message: "Invalid date format for startDate or endDate"
+        });
+      }
+
+      if (this.getWorkerAvailabilityUseCase.executeBulk) {
+        const result = await this.getWorkerAvailabilityUseCase.executeBulk(id, parsedStart, parsedEnd);
+        return res.json({
+          success: true,
+          payload: result
+        });
+      }
+    }
 
     if (!date) {
       return res.status(HttpStatusCode.BAD_REQUEST).json({
         success: false,
-        message: "Date is required"
+        message: "Date is required if not using startDate/endDate"
       });
     }
 
@@ -84,7 +104,7 @@ export class ClientController {
 
   bookWorker = async (req: Request, res: Response) => {
 
-    const { workerId, category, date, slotType, numberOfDays, title, description } = req.body;
+    const { workerId, category, date, selectedSlots, slotType, numberOfDays, title, description } = req.body;
 
     const clientId = (req as any).user?.id || (req as any).user?._id;
 
@@ -92,12 +112,20 @@ export class ClientController {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
 
+    const scheduledDate = new Date(date);
+    const parsedSelectedSlots = selectedSlots 
+      ? selectedSlots.map((s: any) => ({
+          date: new Date(s.date),
+          slotType: s.slotType
+        }))
+      : [{ date: scheduledDate, slotType }];
+
     const result = await this.bookWorkerUseCase.execute({
       clientId,
       workerId,
       category,
-      scheduledDate: new Date(date),
-      slotType,
+      scheduledDate,
+      selectedSlots: parsedSelectedSlots,
       numberOfDays,
       title,
       description,

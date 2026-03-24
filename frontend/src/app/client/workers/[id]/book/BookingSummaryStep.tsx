@@ -7,6 +7,7 @@ interface BookingSummaryStepProps {
   description: string;
   numberOfDays: number;
   startDate: Date | null;
+  selectedSlots: { date: string; slotType: SlotType }[];
   slotType: SlotType | null;
   workerName: string;
   category: string;
@@ -20,6 +21,7 @@ export function BookingSummaryStep({
   description,
   numberOfDays,
   startDate,
+  selectedSlots,
   slotType,
   workerName,
   category,
@@ -27,18 +29,18 @@ export function BookingSummaryStep({
   onConfirm,
 }: BookingSummaryStepProps) {
   
-  if (!startDate || !slotType) return null;
-
-  const endDate = new Date(startDate);
-  endDate.setDate(endDate.getDate() + numberOfDays - 1);
+  if (!selectedSlots || selectedSlots.length === 0) return null;
 
   const formatOpts: Intl.DateTimeFormatOptions = { weekday: 'short', month: 'short', day: 'numeric' };
-  const dateString = 
-    numberOfDays === 1 
-      ? startDate.toLocaleDateString("en-US", formatOpts)
-      : `${startDate.toLocaleDateString("en-US", formatOpts)} - ${endDate.toLocaleDateString("en-US", formatOpts)}`;
+  
+  // Format the dates visually nicely
+  const sortedDates = [...selectedSlots].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  
+  const dateString = sortedDates.length === 1 
+      ? new Date(sortedDates[0].date).toLocaleDateString("en-US", formatOpts)
+      : sortedDates.map(s => new Date(s.date).toLocaleDateString("en-US", { month: 'short', day: 'numeric' })).join(', ');
 
-  const totalAmount = SLOT_PRICES[slotType] * numberOfDays;
+  const totalAmount = selectedSlots.reduce((sum, slot) => sum + SLOT_PRICES[slot.slotType], 0);
 
   return (
     <div className="bg-white rounded-[24px] p-6 sm:p-8 shadow-sm border border-gray-100 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -75,7 +77,9 @@ export function BookingSummaryStep({
         <div className="flex justify-between items-center">
            <div>
             <p className="text-sm font-bold text-gray-500 mb-1">Daily Slot</p>
-            <p className="font-bold text-gray-900">{SLOT_LABELS[slotType]}</p>
+            <p className="font-bold text-gray-900">
+               {selectedSlots.length === 1 ? SLOT_LABELS[selectedSlots[0].slotType] : 'Mixed Slots / Full Days'}
+            </p>
           </div>
            <div className="text-right">
             <p className="text-sm font-bold text-gray-500 mb-1">Total Expected</p>

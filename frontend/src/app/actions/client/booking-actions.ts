@@ -15,7 +15,7 @@ export async function getBookingDetailAction(id: string) {
       workerName: "Professional Worker",
       category: "Service",
       scheduledDate: new Date().toISOString(),
-      slotType: SlotType.HALF_DAY,
+      slotType: SlotType.MORNING_HALF,
       status: "CONFIRMED",
       amount: 700,
     },

@@ -21,15 +21,17 @@ export class BookWorkerUseCase implements IBookWorkerUseCase {
     const worker = await this.workerRepo.findById(dto.workerId);
     if (!worker) throw new Error("Worker not found");
 
-    // 2. Check slot
-    const existing = await this.scheduleRepo.findByWorkerDateAndSlot(
-      dto.workerId,
-      dto.scheduledDate,
-      dto.slotType
-    );
+    // 2. Check slots for all selected dates
+    for (const slot of dto.selectedSlots) {
+      const existing = await this.scheduleRepo.findByWorkerDateAndSlot(
+        dto.workerId,
+        slot.date,
+        slot.slotType
+      );
 
-    if (existing && existing.isBooked) {
-      throw new Error("Slot already booked");
+      if (existing && existing.isBooked) {
+        throw new Error(`Slot already booked for date: ${slot.date.toISOString().split('T')[0]}`);
+      }
     }
 
     // 3. Map DTO → Entity
@@ -38,13 +40,15 @@ export class BookWorkerUseCase implements IBookWorkerUseCase {
     // 4. Save
     const created = await this.serviceRepo.create(serviceEntity);
 
-    // 5. Lock slot
-    await this.scheduleRepo.markAsBooked(
-      dto.workerId,
-      dto.scheduledDate,
-      dto.slotType,
-      created.serviceId
-    );
+    // 5. Lock slots for all selected dates
+    for (const slot of dto.selectedSlots) {
+      await this.scheduleRepo.markAsBooked(
+        dto.workerId,
+        slot.date,
+        slot.slotType,
+        created.serviceId
+      );
+    }
 
     // 6. Return DTO
     return ServiceMapper.toResponse(created);

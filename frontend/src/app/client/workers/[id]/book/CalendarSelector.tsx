@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { DateAvailabilitySummary } from "@/shared/types/serviceTypes";
+import { DateAvailabilitySummary, SlotType } from "@/shared/types/serviceTypes";
 
 interface CalendarSelectorProps {
-  selectedDate: Date | null;
-  onDateSelect: (date: Date) => void;
+  selectedSlots: Record<string, SlotType>;
+  onSlotChange: (slots: Record<string, SlotType>) => void;
   availabilityData: Record<string, DateAvailabilitySummary>;
   isLoadingDate: boolean;
   numberOfDays: number;
@@ -40,8 +40,8 @@ const HIGHLIGHT_DOT: Record<string, string> = {
 };
 
 export function CalendarSelector({
-  selectedDate,
-  onDateSelect,
+  selectedSlots,
+  onSlotChange,
   availabilityData,
   isLoadingDate,
   numberOfDays,
@@ -56,6 +56,37 @@ export function CalendarSelector({
 
   const firstDayOfMonth = new Date(viewYear, viewMonth, 1).getDay();
   const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+
+  const [focusedDate, setFocusedDate] = useState<string | null>(null);
+  const [warningMessage, setWarningMessage] = useState<string | null>(null);
+
+  // Re-check selected dates if availability updates behind the scenes
+  useEffect(() => {
+    let changed = false;
+    const newSlots = { ...selectedSlots };
+    
+    Object.keys(newSlots).forEach((date) => {
+      const avail = availabilityData[date];
+      if (!avail) return;
+      
+      const slot = newSlots[date];
+      if (
+        avail.highlight === "red" ||
+        (slot === SlotType.FULL_DAY && !avail.fullDayAvailable) ||
+        (slot === SlotType.MORNING_HALF && !avail.morningAvailable) ||
+        (slot === SlotType.EVENING_HALF && !avail.eveningAvailable)
+      ) {
+        delete newSlots[date];
+        changed = true;
+      }
+    });
+
+    if (changed) {
+      onSlotChange(newSlots);
+      setWarningMessage("Some selected dates are unavailable and were removed.");
+      setTimeout(() => setWarningMessage(null), 5000);
+    }
+  }, [availabilityData, selectedSlots, onSlotChange]);
 
   const cells = useMemo(() => {
     const arr: Array<number | null> = [];
@@ -82,59 +113,50 @@ export function CalendarSelector({
     viewYear < today.getFullYear() ||
     (viewYear === today.getFullYear() && viewMonth < today.getMonth());
 
-  const checkIsSelectedRange = (date: Date) => {
-    if (!selectedDate) return false;
-
-    const d = new Date(date);
-    d.setHours(0, 0, 0, 0);
-
-    const start = new Date(selectedDate);
-    start.setHours(0, 0, 0, 0);
-
-    const end = new Date(start);
-    end.setDate(end.getDate() + numberOfDays - 1);
-
-    return d >= start && d <= end;
-  };
-
   const isDateSelected = (date: Date) => {
-    if (!selectedDate) return false;
-    const d1 = new Date(date);
-    d1.setHours(0, 0, 0, 0);
-    const d2 = new Date(selectedDate);
-    d2.setHours(0, 0, 0, 0);
-    return d1.getTime() === d2.getTime();
+    const key = toDateKey(date.getFullYear(), date.getMonth(), date.getDate());
+    return !!selectedSlots[key];
   };
 
-  const getDayClass = (date: Date | null, isPast: boolean) => {
+  const getSlotSelectionClass = (date: Date) => {
+    const key = toDateKey(date.getFullYear(), date.getMonth(), date.getDate());
+    const slot = selectedSlots[key];
+    if (!slot) return '';
+    if (slot === SlotType.FULL_DAY) {
+      return 'bg-emerald-500 text-white font-bold ring-2 ring-emerald-500 ring-offset-2 shadow-md shadow-emerald-200 z-10';
+    } else {
+      return 'bg-amber-400 text-white font-bold ring-2 ring-amber-400 ring-offset-2 shadow-md shadow-amber-200 z-10';
+    }
+  };
+
+  const isDateUnavailable = (availability: DateAvailabilitySummary | undefined) => {
+    if (!availability) return false;
+    if (availability.highlight === "red") return true;
+    return false;
+  };
+
+  const getDayClass = (date: Date | null, isPast: boolean, isUnavailable: boolean) => {
     if (!date) return '';
 
+    const key = toDateKey(date.getFullYear(), date.getMonth(), date.getDate());
     let classes = 'relative flex flex-col items-center justify-center p-2 rounded-xl transition-all h-14 w-full cursor-pointer ';
 
     if (isPast) {
       return classes + 'text-gray-300 cursor-not-allowed bg-gray-50/50';
     }
+    if (isUnavailable) {
+      return classes + 'text-red-400 cursor-not-allowed bg-red-50';
+    }
 
-    const isSelectedStart = isDateSelected(date);
-    const isInRange = checkIsSelectedRange(date);
+    const isSelected = isDateSelected(date);
+    const isFocused = focusedDate === key;
 
-    if (isSelectedStart && numberOfDays === 1) {
-      classes += 'bg-emerald-600 text-white font-bold shadow-md shadow-emerald-200 ring-2 ring-emerald-600 ring-offset-2 z-10 rounded-xl';
-    } else if (isSelectedStart) {
-      classes += 'bg-emerald-600 text-white font-bold shadow-md shadow-emerald-200 z-10 rounded-l-xl rounded-r-none';
-    } else if (isInRange) {
-      const d = new Date(date);
-      d.setHours(0, 0, 0, 0);
-      const end = new Date(selectedDate!);
-      end.setHours(0, 0, 0, 0);
-      end.setDate(end.getDate() + numberOfDays - 1);
-      if (d.getTime() === end.getTime()) {
-        classes += 'bg-emerald-100 text-emerald-800 font-bold border-y-2 border-r-2 border-emerald-200 z-0 rounded-r-xl rounded-l-none';
-      } else {
-        classes += 'bg-emerald-100 text-emerald-800 font-bold border-y-2 border-emerald-200 z-0 rounded-none';
-      }
+    if (isSelected) {
+      classes += `${getSlotSelectionClass(date)} rounded-xl`;
+      if (isFocused) classes += ' ring-4 ring-emerald-400';
     } else {
       classes += 'text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 font-medium active:scale-95 border border-transparent hover:border-emerald-100';
+      if (isFocused) classes += ' ring-2 ring-gray-900 ring-offset-1 rounded-xl font-bold bg-gray-50';
     }
 
     return classes;
@@ -142,6 +164,11 @@ export function CalendarSelector({
 
   return (
     <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
+      {warningMessage && (
+        <div className="mb-5 bg-red-50 text-red-600 p-3 rounded-xl border border-red-100 text-sm font-bold text-center animate-in fade-in duration-300">
+          {warningMessage}
+        </div>
+      )}
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <button
@@ -190,28 +217,39 @@ export function CalendarSelector({
           const dateObj = new Date(viewYear, viewMonth, day);
           const isPast = dateObj < today;
           const dayAvailability = availabilityData[key];
+          const isUnavailable = isDateUnavailable(dayAvailability);
 
           return (
             <div
               key={key}
               className="flex items-center justify-center py-0.5"
-              onClick={() => !isPast && onDateSelect(dateObj)}
+              onClick={() => {
+                if (isPast || isUnavailable) return;
+                
+                if (isDateSelected(dateObj)) {
+                  // If already selected, clicking the DATE toggles it off
+                  const newSlots = { ...selectedSlots };
+                  delete newSlots[key];
+                  onSlotChange(newSlots);
+                  if (focusedDate === key) setFocusedDate(null);
+                } else {
+                  // Not selected. Focus it to show the panel.
+                  setFocusedDate(key);
+                }
+              }}
             >
-              <div className={getDayClass(dateObj, isPast)}>
+              <div className={getDayClass(dateObj, isPast, isUnavailable)}>
                 {day}
                 {/* Indicator Dots */}
-                {(!checkIsSelectedRange(dateObj) || isDateSelected(dateObj)) && (
-                  <div className="absolute bottom-1.5 flex gap-1">
-                    {dayAvailability ? (
-                      <div className={`w-1.5 h-1.5 rounded-full ${isDateSelected(dateObj) ? 'bg-white/80' :
-                        dayAvailability.highlight === 'red' ? 'bg-red-400' :
-                          dayAvailability.highlight === 'yellow' ? 'bg-amber-400' : 'bg-emerald-400'
-                        }`} />
-                    ) : (
-                      <div className="w-1.5 h-1.5 rounded-full bg-gray-200" />
-                    )}
-                  </div>
-                )}
+                <div className="absolute bottom-1.5 flex gap-1">
+                  {isDateSelected(dateObj) ? (
+                     <div className="w-1.5 h-1.5 rounded-full bg-white/80" />
+                  ) : isUnavailable ? (
+                     <div className="w-1.5 h-1.5 rounded-full bg-red-400" />
+                  ) : (
+                     <div className="w-1.5 h-1.5 rounded-full bg-gray-200" />
+                  )}
+                </div>
               </div>
             </div>
           );
@@ -219,20 +257,101 @@ export function CalendarSelector({
       </div>
 
       {/* Legend */}
-      <div className="flex items-center gap-4 mt-4 pt-4 border-t border-gray-100">
+      <div className="flex flex-wrap items-center gap-4 mt-4 pt-4 border-t border-gray-100">
         <div className="flex items-center gap-1.5 text-xs text-gray-500">
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block" />
-          Available
+          <span className="w-3 h-3 rounded-md bg-emerald-500 inline-block" />
+          Selected (Full)
         </div>
         <div className="flex items-center gap-1.5 text-xs text-gray-500">
-          <span className="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block" />
-          Limited
+          <span className="w-3 h-3 rounded-md bg-amber-400 inline-block" />
+          Selected (Half)
         </div>
         <div className="flex items-center gap-1.5 text-xs text-gray-500">
           <span className="w-2.5 h-2.5 rounded-full bg-red-400 inline-block" />
           Fully booked
         </div>
+        <div className="flex items-center gap-1.5 text-xs text-gray-500">
+          <span className="w-2.5 h-2.5 rounded-full bg-gray-200 inline-block" />
+          Available
+        </div>
       </div>
+
+      {/* Secondary Slot Picker Panel */}
+      {focusedDate && availabilityData[focusedDate] && (
+        <div className="mt-6 p-5 border-2 border-gray-900 rounded-2xl bg-gray-50 animate-in slide-in-from-top-4 fade-in duration-300">
+           <h4 className="text-sm font-bold text-gray-900 mb-3 flex items-center justify-between">
+             <span>Select Slot for {new Date(focusedDate).toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })}</span>
+             <button onClick={() => setFocusedDate(null)} className="text-gray-400 hover:text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-full w-6 h-6 flex items-center justify-center text-xs">✕</button>
+           </h4>
+           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+             <button
+               onClick={() => {
+                 const newSlots = { ...selectedSlots };
+                 if (Object.keys(newSlots).length >= numberOfDays && !newSlots[focusedDate]) {
+                    alert(`You have already selected ${numberOfDays} day(s). Deselect a date first.`);
+                    return;
+                 }
+                 newSlots[focusedDate] = SlotType.MORNING_HALF;
+                 onSlotChange(newSlots);
+               }}
+               disabled={!availabilityData[focusedDate].morningAvailable}
+               className={`py-3 px-2 rounded-xl text-sm font-bold transition-all border-2 flex flex-col items-center justify-center gap-1 
+                ${selectedSlots[focusedDate] === SlotType.MORNING_HALF 
+                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-md' 
+                  : !availabilityData[focusedDate].morningAvailable 
+                    ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-60' 
+                    : 'bg-white text-gray-700 border-gray-200 hover:border-emerald-500 hover:text-emerald-600'}`}
+             >
+                <span>Morning</span>
+                <span className="text-xs font-medium opacity-80">(4-5 hrs)</span>
+             </button>
+
+             <button
+               onClick={() => {
+                 const newSlots = { ...selectedSlots };
+                 if (Object.keys(newSlots).length >= numberOfDays && !newSlots[focusedDate]) {
+                    alert(`You have already selected ${numberOfDays} day(s). Deselect a date first.`);
+                    return;
+                 }
+                 newSlots[focusedDate] = SlotType.EVENING_HALF;
+                 onSlotChange(newSlots);
+               }}
+               disabled={!availabilityData[focusedDate].eveningAvailable}
+               className={`py-3 px-2 rounded-xl text-sm font-bold transition-all border-2 flex flex-col items-center justify-center gap-1 
+                ${selectedSlots[focusedDate] === SlotType.EVENING_HALF 
+                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-md' 
+                  : !availabilityData[focusedDate].eveningAvailable
+                    ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-60' 
+                    : 'bg-white text-gray-700 border-gray-200 hover:border-emerald-500 hover:text-emerald-600'}`}
+             >
+                <span>Evening</span>
+                <span className="text-xs font-medium opacity-80">(4-5 hrs)</span>
+             </button>
+
+             <button
+               onClick={() => {
+                 const newSlots = { ...selectedSlots };
+                 if (Object.keys(newSlots).length >= numberOfDays && !newSlots[focusedDate]) {
+                    alert(`You have already selected ${numberOfDays} day(s). Deselect a date first.`);
+                    return;
+                 }
+                 newSlots[focusedDate] = SlotType.FULL_DAY;
+                 onSlotChange(newSlots);
+               }}
+               disabled={!availabilityData[focusedDate].fullDayAvailable}
+               className={`py-3 px-2 rounded-xl text-sm font-bold transition-all border-2 flex flex-col items-center justify-center gap-1 
+                ${selectedSlots[focusedDate] === SlotType.FULL_DAY 
+                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-md' 
+                  : !availabilityData[focusedDate].fullDayAvailable
+                    ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-60' 
+                    : 'bg-white text-gray-700 border-gray-200 hover:border-emerald-500 hover:text-emerald-600'}`}
+             >
+                <span>Full Day</span>
+                <span className="text-xs font-medium opacity-80">(8-9 hrs)</span>
+             </button>
+           </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -20,8 +20,10 @@ export interface Service {
   };
 
   scheduledDate: Date;
-
-  slotType: SlotType;
+  selectedSlots: {
+    date: Date;
+    slotType: SlotType;
+  }[];
 
   numberOfDays: number;
 

@@ -1,5 +1,6 @@
 export enum SlotType {
   SHORT = "SHORT",
-  HALF_DAY = "HALF_DAY",
+  MORNING_HALF = "MORNING_HALF",
+  EVENING_HALF = "EVENING_HALF",
   FULL_DAY = "FULL_DAY"
 }
