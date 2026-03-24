@@ -37,7 +37,13 @@ export class CreateWorkerScheduleUseCase implements ICreateWorkerScheduleUseCase
       schedulesToCreate.push({
         workerId,
         date: dateForSlot,
-        slotType: SlotType.HALF_DAY,
+        slotType: SlotType.MORNING_HALF,
+        isBooked: false,
+      });
+      schedulesToCreate.push({
+        workerId,
+        date: dateForSlot,
+        slotType: SlotType.EVENING_HALF,
         isBooked: false,
       });
       schedulesToCreate.push({
