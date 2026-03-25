@@ -1,17 +1,17 @@
 import { Request, Response } from "express";
-import { HttpStatusCode } from "../../shared/enums/httpCodes";
-import { IUserController } from "../interfaces/IUserController";
-import { IChangeUserRoleUseCase } from "../../application/interfaces/user/IChangeUserRoleUseCase";
-import { IGetCurrentUserUseCase } from "../../application/interfaces/user/IGetCurrentUserUseCase";
+import { HttpStatusCode } from "../../../shared/enums/httpCodes";
+import { IUserController } from "../../interfaces/IUserController";
+import { IChangeUserRoleUseCase } from "../../../application/interfaces/user/IChangeUserRoleUseCase";
+import { IGetCurrentUserUseCase } from "../../../application/interfaces/user/IGetCurrentUserUseCase";
 
 import {
     AuthenticationError,
     UserBlockedError,
     UserNotFoundError
-} from "../../domain/errors/DomainError";
-import { ResponseHandler } from "../../shared/responses/ApiResponse";
-import { LoginResponseDTO } from "../../application/dtos/UserDTO";
-import { RESPONSE_MESSAGES } from "../../shared/responses/ResponseMessages";
+} from "../../../domain/errors/DomainError";
+import { ResponseHandler } from "../../../shared/responses/ApiResponse";
+import { LoginResponseDTO } from "../../../application/dtos/UserDTO";
+import { RESPONSE_MESSAGES } from "../../../shared/responses/ResponseMessages";
 
 export class UserController implements IUserController {
 

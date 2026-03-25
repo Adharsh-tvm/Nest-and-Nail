@@ -160,14 +160,14 @@ const ClientHeader: React.FC = () => {
               <div className="hidden md:flex items-center gap-8 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
                 {userMode === "worker" && (
                   <Link
-                    href="/worker/find-works"
+                    href="/worker/ongoing"
                     className={`text-sm font-medium transition-all ${
                       pathname?.startsWith("/worker/find-works")
                         ? "text-[#1B4332] border-b-2 border-[#1B4332] pb-1"
                         : "text-gray-500 hover:text-[#1B4332]"
                     }`}
                   >
-                    Find Works
+                    Ongoing
                   </Link>
                 )}
                 {userMode !== "worker" && (
@@ -182,16 +182,30 @@ const ClientHeader: React.FC = () => {
                     Workers
                   </Link>
                 )}
-                <Link
-                  href="/client/payments"
-                  className={`text-sm font-medium transition-all ${
-                    pathname?.startsWith("/client/payments")
-                      ? "text-[#1B4332] border-b-2 border-[#1B4332] pb-1"
-                      : "text-gray-500 hover:text-[#1B4332]"
-                  }`}
-                >
-                  Payments
-                </Link>
+                 {userMode === "worker" && (
+                  <Link
+                    href="/worker/services"
+                    className={`text-sm font-medium transition-all ${
+                      pathname?.startsWith("/worker/services")
+                        ? "text-[#1B4332] border-b-2 border-[#1B4332] pb-1"
+                        : "text-gray-500 hover:text-[#1B4332]"
+                    }`}
+                  >
+                    Services
+                  </Link>
+                )}
+                {userMode !== "worker" && (
+                  <Link
+                    href="/client/services"
+                    className={`text-sm font-medium transition-all ${
+                      pathname?.startsWith("/client/services")
+                        ? "text-[#1B4332] border-b-2 border-[#1B4332] pb-1"
+                        : "text-gray-500 hover:text-[#1B4332]"
+                    }`}
+                  >
+                    Services
+                  </Link>
+                )}
                 <Link
                   href="/client/meetings"
                   className={`text-sm font-medium transition-all ${

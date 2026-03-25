@@ -1,14 +1,14 @@
 import { Request, Response } from "express";
-import { HttpStatusCode } from "../../shared/enums/httpCodes";
-import { IUserProfileController } from "../interfaces/IUserProfileController";
-import { ResponseHandler } from "../../shared/responses/ApiResponse";
-import { RESPONSE_MESSAGES } from "../../shared/responses/ResponseMessages";
-import { IUpdateUserSkillsUseCase } from "../../application/interfaces/user/IUpdateUserSkillsUseCase";
-import { IUpdateWorkerCategoriesUseCase } from "../../application/interfaces/worker/profile/IUpdateWorkerCategoriesUseCase";
-import { IUpdateUserProfileUseCase } from "../../application/interfaces/user/IUpdateUserProfileUseCase";
-import { IAddUserAddressUseCase } from "../../application/interfaces/address/IUpdateUserAddressUseCase";
-import { IEditUserAddressUseCase } from "../../application/interfaces/address/IEditUserAddressUseCase";
-import { IDeleteUserAddressUseCase } from "../../application/interfaces/address/IDeleteUserAddressUseCase";
+import { HttpStatusCode } from "../../../shared/enums/httpCodes";
+import { IUserProfileController } from "../../interfaces/IUserProfileController";
+import { ResponseHandler } from "../../../shared/responses/ApiResponse";
+import { RESPONSE_MESSAGES } from "../../../shared/responses/ResponseMessages";
+import { IUpdateUserSkillsUseCase } from "../../../application/interfaces/user/IUpdateUserSkillsUseCase";
+import { IUpdateWorkerCategoriesUseCase } from "../../../application/interfaces/worker/profile/IUpdateWorkerCategoriesUseCase";
+import { IUpdateUserProfileUseCase } from "../../../application/interfaces/user/IUpdateUserProfileUseCase";
+import { IAddUserAddressUseCase } from "../../../application/interfaces/address/IUpdateUserAddressUseCase";
+import { IEditUserAddressUseCase } from "../../../application/interfaces/address/IEditUserAddressUseCase";
+import { IDeleteUserAddressUseCase } from "../../../application/interfaces/address/IDeleteUserAddressUseCase";
 
 export class UserProfileController implements IUserProfileController {
 

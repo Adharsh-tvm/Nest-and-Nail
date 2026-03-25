@@ -1,14 +1,14 @@
 import { Request, Response } from "express";
-import { IAdminController } from "../interfaces/IAdminController";
-import { IGetAllClientsUseCase } from "../../application/interfaces/admin/IGetAllClientsUseCase";
-import { IGetAllWorkersUseCase } from "../../application/interfaces/admin/IGetAllWorkersUseCase";
-import { HttpStatusCode } from "../../shared/enums/httpCodes";
-import { IUpdateVerificationStatusUseCase } from "../../application/interfaces/admin/IUpdateVerificationStatusUseCase";
-import { VerificationStatus } from "../../shared/enums/authEnums";
-import { IUpdateUserAccessUseCase } from "../../application/interfaces/admin/IUpdateUserAccessUseCase";
-import { ResponseHandler } from "../../shared/responses/ApiResponse";
-import { RESPONSE_MESSAGES } from "../../shared/responses/ResponseMessages";
-import { IGetAllUsersUseCase } from "../../application/interfaces/admin/IGetAllUsersUseCase";
+import { IAdminController } from "../../interfaces/IAdminController";
+import { IGetAllClientsUseCase } from "../../../application/interfaces/admin/IGetAllClientsUseCase";
+import { IGetAllWorkersUseCase } from "../../../application/interfaces/admin/IGetAllWorkersUseCase";
+import { HttpStatusCode } from "../../../shared/enums/httpCodes";
+import { IUpdateVerificationStatusUseCase } from "../../../application/interfaces/admin/IUpdateVerificationStatusUseCase";
+import { VerificationStatus } from "../../../shared/enums/authEnums";
+import { IUpdateUserAccessUseCase } from "../../../application/interfaces/admin/IUpdateUserAccessUseCase";
+import { ResponseHandler } from "../../../shared/responses/ApiResponse";
+import { RESPONSE_MESSAGES } from "../../../shared/responses/ResponseMessages";
+import { IGetAllUsersUseCase } from "../../../application/interfaces/admin/IGetAllUsersUseCase";
 
 export class AdminController implements IAdminController {
     constructor(

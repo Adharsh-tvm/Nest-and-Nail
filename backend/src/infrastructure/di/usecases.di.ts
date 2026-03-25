@@ -68,6 +68,12 @@ import { IGetWorkerAvailabilityUseCase } from "../../application/interfaces/clie
 import { GetWorkerAvailabilityUseCase } from "../../application/use-cases/client/GetWorkerAvailabilityUseCase";
 import { IBookWorkerUseCase } from "../../domain/repositories/IBookWorkerUseCase";
 import { BookWorkerUseCase } from "../repo/BookWorkerUseCase";
+import { IGetClientServiceHistoryUseCase } from "../../application/interfaces/service/client/IGetClientServiceHistoryUseCase";
+import { GetClientServiceHistoryUseCase } from "../../application/use-cases/service/client/GetClientServiceHistoryUseCase";
+import { IGetClientServiceByIdUseCase } from "../../application/interfaces/service/client/IGetClientServiceByIdUseCase";
+import { IGetClientOngoingServicesUseCase } from "../../application/interfaces/service/client/IGetClientOngoingServicesUseCase";
+import { GetClientServiceByIdUseCase } from "../../application/use-cases/service/client/GetClientServiceByIdUseCase";
+import { GetClientOngoingServicesUseCase } from "../../application/use-cases/service/client/GetClientOngoingServicesUseCase";
 
 
 export class UseCaseDI {
@@ -114,7 +120,11 @@ export class UseCaseDI {
   private _getAvailableWorkersUseCase?: IGetAvailableWorkersUseCase;
   private _getWorkerByIdUseCase?: IGetWorkerByIdUseCase;
   private _getWorkerAvailabilityUseCase?: IGetWorkerAvailabilityUseCase;
+
   private _bookWorkerUseCase?: IBookWorkerUseCase;
+  private _getClientServiceHistoryUseCase?: IGetClientServiceHistoryUseCase;
+  private _getClientServiceByIdUseCase ?: IGetClientServiceByIdUseCase;
+  private _getClientOngoingServicesUseCase ?: IGetClientOngoingServicesUseCase;
 
   constructor(private infra: InfrastructureDI) { }
 
@@ -453,5 +463,32 @@ export class UseCaseDI {
       )
     }
     return this._bookWorkerUseCase;
+  }
+
+  get getClientServiceHistoryUseCase (): IGetClientServiceHistoryUseCase {
+    if(!this._getClientServiceHistoryUseCase) {
+      this._getClientServiceHistoryUseCase = new GetClientServiceHistoryUseCase(
+        this.infra.serviceRepository
+      )
+    }
+    return this._getClientServiceHistoryUseCase
+  }
+
+  get getClientServiceByIdUseCase(): IGetClientServiceByIdUseCase {
+    if(!this._getClientServiceByIdUseCase) {
+      this._getClientServiceByIdUseCase = new GetClientServiceByIdUseCase(
+        this.infra.serviceRepository
+      )
+    }
+    return this._getClientServiceByIdUseCase
+  }
+
+  get getClientOngoingServicesUseCase(): IGetClientOngoingServicesUseCase {
+    if(!this._getClientOngoingServicesUseCase) {
+      this._getClientOngoingServicesUseCase = new GetClientOngoingServicesUseCase(
+        this.infra.serviceRepository
+      )
+    }
+    return this._getClientOngoingServicesUseCase
   }
 }

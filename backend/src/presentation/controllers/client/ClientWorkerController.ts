@@ -1,9 +1,8 @@
 import { Request, Response } from "express";
-import { IGetAvailableWorkersUseCase } from "../../application/interfaces/client/IGetAvailableWorkersUseCase";
-import { IGetWorkerByIdUseCase } from "../../application/interfaces/client/IGetWorkerByIdUseCase";
-import { IGetWorkerAvailabilityUseCase } from "../../application/interfaces/client/IGetWorkerAvailabilityUseCase";
-import { HttpStatusCode } from "../../shared/enums/httpCodes";
-import { IBookWorkerUseCase } from "../../domain/repositories/IBookWorkerUseCase";
+import { IGetAvailableWorkersUseCase } from "../../../application/interfaces/client/IGetAvailableWorkersUseCase";
+import { IGetWorkerByIdUseCase } from "../../../application/interfaces/client/IGetWorkerByIdUseCase";
+import { IGetWorkerAvailabilityUseCase } from "../../../application/interfaces/client/IGetWorkerAvailabilityUseCase";
+import { HttpStatusCode } from "../../../shared/enums/httpCodes";
 
 export class ClientController {
 
@@ -11,7 +10,6 @@ export class ClientController {
     private readonly getAvailableWorkersUseCase: IGetAvailableWorkersUseCase,
     private readonly getWorkerByIdUseCase: IGetWorkerByIdUseCase,
     private readonly getWorkerAvailabilityUseCase: IGetWorkerAvailabilityUseCase,
-    private readonly bookWorkerUseCase: IBookWorkerUseCase
   ) { }
 
   getAvailableWorkers = async (req: Request, res: Response) => {
@@ -23,7 +21,7 @@ export class ClientController {
       Number(lat),
       Number(lng),
       search as string | undefined,
-      isOnline === 'true' ? true : undefined  // only filter if explicitly "true"
+      isOnline === 'true' ? true : undefined
     );
 
     res.json({
@@ -102,43 +100,4 @@ export class ClientController {
     });
   };
 
-  bookWorker = async (req: Request, res: Response) => {
-
-    const { workerId, category, date, selectedSlots, slotType, numberOfDays, title, description } = req.body;
-
-    const clientId = (req as any).user?.id || (req as any).user?._id;
-
-    if (!clientId) {
-      return res.status(401).json({ success: false, message: "Unauthorized" });
-    }
-
-    const scheduledDate = new Date(date);
-    const parsedSelectedSlots = selectedSlots 
-      ? selectedSlots.map((s: any) => ({
-          date: new Date(s.date),
-          slotType: s.slotType
-        }))
-      : [{ date: scheduledDate, slotType }];
-
-    const result = await this.bookWorkerUseCase.execute({
-      clientId,
-      workerId,
-      category,
-      scheduledDate,
-      selectedSlots: parsedSelectedSlots,
-      numberOfDays,
-      title,
-      description,
-
-      location: {
-        type: "Point",
-        coordinates: [0, 0] // replace later
-      }
-    });
-
-    res.json({
-      success: true,
-      payload: result
-    });
-  };
 }

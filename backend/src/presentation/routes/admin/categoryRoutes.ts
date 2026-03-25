@@ -18,8 +18,7 @@ export function createCategoryRoutes(categoryController: ICategoryController, au
 export function createUserCategoryRoutes(categoryController: ICategoryController, authMiddleware: AuthMiddleware) {
     const router = express.Router();
 
-    // User routes for categories
-    router.get("/", (req, res) => categoryController.getAll(req, res)); // Assuming public or handled by frontend
+    router.get("/", (req, res) => categoryController.getAll(req, res)); 
     router.patch("/:userId", authMiddleware.verify.bind(authMiddleware), (req, res) => categoryController.updateUserCategories(req, res));
 
     return router;
