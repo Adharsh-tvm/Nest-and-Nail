@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { IGetS3UploadUrlUseCase } from "../../application/interfaces/media/IGetS3UploadUrlUseCase";
-import { HttpStatusCode } from "../../shared/enums/httpCodes";
+import { IGetS3UploadUrlUseCase } from "../../../application/interfaces/media/IGetS3UploadUrlUseCase";
+import { HttpStatusCode } from "../../../shared/enums/httpCodes";
 
 export class MediaController {
   constructor(

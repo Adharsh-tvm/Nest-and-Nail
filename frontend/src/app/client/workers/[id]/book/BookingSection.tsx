@@ -106,13 +106,13 @@ export function BookingSection({ worker }: BookingSectionProps) {
         <p className="text-gray-500 mb-8">
           Your service request has been successfully scheduled.
         </p>
-        <Link
+        {/* <Link
           href={`/client/bookings/${bookingState.data.id || bookingState.data.serviceId}`}
           className="w-full inline-flex items-center justify-center bg-gray-900 hover:bg-black text-white font-bold py-4 px-6 rounded-xl transition-all shadow-md hover:shadow-lg active:scale-[0.98]"
         >
           View Request Details
           <ChevronRight className="w-5 h-5 ml-1" />
-        </Link>
+        </Link> */}
       </div>
     );
   }

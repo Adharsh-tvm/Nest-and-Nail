@@ -1,12 +1,13 @@
-import { AdminController } from "../../presentation/controllers/AdminController";
-import { AuthController } from "../../presentation/controllers/AuthController";
-import { CategoryController } from "../../presentation/controllers/CategoryController";
-import { ClientController } from "../../presentation/controllers/ClientController";
-import { GoogleAuthController } from "../../presentation/controllers/GoogleAuthController";
-import { MediaController } from "../../presentation/controllers/MediaController";
-import { UploadController } from "../../presentation/controllers/UploadController";
-import { UserController } from "../../presentation/controllers/UserController";
-import { UserProfileController } from "../../presentation/controllers/UserProfileController";
+import { AdminController } from "../../presentation/controllers/admin/AdminController";
+import { AuthController } from "../../presentation/controllers/auth/AuthController";
+import { CategoryController } from "../../presentation/controllers/worker/CategoryController";
+import { ClientServiceController } from "../../presentation/controllers/client/ClientServiceController";
+import { ClientController } from "../../presentation/controllers/client/ClientWorkerController";
+import { GoogleAuthController } from "../../presentation/controllers/auth/GoogleAuthController";
+import { MediaController } from "../../presentation/controllers/auth/MediaController";
+import { UploadController } from "../../presentation/controllers/auth/UploadController";
+import { UserController } from "../../presentation/controllers/auth/UserController";
+import { UserProfileController } from "../../presentation/controllers/auth/UserProfileController";
 import { IAdminController } from "../../presentation/interfaces/IAdminController";
 import { IAuthController } from "../../presentation/interfaces/IAuthController";
 import { ICategoryController } from "../../presentation/interfaces/ICategoryController";
@@ -26,6 +27,7 @@ export class ControllerDI {
     private _adminController?: IAdminController;
     private _userController?: IUserController;
     private _clientController?: ClientController;
+    private _clientServiceController?: ClientServiceController;
 
     private _uploadController?: IUploadController;
     private _userProfileController?: IUserProfileController;
@@ -140,15 +142,26 @@ export class ControllerDI {
     }
 
     get clientController(): ClientController {
-        if(!this._clientController) {
+        if (!this._clientController) {
             this._clientController = new ClientController(
                 this._useCases.getAvailableWorkersUseCase,
                 this._useCases.getWorkerByIdUseCase,
                 this._useCases.getWorkerAvailabilityUseCase,
-                this._useCases.bookWorkerUseCase
             )
         }
         return this._clientController
+    }
+
+    get clientServiceController(): ClientServiceController {
+        if (!this._clientServiceController) {
+            this._clientServiceController = new ClientServiceController(
+                this._useCases.getClientServiceHistoryUseCase,
+                this._useCases.getClientServiceByIdUseCase,
+                this._useCases.getClientOngoingServicesUseCase,
+                this._useCases.bookWorkerUseCase
+            )
+        }
+        return this._clientServiceController
     }
 }
 

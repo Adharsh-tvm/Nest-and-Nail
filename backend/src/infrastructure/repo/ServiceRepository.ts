@@ -32,4 +32,12 @@ export class ServiceRepository implements IServiceRepository {
 
         return updated as Service | null;
     }
+
+    async findByClientId(clientId: string): Promise<Service[]> {
+        const docs = await ServiceModel.find({ clientId })
+            .sort({ createdAt: -1 })
+            .lean();
+
+        return docs as Service[];
+    }
 }
