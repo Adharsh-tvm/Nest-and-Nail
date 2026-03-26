@@ -10,13 +10,13 @@ export function createClientServiceRoutes(
     authMiddleware: AuthMiddleware
 ) {
 
-    router.post("/book", authMiddleware.verify, (req, res) => clientServiceController.bookWorker(req, res))
+    router.post("/book", authMiddleware.verify, (req, res, next) => clientServiceController.bookWorker(req, res, next))
 
-    router.get("/history", authMiddleware.verify, (req, res) => clientServiceController.getServiceHistory(req, res));
+    router.get("/history", authMiddleware.verify, (req, res, next) => clientServiceController.getServiceHistory(req, res, next));
 
-    router.get("/ongoing", authMiddleware.verify, (req, res) => clientServiceController.getOngoingServices(req, res));
+    router.get("/ongoing", authMiddleware.verify, (req, res, next) => clientServiceController.getOngoingServices(req, res, next));
 
-    router.get("/:serviceId", authMiddleware.verify, (req, res) => clientServiceController.getServiceByClientId(req, res));
+    router.get("/:serviceId", authMiddleware.verify, (req, res, next) => clientServiceController.getServiceByClientId(req, res, next));
 
     return router;
 }

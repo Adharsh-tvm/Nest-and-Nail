@@ -1,130 +1,117 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import { IGetWorkerServicesUseCase } from "../../../application/interfaces/service/worker/IGetWorkerServicesUseCase";
 import { IGetWorkerServiceDetailsUseCase } from "../../../application/interfaces/service/worker/IGetWorkerServiceDetailsUseCase";
+import { IGetActiveWorkerServiceUseCase } from "../../../application/interfaces/service/worker/IGetActiveWorkerServiceUseCase";
 import { ServiceStatus } from "../../../shared/enums/serviceEnums";
 import { HttpStatusCode } from "../../../shared/enums/httpCodes";
-import { IGetActiveWorkerServiceUseCase } from "../../../application/interfaces/service/worker/IGetActiveWorkerServiceUseCase";
+import { ResponseHandler } from "../../../shared/responses/ApiResponse";
 
 export class WorkerServiceController {
+  constructor(
+    private readonly _getWorkerServicesUseCase: IGetWorkerServicesUseCase,
+    private readonly _getWorkerServiceDetailsUseCase: IGetWorkerServiceDetailsUseCase,
+    private readonly _getActiveWorkerServiceUseCase: IGetActiveWorkerServiceUseCase
+  ) {}
 
-    constructor(
-        private readonly _getWorkerServicesUseCase: IGetWorkerServicesUseCase,
-        private readonly _getWorkerServiceDetailsUseCase: IGetWorkerServiceDetailsUseCase,
-        private readonly _getActiveWorkerServiceUseCase: IGetActiveWorkerServiceUseCase
-    ) { }
+  // Fetch all services for a worker with optional status filter
+  getWorkerServices = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const workerId = (req as any).user?.id;
 
-    async getWorkerServices(req: Request, res: Response): Promise<void> {
-        try {
-            const workerId = (req as any).user?.id;
+      // Validate worker authentication
+      if (!workerId) {
+        res.status(HttpStatusCode.UNAUTHORIZED).json(
+          ResponseHandler.error("Unauthorized")
+        );
+        return;
+      }
 
-            if (!workerId) {
-                res.status(HttpStatusCode.UNAUTHORIZED).json({
-                    success: false,
-                    message: "Unauthorized"
-                });
-                return;
-            }
+      const { status } = req.query;
+      let parsedStatus: ServiceStatus | undefined;
 
-            const { status } = req.query;
-
-            let parsedStatus: ServiceStatus | undefined;
-
-            if (typeof status === "string") {
-                if (Object.values(ServiceStatus).includes(status as ServiceStatus)) {
-                    parsedStatus = status as ServiceStatus;
-                } else {
-                    res.status(HttpStatusCode.BAD_REQUEST).json({
-                        success: false,
-                        message: "Invalid service status"
-                    });
-                    return;
-                }
-            }
-
-            const services = await this._getWorkerServicesUseCase.execute(
-                workerId,
-                parsedStatus
-            );
-
-            res.status(HttpStatusCode.OK).json({
-                success: true,
-                message: "Worker services fetched successfully",
-                data: services
-            });
-
-        } catch (error: any) {
-            res.status(HttpStatusCode.INTERNAL_SERVER).json({
-                success: false,
-                message: error.message || "Failed to fetch worker services"
-            });
+      // Validate status query param
+      if (typeof status === "string") {
+        if (Object.values(ServiceStatus).includes(status as ServiceStatus)) {
+          parsedStatus = status as ServiceStatus;
+        } else {
+          res.status(HttpStatusCode.BAD_REQUEST).json(
+            ResponseHandler.error("Invalid service status")
+          );
+          return;
         }
+      }
+
+      const services = await this._getWorkerServicesUseCase.execute(
+        workerId,
+        parsedStatus
+      );
+
+      res.status(HttpStatusCode.OK).json(
+        ResponseHandler.success(services, "Worker services fetched successfully")
+      );
+
+    } catch (error) {
+      next(error);
     }
+  };
 
-    async getWorkerServiceDetails(req: Request, res: Response): Promise<void> {
-        try {
-            const workerId = (req as any).user?.id;
-            const { serviceId } = req.params;
+  // Fetch details of a specific service for a worker
+  getWorkerServiceDetails = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const workerId = (req as any).user?.id;
+      const { serviceId } = req.params;
 
-            if (!workerId) {
-                res.status(HttpStatusCode.UNAUTHORIZED).json({
-                    success: false,
-                    message: "Unauthorized"
-                });
-                return;
-            }
+      // Validate worker authentication
+      if (!workerId) {
+        res.status(HttpStatusCode.UNAUTHORIZED).json(
+          ResponseHandler.error("Unauthorized")
+        );
+        return;
+      }
 
-            if (!serviceId) {
-                res.status(HttpStatusCode.BAD_REQUEST).json({
-                    success: false,
-                    message: "Service ID is required"
-                });
-                return;
-            }
+      // Validate serviceId param
+      if (!serviceId) {
+        res.status(HttpStatusCode.BAD_REQUEST).json(
+          ResponseHandler.error("Service ID is required")
+        );
+        return;
+      }
 
-            const service = await this._getWorkerServiceDetailsUseCase.execute(
-                serviceId,
-                workerId
-            );
+      const service = await this._getWorkerServiceDetailsUseCase.execute(
+        serviceId,
+        workerId
+      );
 
-            res.status(HttpStatusCode.OK).json({
-                success: true,
-                message: "Service details fetched successfully",
-                data: service
-            });
+      res.status(HttpStatusCode.OK).json(
+        ResponseHandler.success(service, "Service details fetched successfully")
+      );
 
-        } catch (error: any) {
-            res.status(HttpStatusCode.INTERNAL_SERVER).json({
-                success: false,
-                message: error.message || "Failed to fetch service details"
-            });
-        }
+    } catch (error) {
+      next(error);
     }
+  };
 
-    async getActiveService(req: Request, res: Response): Promise<void> {
-        try {
-            const workerId = (req as any).user?.id;
+  // Fetch currently active service for a worker
+  getActiveService = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const workerId = (req as any).user?.id;
 
-            if (!workerId) {
-                res.status(HttpStatusCode.UNAUTHORIZED).json({
-                    success: false,
-                    message: "Unauthorized"
-                });
-                return;
-            }
+      // Validate worker authentication
+      if (!workerId) {
+        res.status(HttpStatusCode.UNAUTHORIZED).json(
+          ResponseHandler.error("Unauthorized")
+        );
+        return;
+      }
 
-            const service = await this._getActiveWorkerServiceUseCase.execute(workerId);
+      const service = await this._getActiveWorkerServiceUseCase.execute(workerId);
 
-            res.status(HttpStatusCode.OK).json({
-                success: true,
-                message: "Active service fetched successfully",
-                data: service
-            });
+      res.status(HttpStatusCode.OK).json(
+        ResponseHandler.success(service, "Active service fetched successfully")
+      );
 
-        } catch (error: any) {
-            res.status(HttpStatusCode.INTERNAL_SERVER).json({
-                success: false,
-                message: error.message || "Failed to fetch active service"
-            });
-        }
+    } catch (error) {
+      next(error);
     }
+  };
 }

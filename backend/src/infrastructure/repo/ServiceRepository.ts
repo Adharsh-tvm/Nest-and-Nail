@@ -54,11 +54,11 @@ export class ServiceRepository implements IServiceRepository {
         const service = await ServiceModel.findOne({
             workerId,
             status: {
-                $in : [
+                $in: [
                     ServiceStatus.IN_PROGRESS
                 ]
             }
         });
         return service as Service;
-    }    
+    }
 }

@@ -13,7 +13,8 @@ export class GetWorkerServicesUseCase implements IGetWorkerServicesUseCase {
 
         let services = await this.serviceRepo.findByWorkerId(workerId);
 
-        //Filter by status if provided
+        console.log("workerId :", workerId);
+
         if (status) {
             services = services.filter(s => s.status === status);
         }
