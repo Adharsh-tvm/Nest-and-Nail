@@ -9,6 +9,7 @@ import { createUploadRoutes } from "./user/upload.routes";
 import { createMediaRoutes } from "./user/media.routes";
 import { createClientRoutes } from "./client/client.worker.routes";
 import { createClientServiceRoutes } from "./client/client.service.routes";
+import { createWorkerServiceRoutes } from "./worker/worker.service.routes";
 
 export const createRoutes = (container: DIContainer): Router => {
   const router = Router();
@@ -34,6 +35,8 @@ export const createRoutes = (container: DIContainer): Router => {
   router.use("/api/client/workers", createClientRoutes(container.controllers.clientController, container.controllers.authMiddleware))
 
   router.use("/api/client/services", createClientServiceRoutes(container.controllers.clientServiceController, container.controllers.authMiddleware))
+
+  router.use("/api/worker/service", createWorkerServiceRoutes(container.controllers.workerServiceController, container.controllers.authMiddleware))
 
   return router;
 };
