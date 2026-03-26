@@ -10,21 +10,21 @@ export function createWorkerServiceRoutes(
 ) {
 
     router.get(
-        "/services",
+        "/",
         authMiddleware.verify.bind(authMiddleware),
-        (req, res) => workerServiceController.getWorkerServices(req, res)
+        (req, res, next) => workerServiceController.getWorkerServices(req, res, next)
     );
 
     router.get(
-        "/services/:serviceId",
+        "/:serviceId",
         authMiddleware.verify.bind(authMiddleware),
-        (req, res) => workerServiceController.getWorkerServiceDetails(req, res)
+        (req, res, next) => workerServiceController.getWorkerServiceDetails(req, res, next)
     );
 
     router.get(
-        "/services/active",
+        "/active",
         authMiddleware.verify.bind(authMiddleware),
-        (req, res) => workerServiceController.getActiveService(req, res)
+        (req, res, next) => workerServiceController.getActiveService(req, res, next)
     )
 
     return router;

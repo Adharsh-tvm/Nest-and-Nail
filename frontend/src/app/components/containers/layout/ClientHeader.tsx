@@ -51,10 +51,6 @@ const ClientHeader: React.FC = () => {
     userMode === "worker" ? "/worker/profile" : "/client/profile";
 
   useEffect(() => {
-    console.log("Worker Current:", currentUser);
-  });
-
-  useEffect(() => {
     setIsLoggedIn(Boolean(currentUser && Object.keys(currentUser).length));
   }, [currentUser]);
 

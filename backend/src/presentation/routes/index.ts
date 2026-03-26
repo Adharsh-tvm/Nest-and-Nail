@@ -36,7 +36,7 @@ export const createRoutes = (container: DIContainer): Router => {
 
   router.use("/api/client/services", createClientServiceRoutes(container.controllers.clientServiceController, container.controllers.authMiddleware))
 
-  router.use("/api/worker/service", createWorkerServiceRoutes(container.controllers.workerServiceController, container.controllers.authMiddleware))
+  router.use("/api/worker/services", createWorkerServiceRoutes(container.controllers.workerServiceController, container.controllers.authMiddleware))
 
   return router;
 };
