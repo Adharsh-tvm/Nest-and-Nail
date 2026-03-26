@@ -426,9 +426,9 @@ export const LoginForm = () => {
 
       setTimeout(() => {
         const role = state.userRole ?? "client";
-        if (role === "worker") router.push("/worker");
-        else if (role === "admin") router.push("/admin");
-        else router.push("/client");
+        if (role === "worker") router.replace("/worker");
+        else if (role === "admin") router.replace("/admin");
+        else router.replace("/client");
       }, 500);
     }
   }, [state?.success]);

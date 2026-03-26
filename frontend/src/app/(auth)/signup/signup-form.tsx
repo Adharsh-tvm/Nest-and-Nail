@@ -173,12 +173,12 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
       if (result.success) {
         if (signupData.role === "worker") {
           if (result.isVerified === "VERIFIED") {
-            router.push("/worker");
+            router.replace("/worker");
           } else {
-            router.push("/worker/documents");
+            router.replace("/worker/documents");
           }
         } else {
-          router.push("/client");
+          router.replace("/client");
         }
       } else {
         toast.error(result.error || "Verification failed");
