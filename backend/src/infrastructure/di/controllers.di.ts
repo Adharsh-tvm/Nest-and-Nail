@@ -18,6 +18,7 @@ import { IUserProfileController } from "../../presentation/interfaces/IUserProfi
 import { AuthMiddleware } from "../../presentation/middlewares/AuthMiddleware";
 import { InfrastructureDI } from "./infrastructure.di";
 import { UseCaseDI } from "./usecases.di";
+import { WorkerServiceController } from "../../presentation/controllers/worker/WorkerServiceController";
 
 export class ControllerDI {
     private _authController?: IAuthController;
@@ -28,6 +29,8 @@ export class ControllerDI {
     private _userController?: IUserController;
     private _clientController?: ClientController;
     private _clientServiceController?: ClientServiceController;
+
+    private _workerServiceController?: WorkerServiceController;
 
     private _uploadController?: IUploadController;
     private _userProfileController?: IUserProfileController;
@@ -162,6 +165,17 @@ export class ControllerDI {
             )
         }
         return this._clientServiceController
+    }
+
+    get workerServiceController(): WorkerServiceController {
+        if(!this._workerServiceController) {
+            this._workerServiceController = new WorkerServiceController(
+                this._useCases.getWorkerServicesUseCase,
+                this._useCases.getWorkerServiceDetailsUseCase,
+                this._useCases.getActiveWorkerServiceUseCase
+            )
+        }
+        return this._workerServiceController
     }
 }
 

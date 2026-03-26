@@ -74,6 +74,12 @@ import { IGetClientServiceByIdUseCase } from "../../application/interfaces/servi
 import { IGetClientOngoingServicesUseCase } from "../../application/interfaces/service/client/IGetClientOngoingServicesUseCase";
 import { GetClientServiceByIdUseCase } from "../../application/use-cases/service/client/GetClientServiceByIdUseCase";
 import { GetClientOngoingServicesUseCase } from "../../application/use-cases/service/client/GetClientOngoingServicesUseCase";
+import { IGetWorkerServicesUseCase } from "../../application/interfaces/service/worker/IGetWorkerServicesUseCase";
+import { IGetWorkerServiceDetailsUseCase } from "../../application/interfaces/service/worker/IGetWorkerServiceDetailsUseCase";
+import { GetWorkerServiceDetailsUseCase } from "../../application/use-cases/service/worker/GetWorkerServiceDetailsUseCase";
+import { GetWorkerServicesUseCase } from "../../application/use-cases/service/worker/GetWorkerServicesUseCase";
+import { IGetActiveWorkerServiceUseCase } from "../../application/interfaces/service/worker/IGetActiveWorkerServiceUseCase";
+import { GetActiveWorkerServiceUseCase } from "../../application/use-cases/service/worker/GetActiveWorkerServiceUseCase";
 
 
 export class UseCaseDI {
@@ -125,6 +131,9 @@ export class UseCaseDI {
   private _getClientServiceHistoryUseCase?: IGetClientServiceHistoryUseCase;
   private _getClientServiceByIdUseCase ?: IGetClientServiceByIdUseCase;
   private _getClientOngoingServicesUseCase ?: IGetClientOngoingServicesUseCase;
+  private _getWorkerServicesUseCase ?: IGetWorkerServicesUseCase;
+  private _getWorkerServiceDetailsUseCase ?: IGetWorkerServiceDetailsUseCase;
+  private _getActiveWorkerServiceUseCase ?: IGetActiveWorkerServiceUseCase;
 
   constructor(private infra: InfrastructureDI) { }
 
@@ -490,5 +499,32 @@ export class UseCaseDI {
       )
     }
     return this._getClientOngoingServicesUseCase
+  }
+
+  get getWorkerServicesUseCase(): IGetWorkerServicesUseCase {
+    if(!this._getWorkerServicesUseCase) {
+      this._getWorkerServicesUseCase = new GetWorkerServicesUseCase(
+        this.infra.serviceRepository
+      )
+    } 
+    return this._getWorkerServicesUseCase
+  }
+
+  get getWorkerServiceDetailsUseCase(): IGetWorkerServiceDetailsUseCase {
+    if(!this._getWorkerServiceDetailsUseCase) {
+      this._getWorkerServiceDetailsUseCase = new GetWorkerServiceDetailsUseCase(
+        this.infra.serviceRepository
+      )
+    } 
+    return this._getWorkerServiceDetailsUseCase
+  }
+
+  get getActiveWorkerServiceUseCase(): IGetActiveWorkerServiceUseCase {
+    if(!this._getActiveWorkerServiceUseCase) {
+      this._getActiveWorkerServiceUseCase = new GetActiveWorkerServiceUseCase(
+        this.infra.serviceRepository
+      )
+    }
+    return this._getActiveWorkerServiceUseCase;
   }
 }

@@ -1,5 +1,6 @@
 import { Service } from "../../domain/entities/Service";
 import { IServiceRepository } from "../../domain/repositories/IServiceRepository";
+import { ServiceStatus } from "../../shared/enums/serviceEnums";
 import { ServiceModel } from "../database/models/ServiceModel";
 
 export class ServiceRepository implements IServiceRepository {
@@ -40,4 +41,24 @@ export class ServiceRepository implements IServiceRepository {
 
         return docs as Service[];
     }
+
+    async findByWorkerId(workerId: string): Promise<Service[]> {
+        const services = await ServiceModel.find({ workerId })
+            .sort({ createdAt: -1 })
+            .lean();;
+
+        return services as Service[];
+    }
+
+    async findActiveByWorkerId(workerId: string): Promise<Service | null> {
+        const service = await ServiceModel.findOne({
+            workerId,
+            status: {
+                $in : [
+                    ServiceStatus.IN_PROGRESS
+                ]
+            }
+        });
+        return service as Service;
+    }    
 }

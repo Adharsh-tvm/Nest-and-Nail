@@ -34,6 +34,12 @@ export class BookWorkerUseCase implements IBookWorkerUseCase {
       }
     }
 
+    const existing = await this.serviceRepo.findActiveByWorkerId(dto.workerId);
+
+    if (existing) {
+      throw new Error("Worker already has an active service");
+    }
+
     // 3. Map DTO → Entity
     const serviceEntity = ServiceMapper.toEntity(dto);
 
