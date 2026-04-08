@@ -1,0 +1,19 @@
+import { Router } from "express";
+import { ClientController } from "../../controllers/client/ClientWorkerController";
+import { AuthMiddleware } from "../../middlewares/AuthMiddleware";
+
+const router = Router();
+
+export function createClientRoutes(
+    clientController: ClientController,
+    authMiddleware: AuthMiddleware
+) {
+
+    router.get("/", (req, res, next) => { authMiddleware.verify(req, res, next); }, (req, res, next) => clientController.getAvailableWorkers(req, res, next))
+
+    router.get("/:id", (req, res, next) => { authMiddleware.verify(req, res, next); }, (req, res, next) => clientController.getWorkerById(req, res, next))
+
+    router.get("/:id/availability", (req, res, next) => { authMiddleware.verify(req, res, next); }, (req, res, next) => clientController.getWorkerAvailability(req, res, next));
+
+    return router;
+}

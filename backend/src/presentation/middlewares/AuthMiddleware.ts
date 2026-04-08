@@ -1,0 +1,56 @@
+// src/presentation/middlewares/AuthMiddleware.ts
+import { Request, Response, NextFunction, RequestHandler } from "express";
+import { ITokenService } from "../../application/contracts/ITokenService";
+import { HttpStatusCode } from "../../shared/enums/httpCodes";
+import { Role } from "../../shared/enums/authEnums";
+
+declare global {
+  namespace Express {
+    interface Request {
+      user?: any;
+    }
+  }
+}
+
+export class AuthMiddleware {
+  constructor(private readonly _tokenService: ITokenService) { }
+
+  public verify: RequestHandler = (req: Request, res: Response, next: NextFunction) => {
+    let token = req.cookies?.accessToken;
+
+    if (!token) {
+      const authHeader = req.headers.authorization;
+      if (authHeader?.startsWith("Bearer ")) {
+        token = authHeader.split(" ")[1];
+      }
+    }
+
+    if (!token) {
+      return res
+        .status(HttpStatusCode.UNAUTHORIZED)
+        .json({ message: "Unauthorized" });
+    }
+
+    try {
+      const payload = this._tokenService.verifyAccessToken(token);
+      req.user = payload;
+      next();
+    } catch (error) {
+      return res
+        .status(HttpStatusCode.FORBIDDEN)
+        .json({ message: "Invalid or expired token" });
+    }
+  };
+
+  public adminOnly: RequestHandler = (req: Request, res: Response, next: NextFunction) => {
+    this.verify(req, res, () => {
+      if (req.user && req.user.role === Role.ADMIN) {
+        next();
+      } else {
+        return res
+          .status(HttpStatusCode.FORBIDDEN)
+          .json({ message: "Admin access required" });
+      }
+    });
+  };
+}
