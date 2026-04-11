@@ -4,7 +4,6 @@ import { ResponseHandler } from "../../../shared/responses/ApiResponse";
 import { IGetWorkerScheduledMeetingsUseCase } from "../../../application/interfaces/meetings/worker/IGetWorkerScheduledMeetingsUseCase";
 import { IGetWorkerMeetingsHistoryUseCase } from "../../../application/interfaces/meetings/worker/IGetWorkerMeetingsUseCase";
 import { IGetWorkerMeetingByIdUseCase } from "../../../application/interfaces/meetings/worker/IGetWorkerMeetingByIdUseCase";
-import { IJoinVideoCallUseCase } from "../../../application/interfaces/meetings/worker/IJoinVideoCallUseCase";
 
 
 export class WorkerMeetingsController {
@@ -12,7 +11,6 @@ export class WorkerMeetingsController {
         private readonly getScheduledUseCase: IGetWorkerScheduledMeetingsUseCase,
         private readonly getHistoryUseCase: IGetWorkerMeetingsHistoryUseCase,
         private readonly _getMeetingByIdUseCase: IGetWorkerMeetingByIdUseCase,
-        private readonly _joinVideoCallUseCase: IJoinVideoCallUseCase
     ) { }
 
     getScheduledMeetings = async (
@@ -76,25 +74,6 @@ export class WorkerMeetingsController {
             res.status(HttpStatusCode.OK).json(
                 ResponseHandler.success(result, "Meeting fetched")
             );
-        } catch (error) {
-            next(error);
-        }
-    };
-
-    joinVideoCall = async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const workerId = req.user.id;
-            const { serviceId } = req.params;
-
-            const result = await this._joinVideoCallUseCase.execute(
-                serviceId,
-                workerId
-            );
-
-            res.status(200).json(
-                ResponseHandler.success(result, "Join video call")
-            );
-
         } catch (error) {
             next(error);
         }

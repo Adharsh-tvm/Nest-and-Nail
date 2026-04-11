@@ -28,11 +28,5 @@ export function createWorkerMeetingsRoutes(
         workerMeetingsController.getMeetingById
     );
 
-    router.get(
-        "/join/:serviceId",
-        authMiddleware.verify.bind(authMiddleware),
-        workerMeetingsController.joinVideoCall
-    );
-
     return router;
 }

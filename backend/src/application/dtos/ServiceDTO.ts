@@ -79,7 +79,7 @@ export interface ServiceResponseDTO {
     roomId: string;
     startTime: Date;
     endTime: Date;
-    joinUrl?: string;
+    meetingLink?: string;
   };
 }
 

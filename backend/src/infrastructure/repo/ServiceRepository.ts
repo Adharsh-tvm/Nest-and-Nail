@@ -203,11 +203,7 @@ export class ServiceRepository implements IServiceRepository {
     async updateVideoCall(serviceId: string, videoCall: any): Promise<any> {
         return await ServiceModel.findOneAndUpdate(
             { serviceId },
-            {
-                $set: {
-                    videoCall
-                }
-            },
+            { $set: { videoCall } },
             { new: true }
         );
     }

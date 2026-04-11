@@ -1,5 +1,5 @@
 import { PaymentStatus } from "../../shared/enums/paymentStatus";
-import { ServiceStatus } from "../../shared/enums/serviceEnums";
+import { ServiceStatus, VideoCallStatus } from "../../shared/enums/serviceEnums";
 import { SlotType } from "../../shared/enums/slotEnums";
 
 export interface Service {
@@ -65,7 +65,13 @@ export interface Service {
     roomId: string;
     startTime: Date;
     endTime: Date;
-    joinUrl?: string;
+    meetingLink?: string;
+
+    status?: VideoCallStatus
+    joinedUsers?: string[];
+
+    startedAt?: Date;
+    endedAt?: Date;
   };
 
   createdAt: Date;

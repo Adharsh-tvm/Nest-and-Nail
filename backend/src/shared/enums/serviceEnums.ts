@@ -8,3 +8,10 @@ export enum ServiceStatus {
     CANCELLED = "CANCELLED",
     EXPIRED = "EXPIRED",
 }
+
+export enum VideoCallStatus {
+    SCHEDULED = "SCHEDULED",
+    ONGOING = "ONGOING",
+    ENDED = "ENDED",
+    MISSED = "MISSED"
+}

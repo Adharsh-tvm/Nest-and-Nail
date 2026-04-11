@@ -4,7 +4,6 @@ import { ResponseHandler } from "../../../shared/responses/ApiResponse";
 import { IGetClientScheduledMeetingsUseCase } from "../../../application/interfaces/meetings/client/IGetClientScheduledVideoCallsUseCase";
 import { IGetClientMeetingsHistoryUseCase } from "../../../application/interfaces/meetings/client/IGetClientVideoCallHistoryUseCase";
 import { IGetClientMeetingByIdUseCase } from "../../../application/interfaces/meetings/client/IGetClientMeetingByIdUseCase";
-import { ICreateVideoCallUseCase } from "../../../application/interfaces/meetings/client/ICreateVideoCallUseCase";
 
 
 export class ClientMeetingsController {
@@ -12,7 +11,6 @@ export class ClientMeetingsController {
         private readonly _getScheduledUseCase: IGetClientScheduledMeetingsUseCase,
         private readonly _getHistoryUseCase: IGetClientMeetingsHistoryUseCase,
         private readonly _getMeetingByIdUseCase: IGetClientMeetingByIdUseCase,
-        private readonly _createVideoCallUseCase: ICreateVideoCallUseCase
     ) { }
 
     getScheduledMeetings = async (
@@ -81,25 +79,4 @@ export class ClientMeetingsController {
         }
     };
 
-    createVideoCall = async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const clientId = req.user.id;
-            const { serviceId } = req.params;
-            const { startTime, endTime } = req.body;
-
-            const result = await this._createVideoCallUseCase.execute(
-                serviceId,
-                clientId,
-                new Date(startTime),
-                new Date(endTime)
-            );
-
-            res.status(200).json(
-                ResponseHandler.success(result, "Video call scheduled successfully")
-            );
-
-        } catch (error) {
-            next(error);
-        }
-    };
 }

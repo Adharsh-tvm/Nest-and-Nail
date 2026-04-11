@@ -1,3 +1,4 @@
+import { UpdateVideoCallDTO } from "../../application/dtos/videoCallDTO";
 import { Service } from "../entities/Service";
 
 export interface IServiceRepository {
@@ -11,5 +12,5 @@ export interface IServiceRepository {
     findDetailedByServiceId(serviceId: string): Promise<any | null>;
     getMeetingsByClient(clientId: string): Promise<Service[]>;
     getMeetingsByWorker(workerId: string): Promise<Service[]>;
-    updateVideoCall(serviceId: string, videoCall: { roomId: string; startTime: Date; endTime: Date; meetingLink: string; }): Promise<any>;
-}
+    updateVideoCall(serviceId: string, videoCall: UpdateVideoCallDTO): Promise<any>;
+}    

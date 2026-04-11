@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
-import { ServiceStatus } from "../../../shared/enums/serviceEnums";
+import { ServiceStatus, VideoCallStatus } from "../../../shared/enums/serviceEnums";
 import { PaymentStatus } from "../../../shared/enums/paymentStatus";
 import { SlotType } from "../../../shared/enums/slotEnums";
 
@@ -66,6 +66,8 @@ export interface IServiceDocument extends Document {
     startTime: Date;
     endTime: Date;
     meetingLink?: string;
+    status?: VideoCallStatus;
+    joinedUsers?: string[];
   };
 
   createdAt: Date;

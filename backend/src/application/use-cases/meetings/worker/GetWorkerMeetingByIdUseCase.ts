@@ -14,12 +14,10 @@ export class GetWorkerMeetingByIdUseCase implements IGetWorkerMeetingByIdUseCase
       throw new Error("Meeting not found");
     }
 
-    // 🔒 Ownership check
     if (service.workerId !== workerId) {
       throw new Error("Unauthorized");
     }
 
-    // 🎥 Ensure it's a video call
     if (service.category !== "VIDEO_CALL") {
       throw new Error("Not a meeting");
     }

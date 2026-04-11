@@ -23,6 +23,7 @@ import { AdminServiceController } from "../../presentation/controllers/admin/Adm
 import { WorkerController } from "../../presentation/controllers/worker/WorkerController";
 import { ClientMeetingsController } from "../../presentation/controllers/client/ClientMeetingController";
 import { WorkerMeetingsController } from "../../presentation/controllers/worker/WorkerMeetingController";
+import { VideoCallController } from "../../presentation/controllers/common/videoCallController";
 
 export class ControllerDI {
     private _authController?: IAuthController;
@@ -46,6 +47,8 @@ export class ControllerDI {
     private _categoryController?: ICategoryController;
 
     private _mediaController?: MediaController;
+    
+    private _videoCallController?: VideoCallController;
 
     constructor(
         private _useCases: UseCaseDI,
@@ -215,7 +218,6 @@ export class ControllerDI {
                 this._useCases.getClientScheduledMeetingsUseCase,
                 this._useCases.getClientMeetingsHistoryUseCase,
                 this._useCases.getClientMeetingByIdUseCase,
-                this._useCases.createVideoCallUseCase
             )
         }
         return this._clientMeetingsController
@@ -227,10 +229,19 @@ export class ControllerDI {
                 this._useCases.getWorkerScheduledMeetingsUseCase,
                 this._useCases.getWorkerMeetingsHistoryUseCase,
                 this._useCases.getWorkerMeetingByIdUseCase,
-                this._useCases.joinVideoCallUseCase
             )
         }
         return this._workerMeetingsController
+    }
+
+    get videoCallController(): VideoCallController {
+        if (!this._videoCallController) {
+            this._videoCallController = new VideoCallController(
+                this._useCases.joinVideoCallUseCase,
+                this._useCases.endVideoCallUseCase
+            );
+        }
+        return this._videoCallController;
     }
 }
 

@@ -106,10 +106,10 @@ import { IGetClientMeetingByIdUseCase } from "../../application/interfaces/meeti
 import { IGetWorkerMeetingByIdUseCase } from "../../application/interfaces/meetings/worker/IGetWorkerMeetingByIdUseCase";
 import { GetClientMeetingByIdUseCase } from "../../application/use-cases/meetings/client/GetClientMeetingByIdUseCase";
 import { GetWorkerMeetingByIdUseCase } from "../../application/use-cases/meetings/worker/GetWorkerMeetingByIdUseCase";
-import { ICreateVideoCallUseCase } from "../../application/interfaces/meetings/client/ICreateVideoCallUseCase";
-import { CreateVideoCallUseCase } from "../../application/use-cases/meetings/client/CreateVideoCallUseCase";
-import { IJoinVideoCallUseCase } from "../../application/interfaces/meetings/worker/IJoinVideoCallUseCase";
-import { JoinVideoCallUseCase } from "../../application/use-cases/meetings/worker/JoinVideoCallUseCase";
+import { IJoinVideoCallUseCase } from "../../application/interfaces/meetings/IJoinVideoCallUseCase";
+import { IEndVideoCallUseCase } from "../../application/interfaces/meetings/IEndVideoCallUseCase";
+import { JoinVideoCallUseCase } from "../../application/use-cases/meetings/JoinVideoCallUseCase";
+import { EndVideoCallUseCase } from "../../application/use-cases/meetings/EndVideoCallUseCase";
 
 
 
@@ -178,8 +178,9 @@ export class UseCaseDI {
   private _getWorkerMeetingsHistoryUseCase?: IGetWorkerMeetingsHistoryUseCase;
   private _getClientMeetingByIdUseCase?: IGetClientMeetingByIdUseCase;
   private _getWorkerMeetingByIdUseCase?: IGetWorkerMeetingByIdUseCase
-  private _createVideoCallUseCase?: ICreateVideoCallUseCase
+
   private _joinVideoCallUseCase?: IJoinVideoCallUseCase;
+  private _endVideoCallUseCase?: IEndVideoCallUseCase;
 
 
 
@@ -697,14 +698,6 @@ export class UseCaseDI {
     return this._getWorkerMeetingByIdUseCase
   }
 
-  get createVideoCallUseCase(): ICreateVideoCallUseCase {
-    if (!this._createVideoCallUseCase) {
-      this._createVideoCallUseCase = new CreateVideoCallUseCase(
-        this.infra.serviceRepository
-      );
-    }
-    return this._createVideoCallUseCase;
-  }
 
   get joinVideoCallUseCase(): IJoinVideoCallUseCase {
     if (!this._joinVideoCallUseCase) {
@@ -713,5 +706,14 @@ export class UseCaseDI {
       );
     }
     return this._joinVideoCallUseCase;
+  }
+
+  get endVideoCallUseCase(): IEndVideoCallUseCase {
+    if (!this._endVideoCallUseCase) {
+      this._endVideoCallUseCase = new EndVideoCallUseCase(
+        this.infra.serviceRepository
+      );
+    }
+    return this._endVideoCallUseCase;
   }
 }

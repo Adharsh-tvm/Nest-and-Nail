@@ -8,7 +8,7 @@ import { RequestLogger } from "./presentation/middlewares/RequestLogger";
 import { DIContainer } from "./infrastructure/di/DIContainer";
 import { createRoutes } from "./presentation/routes";
 import http from "http";
-import { SocketServer } from "./infrastructure/socket/socketServer";
+import { initSocketServer } from "./infrastructure/socket/socketServer";
 
 
 
@@ -44,7 +44,7 @@ async function bootstrap() {
 
   const server = http.createServer(app);
 
-  SocketServer.init(server);
+  initSocketServer(server);
 
   // Start server
   const PORT = env.PORT;

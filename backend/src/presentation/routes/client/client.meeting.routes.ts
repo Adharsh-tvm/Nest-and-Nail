@@ -28,11 +28,5 @@ export function createClientMeetingsRoutes(
         clientMeetingsController.getMeetingById
     );
 
-    router.post(
-        "/create/:serviceId",
-        authMiddleware.verify.bind(authMiddleware),
-        clientMeetingsController.createVideoCall
-    );
-
     return router;
 }
