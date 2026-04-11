@@ -8,12 +8,13 @@ import {
   MapPin, User, CheckCircle2, AlertCircle, Timer, XCircle
 } from "lucide-react";
 
-export async function generateMetadata({ params }: { params: { meetingId: string } }) {
+export async function generateMetadata({ params }: { params: Promise<{ meetingId: string }> }) {
   return { title: `Meeting Details | Worker` };
 }
 
-export default async function WorkerMeetingDetailPage({ params }: { params: { meetingId: string } }) {
-  const res = await getWorkerMeetingByIdAction(params.meetingId);
+export default async function WorkerMeetingDetailPage({ params }: { params: Promise<{ meetingId: string }> }) {
+  const { meetingId } = await params;
+  const res = await getWorkerMeetingByIdAction(meetingId);
 
   if (!res.success || !res.data) {
     notFound();
@@ -181,17 +182,13 @@ export default async function WorkerMeetingDetailPage({ params }: { params: { me
                     <p className="text-emerald-100 text-xs">Be ready at the scheduled time</p>
                   </div>
                 </div>
-                {meeting.videoCall?.meetingLink && (
-                  <a
-                    href={meeting.videoCall.meetingLink}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-2 bg-white text-emerald-700 font-bold text-sm px-5 py-2.5 rounded-xl hover:bg-emerald-50 transition-colors shadow-sm shrink-0"
-                  >
-                    <Video className="w-4 h-4" />
-                    Join Now
-                  </a>
-                )}
+                <Link
+                  href={`/worker/video-call/${meeting.serviceId}`}
+                  className="inline-flex items-center gap-2 bg-white text-emerald-700 font-bold text-sm px-5 py-2.5 rounded-xl hover:bg-emerald-50 transition-colors shadow-sm shrink-0"
+                >
+                  <Video className="w-4 h-4" />
+                  Join Now
+                </Link>
               </div>
             )}
           </div>

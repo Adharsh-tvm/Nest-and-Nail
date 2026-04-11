@@ -48,7 +48,7 @@ async function bootstrap() {
 
   // Start server
   const PORT = env.PORT;
-  app.listen(PORT, () => {
+  server.listen(PORT, () => {
     container.infra.logger.info(`Server running on http://localhost:${PORT}`);
   });
 }

@@ -1,8 +1,9 @@
 "use client";
 
+import { use } from "react";
 import VideoCall from "@/app/components/containers/video-call/VideoCall";
 
-
-export default function WorkerVideoCallPage({ params }: any) {
-  return <VideoCall roomId={params.roomId} role="WORKER" />;
+export default function WorkerVideoCallPage({ params }: { params: Promise<{ roomId: string }> }) {
+  const { roomId } = use(params);
+  return <VideoCall roomId={roomId} role="WORKER" />;
 }

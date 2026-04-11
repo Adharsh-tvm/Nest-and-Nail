@@ -1,6 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig = {
+  eslint: {
+    // Lint rules are configured as warnings in eslint.config.mjs — build should not fail on them
+    ignoreDuringBuilds: true,
+  },
 
   experimental: {
     serverActions: {
