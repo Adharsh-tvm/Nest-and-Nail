@@ -217,10 +217,26 @@ export default function VideoCall({ roomId, role }: { roomId: string; role: stri
   };
 
   const endCall = () => {
-    localStreamRef.current?.getTracks().forEach((t) => t.stop());
-    socketRef.current?.emit("leave-room", { roomId, userId: role });
+    // 1. Null out video srcObjects first — this signals the browser to release the camera/mic indicator
+    if (localVideo.current) localVideo.current.srcObject = null;
+    if (remoteVideo.current) remoteVideo.current.srcObject = null;
+
+    // 2. Stop every media track (kills the camera/mic hardware access)
+    localStreamRef.current?.getTracks().forEach((t) => {
+      t.stop();
+    });
+    localStreamRef.current = null;
+
+    // 3. Close WebRTC peer connection
     pcRef.current?.close();
-    router.push(`/${role.toLowerCase()}/meetings`);
+    pcRef.current = null;
+
+    // 4. Notify the other participant and disconnect socket
+    socketRef.current?.emit("leave-room", { roomId, userId: role });
+    socketRef.current?.disconnect();
+
+    // 5. Hard redirect — ensures browser fully drops all device locks before the new page loads
+    window.location.href = `/${role.toLowerCase()}/meetings`;
   };
 
   if (!mounted) return null;
