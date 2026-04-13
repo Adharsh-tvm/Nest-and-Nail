@@ -275,3 +275,9 @@ Next
 ☐ messages in constant
 ☐ routes in constant
 ☐ types of inheritance
+
+
+
+☐ back button should ask to leave meeting modal in meeting ui.
+☐ duplicate user error 
+☐ button disabled should be enable when waiting for other to join 

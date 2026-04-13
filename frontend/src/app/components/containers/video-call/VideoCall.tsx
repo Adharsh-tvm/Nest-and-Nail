@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import io, { Socket } from "socket.io-client";
 import { createPortal } from "react-dom";
-import { Mic, MicOff, Video as VideoIcon, VideoOff, PhoneOff, Loader2, Users } from "lucide-react";
+import { Mic, MicOff, Video as VideoIcon, VideoOff, LogOut, Loader2, Users } from "lucide-react";
 
 export default function VideoCall({ roomId, role }: { roomId: string; role: string }) {
   const localVideo = useRef<HTMLVideoElement>(null);
@@ -216,7 +216,7 @@ export default function VideoCall({ roomId, role }: { roomId: string; role: stri
     if (track) { track.enabled = !track.enabled; setIsVideoOn(track.enabled); }
   };
 
-  const endCall = () => {
+  const leaveRoom = () => {
     // 1. Null out video srcObjects first — this signals the browser to release the camera/mic indicator
     if (localVideo.current) localVideo.current.srcObject = null;
     if (remoteVideo.current) remoteVideo.current.srcObject = null;
@@ -235,8 +235,8 @@ export default function VideoCall({ roomId, role }: { roomId: string; role: stri
     socketRef.current?.emit("leave-room", { roomId, userId: role });
     socketRef.current?.disconnect();
 
-    // 5. Hard redirect — ensures browser fully drops all device locks before the new page loads
-    window.location.href = `/${role.toLowerCase()}/meetings`;
+    // 5. Hard redirect back to the meeting detail page so user can re-join or end the meeting
+    window.location.href = `/${role.toLowerCase()}/meetings/${roomId}`;
   };
 
   if (!mounted) return null;
@@ -312,10 +312,10 @@ export default function VideoCall({ roomId, role }: { roomId: string; role: stri
           {isMicOn ? <Mic className="w-6 h-6" /> : <MicOff className="w-6 h-6" />}
         </button>
 
-        <button onClick={endCall} title="End Call"
-          className="px-8 py-4 rounded-2xl bg-rose-500 hover:bg-rose-600 active:scale-95 transition-all duration-200 shadow-lg shadow-rose-500/20 text-white font-bold flex items-center gap-2">
-          <PhoneOff className="w-6 h-6" />
-          <span>End Call</span>
+        <button onClick={leaveRoom} title="Leave Room"
+          className="px-8 py-4 rounded-2xl bg-amber-500 hover:bg-amber-600 active:scale-95 transition-all duration-200 shadow-lg shadow-amber-500/20 text-white font-bold flex items-center gap-2">
+          <LogOut className="w-6 h-6" />
+          <span>Leave Room</span>
         </button>
 
         <button onClick={toggleVideo} title={isVideoOn ? "Turn off camera" : "Turn on camera"}

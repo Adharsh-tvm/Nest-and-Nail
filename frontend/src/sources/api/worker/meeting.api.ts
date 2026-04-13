@@ -57,3 +57,18 @@ export async function getWorkerMeetingByIdApi(serviceId: string): Promise<ApiRes
         return { error: null, success: false, message: 'Unexpected error' };
     }
 }
+
+export async function endMeetingApi(serviceId: string): Promise<ApiResponse<{ message: string }>> {
+    try {
+        const response = await axiosInstance.post<BackendResponse<{ message: string }>>(`/api/video-call/end/${serviceId}`, {}, { withCredentials: true });
+        if (!response.data.success) {
+            return { error: response.data.error || null, success: false, message: response.data.message || "Failed" };
+        }
+        return { payload: response.data.payload as { message: string }, success: true, message: response.data.message || "Success" };
+    } catch (error: unknown) {
+        if (axios.isAxiosError(error)) {
+            return { error: error.response?.data?.error || null, success: false, message: error.response?.data?.message || 'Failed' };
+        }
+        return { error: null, success: false, message: 'Unexpected error' };
+    }
+}

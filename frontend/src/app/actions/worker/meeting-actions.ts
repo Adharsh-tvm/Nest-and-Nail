@@ -1,6 +1,6 @@
 "use server";
 
-import { getWorkerScheduledMeetingsApi, getWorkerMeetingsHistoryApi, getWorkerMeetingByIdApi } from "@/sources/api/worker/meeting.api";
+import { getWorkerScheduledMeetingsApi, getWorkerMeetingsHistoryApi, getWorkerMeetingByIdApi, endMeetingApi } from "@/sources/api/worker/meeting.api";
 import { ServiceResponseDTO } from "@/shared/types/serviceTypes";
 
 export async function getWorkerScheduledMeetingsAction(): Promise<{ success: boolean; data?: ServiceResponseDTO[]; error?: string }> {
@@ -36,5 +36,17 @@ export async function getWorkerMeetingByIdAction(serviceId: string): Promise<{ s
         return { success: true, data: response.payload };
     } catch (error: any) {
         return { success: false, error: error.message || "Failed to fetch meeting details" };
+    }
+}
+
+export async function endMeetingAction(serviceId: string): Promise<{ success: boolean; message?: string; error?: string }> {
+    try {
+        const response = await endMeetingApi(serviceId);
+        if (!response.success) {
+            return { success: false, error: response.message };
+        }
+        return { success: true, message: response.message };
+    } catch (error: any) {
+        return { success: false, error: error.message || "Failed to end meeting" };
     }
 }

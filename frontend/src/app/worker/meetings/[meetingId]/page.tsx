@@ -1,12 +1,13 @@
 import React from "react";
 import { notFound } from "next/navigation";
-import { getWorkerMeetingByIdAction } from "@/app/actions/worker/meeting-actions";
+import { getWorkerMeetingByIdAction, endMeetingAction } from "@/app/actions/worker/meeting-actions";
 import { SLOT_LABELS } from "@/shared/types/serviceTypes";
 import Link from "next/link";
 import { 
   CalendarDays, Clock, Video, CreditCard, ArrowLeft, 
   MapPin, User, CheckCircle2, AlertCircle, Timer, XCircle
 } from "lucide-react";
+import EndMeetingButton from "@/app/components/containers/meetings/EndMeetingButton";
 
 export async function generateMetadata({ params }: { params: Promise<{ meetingId: string }> }) {
   return { title: `Meeting Details | Worker` };
@@ -182,13 +183,20 @@ export default async function WorkerMeetingDetailPage({ params }: { params: Prom
                     <p className="text-emerald-100 text-xs">Be ready at the scheduled time</p>
                   </div>
                 </div>
-                <Link
-                  href={`/worker/video-call/${meeting.serviceId}`}
-                  className="inline-flex items-center gap-2 bg-white text-emerald-700 font-bold text-sm px-5 py-2.5 rounded-xl hover:bg-emerald-50 transition-colors shadow-sm shrink-0"
-                >
-                  <Video className="w-4 h-4" />
-                  Join Now
-                </Link>
+                <div className="flex items-center gap-3 shrink-0">
+                  <Link
+                    href={`/worker/video-call/${meeting.serviceId}`}
+                    className="inline-flex items-center gap-2 bg-white text-emerald-700 font-bold text-sm px-5 py-2.5 rounded-xl hover:bg-emerald-50 transition-colors shadow-sm"
+                  >
+                    <Video className="w-4 h-4" />
+                    Join Now
+                  </Link>
+                  <EndMeetingButton
+                    serviceId={meeting.serviceId}
+                    videoCallStatus={meeting.videoCall?.status}
+                    endMeetingAction={endMeetingAction}
+                  />
+                </div>
               </div>
             )}
           </div>
