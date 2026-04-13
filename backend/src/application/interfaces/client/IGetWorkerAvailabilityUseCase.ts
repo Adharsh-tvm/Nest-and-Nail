@@ -8,10 +8,11 @@ export interface IGetWorkerAvailabilityUseCase {
     fullDayAvailable: boolean;
     isBooked: boolean;
     isUnavailable: boolean;
+    bookedSlots?: string[];
   }>;
   executeBulk?(
     workerId: string,
     startDate: Date,
     endDate: Date
-  ): Promise<Record<string, { morningAvailable: boolean; eveningAvailable: boolean; fullDayAvailable: boolean; isBooked: boolean; isUnavailable: boolean; }>>;
+  ): Promise<Record<string, { morningAvailable: boolean; eveningAvailable: boolean; fullDayAvailable: boolean; isBooked: boolean; isUnavailable: boolean; bookedSlots?: string[]; }>>;
 }

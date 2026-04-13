@@ -14,6 +14,7 @@ export interface SlotAvailability {
   fullDayAvailable: boolean;
   isBooked?: boolean;
   isUnavailable?: boolean;
+  bookedSlots?: SlotType[];
 }
 
 export interface BookingPayload {
@@ -51,6 +52,7 @@ export interface DateAvailabilitySummary {
   eveningAvailable: boolean;
   fullDayAvailable: boolean;
   highlight: "green" | "yellow" | "red";
+  bookedSlots?: SlotType[];
 }
 
 export const SLOT_PRICES: Record<SlotType, number> = {

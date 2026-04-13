@@ -8,7 +8,7 @@ export class GetWorkerAvailabilityUseCase implements IGetWorkerAvailabilityUseCa
         private readonly workerScheduleRepo: IWorkerScheduleRepository
     ) { }
 
-    async execute(workerId: string, date: Date): Promise<{ morningAvailable: boolean; eveningAvailable: boolean; fullDayAvailable: boolean; isBooked: boolean; isUnavailable: boolean; }> {
+    async execute(workerId: string, date: Date): Promise<{ morningAvailable: boolean; eveningAvailable: boolean; fullDayAvailable: boolean; isBooked: boolean; isUnavailable: boolean; bookedSlots?: string[]; }> {
 
         const schedules = await this.workerScheduleRepo.findByWorkerAndDate(workerId, date);
 
@@ -32,19 +32,22 @@ export class GetWorkerAvailabilityUseCase implements IGetWorkerAvailabilityUseCa
             s => s.slotType === SlotType.FULL_DAY && s.isBooked
         );
 
+        const bookedSlots = schedules.filter(s => s.isBooked).map(s => s.slotType);
+
         return {
             morningAvailable: !morningUnavailable && !fullDayUnavailable,
             eveningAvailable: !eveningUnavailable && !fullDayUnavailable,
             fullDayAvailable: !morningUnavailable && !eveningUnavailable && !fullDayUnavailable,
             isBooked: fullDayBooked || eveningBooked || schedules.some(s => s.slotType === SlotType.MORNING_HALF && s.isBooked),
-            isUnavailable: schedules.some(s => !s.isAvailable)
+            isUnavailable: schedules.some(s => !s.isAvailable),
+            bookedSlots
         };
     }
 
-    async executeBulk(workerId: string, startDate: Date, endDate: Date): Promise<Record<string, { morningAvailable: boolean; eveningAvailable: boolean; fullDayAvailable: boolean; isBooked: boolean; isUnavailable: boolean; }>> {
+    async executeBulk(workerId: string, startDate: Date, endDate: Date): Promise<Record<string, { morningAvailable: boolean; eveningAvailable: boolean; fullDayAvailable: boolean; isBooked: boolean; isUnavailable: boolean; bookedSlots?: string[]; }>> {
         const schedules = await this.workerScheduleRepo.findByWorkerIdAndDateRange(workerId, startDate, endDate);
 
-        const result: Record<string, { morningAvailable: boolean; eveningAvailable: boolean; fullDayAvailable: boolean; isBooked: boolean; isUnavailable: boolean; }> = {};
+        const result: Record<string, { morningAvailable: boolean; eveningAvailable: boolean; fullDayAvailable: boolean; isBooked: boolean; isUnavailable: boolean; bookedSlots?: string[]; }> = {};
 
         // Initialize all dates in range implicitly via ISO iteration
         const cur = new Date(startDate);
@@ -54,7 +57,7 @@ export class GetWorkerAvailabilityUseCase implements IGetWorkerAvailabilityUseCa
 
         while (cur <= end) {
             const dateKey = `${cur.getFullYear()}-${String(cur.getMonth() + 1).padStart(2, '0')}-${String(cur.getDate()).padStart(2, '0')}`;
-            result[dateKey] = { morningAvailable: true, eveningAvailable: true, fullDayAvailable: true, isBooked: false, isUnavailable: false };
+            result[dateKey] = { morningAvailable: true, eveningAvailable: true, fullDayAvailable: true, isBooked: false, isUnavailable: false, bookedSlots: [] };
             cur.setDate(cur.getDate() + 1);
         }
 
@@ -64,7 +67,11 @@ export class GetWorkerAvailabilityUseCase implements IGetWorkerAvailabilityUseCa
             const dt = new Date(s.date);
             const dateStr = `${dt.getUTCFullYear()}-${String(dt.getUTCMonth() + 1).padStart(2, '0')}-${String(dt.getUTCDate()).padStart(2, '0')}`;
             if (result[dateStr]) {
-                if (s.isBooked) result[dateStr].isBooked = true;
+                if (s.isBooked) {
+                     result[dateStr].isBooked = true;
+                     result[dateStr].bookedSlots = result[dateStr].bookedSlots || [];
+                     result[dateStr].bookedSlots.push(s.slotType);
+                }
                 if (!s.isAvailable) result[dateStr].isUnavailable = true;
 
                 if (s.slotType === SlotType.MORNING_HALF) {

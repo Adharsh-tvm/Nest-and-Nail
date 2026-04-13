@@ -26,6 +26,7 @@ export function MeetingBookingSection({ worker }: MeetingBookingSectionProps) {
 
   const {
     isLoadingDate,
+    calendarHighlights,
     prefetchDays,
     refetchCurrentDate,
   } = useWorkerAvailability(worker.userId || worker.id);
@@ -215,6 +216,7 @@ export function MeetingBookingSection({ worker }: MeetingBookingSectionProps) {
             <MeetingCalendarSelector
               selectedSlots={selectedSlots}
               onSlotChange={setSelectedSlots}
+              availabilityData={Object.fromEntries(calendarHighlights.entries()) as any}
               isLoadingDate={isLoadingDate}
               viewYear={viewYear}
               viewMonth={viewMonth}

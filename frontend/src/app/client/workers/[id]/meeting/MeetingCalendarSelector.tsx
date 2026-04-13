@@ -11,6 +11,7 @@ interface MeetingCalendarSelectorProps {
   onMonthChange?: (fromDate: Date) => void;
   viewYear: number;
   viewMonth: number;
+  availabilityData?: Record<string, { isBooked?: boolean; bookedSlots?: string[] }>;
   onViewChange: (year: number, month: number) => void;
 }
 
@@ -56,6 +57,7 @@ export function MeetingCalendarSelector({
   onMonthChange,
   viewYear,
   viewMonth,
+  availabilityData = {},
   onViewChange,
 }: MeetingCalendarSelectorProps) {
   const today = new Date();
@@ -206,27 +208,36 @@ export function MeetingCalendarSelector({
              {meetingSlots.map(slotType => {
                  const isSelected = selectedSlots[focusedDate] === slotType;
                  const isTooSoon = isSlotWithin12Hours(focusedDate, slotType);
+                 const slotData = availabilityData[focusedDate];
+                 const isBooked = slotData?.bookedSlots?.includes(slotType) || false;
+                 
+                 const isDisabled = isTooSoon || isBooked;
 
                  return (
                     <button
                         key={slotType}
                         onClick={() => {
-                            if (isTooSoon) return;
+                            if (isDisabled) return;
                             const newSlots = { [focusedDate]: slotType };
                             onSlotChange(newSlots);
                             setFocusedDate(null);
                         }}
-                        disabled={isTooSoon}
+                        disabled={isDisabled}
                         className={`py-3 px-2 rounded-xl text-sm font-bold transition-all border-2 flex flex-col items-center justify-center gap-1 relative overflow-hidden
                         ${isSelected
                           ? 'bg-emerald-600 text-white border-emerald-600 shadow-md' 
-                          : isTooSoon
+                          : isDisabled
                             ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-60' 
                             : 'bg-white text-gray-700 border-gray-200 hover:border-emerald-500 hover:text-emerald-600'}`}
                     >
-                        {isTooSoon && (
-                           <div className="absolute top-0 right-0 bg-red-100 text-red-600 text-[9px] px-1.5 py-0.5 rounded-bl-lg font-black uppercase">
+                        {isTooSoon && !isBooked && (
+                           <div className="absolute top-0 right-0 bg-amber-100 text-amber-600 text-[9px] px-1.5 py-0.5 rounded-bl-lg font-black uppercase">
                              &lt;12h
+                           </div>
+                        )}
+                        {isBooked && (
+                           <div className="absolute top-0 right-0 bg-red-100 text-red-600 text-[9px] px-1.5 py-0.5 rounded-bl-lg font-black flex items-center justify-center w-full">
+                             BOOKED
                            </div>
                         )}
                         <span>{SLOT_LABELS[slotType]}</span>
