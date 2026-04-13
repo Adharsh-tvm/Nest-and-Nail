@@ -13,4 +13,5 @@ export interface IServiceRepository {
     getMeetingsByClient(clientId: string): Promise<Service[]>;
     getMeetingsByWorker(workerId: string): Promise<Service[]>;
     updateVideoCall(serviceId: string, videoCall: UpdateVideoCallDTO): Promise<any>;
+    updatePaymentStatus(serviceId: string, paymentStatus: string): Promise<void>;
 }    

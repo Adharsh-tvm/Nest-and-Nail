@@ -37,7 +37,7 @@ export default function ClientMeetingsView({ scheduled, history, workerMap }: Pr
             case ServiceStatus.CANCELLED_BY_CLIENT:
             case ServiceStatus.CANCELLED_BY_WORKER:
                 return <span className="px-3 py-1 bg-red-50 text-red-700 rounded-full text-xs font-bold border border-red-100 shadow-sm">Cancelled</span>;
-            case ServiceStatus.OPEN:
+            case ServiceStatus.PENDING:
             case 'PENDING':
                 return <span className="px-3 py-1 bg-yellow-50 text-yellow-700 rounded-full text-xs font-bold border border-yellow-100 shadow-sm">Pending</span>;
             default:

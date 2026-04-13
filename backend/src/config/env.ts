@@ -42,6 +42,8 @@ const envSchema = z.object({
   AWS_ACCESS_KEY_ID: z.string().min(1),
   AWS_SECRET_ACCESS_KEY: z.string().min(1),
 
+  RAZORPAY_KEY: z.string().min(1, "RAZORPAY_KEY is required"),
+  RAZORPAY_SECRET: z.string().min(1, "RAZORPAY_SECRET is required"),
 
 });
 

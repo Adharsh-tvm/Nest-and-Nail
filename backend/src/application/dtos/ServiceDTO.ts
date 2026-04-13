@@ -1,4 +1,4 @@
-import { PaymentStatus } from "../../shared/enums/paymentStatus";
+import { PaymentStatus } from "../../shared/enums/paymentEnums";
 import { ServiceStatus } from "../../shared/enums/serviceEnums";
 import { SlotType } from "../../shared/enums/slotEnums";
 

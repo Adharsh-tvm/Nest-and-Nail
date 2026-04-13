@@ -207,4 +207,14 @@ export class ServiceRepository implements IServiceRepository {
             { new: true }
         );
     }
+
+    async updatePaymentStatus(
+        serviceId: string,
+        paymentStatus: string
+    ): Promise<void> {
+        await ServiceModel.updateOne(
+            { serviceId },
+            { $set: { paymentStatus } }
+        );
+    }
 }

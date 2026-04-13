@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose";
 import { ServiceStatus, VideoCallStatus } from "../../../shared/enums/serviceEnums";
-import { PaymentStatus } from "../../../shared/enums/paymentStatus";
+import { PaymentStatus } from "../../../shared/enums/paymentEnums";
 import { SlotType } from "../../../shared/enums/slotEnums";
 
 export interface IServiceDocument extends Document {

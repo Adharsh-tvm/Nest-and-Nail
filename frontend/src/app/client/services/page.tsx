@@ -18,11 +18,11 @@ export default async function ClientServicesPage() {
   );
 
   const ongoingServices = sortedServices.filter((s) =>
-    ["OPEN", "CONFIRMED", "IN_PROGRESS"].includes(s.status),
+    ["OPEN", "PENDING", "CONFIRMED", "IN_PROGRESS"].includes(s.status),
   );
 
   const historyServices = sortedServices.filter(
-    (s) => !["OPEN", "CONFIRMED", "IN_PROGRESS"].includes(s.status),
+    (s) => !["OPEN", "PENDING", "CONFIRMED", "IN_PROGRESS"].includes(s.status),
   );
 
   const allServices = sortedServices;

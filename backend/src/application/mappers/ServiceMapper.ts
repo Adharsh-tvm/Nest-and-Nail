@@ -1,6 +1,6 @@
 import { Service } from "../../domain/entities/Service";
 import { ServiceStatus } from "../../shared/enums/serviceEnums";
-import { PaymentStatus } from "../../shared/enums/paymentStatus";
+import { PaymentStatus } from "../../shared/enums/paymentEnums";
 import { v4 as uuidv4 } from "uuid";
 import { CreateServiceDTO, ServiceResponseDTO } from "../dtos/ServiceDTO";
 import { getVideoSlotTime } from "../../utils/getVideoSlotTime";
@@ -52,7 +52,7 @@ export class ServiceMapper {
       pricePerWorker: dto.pricePerWorker,
       totalAmount,
 
-      status: ServiceStatus.CONFIRMED,
+      status: ServiceStatus.PENDING,
       paymentStatus: PaymentStatus.PENDING,
 
       videoCall,

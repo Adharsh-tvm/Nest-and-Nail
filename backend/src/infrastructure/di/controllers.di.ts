@@ -24,6 +24,7 @@ import { WorkerController } from "../../presentation/controllers/worker/WorkerCo
 import { ClientMeetingsController } from "../../presentation/controllers/client/ClientMeetingController";
 import { WorkerMeetingsController } from "../../presentation/controllers/worker/WorkerMeetingController";
 import { VideoCallController } from "../../presentation/controllers/common/videoCallController";
+import { PaymentController } from "../../presentation/controllers/payment/PaymentController";
 
 export class ControllerDI {
     private _authController?: IAuthController;
@@ -47,8 +48,9 @@ export class ControllerDI {
     private _categoryController?: ICategoryController;
 
     private _mediaController?: MediaController;
-    
+
     private _videoCallController?: VideoCallController;
+    private _paymentController?: PaymentController;
 
     constructor(
         private _useCases: UseCaseDI,
@@ -242,6 +244,16 @@ export class ControllerDI {
             );
         }
         return this._videoCallController;
+    }
+
+    get paymentController(): PaymentController {
+        if (!this._paymentController) {
+            this._paymentController = new PaymentController(
+                this._useCases.createPaymentUseCase,
+                this._useCases.verifyPaymentUseCase
+            );
+        }
+        return this._paymentController;
     }
 }
 

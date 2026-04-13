@@ -30,6 +30,11 @@ import { IWorkerScheduleRepository } from "../../domain/repositories/IWorkerSche
 import { WorkerScheduleRepository } from "../repo/WorkerScheduleRepository";
 import { IServiceRepository } from "../../domain/repositories/IServiceRepository";
 import { ServiceRepository } from "../repo/ServiceRepository";
+import { IPaymentRepository } from "../../domain/repositories/IPaymentRepository";
+import { PaymentRepository } from "../repo/PaymentRepository";
+import { IPaymentGateway } from "../../domain/gateways/IPaymentGateway";
+import { RazorpayGateway } from "../adapters/RazorpayGateway";
+import { PaymentModel } from "../database/models/PaymentModel";
 
 export class InfrastructureDI {
   private _userRepositoryFactory?: IUserRepositoryFactory;
@@ -40,6 +45,9 @@ export class InfrastructureDI {
   private _userRepository?: IBaseRepository<any>;
   private _workerScheduleRepo?: IWorkerScheduleRepository;
   private _serviceRepository?: IServiceRepository;
+  private _paymentRepository?: IPaymentRepository;
+
+  private _paymentGateway?: IPaymentGateway;
 
   private _passwordHasher?: IPasswordHasher;
   private _idGenerator?: IGenerateUserID;
@@ -52,6 +60,7 @@ export class InfrastructureDI {
   private _categoryRepository?: ICategoryRepository;
 
   private _s3Service?: S3Service;
+
 
 
 
@@ -173,5 +182,19 @@ export class InfrastructureDI {
       this._s3Service = new S3Service();
     }
     return this._s3Service;
+  }
+
+  get paymentRepository(): IPaymentRepository {
+    if (!this._paymentRepository) {
+      this._paymentRepository = new PaymentRepository(PaymentModel)
+    }
+    return this._paymentRepository;
+  }
+
+  get paymentGateway(): IPaymentGateway {
+    if (!this._paymentGateway) {
+      this._paymentGateway = new RazorpayGateway();
+    }
+    return this._paymentGateway
   }
 }

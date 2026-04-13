@@ -84,7 +84,6 @@ export const SLOT_DURATION_LABEL: Record<SlotType, string> = {
 };
 
 export enum ServiceStatus {
-  OPEN = "OPEN",
   PENDING = "PENDING",
   CONFIRMED = "CONFIRMED",
   IN_PROGRESS = "IN_PROGRESS",

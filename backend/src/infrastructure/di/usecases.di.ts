@@ -110,6 +110,10 @@ import { IJoinVideoCallUseCase } from "../../application/interfaces/meetings/IJo
 import { IEndVideoCallUseCase } from "../../application/interfaces/meetings/IEndVideoCallUseCase";
 import { JoinVideoCallUseCase } from "../../application/use-cases/meetings/JoinVideoCallUseCase";
 import { EndVideoCallUseCase } from "../../application/use-cases/meetings/EndVideoCallUseCase";
+import { ICreatePaymentUseCase } from "../../application/interfaces/payment/ICreatePaymentUseCase";
+import { IVerifyPaymentUseCase } from "../../application/interfaces/payment/IVerifyPaymentUseCase";
+import { CreatePaymentUseCase } from "../../application/use-cases/payment/CreatePaymentUseCase";
+import { VerifyPaymentUseCase } from "../../application/use-cases/payment/VerifyPaymentUseCase";
 
 
 
@@ -182,6 +186,8 @@ export class UseCaseDI {
   private _joinVideoCallUseCase?: IJoinVideoCallUseCase;
   private _endVideoCallUseCase?: IEndVideoCallUseCase;
 
+  private _createPaymentUseCase?: ICreatePaymentUseCase;
+  private _verifyPaymentUseCase?: IVerifyPaymentUseCase;
 
 
   constructor(private infra: InfrastructureDI) { }
@@ -715,5 +721,26 @@ export class UseCaseDI {
       );
     }
     return this._endVideoCallUseCase;
+  }
+
+  get createPaymentUseCase(): ICreatePaymentUseCase {
+    if (!this._createPaymentUseCase) {
+      this._createPaymentUseCase = new CreatePaymentUseCase(
+        this.infra.paymentRepository,
+        this.infra.paymentGateway
+      )
+    }
+    return this.createPaymentUseCase
+  }
+
+  get verifyPaymentUseCase(): IVerifyPaymentUseCase {
+    if (!this._verifyPaymentUseCase) {
+      this._verifyPaymentUseCase = new VerifyPaymentUseCase(
+        this.infra.paymentRepository,
+        this.infra.paymentGateway,
+        this.infra.serviceRepository
+      );
+    }
+    return this._verifyPaymentUseCase;
   }
 }
