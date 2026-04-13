@@ -21,6 +21,7 @@ export default function VideoCall({ roomId, role }: { roomId: string; role: stri
   const [isMicOn, setIsMicOn] = useState(true);
   const [isVideoOn, setIsVideoOn] = useState(true);
   const [connectionState, setConnectionState] = useState<"connecting" | "waiting" | "connected">("connecting");
+  const [showLeaveModal, setShowLeaveModal] = useState(false);
 
   // Flush any ICE candidates buffered before remoteDescription was ready
   const flushPendingCandidates = async (pc: RTCPeerConnection) => {
@@ -206,6 +207,28 @@ export default function VideoCall({ roomId, role }: { roomId: string; role: stri
     };
   }, [roomId, role, createPeerConnection]);
 
+  const onBeforeUnload = useCallback((e: BeforeUnloadEvent) => {
+    e.preventDefault();
+    e.returnValue = "Are you sure you want to leave the meeting room?";
+  }, []);
+
+  useEffect(() => {
+    window.history.pushState(null, "", window.location.href);
+
+    const handlePopState = () => {
+      setShowLeaveModal(true);
+      window.history.pushState(null, "", window.location.href);
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    window.addEventListener("beforeunload", onBeforeUnload);
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+      window.removeEventListener("beforeunload", onBeforeUnload);
+    };
+  }, [onBeforeUnload]);
+
   const toggleMic = () => {
     const track = localStreamRef.current?.getAudioTracks()[0];
     if (track) { track.enabled = !track.enabled; setIsMicOn(track.enabled); }
@@ -216,7 +239,9 @@ export default function VideoCall({ roomId, role }: { roomId: string; role: stri
     if (track) { track.enabled = !track.enabled; setIsVideoOn(track.enabled); }
   };
 
-  const leaveRoom = () => {
+  const executeLeave = () => {
+    window.removeEventListener("beforeunload", onBeforeUnload);
+
     // 1. Null out video srcObjects first — this signals the browser to release the camera/mic indicator
     if (localVideo.current) localVideo.current.srcObject = null;
     if (remoteVideo.current) remoteVideo.current.srcObject = null;
@@ -237,6 +262,10 @@ export default function VideoCall({ roomId, role }: { roomId: string; role: stri
 
     // 5. Hard redirect back to the meeting detail page so user can re-join or end the meeting
     window.location.href = `/${role.toLowerCase()}/meetings/${roomId}`;
+  };
+
+  const leaveRoom = () => {
+    setShowLeaveModal(true);
   };
 
   if (!mounted) return null;
@@ -306,7 +335,7 @@ export default function VideoCall({ roomId, role }: { roomId: string; role: stri
       </div>
 
       {/* Controls Bar */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-5 bg-white/10 backdrop-blur-lg border border-white/20 p-4 rounded-3xl shadow-2xl">
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-5 bg-white/10 backdrop-blur-lg border border-white/20 p-4 rounded-3xl shadow-2xl z-50">
         <button onClick={toggleMic} title={isMicOn ? "Mute" : "Unmute"}
           className={`p-4 rounded-2xl transition-all duration-200 shadow-lg ${isMicOn ? "bg-slate-700/80 hover:bg-slate-600 text-white" : "bg-rose-500 hover:bg-rose-600 text-white"}`}>
           {isMicOn ? <Mic className="w-6 h-6" /> : <MicOff className="w-6 h-6" />}
@@ -323,6 +352,35 @@ export default function VideoCall({ roomId, role }: { roomId: string; role: stri
           {isVideoOn ? <VideoIcon className="w-6 h-6" /> : <VideoOff className="w-6 h-6" />}
         </button>
       </div>
+
+      {/* Confirmation Modal */}
+      {showLeaveModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[10000] flex items-center justify-center p-4">
+          <div className="bg-slate-800 border border-slate-700 rounded-3xl p-8 max-w-md w-full shadow-2xl flex flex-col items-center text-center animate-in fade-in zoom-in duration-200">
+            <div className="w-16 h-16 bg-rose-500/10 rounded-full flex items-center justify-center mb-6">
+              <LogOut className="w-8 h-8 text-rose-500" />
+            </div>
+            <h3 className="text-2xl font-bold text-white mb-2">Leave Meeting?</h3>
+            <p className="text-slate-300 mb-8">
+              Are you sure you want to leave the meeting room? Your camera and microphone will be turned off.
+            </p>
+            <div className="flex w-full gap-4">
+              <button
+                onClick={() => setShowLeaveModal(false)}
+                className="flex-1 py-3 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-semibold transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={executeLeave}
+                className="flex-1 py-3 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-semibold transition-colors shadow-lg shadow-rose-500/20"
+              >
+                Yes, Leave
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>,
     document.body
   );
