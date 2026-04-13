@@ -1,8 +1,7 @@
 export interface ICreatePaymentUseCase {
     execute(
         serviceId: string,
-        clientId: string,
-        amount: number
+        clientId: string
     ): Promise<{
         orderId: string;
         currency: string;

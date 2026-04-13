@@ -19,6 +19,8 @@ import { BookingSummaryStep } from "./BookingSummaryStep";
 import { StepsIndicator } from "./StepsIndicator";
 import { CheckCircle2, ChevronRight, ChevronLeft } from "lucide-react";
 import Link from "next/link";
+import { loadRazorpay } from "@/utils/loadRazorpay";
+import { createPaymentOrderAction, verifyPaymentAction } from "@/app/actions/client/payment-actions";
 
 interface BookingSectionProps {
   worker: User;
@@ -58,6 +60,10 @@ export function BookingSection({ worker }: BookingSectionProps) {
 
   const [viewYear, setViewYear] = useState(new Date().getFullYear());
   const [viewMonth, setViewMonth] = useState(new Date().getMonth());
+
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
+
   // Auto-clear error when dates change
   useEffect(() => {
     resetBookingError();
@@ -118,30 +124,114 @@ export function BookingSection({ worker }: BookingSectionProps) {
   const nextStep = () => setCurrentStep((p) => Math.min(p + 1, 5));
   const prevStep = () => setCurrentStep((p) => Math.max(p - 1, 1));
 
+  const handlePayment = async (bookingData: any) => {
+    setIsProcessingPayment(true);
+    
+    const res = await loadRazorpay();
+    if (!res) {
+        toast.error("Razorpay SDK failed to load. Are you online?");
+        setIsProcessingPayment(false);
+        return;
+    }
+
+    const orderRes = await createPaymentOrderAction(bookingData.serviceId || bookingData.id);
+    if (!orderRes.success) {
+        toast.error(orderRes.error || "Failed to create payment order");
+        setIsProcessingPayment(false);
+        return;
+    }
+
+    const { orderId: order_id, amount, currency } = orderRes.data;
+
+    const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY || "rzp_test_YourKeyHere",
+        amount: amount.toString(),
+        currency: currency,
+        name: "Nest & Nail",
+        description: "Service Booking Payment",
+        order_id: order_id,
+        handler: async function (response: any) {
+            try {
+                setIsProcessingPayment(true);
+                const verifyRes = await verifyPaymentAction({
+                    razorpay_payment_id: response.razorpay_payment_id,
+                    razorpay_order_id: response.razorpay_order_id,
+                    razorpay_signature: response.razorpay_signature
+                });
+
+                if (verifyRes.success) {
+                    toast.success("Payment verified successfully!");
+                    setPaymentSuccess(true);
+                } else {
+                    toast.error("Payment verification failed. Please contact support.");
+                }
+            } catch (error) {
+                toast.error("An error occurred during verification.");
+            } finally {
+                setIsProcessingPayment(false);
+            }
+        },
+        prefill: {
+            name: user?.name,
+            email: user?.email,
+            contact: user?.phone_number?.toString()
+        },
+        theme: {
+            color: "#10b981",
+        },
+        modal: {
+            ondismiss: function () {
+                setIsProcessingPayment(false);
+                toast.error("Payment was cancelled.");
+            }
+        }
+    };
+
+    const paymentObject = new (window as any).Razorpay(options);
+    paymentObject.on("payment.failed", function (response: any) {
+        toast.error(response.error?.description || "Payment failed");
+        setIsProcessingPayment(false);
+    });
+
+    paymentObject.open();
+  };
+
   // ---------------------------------------------------------------------------
   // SUCCESS STATE (Step 6 intrinsically)
   // ---------------------------------------------------------------------------
   if (bookingState.status === "success" && bookingState.data) {
-    return (
-      <div className="bg-white rounded-[24px] border border-emerald-200 p-8 shadow-sm text-center animate-in zoom-in-95 duration-500">
-        <div className="w-20 h-20 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6">
-          <CheckCircle2 className="w-10 h-10" />
+    if (paymentSuccess) {
+      return (
+        <div className="bg-white rounded-[24px] border border-emerald-200 p-8 shadow-sm text-center animate-in zoom-in-95 duration-500">
+          <div className="w-20 h-20 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6">
+            <CheckCircle2 className="w-10 h-10" />
+          </div>
+          <h2 className="text-2xl font-black text-gray-900 mb-2">
+            Booking Confirmed!
+          </h2>
+          <p className="text-gray-500 mb-8">
+            Your service request has been successfully scheduled and paid.
+          </p>
         </div>
-        <h2 className="text-2xl font-black text-gray-900 mb-2">
-          Booking Confirmed!
-        </h2>
-        <p className="text-gray-500 mb-8">
-          Your service request has been successfully scheduled.
-        </p>
-        {/* <Link
-          href={`/client/bookings/${bookingState.data.id || bookingState.data.serviceId}`}
-          className="w-full inline-flex items-center justify-center bg-gray-900 hover:bg-black text-white font-bold py-4 px-6 rounded-xl transition-all shadow-md hover:shadow-lg active:scale-[0.98]"
-        >
-          View Request Details
-          <ChevronRight className="w-5 h-5 ml-1" />
-        </Link> */}
-      </div>
-    );
+      );
+    } else {
+      return (
+        <div className="bg-white rounded-[24px] border border-emerald-200 p-8 shadow-sm text-center animate-in zoom-in-95 duration-500">
+           <h2 className="text-2xl font-black text-gray-900 mb-2">Payment Required</h2>
+           <p className="text-gray-500 mb-8">Please complete the payment to confirm your booking.</p>
+           {isProcessingPayment ? (
+               <div className="text-emerald-500 font-bold mb-4">Processing payment... Please do not refresh.</div>
+           ) : (
+               <button 
+                   onClick={() => handlePayment(bookingState.data)}
+                   className="w-full inline-flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 px-6 rounded-xl transition-all shadow-md hover:shadow-lg active:scale-[0.98]"
+               >
+                   Pay Now
+               </button>
+           )}
+        </div>
+      );
+    }
   }
 
   // ---------------------------------------------------------------------------

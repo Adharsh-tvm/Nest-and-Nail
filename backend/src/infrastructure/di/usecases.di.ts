@@ -727,10 +727,11 @@ export class UseCaseDI {
     if (!this._createPaymentUseCase) {
       this._createPaymentUseCase = new CreatePaymentUseCase(
         this.infra.paymentRepository,
-        this.infra.paymentGateway
+        this.infra.paymentGateway,
+        this.infra.serviceRepository
       )
     }
-    return this.createPaymentUseCase
+    return this._createPaymentUseCase
   }
 
   get verifyPaymentUseCase(): IVerifyPaymentUseCase {

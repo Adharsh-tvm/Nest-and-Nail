@@ -6,37 +6,41 @@ import { IServiceRepository } from "../../../domain/repositories/IServiceReposit
 import { PaymentStatus } from "../../../shared/enums/paymentEnums";
 import { IVerifyPaymentUseCase } from "../../interfaces/payment/IVerifyPaymentUseCase";
 
-export class VerifyPaymentUseCase implements IVerifyPaymentUseCase{
-  constructor(
-    private paymentRepo: IPaymentRepository,
-    private paymentGateway: IPaymentGateway,
-    private serviceRepo: IServiceRepository
-  ) {}
+export class VerifyPaymentUseCase implements IVerifyPaymentUseCase {
+    constructor(
+        private paymentRepo: IPaymentRepository,
+        private paymentGateway: IPaymentGateway,
+        private serviceRepo: IServiceRepository
+    ) { }
 
-  async execute(data: {
-    orderId: string;
-    paymentId: string;
-    signature: string;
-  }) {
+    async execute(data: {
+        orderId: string;
+        paymentId: string;
+        signature: string;
+    }) {
 
-    const isValid = this.paymentGateway.verifyPayment(data);
+        const isValid = this.paymentGateway.verifyPayment(data);
 
-    if (!isValid) throw new Error("Invalid payment");
+        if (!isValid) throw new Error("Invalid payment");
 
-    const payment = await this.paymentRepo.findByOrderId(data.orderId);
-    if (!payment) throw new Error("Payment not found");
+        const payment = await this.paymentRepo.findByOrderId(data.orderId);
+        if (!payment) throw new Error("Payment not found");
 
-    await this.paymentRepo.updateByOrderId(data.orderId, {
-      paymentId: data.paymentId,
-      signature: data.signature,
-      status: PaymentStatus.SUCCESS
-    });
+        if (payment.status === "SUCCESS") {
+            return { success: true };
+        }
 
-    await this.serviceRepo.updatePaymentStatus(
-      payment.serviceId,
-      "SUCCESS"
-    );
+        await this.paymentRepo.updateByOrderId(data.orderId, {
+            paymentId: data.paymentId,
+            signature: data.signature,
+            status: PaymentStatus.SUCCESS
+        });
 
-    return { success: true };
-  }
+        await this.serviceRepo.updatePaymentStatus(
+            payment.serviceId,
+            "SUCCESS"
+        );
+
+        return { success: true };
+    }
 }

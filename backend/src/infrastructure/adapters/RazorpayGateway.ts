@@ -34,6 +34,12 @@ export class RazorpayGateway implements IPaymentGateway {
       .update(body)
       .digest("hex");
 
+    console.log("=== Signature Verification ===");
+    console.log("Order ID:", orderId);
+    console.log("Payment ID:", paymentId);
+    console.log("Provided:", signature);
+    console.log("Expected:", expected);
+
     return expected === signature;
   }
 }

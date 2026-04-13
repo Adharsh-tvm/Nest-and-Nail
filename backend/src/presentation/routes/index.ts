@@ -15,6 +15,7 @@ import { createWorkerRoutes } from "./worker/worker.routes";
 import { createClientMeetingsRoutes } from "./client/client.meeting.routes";
 import { createWorkerMeetingsRoutes } from "./worker/worker.meeting.routes";
 import { createUsersVideoCallRoutes } from "./common/videoCall.routes";
+import { createPaymentRoutes } from "./payment/payment.routes";
 
 export const createRoutes = (container: DIContainer): Router => {
   const router = Router();
@@ -52,6 +53,8 @@ export const createRoutes = (container: DIContainer): Router => {
   router.use("/api/worker/", createWorkerRoutes(container.controllers.workerController, container.controllers.authMiddleware))
 
   router.use("/api/video-call", createUsersVideoCallRoutes(container.controllers.authMiddleware, container.controllers.videoCallController));
+
+  router.use("/api", createPaymentRoutes(container.controllers.authMiddleware, container.controllers.paymentController));
 
   return router;
 };
