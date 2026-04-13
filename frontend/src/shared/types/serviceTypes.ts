@@ -152,6 +152,7 @@ export interface ServiceResponseDTO {
     endTime?: string | Date;
     joinUrl?: string;
     meetingLink?: string;
+    status: string
   };
 }
 
