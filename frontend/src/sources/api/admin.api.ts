@@ -216,3 +216,27 @@ export async function fetchAdminServiceDetails(serviceId: string): Promise<Admin
     throw new Error(error.response?.data?.message || error.message || "Failed to fetch admin service details");
   }
 }
+
+export async function fetchAllAdminMeetings(): Promise<AdminServiceResponseDTO[]> {
+  try {
+    const res = await axiosInstance.get<ApiResponse<AdminServiceResponseDTO[]>>("/api/admin/meetings");
+    if (!res.data.success) {
+      throw new Error(res.data.message || "Failed to fetch admin meetings");
+    }
+    return res.data.payload;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || error.message || "Failed to fetch admin meetings");
+  }
+}
+
+export async function fetchAdminMeetingDetails(serviceId: string): Promise<AdminServiceResponseDTO> {
+  try {
+    const res = await axiosInstance.get<ApiResponse<AdminServiceResponseDTO>>(`/api/admin/meetings/${serviceId}`);
+    if (!res.data.success) {
+      throw new Error(res.data.message || "Failed to fetch admin meeting details");
+    }
+    return res.data.payload;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || error.message || "Failed to fetch admin meeting details");
+  }
+}

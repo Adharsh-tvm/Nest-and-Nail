@@ -14,6 +14,7 @@ import {
   Settings,
   HelpCircle,
   Menu,
+  Calendar,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -39,6 +40,12 @@ const navItems = [
     label: "Services",
     icon: Wrench,
     href: "/admin/services",
+  },
+  {
+    id: "meetings",
+    label: "Meetings",
+    icon: Calendar,
+    href: "/admin/meetings",
   },
   {
     id: "verification",

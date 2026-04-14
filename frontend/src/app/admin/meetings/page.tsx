@@ -11,10 +11,9 @@ import {
   CreditCard,
   User,
   Wrench,
-  Search,
-  List,
   Activity,
   CheckSquare,
+  Video
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
@@ -24,60 +23,58 @@ import DataTable, {
 } from "@/app/components/containers/widgets/DataTable";
 import {
   AdminServiceResponseDTO,
-  ServiceStatus,
-  PaymentStatus,
 } from "@/shared/types/serviceTypes";
 import { getAdminServicesAction } from "@/app/actions/admin/service-actions";
 
-const AdminServicesPage = () => {
+const AdminMeetingsPage = () => {
   const router = useRouter();
-  const [services, setServices] = useState<AdminServiceResponseDTO[]>([]);
+  const [meetings, setMeetings] = useState<AdminServiceResponseDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const fetchServices = async () => {
+  const fetchMeetings = async () => {
     try {
       setLoading(true);
       const res = await getAdminServicesAction();
 
       if (!res.success) {
-        throw new Error(res.error || "Failed to load services");
+        throw new Error(res.error || "Failed to load meetings");
       }
 
-      const servicesOnly = (res.data || []).filter(s => s.category !== "VIDEO_CALL");
-      setServices(servicesOnly);
+      const meetingsOnly = (res.data || []).filter(s => s.category === "VIDEO_CALL");
+      setMeetings(meetingsOnly);
     } catch (error: any) {
-      toast.error(error.message || "Failed to load services");
+      toast.error(error.message || "Failed to load meetings");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchServices();
+    fetchMeetings();
   }, []);
 
-  const filteredServices = services.filter((s) => {
+  const filteredMeetings = meetings.filter((m) => {
     const searchLower = searchQuery.toLowerCase();
     return (
-      s.category.toLowerCase().includes(searchLower) ||
-      s.client.name.toLowerCase().includes(searchLower) ||
-      s.worker.name.toLowerCase().includes(searchLower) ||
-      s.status.toLowerCase().includes(searchLower)
+      m.category.toLowerCase().includes(searchLower) ||
+      m.client.name.toLowerCase().includes(searchLower) ||
+      m.worker.name.toLowerCase().includes(searchLower) ||
+      m.status.toLowerCase().includes(searchLower)
     );
   });
 
   // Stats
-  const totalServices = services.length;
-  const activeServices = services.filter(
-    (s) =>
-      s.status === "OPEN" ||
-      s.status === "PENDING" ||
-      s.status === "CONFIRMED" ||
-      s.status === "IN_PROGRESS",
+  const totalMeetings = meetings.length;
+  const activeMeetings = meetings.filter(
+    (m) =>
+      m.status === "OPEN" ||
+      m.status === "PENDING" ||
+      m.status === "CONFIRMED" ||
+      m.status === "IN_PROGRESS",
   ).length;
-  const completedServices = services.filter(
-    (s) => s.status === "COMPLETED",
+  const completedMeetings = meetings.filter(
+    (m) => m.status === "COMPLETED",
   ).length;
 
   const getStatusColor = (status: string) => {
@@ -122,13 +119,13 @@ const AdminServicesPage = () => {
 
   const columns: Column<AdminServiceResponseDTO>[] = [
     {
-      header: "Service",
+      header: "Meeting",
       accessorKey: "category",
       className: "min-w-[200px]",
       cell: (row) => (
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center border border-indigo-100 transition-all hover:scale-110">
-            <Wrench size={18} />
+          <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center border border-purple-100 transition-all hover:scale-110">
+            <Video size={18} />
           </div>
           <div>
             <div className="font-bold text-gray-900 capitalize">
@@ -160,12 +157,12 @@ const AdminServicesPage = () => {
       ),
     },
     {
-      header: "Schedule",
+      header: "Meeting Schedule",
       accessorKey: "scheduledDate",
       cell: (row) => (
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2 text-sm text-gray-800 font-medium">
-            <Calendar size={14} className="text-indigo-400" />
+            <Calendar size={14} className="text-purple-400" />
             {new Date(row.scheduledDate).toLocaleDateString("en-US", {
               day: "numeric",
               month: "short",
@@ -237,9 +234,9 @@ const AdminServicesPage = () => {
           <button
             onClick={(e) => {
               e.stopPropagation();
-              router.push(`/admin/services/${row.serviceId}`);
+              router.push(`/admin/meetings/${row.serviceId}`);
             }}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 hover:border-indigo-300 hover:bg-indigo-50 rounded-lg text-gray-600 hover:text-indigo-600 transition-all shadow-sm"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 hover:border-purple-300 hover:bg-purple-50 rounded-lg text-gray-600 hover:text-purple-600 transition-all shadow-sm"
             title="View Details"
           >
             <Eye size={16} />
@@ -273,7 +270,7 @@ const AdminServicesPage = () => {
       <div className="flex items-center justify-between bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
         <div>
           <h1 className="text-2xl font-black text-gray-900 tracking-tight">
-            Services Management
+            Meetings Management
           </h1>
         </div>
       </div>
@@ -281,20 +278,20 @@ const AdminServicesPage = () => {
       {/* Header Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6">
         <StatCard
-          title="Total Services"
-          value={totalServices}
-          icon={List}
-          iconColor="text-indigo-500"
+          title="Total Meetings"
+          value={totalMeetings}
+          icon={Calendar}
+          iconColor="text-purple-500"
         />
         <StatCard
-          title="Active Services"
-          value={activeServices}
+          title="Active Meetings"
+          value={activeMeetings}
           icon={Activity}
           iconColor="text-amber-500"
         />
         <StatCard
-          title="Completed Services"
-          value={completedServices}
+          title="Completed Meetings"
+          value={completedMeetings}
           icon={CheckSquare}
           iconColor="text-emerald-500"
         />
@@ -302,15 +299,15 @@ const AdminServicesPage = () => {
 
       <div className="h-[650px] bg-white rounded-[2rem] border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden flex flex-col">
         <DataTable<AdminServiceResponseDTO>
-          title="All Services"
+          title="All Meetings"
           columns={columns}
-          data={filteredServices}
+          data={filteredMeetings}
           isLoading={loading}
-          searchPlaceholder="Search services by category, client, worker, or status..."
+          searchPlaceholder="Search meetings by category, client, worker, or status..."
         />
       </div>
     </div>
   );
 };
 
-export default AdminServicesPage;
+export default AdminMeetingsPage;
