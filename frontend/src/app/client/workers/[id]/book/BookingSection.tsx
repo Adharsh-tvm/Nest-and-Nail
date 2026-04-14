@@ -17,10 +17,11 @@ import { DaysSelectionStep } from "./DaysSelectionStep";
 import { ServiceDetailsStep } from "./ServiceDetailsStep";
 import { BookingSummaryStep } from "./BookingSummaryStep";
 import { StepsIndicator } from "./StepsIndicator";
-import { CheckCircle2, ChevronRight, ChevronLeft } from "lucide-react";
+import { CheckCircle2, ChevronRight, ChevronLeft, CreditCard, Wallet, RotateCcw } from "lucide-react";
 import Link from "next/link";
 import { loadRazorpay } from "@/utils/loadRazorpay";
-import { createPaymentOrderAction, verifyPaymentAction } from "@/app/actions/client/payment-actions";
+import { createPaymentOrderAction, verifyPaymentAction, processWalletPaymentAction } from "@/app/actions/client/payment-actions";
+import { getWalletBalanceAction } from "@/app/actions/client/wallet-actions";
 
 interface BookingSectionProps {
   worker: User;
@@ -45,6 +46,12 @@ export function BookingSection({ worker }: BookingSectionProps) {
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
   const [isAddAddressOpen, setIsAddAddressOpen] = useState(false);
 
+  // Payment state
+  const [paymentMethod, setPaymentMethod] = useState<"razorpay" | "wallet">("razorpay");
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [walletBalance, setWalletBalance] = useState(0);
+
   const {
     selectedDate,
     currentAvailability,
@@ -61,13 +68,19 @@ export function BookingSection({ worker }: BookingSectionProps) {
   const [viewYear, setViewYear] = useState(new Date().getFullYear());
   const [viewMonth, setViewMonth] = useState(new Date().getMonth());
 
-  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
-  const [paymentSuccess, setPaymentSuccess] = useState(false);
-
   // Auto-clear error when dates change
   useEffect(() => {
     resetBookingError();
   }, [selectedSlots, resetBookingError]);
+
+  // Fetch wallet balance from API on mount
+  useEffect(() => {
+    getWalletBalanceAction().then((res) => {
+      if (res.success && res.data) {
+        setWalletBalance(res.data.balance);
+      }
+    });
+  }, []);
 
   // Initial fetch for calendar dots
   useEffect(() => {
@@ -82,7 +95,6 @@ export function BookingSection({ worker }: BookingSectionProps) {
     const slotsArray = Object.entries(selectedSlots).map(([date, slotType]) => ({ date, slotType }));
     if (slotsArray.length === 0) return;
     
-    // finalSlot fallback for backend constraints if needed, but we pass selectedSlots anyway
     const finalSlot = slotsArray[0].slotType;
 
     book({
@@ -124,7 +136,7 @@ export function BookingSection({ worker }: BookingSectionProps) {
   const nextStep = () => setCurrentStep((p) => Math.min(p + 1, 5));
   const prevStep = () => setCurrentStep((p) => Math.max(p - 1, 1));
 
-  const handlePayment = async (bookingData: any) => {
+  const handleRazorpayPayment = async (bookingData: any) => {
     setIsProcessingPayment(true);
     
     const res = await loadRazorpay();
@@ -148,7 +160,7 @@ export function BookingSection({ worker }: BookingSectionProps) {
         amount: amount.toString(),
         currency: currency,
         name: "Nest & Nail",
-        description: "Service Booking Payment",
+        description: "Service Booking – Full Payment",
         order_id: order_id,
         handler: async function (response: any) {
             try {
@@ -160,7 +172,7 @@ export function BookingSection({ worker }: BookingSectionProps) {
                 });
 
                 if (verifyRes.success) {
-                    toast.success("Payment verified successfully!");
+                    toast.success("Payment successful!");
                     setPaymentSuccess(true);
                 } else {
                     toast.error("Payment verification failed. Please contact support.");
@@ -176,9 +188,7 @@ export function BookingSection({ worker }: BookingSectionProps) {
             email: user?.email,
             contact: user?.phone_number?.toString()
         },
-        theme: {
-            color: "#10b981",
-        },
+        theme: { color: "#10b981" },
         modal: {
             ondismiss: function () {
                 setIsProcessingPayment(false);
@@ -192,12 +202,36 @@ export function BookingSection({ worker }: BookingSectionProps) {
         toast.error(response.error?.description || "Payment failed");
         setIsProcessingPayment(false);
     });
-
     paymentObject.open();
   };
 
+  const handleWalletPayment = async (bookingData: any) => {
+    setIsProcessingPayment(true);
+    try {
+      const res = await processWalletPaymentAction(bookingData.serviceId || bookingData.id);
+      if (res.success) {
+        toast.success("Payment successful via Wallet!");
+        setPaymentSuccess(true);
+      } else {
+        toast.error(res.error || "Wallet payment failed.");
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Wallet payment failed.");
+    } finally {
+      setIsProcessingPayment(false);
+    }
+  };
+
+  const handlePayment = (bookingData: any) => {
+    if (paymentMethod === "wallet") {
+      handleWalletPayment(bookingData);
+    } else {
+      handleRazorpayPayment(bookingData);
+    }
+  };
+
   // ---------------------------------------------------------------------------
-  // SUCCESS STATE (Step 6 intrinsically)
+  // SUCCESS STATE
   // ---------------------------------------------------------------------------
   if (bookingState.status === "success" && bookingState.data) {
     if (paymentSuccess) {
@@ -206,29 +240,76 @@ export function BookingSection({ worker }: BookingSectionProps) {
           <div className="w-20 h-20 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle2 className="w-10 h-10" />
           </div>
-          <h2 className="text-2xl font-black text-gray-900 mb-2">
-            Booking Confirmed!
-          </h2>
-          <p className="text-gray-500 mb-8">
-            Your service request has been successfully scheduled and paid.
-          </p>
+          <h2 className="text-2xl font-black text-gray-900 mb-2">Booking Confirmed!</h2>
+          <p className="text-gray-500 mb-8">Your service has been successfully scheduled and paid in full.</p>
         </div>
       );
     } else {
+      // Compute totals for display
+      const slotsArr = Object.entries(selectedSlots).map(([date, slotType]) => ({ date, slotType }));
+      const totalAmount = slotsArr.reduce((sum, s) => sum + SLOT_PRICES[s.slotType], 0) * numberOfWorkers;
+      const walletSufficient = walletBalance >= totalAmount;
+
       return (
         <div className="bg-white rounded-[24px] border border-emerald-200 p-8 shadow-sm text-center animate-in zoom-in-95 duration-500">
-           <h2 className="text-2xl font-black text-gray-900 mb-2">Payment Required</h2>
-           <p className="text-gray-500 mb-8">Please complete the payment to confirm your booking.</p>
-           {isProcessingPayment ? (
-               <div className="text-emerald-500 font-bold mb-4">Processing payment... Please do not refresh.</div>
-           ) : (
-               <button 
-                   onClick={() => handlePayment(bookingState.data)}
-                   className="w-full inline-flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 px-6 rounded-xl transition-all shadow-md hover:shadow-lg active:scale-[0.98]"
-               >
-                   Pay Now
-               </button>
-           )}
+          <h2 className="text-2xl font-black text-gray-900 mb-2">Complete Payment</h2>
+          <p className="text-gray-500 mb-2">Total amount: <span className="font-bold text-emerald-600 text-lg">₹{totalAmount}</span></p>
+          <p className="text-gray-400 text-sm mb-8">Full payment required to confirm your booking.</p>
+
+          {/* Payment Method Selector */}
+          <div className="flex gap-4 mb-8 justify-center">
+            {/* Razorpay Option */}
+            <button
+              onClick={() => setPaymentMethod("razorpay")}
+              className={`flex-1 max-w-[180px] flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all ${
+                paymentMethod === "razorpay"
+                  ? "border-emerald-500 bg-emerald-50 shadow-md"
+                  : "border-gray-200 bg-white hover:border-gray-300"
+              }`}
+            >
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${paymentMethod === "razorpay" ? "bg-emerald-100" : "bg-gray-100"}`}>
+                <CreditCard className={`w-5 h-5 ${paymentMethod === "razorpay" ? "text-emerald-600" : "text-gray-400"}`} />
+              </div>
+              <span className={`text-sm font-bold ${paymentMethod === "razorpay" ? "text-emerald-700" : "text-gray-500"}`}>Razorpay</span>
+              <span className="text-xs text-gray-400">UPI, Cards, NetBanking</span>
+              {paymentMethod === "razorpay" && <CheckCircle2 className="w-4 h-4 text-emerald-500" />}
+            </button>
+
+            {/* Wallet Option */}
+            <button
+              onClick={() => setPaymentMethod("wallet")}
+              className={`flex-1 max-w-[180px] flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all ${
+                paymentMethod === "wallet"
+                  ? "border-purple-500 bg-purple-50 shadow-md"
+                  : "border-gray-200 bg-white hover:border-gray-300"
+              }`}
+            >
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${paymentMethod === "wallet" ? "bg-purple-100" : "bg-gray-100"}`}>
+                <Wallet className={`w-5 h-5 ${paymentMethod === "wallet" ? "text-purple-600" : "text-gray-400"}`} />
+              </div>
+              <span className={`text-sm font-bold ${paymentMethod === "wallet" ? "text-purple-700" : "text-gray-500"}`}>Wallet</span>
+              <span className={`text-xs font-medium ${walletSufficient ? "text-gray-400" : "text-red-400"}`}>
+                Balance: ₹{walletBalance}
+              </span>
+              {!walletSufficient && <span className="text-xs text-red-500 font-semibold">Insufficient</span>}
+              {paymentMethod === "wallet" && <CheckCircle2 className="w-4 h-4 text-purple-500" />}
+            </button>
+          </div>
+
+          {isProcessingPayment ? (
+            <div className="text-emerald-500 font-bold mb-4 flex items-center justify-center gap-2">
+              <RotateCcw className="w-4 h-4 animate-spin" /> Processing... Please do not refresh.
+            </div>
+          ) : (
+            <button
+              onClick={() => handlePayment(bookingState.data)}
+              disabled={paymentMethod === "wallet" && !walletSufficient}
+              className="w-full inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-4 px-6 rounded-xl transition-all shadow-md hover:shadow-lg active:scale-[0.98]"
+            >
+              {paymentMethod === "wallet" ? <Wallet className="w-5 h-5" /> : <CreditCard className="w-5 h-5" />}
+              {paymentMethod === "wallet" ? "Pay with Wallet" : "Pay with Razorpay"}
+            </button>
+          )}
         </div>
       );
     }

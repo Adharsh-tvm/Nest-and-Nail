@@ -50,3 +50,12 @@ export type PaginatedUserResponse = {
   limit: number;
   totalPages: number;
 };
+
+export type Wallet = {
+  walletId: string;
+  userId: string;
+  balance: number;
+  currency: "INR";
+  createdAt?: string;
+  updatedAt?: string;
+};

@@ -46,6 +46,7 @@ import toast from "react-hot-toast";
 import { VerificationStatus } from "@/shared/enums/authEnums";
 import { AddAddressModal } from "@/app/components/containers/layout/AddAddressModal"; // Import modal
 import { ChangePasswordModal } from "@/app/components/containers/auth/ChangePasswordModal";
+import { getWalletBalanceAction } from "@/app/actions/client/wallet-actions";
 import { User } from "@/shared/types/userTypes";
 import { Address } from "@/shared/types/addressType";
 
@@ -788,102 +789,65 @@ const AddressesView: React.FC<ViewProps> = ({ user, setUser }) => {
   );
 };
 
-// const WalletView: React.FC<ViewProps> = ({user}) => {
-//   return (
-//     <div className="grid lg:grid-cols-3 gap-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
-//       <div className="lg:col-span-1">
-//         <div className="bg-gradient-to-br from-[#1B4332] to-[#0D2E21] text-white p-8 rounded-2xl shadow-lg relative overflow-hidden">
-//           <div className="relative z-10 flex flex-col h-full justify-between min-h-[220px]">
-//             <div className="flex justify-between items-start">
-//               <div>
-//                 <p className="text-xs font-bold text-emerald-100/80 uppercase tracking-widest">
-//                   Total Balance
-//                 </p>
-//                 <h2 className="text-4xl font-bold mt-2 tracking-tight">
-//                   ${user.walletBalance?.toLocaleString() || "0.00"}
-//                 </h2>
-//               </div>
-//               <WalletIcon className="text-emerald-400/20" size={40} />
-//             </div>
-//             <div className="grid grid-cols-2 gap-4 mt-8">
-//               <button className="bg-white text-[#1B4332] py-3 rounded-lg text-sm font-bold hover:bg-emerald-50 transition-colors">
-//                 Add Funds
-//               </button>
-//               <button className="bg-[#1B4332] border border-white/20 text-white py-3 rounded-lg text-sm font-bold hover:bg-white/10 transition-colors">
-//                 Withdraw
-//               </button>
-//             </div>
-//           </div>
-//           {/* Decorative circles */}
-//           <div className="absolute -top-12 -right-12 w-40 h-40 bg-emerald-500/20 rounded-full blur-3xl"></div>
-//           <div className="absolute -bottom-12 -left-12 w-40 h-40 bg-black/20 rounded-full blur-3xl"></div>
-//         </div>
-//       </div>
+const WalletView: React.FC<ViewProps> = ({ user }) => {
+  const [balance, setBalance] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState(true);
 
-//       <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
-//         <div className="px-8 py-5 border-b border-gray-100 flex justify-between items-center">
-//           <h3 className="font-bold text-gray-900 text-lg">
-//             Recent Transactions
-//           </h3>
-//           <button className="text-sm font-medium text-[#1B4332] hover:underline">
-//             View All
-//           </button>
-//         </div>
-//         <div className="flex-1 overflow-y-auto max-h-[350px]">
-//           {user.transactions?.map((tx) => (
-//             <div
-//               key={tx.id}
-//               className="px-8 py-5 border-b border-gray-50 last:border-0 flex items-center justify-between hover:bg-gray-50 transition-colors"
-//             >
-//               <div className="flex items-center gap-5">
-//                 <div
-//                   className={`p-3 rounded-full ${
-//                     tx.type === "credit"
-//                       ? "bg-green-50 text-green-600"
-//                       : "bg-red-50 text-red-600"
-//                   }`}
-//                 >
-//                   {tx.type === "credit" ? (
-//                     <Plus size={20} />
-//                   ) : (
-//                     <LogOut size={20} />
-//                   )}
-//                 </div>
-//                 <div>
-//                   <p className="text-base font-bold text-gray-900">
-//                     {tx.description}
-//                   </p>
-//                   <p className="text-sm text-gray-500 mt-1">
-//                     {new Date(tx.date).toLocaleDateString()}
-//                   </p>
-//                 </div>
-//               </div>
-//               <div className="text-right">
-//                 <span
-//                   className={`block text-base font-bold ${
-//                     tx.type === "credit" ? "text-green-600" : "text-gray-900"
-//                   }`}
-//                 >
-//                   {tx.type === "credit" ? "+" : ""}$
-//                   {Math.abs(tx.amount).toFixed(2)}
-//                 </span>
-//                 <span
-//                   className={`inline-block text-[11px] font-bold px-2.5 py-0.5 rounded-full mt-1.5 ${
-//                     tx.status === "completed"
-//                       ? "bg-gray-100 text-gray-500"
-//                       : "bg-yellow-50 text-yellow-600"
-//                   }`}
-//                 >
-//                   {tx.status}
-//                 </span>
-//               </div>
-//             </div>
-//           ))}
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
+  useEffect(() => {
+    getWalletBalanceAction().then((res) => {
+      if (res.success && res.data) {
+        setBalance(res.data.balance);
+      }
+      setIsLoading(false);
+    });
+  }, []);
+
+  return (
+    <div className="grid lg:grid-cols-3 gap-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
+      <div className="lg:col-span-1">
+        <div className="bg-gradient-to-br from-[#1B4332] to-[#0D2E21] text-white p-8 rounded-2xl shadow-lg relative overflow-hidden">
+          <div className="relative z-10 flex flex-col h-full justify-between min-h-[220px]">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-xs font-bold text-emerald-100/80 uppercase tracking-widest">
+                  Total Balance
+                </p>
+                <h2 className="text-4xl font-bold mt-2 tracking-tight">
+                  {isLoading ? "..." : `₹${balance.toLocaleString()}`}
+                </h2>
+              </div>
+              <WalletIcon className="text-emerald-400/20" size={40} />
+            </div>
+            <div className="grid gap-4 mt-8">
+               <div className="bg-white/10 text-emerald-100 py-3 rounded-lg text-sm font-bold text-center border border-white/20">
+                Wallet Active
+              </div>
+            </div>
+          </div>
+          {/* Decorative circles */}
+          <div className="absolute -top-12 -right-12 w-40 h-40 bg-emerald-500/20 rounded-full blur-3xl"></div>
+          <div className="absolute -bottom-12 -left-12 w-40 h-40 bg-black/20 rounded-full blur-3xl"></div>
+        </div>
+      </div>
+
+      <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
+        <div className="px-8 py-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+          <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2.5">
+           <CreditCard size={20} className="text-[#1B4332]" />
+            Recent Transactions
+          </h3>
+        </div>
+        <div className="p-8 flex flex-col items-center justify-center text-center h-full min-h-[250px]">
+             <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+               <WalletIcon size={32} className="text-gray-400" />
+             </div>
+             <p className="text-gray-500 font-medium">No recent transactions</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 
 const SettingsView: React.FC = () => {
   const [isAvailable, setIsAvailable] = useState(true);
@@ -1129,12 +1093,12 @@ const UserProfile = () => {
               setUser={(updatedUser) => setUser(updatedUser as any)}
             />
           )}
-          {/* {activeTab === "wallet" && (
+          {activeTab === "wallet" && (
             <WalletView
               user={safeUser}
               setUser={(updatedUser) => setUser(updatedUser as any)}
             />
-          )} */}
+          )}
           {activeTab === "settings" && <SettingsView />}
         </div>
       </div>

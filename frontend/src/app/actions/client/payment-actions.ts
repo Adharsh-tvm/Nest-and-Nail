@@ -1,6 +1,6 @@
 "use server";
 
-import { createPaymentOrderApi, verifyPaymentApi } from "@/sources/api/payment.api";
+import { createPaymentOrderApi, verifyPaymentApi, processWalletPaymentApi } from "@/sources/api/payment.api";
 
 export async function createPaymentOrderAction(
   serviceId: string
@@ -29,5 +29,20 @@ export async function verifyPaymentAction(
   } catch (error: any) {
     console.error("verifyPaymentAction error:", error);
     return { success: false, error: error.message || "Failed to verify payment" };
+  }
+}
+
+export async function processWalletPaymentAction(
+  serviceId: string
+): Promise<{ success: boolean; data?: any; error?: string }> {
+  try {
+    const res = await processWalletPaymentApi(serviceId);
+    if (!res.success) {
+      return { success: false, error: res.message };
+    }
+    return { success: true, data: res.payload };
+  } catch (error: any) {
+    console.error("processWalletPaymentAction error:", error);
+    return { success: false, error: error.message || "Failed to process wallet payment" };
   }
 }

@@ -23,5 +23,11 @@ export function createPaymentRoutes(
         paymentController.verify
     );
 
+    router.post(
+        "/payment/wallet",
+        authMiddleware.verify.bind(authMiddleware),
+        paymentController.processWalletPayment
+    );
+
     return router;
 }

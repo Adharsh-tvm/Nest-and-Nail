@@ -18,13 +18,7 @@ export class CreatePaymentUseCase implements ICreatePaymentUseCase {
       throw new Error("Service not found");
     }
 
-    let amount = 0;
-    
-    if (service.category === 'VIDEO_CALL' || service.videoCall) {
-       amount = service.totalAmount;
-    } else {
-       amount = 100;
-    }
+    const amount = service.totalAmount;
 
     const order = await this.paymentGateway.createOrder(amount);
 

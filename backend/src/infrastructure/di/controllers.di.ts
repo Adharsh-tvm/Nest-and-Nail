@@ -26,6 +26,7 @@ import { WorkerMeetingsController } from "../../presentation/controllers/worker/
 import { VideoCallController } from "../../presentation/controllers/common/videoCallController";
 import { PaymentController } from "../../presentation/controllers/payment/PaymentController";
 import { AdminMeetingController } from "../../presentation/controllers/admin/AdminMeetingController";
+import { WalletController } from "../../presentation/controllers/wallet/WalletController";
 
 export class ControllerDI {
     private _authController?: IAuthController;
@@ -53,6 +54,7 @@ export class ControllerDI {
     private _videoCallController?: VideoCallController;
     private _paymentController?: PaymentController;
     private _adminMeetingController ?: AdminMeetingController;
+    private _walletController?: WalletController;
 
     constructor(
         private _useCases: UseCaseDI,
@@ -252,7 +254,8 @@ export class ControllerDI {
         if (!this._paymentController) {
             this._paymentController = new PaymentController(
                 this._useCases.createPaymentUseCase,
-                this._useCases.verifyPaymentUseCase
+                this._useCases.verifyPaymentUseCase,
+                this._useCases.processWalletPaymentUseCase
             );
         }
         return this._paymentController;
@@ -266,6 +269,15 @@ export class ControllerDI {
             )
         }
         return this._adminMeetingController
+    }
+
+    get walletController(): WalletController {
+        if (!this._walletController) {
+            this._walletController = new WalletController(
+                this._useCases.getWalletBalanceUseCase
+            );
+        }
+        return this._walletController;
     }
 }
 

@@ -114,6 +114,9 @@ import { ICreatePaymentUseCase } from "../../application/interfaces/payment/ICre
 import { IVerifyPaymentUseCase } from "../../application/interfaces/payment/IVerifyPaymentUseCase";
 import { CreatePaymentUseCase } from "../../application/use-cases/payment/CreatePaymentUseCase";
 import { VerifyPaymentUseCase } from "../../application/use-cases/payment/VerifyPaymentUseCase";
+import { ProcessWalletPaymentUseCase } from "../../application/use-cases/payment/ProcessWalletPaymentUseCase";
+import { GetWalletBalanceUseCase } from "../../application/use-cases/payment/GetWalletBalanceUseCase";
+import { IGetWalletBalanceUseCase } from "../../application/interfaces/payment/IGetWalletBalanceUseCase";
 import { IGetMeetingByIdForAdminUseCase } from "../../application/interfaces/meetings/admin/IGetMeetingByIdForAdminUseCase";
 import { GetMeetingByIdForAdminUseCase } from "../../application/use-cases/meetings/admin/GetMeetingByIdForAdminUseCase";
 import { IGetAllMeetingsForAdminUseCase } from "../../application/interfaces/meetings/admin/IGetAllMeetingsForAdminUseCase";
@@ -192,9 +195,12 @@ export class UseCaseDI {
 
   private _createPaymentUseCase?: ICreatePaymentUseCase;
   private _verifyPaymentUseCase?: IVerifyPaymentUseCase;
+  private _processWalletPaymentUseCase?: ProcessWalletPaymentUseCase;
+  private _getWalletBalanceUseCase?: IGetWalletBalanceUseCase;
 
   private _getMeetingByIdForAdminUseCase?: IGetMeetingByIdForAdminUseCase;
   private _getAllMeetingsForAdminUseCase?: IGetAllMeetingsForAdminUseCase;
+
 
 
   constructor(private infra: InfrastructureDI) { }
@@ -752,6 +758,26 @@ export class UseCaseDI {
     return this._verifyPaymentUseCase;
   }
 
+  get processWalletPaymentUseCase(): ProcessWalletPaymentUseCase {
+    if (!this._processWalletPaymentUseCase) {
+      this._processWalletPaymentUseCase = new ProcessWalletPaymentUseCase(
+        this.infra.paymentRepository,
+        this.infra.serviceRepository,
+        this.infra.walletRepository
+      );
+    }
+    return this._processWalletPaymentUseCase;
+  }
+
+  get getWalletBalanceUseCase(): IGetWalletBalanceUseCase {
+    if (!this._getWalletBalanceUseCase) {
+      this._getWalletBalanceUseCase = new GetWalletBalanceUseCase(
+        this.infra.walletRepository
+      );
+    }
+    return this._getWalletBalanceUseCase;
+  }
+
   get getMeetingByIdForAdminUseCase(): IGetMeetingByIdForAdminUseCase {
     if (!this._getMeetingByIdForAdminUseCase) {
       this._getMeetingByIdForAdminUseCase = new GetMeetingByIdForAdminUseCase(
@@ -769,4 +795,5 @@ export class UseCaseDI {
     }
     return this._getAllMeetingsForAdminUseCase
   }
+
 }
