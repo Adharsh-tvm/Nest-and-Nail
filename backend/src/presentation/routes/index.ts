@@ -16,6 +16,7 @@ import { createClientMeetingsRoutes } from "./client/client.meeting.routes";
 import { createWorkerMeetingsRoutes } from "./worker/worker.meeting.routes";
 import { createUsersVideoCallRoutes } from "./common/videoCall.routes";
 import { createPaymentRoutes } from "./payment/payment.routes";
+import { createAdminMeetingRoutes } from "./admin/admin.meeting.routes";
 
 export const createRoutes = (container: DIContainer): Router => {
   const router = Router();
@@ -32,6 +33,8 @@ export const createRoutes = (container: DIContainer): Router => {
 
   router.use("/api/admin/services", createAdminServiceRoutes(container.controllers.adminServiceController, container.controllers.authMiddleware))
 
+  router.use("/api/admin/meetings", createAdminMeetingRoutes(container.controllers.adminMeetingController, container.controllers.authMiddleware))
+
   router.use("/api/upload", createUploadRoutes(container.controllers.uploadController, container.controllers.authMiddleware));
 
   router.use("/api/users/categories", createUserCategoryRoutes(container.controllers.categoryController, container.controllers.authMiddleware));
@@ -46,7 +49,7 @@ export const createRoutes = (container: DIContainer): Router => {
 
   router.use("/api/client/meetings", createClientMeetingsRoutes(container.controllers.clientMeetingsController, container.controllers.authMiddleware))
 
-  router.use("/api/worker/meetings", createWorkerMeetingsRoutes(container.controllers.authMiddleware ,container.controllers.workerMeetingsController))
+  router.use("/api/worker/meetings", createWorkerMeetingsRoutes(container.controllers.authMiddleware, container.controllers.workerMeetingsController))
 
   router.use("/api/worker/services", createWorkerServiceRoutes(container.controllers.workerServiceController, container.controllers.authMiddleware))
 

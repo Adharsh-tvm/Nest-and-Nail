@@ -217,4 +217,46 @@ export class ServiceRepository implements IServiceRepository {
             { $set: { paymentStatus } }
         );
     }
+
+    async getAllMeetingsForAdmin(query: any) {
+        const { page, limit, search, status } = query;
+
+        const filter: any = {
+            meeting: { $exists: true }
+        };
+
+        if (status) {
+            filter["meeting.status"] = status;
+        }
+
+        if (search) {
+            filter.$or = [
+                { title: { $regex: search, $options: "i" } }
+            ];
+        }
+
+        const skip = (page - 1) * limit;
+
+        const services = await ServiceModel
+            .find(filter)
+            .populate("clientId workerId")
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
+
+        const total = await ServiceModel.countDocuments(filter);
+
+        return {
+            data: services,
+            total,
+            page,
+            limit
+        };
+    }
+
+    async getMeetingByIdForAdmin(serviceId: string) {
+        return await ServiceModel
+            .findById(serviceId)
+            .populate("clientId workerId");
+    }
 }

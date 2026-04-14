@@ -14,4 +14,12 @@ export interface IServiceRepository {
     getMeetingsByWorker(workerId: string): Promise<Service[]>;
     updateVideoCall(serviceId: string, videoCall: UpdateVideoCallDTO): Promise<any>;
     updatePaymentStatus(serviceId: string, paymentStatus: string): Promise<void>;
+    getAllMeetingsForAdmin(query: {
+        page: number;
+        limit: number;
+        search?: string;
+        status?: string;
+    }): Promise<any>;
+     getMeetingByIdForAdmin(serviceId: string): Promise<any>;
+
 }    

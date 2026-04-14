@@ -25,6 +25,7 @@ import { ClientMeetingsController } from "../../presentation/controllers/client/
 import { WorkerMeetingsController } from "../../presentation/controllers/worker/WorkerMeetingController";
 import { VideoCallController } from "../../presentation/controllers/common/videoCallController";
 import { PaymentController } from "../../presentation/controllers/payment/PaymentController";
+import { AdminMeetingController } from "../../presentation/controllers/admin/AdminMeetingController";
 
 export class ControllerDI {
     private _authController?: IAuthController;
@@ -51,6 +52,7 @@ export class ControllerDI {
 
     private _videoCallController?: VideoCallController;
     private _paymentController?: PaymentController;
+    private _adminMeetingController ?: AdminMeetingController;
 
     constructor(
         private _useCases: UseCaseDI,
@@ -254,6 +256,16 @@ export class ControllerDI {
             );
         }
         return this._paymentController;
+    }
+
+    get adminMeetingController(): AdminMeetingController {
+        if(!this._adminMeetingController) {
+            this._adminMeetingController = new AdminMeetingController(
+                this._useCases.getAllMeetingsForAdminUseCase,
+                this._useCases.getMeetingByIdForAdminUseCase
+            )
+        }
+        return this._adminMeetingController
     }
 }
 

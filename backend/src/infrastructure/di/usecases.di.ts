@@ -1,3 +1,4 @@
+import { InfrastructureDI } from "./infrastructure.di";
 import { IChangeUserRoleUseCase } from "../../application/interfaces/user/IChangeUserRoleUseCase";
 import { ICreateCategoryUseCase } from "../../application/interfaces/category/ICreateCategoryUseCase";
 import { IForgotPasswordUseCase } from "../../application/interfaces/auth/IForgotPasswordUseCase";
@@ -50,7 +51,6 @@ import { UpdateUserSkillsUseCase } from "../../application/use-cases/user/Update
 import { UpdateWorkerCategoriesUseCase } from "../../application/use-cases/worker/profile/UpdateWorkerCategoriesUseCase";
 
 import { UploadWorkerDocumentUseCase } from "../../application/use-cases/user/UploadWorkerDocumentUseCase";
-import { InfrastructureDI } from "./infrastructure.di";
 
 import { IAddUserAddressUseCase } from "../../application/interfaces/address/IUpdateUserAddressUseCase";
 import { IEditUserAddressUseCase } from "../../application/interfaces/address/IEditUserAddressUseCase";
@@ -114,6 +114,10 @@ import { ICreatePaymentUseCase } from "../../application/interfaces/payment/ICre
 import { IVerifyPaymentUseCase } from "../../application/interfaces/payment/IVerifyPaymentUseCase";
 import { CreatePaymentUseCase } from "../../application/use-cases/payment/CreatePaymentUseCase";
 import { VerifyPaymentUseCase } from "../../application/use-cases/payment/VerifyPaymentUseCase";
+import { IGetMeetingByIdForAdminUseCase } from "../../application/interfaces/meetings/admin/IGetMeetingByIdForAdminUseCase";
+import { GetMeetingByIdForAdminUseCase } from "../../application/use-cases/meetings/admin/GetMeetingByIdForAdminUseCase";
+import { IGetAllMeetingsForAdminUseCase } from "../../application/interfaces/meetings/admin/IGetAllMeetingsForAdminUseCase";
+import { GetAllMeetingsForAdminUseCase } from "../../application/use-cases/meetings/admin/GetAllMeetingsForAdminUseCase";
 
 
 
@@ -188,6 +192,9 @@ export class UseCaseDI {
 
   private _createPaymentUseCase?: ICreatePaymentUseCase;
   private _verifyPaymentUseCase?: IVerifyPaymentUseCase;
+
+  private _getMeetingByIdForAdminUseCase?: IGetMeetingByIdForAdminUseCase;
+  private _getAllMeetingsForAdminUseCase?: IGetAllMeetingsForAdminUseCase;
 
 
   constructor(private infra: InfrastructureDI) { }
@@ -743,5 +750,23 @@ export class UseCaseDI {
       );
     }
     return this._verifyPaymentUseCase;
+  }
+
+  get getMeetingByIdForAdminUseCase(): IGetMeetingByIdForAdminUseCase {
+    if (!this._getMeetingByIdForAdminUseCase) {
+      this._getMeetingByIdForAdminUseCase = new GetMeetingByIdForAdminUseCase(
+        this.infra.serviceRepository
+      )
+    }
+    return this._getMeetingByIdForAdminUseCase
+  }
+
+  get getAllMeetingsForAdminUseCase(): IGetAllMeetingsForAdminUseCase {
+    if (!this._getAllMeetingsForAdminUseCase) {
+      this._getAllMeetingsForAdminUseCase = new GetAllMeetingsForAdminUseCase(
+        this.infra.serviceRepository
+      )
+    }
+    return this._getAllMeetingsForAdminUseCase
   }
 }
