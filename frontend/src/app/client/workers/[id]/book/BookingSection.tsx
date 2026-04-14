@@ -133,8 +133,14 @@ export function BookingSection({ worker }: BookingSectionProps) {
     }
   };
 
-  const nextStep = () => setCurrentStep((p) => Math.min(p + 1, 5));
-  const prevStep = () => setCurrentStep((p) => Math.max(p - 1, 1));
+  const nextStep = () => {
+    setCurrentStep((p) => Math.min(p + 1, 5));
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+  const prevStep = () => {
+    setCurrentStep((p) => Math.max(p - 1, 1));
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const handleRazorpayPayment = async (bookingData: any) => {
     setIsProcessingPayment(true);
@@ -236,12 +242,12 @@ export function BookingSection({ worker }: BookingSectionProps) {
   if (bookingState.status === "success" && bookingState.data) {
     if (paymentSuccess) {
       return (
-        <div className="bg-white rounded-[24px] border border-emerald-200 p-8 shadow-sm text-center animate-in zoom-in-95 duration-500">
-          <div className="w-20 h-20 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle2 className="w-10 h-10" />
+        <div className="bg-white rounded-xl border border-emerald-200 p-6 shadow-sm text-center animate-in zoom-in-95 duration-500">
+          <div className="w-16 h-16 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <CheckCircle2 className="w-8 h-8" />
           </div>
-          <h2 className="text-2xl font-black text-gray-900 mb-2">Booking Confirmed!</h2>
-          <p className="text-gray-500 mb-8">Your service has been successfully scheduled and paid in full.</p>
+          <h2 className="text-xl font-black text-gray-900 mb-2">Booking Confirmed!</h2>
+          <p className="text-sm text-gray-500 mb-4">Your service has been successfully scheduled and paid in full.</p>
         </div>
       );
     } else {
@@ -251,44 +257,44 @@ export function BookingSection({ worker }: BookingSectionProps) {
       const walletSufficient = walletBalance >= totalAmount;
 
       return (
-        <div className="bg-white rounded-[24px] border border-emerald-200 p-8 shadow-sm text-center animate-in zoom-in-95 duration-500">
-          <h2 className="text-2xl font-black text-gray-900 mb-2">Complete Payment</h2>
-          <p className="text-gray-500 mb-2">Total amount: <span className="font-bold text-emerald-600 text-lg">₹{totalAmount}</span></p>
-          <p className="text-gray-400 text-sm mb-8">Full payment required to confirm your booking.</p>
+        <div className="bg-white rounded-xl border border-emerald-200 p-6 shadow-sm text-center animate-in zoom-in-95 duration-500">
+          <h2 className="text-xl font-black text-gray-900 mb-1">Complete Payment</h2>
+          <p className="text-sm text-gray-500 mb-2">Total amount: <span className="font-bold text-emerald-600 text-lg">₹{totalAmount}</span></p>
+          <p className="text-xs text-gray-400 mb-5">Full payment required to confirm your booking.</p>
 
           {/* Payment Method Selector */}
-          <div className="flex gap-4 mb-8 justify-center">
+          <div className="flex gap-3 mb-6 justify-center">
             {/* Razorpay Option */}
             <button
               onClick={() => setPaymentMethod("razorpay")}
-              className={`flex-1 max-w-[180px] flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all ${
+              className={`flex-1 max-w-[160px] flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${
                 paymentMethod === "razorpay"
-                  ? "border-emerald-500 bg-emerald-50 shadow-md"
+                  ? "border-emerald-500 bg-emerald-50 shadow-sm"
                   : "border-gray-200 bg-white hover:border-gray-300"
               }`}
             >
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${paymentMethod === "razorpay" ? "bg-emerald-100" : "bg-gray-100"}`}>
-                <CreditCard className={`w-5 h-5 ${paymentMethod === "razorpay" ? "text-emerald-600" : "text-gray-400"}`} />
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${paymentMethod === "razorpay" ? "bg-emerald-100" : "bg-gray-100"}`}>
+                <CreditCard className={`w-4 h-4 ${paymentMethod === "razorpay" ? "text-emerald-600" : "text-gray-400"}`} />
               </div>
               <span className={`text-sm font-bold ${paymentMethod === "razorpay" ? "text-emerald-700" : "text-gray-500"}`}>Razorpay</span>
-              <span className="text-xs text-gray-400">UPI, Cards, NetBanking</span>
+              <span className="text-[10px] text-gray-400">UPI, Cards, NetBanking</span>
               {paymentMethod === "razorpay" && <CheckCircle2 className="w-4 h-4 text-emerald-500" />}
             </button>
 
             {/* Wallet Option */}
             <button
               onClick={() => setPaymentMethod("wallet")}
-              className={`flex-1 max-w-[180px] flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all ${
+              className={`flex-1 max-w-[160px] flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${
                 paymentMethod === "wallet"
-                  ? "border-purple-500 bg-purple-50 shadow-md"
+                  ? "border-purple-500 bg-purple-50 shadow-sm"
                   : "border-gray-200 bg-white hover:border-gray-300"
               }`}
             >
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${paymentMethod === "wallet" ? "bg-purple-100" : "bg-gray-100"}`}>
-                <Wallet className={`w-5 h-5 ${paymentMethod === "wallet" ? "text-purple-600" : "text-gray-400"}`} />
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${paymentMethod === "wallet" ? "bg-purple-100" : "bg-gray-100"}`}>
+                <Wallet className={`w-4 h-4 ${paymentMethod === "wallet" ? "text-purple-600" : "text-gray-400"}`} />
               </div>
               <span className={`text-sm font-bold ${paymentMethod === "wallet" ? "text-purple-700" : "text-gray-500"}`}>Wallet</span>
-              <span className={`text-xs font-medium ${walletSufficient ? "text-gray-400" : "text-red-400"}`}>
+              <span className={`text-[10px] font-medium ${walletSufficient ? "text-gray-400" : "text-red-400"}`}>
                 Balance: ₹{walletBalance}
               </span>
               {!walletSufficient && <span className="text-xs text-red-500 font-semibold">Insufficient</span>}
@@ -304,7 +310,7 @@ export function BookingSection({ worker }: BookingSectionProps) {
             <button
               onClick={() => handlePayment(bookingState.data)}
               disabled={paymentMethod === "wallet" && !walletSufficient}
-              className="w-full inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-4 px-6 rounded-xl transition-all shadow-md hover:shadow-lg active:scale-[0.98]"
+              className="w-full inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-xl transition-all shadow-sm hover:shadow-md active:scale-[0.98]"
             >
               {paymentMethod === "wallet" ? <Wallet className="w-5 h-5" /> : <CreditCard className="w-5 h-5" />}
               {paymentMethod === "wallet" ? "Pay with Wallet" : "Pay with Razorpay"}
