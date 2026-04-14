@@ -5,12 +5,12 @@ import { ServiceMapper } from "../../../mappers/ServiceMapper";
 export class GetActiveWorkerServiceUseCase implements IGetActiveWorkerServiceUseCase {
 
     constructor(
-        private readonly serviceRepo: IServiceRepository
+        private readonly _serviceRepo: IServiceRepository
     ) {}
 
     async execute(workerId: string) {
 
-        const service = await this.serviceRepo.findActiveByWorkerId(workerId);
+        const service = await this._serviceRepo.findActiveByWorkerId(workerId);
 
         if (!service) return null;
 

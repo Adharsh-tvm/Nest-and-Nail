@@ -5,12 +5,12 @@ import { IGetWorkerAvailabilityUseCase } from "../../interfaces/client/IGetWorke
 export class GetWorkerAvailabilityUseCase implements IGetWorkerAvailabilityUseCase {
 
     constructor(
-        private readonly workerScheduleRepo: IWorkerScheduleRepository
+        private readonly _workerScheduleRepo: IWorkerScheduleRepository
     ) { }
 
     async execute(workerId: string, date: Date): Promise<{ morningAvailable: boolean; eveningAvailable: boolean; fullDayAvailable: boolean; isBooked: boolean; isUnavailable: boolean; bookedSlots?: string[]; }> {
 
-        const schedules = await this.workerScheduleRepo.findByWorkerAndDate(workerId, date);
+        const schedules = await this._workerScheduleRepo.findByWorkerAndDate(workerId, date);
 
         const morningUnavailable = schedules.some(
             s => s.slotType === SlotType.MORNING_HALF && (!s.isAvailable || s.isBooked)
@@ -45,7 +45,7 @@ export class GetWorkerAvailabilityUseCase implements IGetWorkerAvailabilityUseCa
     }
 
     async executeBulk(workerId: string, startDate: Date, endDate: Date): Promise<Record<string, { morningAvailable: boolean; eveningAvailable: boolean; fullDayAvailable: boolean; isBooked: boolean; isUnavailable: boolean; bookedSlots?: string[]; }>> {
-        const schedules = await this.workerScheduleRepo.findByWorkerIdAndDateRange(workerId, startDate, endDate);
+        const schedules = await this._workerScheduleRepo.findByWorkerIdAndDateRange(workerId, startDate, endDate);
 
         const result: Record<string, { morningAvailable: boolean; eveningAvailable: boolean; fullDayAvailable: boolean; isBooked: boolean; isUnavailable: boolean; bookedSlots?: string[]; }> = {};
 

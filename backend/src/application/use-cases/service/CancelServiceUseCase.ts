@@ -7,13 +7,13 @@ import { ServiceMapper } from "../../mappers/ServiceMapper";
 export class CancelServiceUseCase implements ICancelServiceUseCase {
 
     constructor(
-        private readonly serviceRepo: IServiceRepository,
-        private readonly scheduleRepo: IWorkerScheduleRepository
+        private readonly _serviceRepo: IServiceRepository,
+        private readonly _scheduleRepo: IWorkerScheduleRepository
     ) { }
 
     async execute(serviceId: string, userId: string) {
 
-        const service = await this.serviceRepo.findById(serviceId);
+        const service = await this._serviceRepo.findById(serviceId);
 
         if (!service) {
             throw new Error("Service not found");
@@ -29,7 +29,7 @@ export class CancelServiceUseCase implements ICancelServiceUseCase {
             throw new Error("Cannot cancel completed service");
         }
 
-        const updated = await this.serviceRepo.updateStatus(serviceId, {
+        const updated = await this._serviceRepo.updateStatus(serviceId, {
             status: ServiceStatus.CANCELLED,
             cancelledAt: new Date(),
             updatedAt: new Date()
@@ -40,7 +40,7 @@ export class CancelServiceUseCase implements ICancelServiceUseCase {
         }
 
         for (const slot of service.selectedSlots) {
-            await this.scheduleRepo.unmarkAsBooked(
+            await this._scheduleRepo.unmarkAsBooked(
                 service.workerId,
                 slot.date,
                 slot.slotType

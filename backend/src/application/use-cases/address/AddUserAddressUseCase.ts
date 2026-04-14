@@ -6,11 +6,11 @@ import { UserMapper } from "../../mappers/UserMapper";
 import { randomUUID } from "crypto";
 
 export class AddUserAddressUseCase implements IAddUserAddressUseCase {
-    constructor(private readonly userRepoFactory: IUserRepositoryFactory) { }
+    constructor(private readonly _userRepoFactory: IUserRepositoryFactory) { }
 
     async execute(userId: string, data: AddAddressDTO) {
-        const clientRepo = this.userRepoFactory.getRepository(Role.CLIENT);
-        const workerRepo = this.userRepoFactory.getRepository(Role.WORKER);
+        const clientRepo = this._userRepoFactory.getRepository(Role.CLIENT);
+        const workerRepo = this._userRepoFactory.getRepository(Role.WORKER);
 
         let user = await clientRepo.findById(userId);
         let repo = clientRepo;

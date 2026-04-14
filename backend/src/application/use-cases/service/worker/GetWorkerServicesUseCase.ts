@@ -6,12 +6,12 @@ import { ServiceStatus } from "../../../../shared/enums/serviceEnums";
 export class GetWorkerServicesUseCase implements IGetWorkerServicesUseCase {
 
   constructor(
-    private readonly serviceRepo: IServiceRepository
+    private readonly _serviceRepo: IServiceRepository
   ) {}
 
   async execute(workerId: string, status?: ServiceStatus) {
 
-    let services = await this.serviceRepo.findByWorkerId(workerId);
+    let services = await this._serviceRepo.findByWorkerId(workerId);
 
     console.log("workerId :", workerId);
 

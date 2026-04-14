@@ -6,12 +6,12 @@ import { ServiceMapper } from "../../mappers/ServiceMapper";
 export class CompleteServiceUseCase implements ICompleteServiceUseCase {
 
     constructor(
-        private readonly serviceRepo: IServiceRepository
+        private readonly _serviceRepo: IServiceRepository
     ) { }
 
     async execute(serviceId: string, workerId: string) {
 
-        const service = await this.serviceRepo.findById(serviceId);
+        const service = await this._serviceRepo.findById(serviceId);
 
         if (!service) {
             throw new Error("Service not found");
@@ -27,7 +27,7 @@ export class CompleteServiceUseCase implements ICompleteServiceUseCase {
             throw new Error("Service not in progress");
         }
 
-        const updated = await this.serviceRepo.updateStatus(serviceId, {
+        const updated = await this._serviceRepo.updateStatus(serviceId, {
             status: ServiceStatus.COMPLETED,
             completedAt: new Date(),
             updatedAt: new Date()

@@ -8,8 +8,8 @@ import { IGetWorkerMeetingByIdUseCase } from "../../../application/interfaces/me
 
 export class WorkerMeetingsController {
     constructor(
-        private readonly getScheduledUseCase: IGetWorkerScheduledMeetingsUseCase,
-        private readonly getHistoryUseCase: IGetWorkerMeetingsHistoryUseCase,
+        private readonly _getScheduledUseCase: IGetWorkerScheduledMeetingsUseCase,
+        private readonly _getHistoryUseCase: IGetWorkerMeetingsHistoryUseCase,
         private readonly _getMeetingByIdUseCase: IGetWorkerMeetingByIdUseCase,
     ) { }
 
@@ -27,7 +27,7 @@ export class WorkerMeetingsController {
                     .json(ResponseHandler.error("Unauthorized"));
             }
 
-            const result = await this.getScheduledUseCase.execute(workerId);
+            const result = await this._getScheduledUseCase.execute(workerId);
 
             res.status(HttpStatusCode.OK).json(
                 ResponseHandler.success(result, "Scheduled video calls fetched")
@@ -51,7 +51,7 @@ export class WorkerMeetingsController {
                     .json(ResponseHandler.error("Unauthorized"));
             }
 
-            const result = await this.getHistoryUseCase.execute(workerId);
+            const result = await this._getHistoryUseCase.execute(workerId);
 
             res.status(HttpStatusCode.OK).json(
                 ResponseHandler.success(result, "Video call history fetched")

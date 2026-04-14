@@ -4,11 +4,11 @@ import { ServiceMapper } from "../../../mappers/ServiceMapper";
 
 export class GetClientServiceByIdUseCase implements IGetClientServiceByIdUseCase {
   constructor(
-    private readonly serviceRepo: IServiceRepository
+    private readonly _serviceRepo: IServiceRepository
   ) { }
 
   async execute(serviceId: string, clientId: string) {
-    const service = await this.serviceRepo.findById(serviceId);
+    const service = await this._serviceRepo.findById(serviceId);
 
     if (!service) {
       throw new Error("Service not found");

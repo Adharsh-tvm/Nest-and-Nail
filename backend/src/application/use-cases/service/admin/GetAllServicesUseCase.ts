@@ -6,12 +6,12 @@ import { IGetAllServicesUseCase } from "../../../interfaces/service/admin/IGetAl
 export class GetAllServicesUseCase implements IGetAllServicesUseCase {
 
     constructor(
-        private readonly serviceRepo: IServiceRepository
+        private readonly _serviceRepo: IServiceRepository
     ) {}
 
     async execute(): Promise<AdminServiceResponseDTO[]> {
 
-        const services = await this.serviceRepo.findAllWithDetails();
+        const services = await this._serviceRepo.findAllWithDetails();
 
         return services;
     }

@@ -9,10 +9,10 @@ import { RESPONSE_MESSAGES } from "../../../shared/responses/ResponseMessages";
 
 export class ClientServiceController {
     constructor(
-        private readonly getHistoryUseCase: IGetClientServiceHistoryUseCase,
-        private readonly getByIdUseCase: IGetClientServiceByIdUseCase,
-        private readonly getOngoingUseCase: IGetClientOngoingServicesUseCase,
-        private readonly bookWorkerUseCase: IBookWorkerUseCase
+        private readonly _getHistoryUseCase: IGetClientServiceHistoryUseCase,
+        private readonly _getByIdUseCase: IGetClientServiceByIdUseCase,
+        private readonly _getOngoingUseCase: IGetClientOngoingServicesUseCase,
+        private readonly _bookWorkerUseCase: IBookWorkerUseCase
     ) { }
 
     bookWorker = async (req: Request, res: Response, next: NextFunction) => {
@@ -66,7 +66,7 @@ export class ClientServiceController {
             };
 
 
-            const result = await this.bookWorkerUseCase.execute({
+            const result = await this._bookWorkerUseCase.execute({
                 clientId,
                 workerId,
                 category,
@@ -93,7 +93,7 @@ export class ClientServiceController {
         try {
             const clientId = (req as any).user.id;
 
-            const result = await this.getHistoryUseCase.execute(clientId);
+            const result = await this._getHistoryUseCase.execute(clientId);
 
             res.status(HttpStatusCode.OK).json(
                 ResponseHandler.success(result, "Service history fetched")
@@ -108,7 +108,7 @@ export class ClientServiceController {
             const clientId = (req as any).user.id;
             const { serviceId } = req.params;
 
-            const result = await this.getByIdUseCase.execute(serviceId, clientId);
+            const result = await this._getByIdUseCase.execute(serviceId, clientId);
 
             res.status(HttpStatusCode.OK).json(
                 ResponseHandler.success(result, "Service details fetched")
@@ -122,7 +122,7 @@ export class ClientServiceController {
         try {
             const clientId = (req as any).user.id;
 
-            const result = await this.getOngoingUseCase.execute(clientId);
+            const result = await this._getOngoingUseCase.execute(clientId);
 
             res.status(HttpStatusCode.OK).json(
                 ResponseHandler.success(result, "Ongoing services fetched")

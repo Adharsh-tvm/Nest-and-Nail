@@ -4,11 +4,11 @@ import { IGetClientServiceHistoryUseCase } from "../../../interfaces/service/cli
 
 export class GetClientServiceHistoryUseCase implements IGetClientServiceHistoryUseCase {
   constructor(
-    private readonly serviceRepo: IServiceRepository
+    private readonly _serviceRepo: IServiceRepository
   ) { }
 
   async execute(clientId: string) {
-    const services = await this.serviceRepo.findByClientId(clientId);
+    const services = await this._serviceRepo.findByClientId(clientId);
 
     const filtered = services.filter(
       s => s.category !== "VIDEO_CALL"

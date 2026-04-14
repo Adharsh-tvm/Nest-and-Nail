@@ -10,9 +10,9 @@ import { IWorkerScheduleRepository } from "../../../domain/repositories/IWorkerS
 export class BookWorkerUseCase implements IBookWorkerUseCase {
 
   constructor(
-    private readonly serviceRepo: IServiceRepository,
-    private readonly workerRepo: IWorkerRepository,
-    private readonly scheduleRepo: IWorkerScheduleRepository
+    private readonly _serviceRepo: IServiceRepository,
+    private readonly _workerRepo: IWorkerRepository,
+    private readonly _scheduleRepo: IWorkerScheduleRepository
   ) { }
 
   async execute(dto: CreateServiceDTO): Promise<ServiceResponseDTO> {
@@ -38,7 +38,7 @@ export class BookWorkerUseCase implements IBookWorkerUseCase {
       }
     }
 
-    const worker = await this.workerRepo.findById(dto.workerId);
+    const worker = await this._workerRepo.findById(dto.workerId);
     if (!worker) throw new Error("Worker not found");
 
     if (!dto.numberOfWorkers || dto.numberOfWorkers < 1) {
@@ -71,7 +71,7 @@ export class BookWorkerUseCase implements IBookWorkerUseCase {
     }
 
     for (const slot of dto.selectedSlots) {
-      const existing = await this.scheduleRepo.findByWorkerDateAndSlot(
+      const existing = await this._scheduleRepo.findByWorkerDateAndSlot(
         dto.workerId,
         slot.date,
         slot.slotType
@@ -87,7 +87,7 @@ export class BookWorkerUseCase implements IBookWorkerUseCase {
       }
     }
 
-    const existing = await this.serviceRepo.findActiveByWorkerId(dto.workerId);
+    const existing = await this._serviceRepo.findActiveByWorkerId(dto.workerId);
 
     if (existing) {
       throw new Error("Worker already has an active service");
@@ -95,10 +95,10 @@ export class BookWorkerUseCase implements IBookWorkerUseCase {
 
     const serviceEntity = ServiceMapper.toEntity(dto);
 
-    const created = await this.serviceRepo.create(serviceEntity);
+    const created = await this._serviceRepo.create(serviceEntity);
 
     for (const slot of dto.selectedSlots) {
-      await this.scheduleRepo.markAsBooked(
+      await this._scheduleRepo.markAsBooked(
         dto.workerId,
         slot.date,
         slot.slotType,

@@ -5,12 +5,12 @@ import { IGetServiceDetailsForAdminUseCase } from "../../../interfaces/service/a
 export class GetServiceDetailsForAdminUseCase implements IGetServiceDetailsForAdminUseCase {
 
     constructor(
-        private readonly serviceRepo: IServiceRepository
+        private readonly _serviceRepo: IServiceRepository
     ) {}
 
     async execute(serviceId: string) {
 
-        const service = await this.serviceRepo.findDetailedByServiceId(serviceId);
+        const service = await this._serviceRepo.findDetailedByServiceId(serviceId);
 
         if (!service) {
             throw new Error("Service not found");

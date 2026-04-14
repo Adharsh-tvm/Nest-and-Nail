@@ -6,7 +6,7 @@ import { ServiceMapper } from "../../mappers/ServiceMapper";
 export class StartServiceUseCase implements IStartServiceUseCase {
 
     constructor(
-        private readonly serviceRepo: IServiceRepository
+        private readonly _serviceRepo: IServiceRepository
     ) { }
 
     async execute(
@@ -16,7 +16,7 @@ export class StartServiceUseCase implements IStartServiceUseCase {
         lng: number
     ) {
 
-        const service = await this.serviceRepo.findById(serviceId);
+        const service = await this._serviceRepo.findById(serviceId);
 
         if (!service) {
             throw new Error("Service not found");
@@ -54,7 +54,7 @@ export class StartServiceUseCase implements IStartServiceUseCase {
             throw new Error("You are not near the service location");
         }
 
-        const updated = await this.serviceRepo.updateStatus(serviceId, {
+        const updated = await this._serviceRepo.updateStatus(serviceId, {
             status: ServiceStatus.IN_PROGRESS,
             startedAt: new Date(),
             updatedAt: new Date()

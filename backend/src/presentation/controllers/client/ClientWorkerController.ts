@@ -7,16 +7,16 @@ import { IGetWorkerAvailabilityUseCase } from "../../../application/interfaces/c
 
 export class ClientController {
   constructor(
-    private readonly getAvailableWorkersUseCase: IGetAvailableWorkersUseCase,
-    private readonly getWorkerByIdUseCase: IGetWorkerByIdUseCase,
-    private readonly getWorkerAvailabilityUseCase: IGetWorkerAvailabilityUseCase,
-  ) {}
+    private readonly _getAvailableWorkersUseCase: IGetAvailableWorkersUseCase,
+    private readonly _getWorkerByIdUseCase: IGetWorkerByIdUseCase,
+    private readonly _getWorkerAvailabilityUseCase: IGetWorkerAvailabilityUseCase,
+  ) { }
 
   getAvailableWorkers = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { category, lat, lng, search, isOnline } = req.query;
 
-      const workers = await this.getAvailableWorkersUseCase.execute(
+      const workers = await this._getAvailableWorkersUseCase.execute(
         category as string,
         Number(lat),
         Number(lng),
@@ -36,7 +36,7 @@ export class ClientController {
     try {
       const { id } = req.params;
 
-      const worker = await this.getWorkerByIdUseCase.execute(id);
+      const worker = await this._getWorkerByIdUseCase.execute(id);
 
       if (!worker) {
         return res.status(HttpStatusCode.NOT_FOUND).json(
@@ -67,8 +67,8 @@ export class ClientController {
           );
         }
 
-        if (this.getWorkerAvailabilityUseCase.executeBulk) {
-          const result = await this.getWorkerAvailabilityUseCase.executeBulk(
+        if (this._getWorkerAvailabilityUseCase.executeBulk) {
+          const result = await this._getWorkerAvailabilityUseCase.executeBulk(
             id,
             parsedStart,
             parsedEnd
@@ -94,7 +94,7 @@ export class ClientController {
         );
       }
 
-      const result = await this.getWorkerAvailabilityUseCase.execute(
+      const result = await this._getWorkerAvailabilityUseCase.execute(
         id,
         parsedDate
       );

@@ -6,12 +6,12 @@ import { IDeleteUserAddressUseCase } from "../../interfaces/address/IDeleteUserA
 export class DeleteUserAddressUseCase implements IDeleteUserAddressUseCase {
 
   constructor(
-    private readonly userRepoFactory: IUserRepositoryFactory
+    private readonly _userRepoFactory: IUserRepositoryFactory
   ) { }
 
   async execute(userId: string, addressId: string): Promise<void> {
-    const clientRepo = this.userRepoFactory.getRepository(Role.CLIENT);
-    const workerRepo = this.userRepoFactory.getRepository(Role.WORKER);
+    const clientRepo = this._userRepoFactory.getRepository(Role.CLIENT);
+    const workerRepo = this._userRepoFactory.getRepository(Role.WORKER);
 
     let user = await clientRepo.findById(userId);
     let repo = clientRepo;

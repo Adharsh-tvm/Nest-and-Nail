@@ -6,7 +6,7 @@ import { IEditUserAddressUseCase } from "../../interfaces/address/IEditUserAddre
 export class EditUserAddressUseCase implements IEditUserAddressUseCase {
 
     constructor(
-        private readonly userRepoFactory: IUserRepositoryFactory
+        private readonly _userRepoFactory: IUserRepositoryFactory
     ) { }
 
     async execute(
@@ -14,8 +14,8 @@ export class EditUserAddressUseCase implements IEditUserAddressUseCase {
         addressId: string,
         data: UpdateAddressDTO
     ): Promise<void> {
-        const clientRepo = this.userRepoFactory.getRepository(Role.CLIENT);
-        const workerRepo = this.userRepoFactory.getRepository(Role.WORKER);
+        const clientRepo = this._userRepoFactory.getRepository(Role.CLIENT);
+        const workerRepo = this._userRepoFactory.getRepository(Role.WORKER);
 
         let user = await clientRepo.findById(userId);
         let repo = clientRepo;
