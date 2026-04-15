@@ -67,7 +67,7 @@ export function MeetingBookingSection({ worker }: MeetingBookingSectionProps) {
   const handleConfirm = () => {
     const slotsArray = Object.entries(selectedSlots).map(([date, slotType]) => ({ date, slotType }));
     if (slotsArray.length === 0) return;
-    
+
     const finalSlot = slotsArray[0].slotType;
 
     book({
@@ -96,7 +96,7 @@ export function MeetingBookingSection({ worker }: MeetingBookingSectionProps) {
 
   const handleRazorpayPayment = async (bookingData: any) => {
     setIsProcessingPayment(true);
-    
+
     const res = await loadRazorpay();
     if (!res) {
       toast.error("Razorpay SDK failed to load. Are you online?");
@@ -111,7 +111,14 @@ export function MeetingBookingSection({ worker }: MeetingBookingSectionProps) {
       return;
     }
 
-    const { orderId: order_id, amount, currency } = orderRes.data;
+    const orderData = orderRes.data;
+    if (!orderData || orderData.amount == null || !orderData.currency || !orderData.orderId) {
+      toast.error("Invalid payment order response. Please try again.");
+      setIsProcessingPayment(false);
+      return;
+    }
+
+    const { orderId: order_id, amount, currency } = orderData;
 
     const options = {
       key: process.env.NEXT_PUBLIC_RAZORPAY_KEY || "rzp_test_YourKeyHere",
@@ -222,11 +229,10 @@ export function MeetingBookingSection({ worker }: MeetingBookingSectionProps) {
           {/* Razorpay */}
           <button
             onClick={() => setPaymentMethod("razorpay")}
-            className={`flex-1 max-w-[160px] flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${
-              paymentMethod === "razorpay"
+            className={`flex-1 max-w-[160px] flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${paymentMethod === "razorpay"
                 ? "border-purple-500 bg-purple-50 shadow-sm"
                 : "border-gray-200 bg-white hover:border-gray-300"
-            }`}
+              }`}
           >
             <div className={`w-8 h-8 rounded-full flex items-center justify-center ${paymentMethod === "razorpay" ? "bg-purple-100" : "bg-gray-100"}`}>
               <CreditCard className={`w-4 h-4 ${paymentMethod === "razorpay" ? "text-purple-600" : "text-gray-400"}`} />
@@ -239,11 +245,10 @@ export function MeetingBookingSection({ worker }: MeetingBookingSectionProps) {
           {/* Wallet */}
           <button
             onClick={() => setPaymentMethod("wallet")}
-            className={`flex-1 max-w-[160px] flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${
-              paymentMethod === "wallet"
+            className={`flex-1 max-w-[160px] flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${paymentMethod === "wallet"
                 ? "border-indigo-500 bg-indigo-50 shadow-sm"
                 : "border-gray-200 bg-white hover:border-gray-300"
-            }`}
+              }`}
           >
             <div className={`w-8 h-8 rounded-full flex items-center justify-center ${paymentMethod === "wallet" ? "bg-indigo-100" : "bg-gray-100"}`}>
               <Wallet className={`w-4 h-4 ${paymentMethod === "wallet" ? "text-indigo-600" : "text-gray-400"}`} />
@@ -279,20 +284,20 @@ export function MeetingBookingSection({ worker }: MeetingBookingSectionProps) {
     <div className="w-full">
       {/* Basic Step Indicator */}
       <div className="flex items-center justify-center gap-2 mb-8">
-         {[1, 2, 3].map(step => (
-            <div key={step} className="flex items-center gap-2">
-               <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${currentStep >= step ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-400'}`}>
-                  {step}
-               </div>
-               {step < 3 && <div className={`w-10 h-1 rounded-full ${currentStep > step ? 'bg-emerald-600' : 'bg-gray-100'}`} />}
+        {[1, 2, 3].map(step => (
+          <div key={step} className="flex items-center gap-2">
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${currentStep >= step ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-400'}`}>
+              {step}
             </div>
-         ))}
+            {step < 3 && <div className={`w-10 h-1 rounded-full ${currentStep > step ? 'bg-emerald-600' : 'bg-gray-100'}`} />}
+          </div>
+        ))}
       </div>
 
       <div className="relative">
         {currentStep > 1 && bookingState.status !== "loading" && (
           <div className="mb-4">
-            <button 
+            <button
               onClick={prevStep}
               className="inline-flex items-center text-sm font-bold text-gray-500 hover:text-gray-900 transition-colors"
             >
@@ -323,7 +328,7 @@ export function MeetingBookingSection({ worker }: MeetingBookingSectionProps) {
                 <div>
                   <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Selection Status</h3>
                   <p className="font-bold text-gray-900 text-lg flex items-center flex-wrap gap-2">
-                     {Object.keys(selectedSlots).length === 1 ? 'Slot Selected' : 'No slot selected'}
+                    {Object.keys(selectedSlots).length === 1 ? 'Slot Selected' : 'No slot selected'}
                   </p>
                 </div>
                 <button

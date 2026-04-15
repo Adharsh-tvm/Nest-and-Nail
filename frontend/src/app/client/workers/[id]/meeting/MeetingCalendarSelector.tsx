@@ -30,13 +30,13 @@ const isSlotWithin12Hours = (dateKey: string, slotType: SlotType): boolean => {
   const slotDate = new Date(dateKey);
   let startHour = 9;
   let startMinute = 0;
-  
+
   if (slotType.toString().startsWith("VIDEO_")) {
-      const parts = slotType.toString().split("_");
-      if (parts.length >= 3) {
-          startHour = parseInt(parts[1], 10);
-          startMinute = parseInt(parts[2], 10);
-      }
+    const parts = slotType.toString().split("_");
+    if (parts.length >= 3) {
+      startHour = parseInt(parts[1], 10);
+      startMinute = parseInt(parts[2], 10);
+    }
   }
 
   slotDate.setUTCHours(startHour, startMinute, 0, 0);
@@ -134,11 +134,10 @@ export function MeetingCalendarSelector({
         <button
           onClick={goToPrev}
           disabled={isPastMonth}
-          className={`p-2 rounded-xl transition-colors ${
-            isPastMonth
+          className={`p-2 rounded-xl transition-colors ${isPastMonth
               ? "text-gray-200 cursor-not-allowed"
               : "text-gray-500 hover:bg-gray-100 hover:text-gray-800"
-          }`}
+            }`}
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
@@ -189,7 +188,7 @@ export function MeetingCalendarSelector({
                 {day}
                 <div className="absolute bottom-1.5 flex gap-1">
                   {isDateSelected(dateObj) ? (
-                     <div className="w-1.5 h-1.5 rounded-full bg-white/80" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-white/80" />
                   ) : null}
                 </div>
               </div>
@@ -200,52 +199,52 @@ export function MeetingCalendarSelector({
 
       {focusedDate && (
         <div className="mt-6 p-5 border-2 border-gray-900 rounded-2xl bg-gray-50 animate-in slide-in-from-top-4 fade-in duration-300">
-           <h4 className="text-sm font-bold text-gray-900 mb-3 flex items-center justify-between">
-             <span>Select Meeting Slot for {new Date(focusedDate).toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })}</span>
-             <button onClick={() => setFocusedDate(null)} className="text-gray-400 hover:text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-full w-6 h-6 flex items-center justify-center text-xs">✕</button>
-           </h4>
-           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-             {meetingSlots.map(slotType => {
-                 const isSelected = selectedSlots[focusedDate] === slotType;
-                 const isTooSoon = isSlotWithin12Hours(focusedDate, slotType);
-                 const slotData = availabilityData[focusedDate];
-                 const isBooked = slotData?.bookedSlots?.includes(slotType) || false;
-                 
-                 const isDisabled = isTooSoon || isBooked;
+          <h4 className="text-sm font-bold text-gray-900 mb-3 flex items-center justify-between">
+            <span>Select Meeting Slot for {new Date(focusedDate).toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })}</span>
+            <button onClick={() => setFocusedDate(null)} className="text-gray-400 hover:text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-full w-6 h-6 flex items-center justify-center text-xs">✕</button>
+          </h4>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {meetingSlots.map(slotType => {
+              const isSelected = selectedSlots[focusedDate] === slotType;
+              const isTooSoon = isSlotWithin12Hours(focusedDate, slotType);
+              const slotData = availabilityData[focusedDate];
+              const isBooked = slotData?.bookedSlots?.includes(slotType) || false;
 
-                 return (
-                    <button
-                        key={slotType}
-                        onClick={() => {
-                            if (isDisabled) return;
-                            const newSlots = { [focusedDate]: slotType };
-                            onSlotChange(newSlots);
-                            setFocusedDate(null);
-                        }}
-                        disabled={isDisabled}
-                        className={`py-3 px-2 rounded-xl text-sm font-bold transition-all border-2 flex flex-col items-center justify-center gap-1 relative overflow-hidden
+              const isDisabled = isTooSoon || isBooked;
+
+              return (
+                <button
+                  key={slotType}
+                  onClick={() => {
+                    if (isDisabled) return;
+                    const newSlots = { [focusedDate]: slotType };
+                    onSlotChange(newSlots);
+                    setFocusedDate(null);
+                  }}
+                  disabled={isDisabled}
+                  className={`py-3 px-2 rounded-xl text-sm font-bold transition-all border-2 flex flex-col items-center justify-center gap-1 relative overflow-hidden
                         ${isSelected
-                          ? 'bg-emerald-600 text-white border-emerald-600 shadow-md' 
-                          : isDisabled
-                            ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-60' 
-                            : 'bg-white text-gray-700 border-gray-200 hover:border-emerald-500 hover:text-emerald-600'}`}
-                    >
-                        {isTooSoon && !isBooked && (
-                           <div className="absolute top-0 right-0 bg-amber-100 text-amber-600 text-[9px] px-1.5 py-0.5 rounded-bl-lg font-black uppercase">
-                             &lt;12h
-                           </div>
-                        )}
-                        {isBooked && (
-                           <div className="absolute top-0 right-0 bg-red-100 text-red-600 text-[9px] px-1.5 py-0.5 rounded-bl-lg font-black flex items-center justify-center w-full">
-                             BOOKED
-                           </div>
-                        )}
-                        <span>{SLOT_LABELS[slotType]}</span>
-                        <span className="text-xs font-medium opacity-80">({SLOT_DURATION_LABEL[slotType]})</span>
-                    </button>
-                 );
-             })}
-           </div>
+                      ? 'bg-emerald-600 text-white border-emerald-600 shadow-md'
+                      : isDisabled
+                        ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-60'
+                        : 'bg-white text-gray-700 border-gray-200 hover:border-emerald-500 hover:text-emerald-600'}`}
+                >
+                  {isTooSoon && !isBooked && (
+                    <div className="absolute top-0 right-0 bg-amber-100 text-amber-600 text-[9px] px-1.5 py-0.5 rounded-bl-lg font-black uppercase">
+                      &lt;12h
+                    </div>
+                  )}
+                  {isBooked && (
+                    <div className="absolute top-0 right-0 bg-red-100 text-red-600 text-[9px] px-1.5 py-0.5 rounded-bl-lg font-black flex items-center justify-center w-full">
+                      BOOKED
+                    </div>
+                  )}
+                  <span>{SLOT_LABELS[slotType]}</span>
+                  <span className="text-xs font-medium opacity-80">({SLOT_DURATION_LABEL[slotType]})</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
       )}
     </div>

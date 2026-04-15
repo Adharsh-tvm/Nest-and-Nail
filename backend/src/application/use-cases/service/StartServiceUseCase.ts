@@ -37,9 +37,9 @@ export class StartServiceUseCase implements IStartServiceUseCase {
 
         const diffInMinutes = (now.getTime() - scheduled.getTime()) / (1000 * 60);
 
-        if (diffInMinutes < -30) {
-            throw new Error("Too early to start service");
-        }
+        // if (diffInMinutes < -30) {
+        //     throw new Error("Too early to start service");
+        // }
 
         const [serviceLng, serviceLat] = service.location.coordinates;
 
@@ -50,9 +50,9 @@ export class StartServiceUseCase implements IStartServiceUseCase {
             serviceLng
         );
 
-        if (distance > 150) {
-            throw new Error("You are not near the service location");
-        }
+        // if (distance > 150) {
+        //     throw new Error("You are not near the service location");
+        // }
 
         const updated = await this._serviceRepo.updateStatus(serviceId, {
             status: ServiceStatus.IN_PROGRESS,

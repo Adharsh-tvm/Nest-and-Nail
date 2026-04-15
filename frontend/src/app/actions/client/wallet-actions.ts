@@ -1,15 +1,16 @@
 "use server";
 
-import { getWalletBalanceApi, WalletResponse } from "@/sources/api/wallet.api";
+import { getWalletBalanceApi, WalletData } from "@/sources/api/wallet.api";
 
 export async function getWalletBalanceAction(): Promise<{
     success: boolean;
-    data?: WalletResponse;
+    data?: WalletData;
     error?: string;
 }> {
     try {
         const res = await getWalletBalanceApi();
-        if (!res.success) {
+        // getWalletBalanceApi now returns unwrapped WalletData directly
+        if (!res) {
             return { success: false, error: "Failed to fetch wallet balance" };
         }
         return { success: true, data: res };

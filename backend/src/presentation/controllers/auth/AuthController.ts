@@ -277,7 +277,7 @@ export class AuthController implements IAuthController {
       const result = await this._validateUserUseCase.execute(userId);
 
       if (!result.success) {
-        res.status(HttpStatusCode.OK).json({ // Return 200 even if blocked, frontend handles logic
+        res.status(HttpStatusCode.OK).json({ 
           success: false,
           message: result.message
         });
@@ -297,42 +297,38 @@ export class AuthController implements IAuthController {
   }
 
   async changePassword(req: Request, res: Response): Promise<void> {
-  try {
-    const userId = req.user?.id;
+    try {
+      const userId = req.user?.id;
 
-    const { currentPassword, newPassword, confirmPassword } = req.body;
+      const { currentPassword, newPassword, confirmPassword } = req.body;
 
-    if (!userId) {
-      res.status(401).json({ message: "Unauthorized" });
-      return;
+      if (!userId) {
+        res.status(HttpStatusCode.UNAUTHORIZED).json(ResponseHandler.error("Unauthorized"));
+        return;
+      }
+
+      if (!currentPassword || !newPassword || !confirmPassword) {
+        res.status(HttpStatusCode.BAD_REQUEST).json(ResponseHandler.error("All fields are required"));
+        return;
+      }
+
+      if (newPassword !== confirmPassword) {
+        res.status(HttpStatusCode.BAD_REQUEST).json(ResponseHandler.error("Passwords do not match"));
+        return;
+      }
+
+      await this._changePasswordUseCase.execute(
+        userId,
+        currentPassword,
+        newPassword
+      );
+
+      res.status(HttpStatusCode.OK).json(
+        ResponseHandler.success(null, "Password changed successfully")
+      );
+
+    } catch (error: any) {
+      res.status(HttpStatusCode.BAD_REQUEST).json(ResponseHandler.error(error.message));
     }
-
-    if (!currentPassword || !newPassword || !confirmPassword) {
-      res.status(400).json({ message: "All fields are required" });
-      return;
-    }
-
-    if (newPassword !== confirmPassword) {
-      res.status(400).json({ message: "Passwords do not match" });
-      return;
-    }
-
-    await this._changePasswordUseCase.execute(
-      userId,
-      currentPassword,
-      newPassword
-    );
-
-    res.status(200).json({
-      success: true,
-      message: "Password changed successfully"
-    });
-
-  } catch (error: any) {
-    res.status(400).json({
-      success: false,
-      message: error.message
-    });
   }
-}
 }

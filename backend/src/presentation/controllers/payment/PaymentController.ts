@@ -2,6 +2,9 @@ import { Request, Response } from "express";
 import { ICreatePaymentUseCase } from "../../../application/interfaces/payment/ICreatePaymentUseCase";
 import { IVerifyPaymentUseCase } from "../../../application/interfaces/payment/IVerifyPaymentUseCase";
 import { ProcessWalletPaymentUseCase } from "../../../application/use-cases/payment/ProcessWalletPaymentUseCase";
+import { HttpStatusCode } from "../../../shared/enums/httpCodes";
+import { ResponseHandler } from "../../../shared/responses/ApiResponse";
+import { RESPONSE_MESSAGES } from "../../../shared/responses/ResponseMessages";
 
 export class PaymentController {
   constructor(
@@ -10,44 +13,88 @@ export class PaymentController {
     private processWalletPaymentUseCase: ProcessWalletPaymentUseCase
   ) {}
 
-  createOrder = async (req: Request, res: Response) => {
+  createOrder = async (req: Request, res: Response): Promise<void> => {
     const { serviceId } = req.body;
-    const clientId = req.user.id;
+    const clientId = req.user?.id;
 
-    const order = await this.createOrderUseCase.execute(
-      serviceId,
-      clientId
+    if (!clientId) {
+      res.status(HttpStatusCode.UNAUTHORIZED).json(
+        ResponseHandler.error(RESPONSE_MESSAGES.UNAUTHORIZED)
+      );
+      return;
+    }
+
+    if (!serviceId) {
+      res.status(HttpStatusCode.BAD_REQUEST).json(
+        ResponseHandler.error(RESPONSE_MESSAGES.BAD_REQUEST, "serviceId is required")
+      );
+      return;
+    }
+
+    const order = await this.createOrderUseCase.execute(serviceId, clientId);
+
+    res.status(HttpStatusCode.OK).json(
+      ResponseHandler.success(order, "Payment order created")
     );
-
-    res.json(order);
   };
 
-  verify = async (req : Request, res: Response) => {
-    const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
+  verify = async (req: Request, res: Response): Promise<void> => {
+    const {
+      razorpay_payment_id,
+      razorpay_order_id,
+      razorpay_signature,
+      paymentId,
+      orderId,
+      signature
+    } = req.body;
+
+    const finalPaymentId = razorpay_payment_id || paymentId;
+    const finalOrderId = razorpay_order_id || orderId;
+    const finalSignature = razorpay_signature || signature;
+
+    if (!finalPaymentId || !finalOrderId || !finalSignature) {
+      res.status(HttpStatusCode.BAD_REQUEST).json(
+        ResponseHandler.error(
+          RESPONSE_MESSAGES.BAD_REQUEST,
+          "Missing payment verification fields"
+        )
+      );
+      return;
+    }
 
     const result = await this.verifyPaymentUseCase.execute({
-        paymentId: razorpay_payment_id || req.body.paymentId,
-        orderId: razorpay_order_id || req.body.orderId,
-        signature: razorpay_signature || req.body.signature
+      paymentId: finalPaymentId,
+      orderId: finalOrderId,
+      signature: finalSignature
     });
 
-    res.json(result);
+    res.status(HttpStatusCode.OK).json(
+      ResponseHandler.success(result, "Payment verified successfully")
+    );
   };
 
-  processWalletPayment = async (req: Request, res: Response) => {
-    try {
-      const { serviceId } = req.body;
-      const clientId = req.user.id;
+  processWalletPayment = async (req: Request, res: Response): Promise<void> => {
+    const { serviceId } = req.body;
+    const clientId = req.user?.id;
 
-      const result = await this.processWalletPaymentUseCase.execute(serviceId, clientId);
-
-      res.status(200).json(result);
-    } catch (error: any) {
-      if (error.message === "Insufficient wallet balance") {
-        res.status(400).json({ success: false, message: error.message });
-      } else {
-        res.status(500).json({ success: false, message: error.message || "Failed to process wallet payment" });
-      }
+    if (!clientId) {
+      res.status(HttpStatusCode.UNAUTHORIZED).json(
+        ResponseHandler.error(RESPONSE_MESSAGES.UNAUTHORIZED)
+      );
+      return;
     }
+
+    if (!serviceId) {
+      res.status(HttpStatusCode.BAD_REQUEST).json(
+        ResponseHandler.error(RESPONSE_MESSAGES.BAD_REQUEST, "serviceId is required")
+      );
+      return;
+    }
+
+    const result = await this.processWalletPaymentUseCase.execute(serviceId, clientId);
+
+    res.status(HttpStatusCode.OK).json(
+      ResponseHandler.success(result, "Wallet payment successful")
+    );
   };
 }

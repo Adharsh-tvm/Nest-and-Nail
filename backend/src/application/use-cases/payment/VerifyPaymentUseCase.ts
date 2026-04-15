@@ -4,6 +4,7 @@ import { IPaymentGateway } from "../../../domain/gateways/IPaymentGateway";
 import { IPaymentRepository } from "../../../domain/repositories/IPaymentRepository";
 import { IServiceRepository } from "../../../domain/repositories/IServiceRepository";
 import { PaymentStatus } from "../../../shared/enums/paymentEnums";
+import { ServiceStatus } from "../../../shared/enums/serviceEnums";
 import { IVerifyPaymentUseCase } from "../../interfaces/payment/IVerifyPaymentUseCase";
 
 export class VerifyPaymentUseCase implements IVerifyPaymentUseCase {
@@ -40,6 +41,10 @@ export class VerifyPaymentUseCase implements IVerifyPaymentUseCase {
             payment.serviceId,
             "SUCCESS"
         );
+
+        await this.serviceRepo.updateStatus(payment.serviceId,{
+            status: ServiceStatus.CONFIRMED
+        })
 
         return { success: true };
     }
