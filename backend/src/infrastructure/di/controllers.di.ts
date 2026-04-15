@@ -179,7 +179,8 @@ export class ControllerDI {
                 this._useCases.getClientServiceHistoryUseCase,
                 this._useCases.getClientServiceByIdUseCase,
                 this._useCases.getClientOngoingServicesUseCase,
-                this._useCases.bookWorkerUseCase
+                this._useCases.bookWorkerUseCase,
+                this._useCases.cancelServiceUseCase
             )
         }
         return this._clientServiceController

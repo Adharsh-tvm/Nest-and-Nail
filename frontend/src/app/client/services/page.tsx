@@ -21,8 +21,16 @@ export default async function ClientServicesPage() {
     ["OPEN", "PENDING", "CONFIRMED", "IN_PROGRESS"].includes(s.status),
   );
 
+  const cancelledServices = sortedServices.filter((s) =>
+    ["CANCELLED", "CANCELLED_BY_CLIENT", "CANCELLED_BY_WORKER"].includes(s.status),
+  );
+
   const historyServices = sortedServices.filter(
-    (s) => !["OPEN", "PENDING", "CONFIRMED", "IN_PROGRESS"].includes(s.status),
+    (s) =>
+      ![
+        "OPEN", "PENDING", "CONFIRMED", "IN_PROGRESS",
+        "CANCELLED", "CANCELLED_BY_CLIENT", "CANCELLED_BY_WORKER",
+      ].includes(s.status),
   );
 
   const allServices = sortedServices;
@@ -58,6 +66,7 @@ export default async function ClientServicesPage() {
         <ClientServicesView
           ongoing={ongoingServices}
           history={historyServices}
+          cancelled={cancelledServices}
           workerMap={workerMap}
         />
       </div>

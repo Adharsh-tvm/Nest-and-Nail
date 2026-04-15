@@ -121,6 +121,8 @@ import { IGetMeetingByIdForAdminUseCase } from "../../application/interfaces/mee
 import { GetMeetingByIdForAdminUseCase } from "../../application/use-cases/meetings/admin/GetMeetingByIdForAdminUseCase";
 import { IGetAllMeetingsForAdminUseCase } from "../../application/interfaces/meetings/admin/IGetAllMeetingsForAdminUseCase";
 import { GetAllMeetingsForAdminUseCase } from "../../application/use-cases/meetings/admin/GetAllMeetingsForAdminUseCase";
+import { ICancelServiceUseCase } from "../../application/interfaces/service/ICancelServiceUseCase";
+import { CancelServiceUseCase } from "../../application/use-cases/service/CancelServiceUseCase";
 
 
 
@@ -171,6 +173,7 @@ export class UseCaseDI {
   private _getWorkerAvailabilityUseCase?: IGetWorkerAvailabilityUseCase;
 
   private _bookWorkerUseCase?: IBookWorkerUseCase;
+  private _cancelServiceUseCase?: ICancelServiceUseCase;
   private _getClientServiceHistoryUseCase?: IGetClientServiceHistoryUseCase;
   private _getClientServiceByIdUseCase?: IGetClientServiceByIdUseCase;
   private _getClientOngoingServicesUseCase?: IGetClientOngoingServicesUseCase;
@@ -796,4 +799,13 @@ export class UseCaseDI {
     return this._getAllMeetingsForAdminUseCase
   }
 
+  get cancelServiceUseCase(): ICancelServiceUseCase {
+    if (!this._cancelServiceUseCase) {
+      this._cancelServiceUseCase = new CancelServiceUseCase(
+        this.infra.serviceRepository,
+        this.infra.workerScheduleRepo
+      )
+    }
+    return this._cancelServiceUseCase
+  }
 }

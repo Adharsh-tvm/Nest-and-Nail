@@ -2,9 +2,11 @@
 
 import React, { useState } from 'react';
 import { ServiceResponseDTO, ServiceStatus } from '@/shared/types/serviceTypes';
-import { Calendar, Clock, MapPin, ChevronRight, X, Briefcase, Star, IndianRupee } from 'lucide-react';
+import { Calendar, Clock, ChevronRight, X, Briefcase, IndianRupee, AlertTriangle, XCircle, RotateCcw, CheckCircle2, Ban } from 'lucide-react';
 import { User } from '@/shared/types/userTypes';
 import Pagination from '@/app/components/ui/Pagination';
+import { cancelServiceAction } from '@/app/actions/client/service-actions';
+import toast from 'react-hot-toast';
 
 const ACTIVE_PAGE_SIZE = 6;
 const HISTORY_PAGE_SIZE = 6;
@@ -12,19 +14,75 @@ const HISTORY_PAGE_SIZE = 6;
 interface Props {
     ongoing: ServiceResponseDTO[];
     history: ServiceResponseDTO[];
+    cancelled: ServiceResponseDTO[];
     workerMap: Record<string, User>;
 }
 
-export default function ClientServicesView({ ongoing, history, workerMap }: Props) {
+type TabId = 'active' | 'history' | 'cancelled';
+
+type CancelStep = 'reason' | 'confirm';
+
+interface CancelModalState {
+    service: ServiceResponseDTO;
+    step: CancelStep;
+    reason: string;
+    isSubmitting: boolean;
+}
+
+export default function ClientServicesView({ ongoing, history, cancelled, workerMap }: Props) {
+    const [activeTab, setActiveTab] = useState<TabId>('active');
     const [selectedService, setSelectedService] = useState<ServiceResponseDTO | null>(null);
     const [activePage, setActivePage] = useState(1);
     const [historyPage, setHistoryPage] = useState(1);
+    const [cancelledPage, setCancelledPage] = useState(1);
+    const [cancelModal, setCancelModal] = useState<CancelModalState | null>(null);
+    const [localOngoing, setLocalOngoing] = useState<ServiceResponseDTO[]>(ongoing);
 
-    const activeTotalPages = Math.ceil(ongoing.length / ACTIVE_PAGE_SIZE);
+    const activeTotalPages = Math.ceil(localOngoing.length / ACTIVE_PAGE_SIZE);
     const historyTotalPages = Math.ceil(history.length / HISTORY_PAGE_SIZE);
+    const cancelledTotalPages = Math.ceil(cancelled.length / HISTORY_PAGE_SIZE);
 
-    const pagedOngoing = ongoing.slice((activePage - 1) * ACTIVE_PAGE_SIZE, activePage * ACTIVE_PAGE_SIZE);
+    const pagedOngoing = localOngoing.slice((activePage - 1) * ACTIVE_PAGE_SIZE, activePage * ACTIVE_PAGE_SIZE);
     const pagedHistory = history.slice((historyPage - 1) * HISTORY_PAGE_SIZE, historyPage * HISTORY_PAGE_SIZE);
+    const pagedCancelled = cancelled.slice((cancelledPage - 1) * HISTORY_PAGE_SIZE, cancelledPage * HISTORY_PAGE_SIZE);
+
+    const openCancelModal = (e: React.MouseEvent, service: ServiceResponseDTO) => {
+        e.stopPropagation();
+        setCancelModal({ service, step: 'reason', reason: '', isSubmitting: false });
+    };
+
+    const closeCancelModal = () => {
+        if (cancelModal?.isSubmitting) return;
+        setCancelModal(null);
+    };
+
+    const handleCancelSubmit = async () => {
+        if (!cancelModal) return;
+        const { service, reason } = cancelModal;
+
+        if (!reason.trim()) {
+            toast.error('Please provide a reason for cancellation.');
+            return;
+        }
+
+        if (cancelModal.step === 'reason') {
+            setCancelModal(prev => prev ? { ...prev, step: 'confirm' } : prev);
+            return;
+        }
+
+        // Confirm step — submit
+        setCancelModal(prev => prev ? { ...prev, isSubmitting: true } : prev);
+        const res = await cancelServiceAction(service.serviceId, reason.trim());
+
+        if (res.success) {
+            toast.success('Service cancelled successfully.');
+            setLocalOngoing(prev => prev.filter(s => s.serviceId !== service.serviceId));
+            setCancelModal(null);
+        } else {
+            toast.error(res.error || 'Failed to cancel service.');
+            setCancelModal(prev => prev ? { ...prev, isSubmitting: false } : prev);
+        }
+    };
 
     const getStatusBadge = (status: ServiceStatus | string) => {
         switch (status) {
@@ -49,6 +107,15 @@ export default function ClientServicesView({ ongoing, history, workerMap }: Prop
         return new Date(dateString).toLocaleDateString('en-US', {
             month: 'short', day: 'numeric', year: 'numeric'
         });
+    };
+
+    const isCancellable = (service: ServiceResponseDTO) => {
+        const cancellableStatuses: string[] = [
+            ServiceStatus.PENDING,
+            ServiceStatus.CONFIRMED,
+            'PENDING',
+        ];
+        return cancellableStatuses.includes(service.status);
     };
 
     const renderServiceCard = (service: ServiceResponseDTO, isActive: boolean) => {
@@ -96,8 +163,8 @@ export default function ClientServicesView({ ongoing, history, workerMap }: Prop
                         </div>
                     </div>
 
-                    <div className="flex items-center justify-end text-emerald-600 font-semibold text-sm group-hover:text-emerald-700">
-                        View Details <ChevronRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" />
+                    <div className="flex items-center justify-end text-emerald-600 font-semibold text-sm">
+                        View Details <ChevronRight className="w-4 h-4 ml-1" />
                     </div>
                 </div>
             </div>
@@ -105,91 +172,154 @@ export default function ClientServicesView({ ongoing, history, workerMap }: Prop
     };
 
     return (
-        <div className="space-y-10">
+        <div className="space-y-6">
 
-            {/* Active Services Section */}
-            <section>
-                <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center">
-                        <div className="w-2 h-8 bg-blue-500 rounded-full mr-3" />
-                        <h2 className="text-2xl font-bold text-gray-900">Active Services</h2>
-                        {ongoing.length > 0 && (
-                            <span className="ml-3 px-2.5 py-0.5 bg-blue-100 text-blue-700 text-xs font-bold rounded-full">
-                                {ongoing.length}
+            {/* ── Tab Bar ── */}
+            <div className="flex items-center gap-1 bg-gray-100 rounded-2xl p-1.5">
+                {([
+                    { id: 'active' as TabId, label: 'Active', count: localOngoing.length, icon: <Briefcase className="w-4 h-4" /> },
+                    { id: 'history' as TabId, label: 'Completed', count: history.length, icon: <CheckCircle2 className="w-4 h-4" /> },
+                    { id: 'cancelled' as TabId, label: 'Cancelled', count: cancelled.length, icon: <Ban className="w-4 h-4" /> },
+                ]).map(tab => (
+                    <button
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id)}
+                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-sm font-bold transition-all ${
+                            activeTab === tab.id
+                                ? tab.id === 'cancelled'
+                                    ? 'bg-white text-red-600 shadow-sm'
+                                    : 'bg-white text-gray-900 shadow-sm'
+                                : 'text-gray-500 hover:text-gray-700'
+                        }`}
+                    >
+                        {tab.icon}
+                        {tab.label}
+                        {tab.count > 0 && (
+                            <span className={`px-2 py-0.5 rounded-full text-xs ${
+                                activeTab === tab.id
+                                    ? tab.id === 'cancelled' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700'
+                                    : 'bg-gray-200 text-gray-500'
+                            }`}>
+                                {tab.count}
+                            </span>
+                        )}
+                    </button>
+                ))}
+            </div>
+
+            {/* ── Active Services ── */}
+            {activeTab === 'active' && (
+                <>
+                    <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center">
+                            <div className="w-2 h-8 bg-blue-500 rounded-full mr-3" />
+                            <h2 className="text-2xl font-bold text-gray-900">Active Services</h2>
+                            {localOngoing.length > 0 && (
+                                <span className="ml-3 px-2.5 py-0.5 bg-blue-100 text-blue-700 text-xs font-bold rounded-full">
+                                    {localOngoing.length}
+                                </span>
+                            )}
+                        </div>
+                        {activeTotalPages > 1 && (
+                            <span className="text-xs text-gray-400">
+                                Page {activePage} of {activeTotalPages}
                             </span>
                         )}
                     </div>
-                    {activeTotalPages > 1 && (
-                        <span className="text-xs text-gray-400">
-                            Page {activePage} of {activeTotalPages}
-                        </span>
+
+                    {localOngoing.length > 0 ? (
+                        <>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {pagedOngoing.map(service => renderServiceCard(service, true))}
+                            </div>
+                            <Pagination
+                                currentPage={activePage}
+                                totalPages={activeTotalPages}
+                                onPageChange={(p) => { setActivePage(p); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                            />
+                        </>
+                    ) : (
+                        <div className="bg-white rounded-[24px] border border-gray-200 p-10 text-center shadow-sm">
+                            <div className="w-16 h-16 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <Briefcase className="w-8 h-8" />
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-900 mb-2">No Active Services</h3>
+                            <p className="text-gray-500">You don't have any ongoing services at the moment.</p>
+                        </div>
                     )}
-                </div>
+                </>
+            )}
 
-                {ongoing.length > 0 ? (
-                    <>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {pagedOngoing.map(service => renderServiceCard(service, true))}
+            {/* ── Completed History ── */}
+            {activeTab === 'history' && (
+                <>
+                    <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center">
+                            <div className="w-2 h-8 bg-gray-300 rounded-full mr-3" />
+                            <h2 className="text-2xl font-bold text-gray-900">Service History</h2>
+                            {history.length > 0 && (
+                                <span className="ml-3 px-2.5 py-0.5 bg-gray-100 text-gray-600 text-xs font-bold rounded-full">
+                                    {history.length}
+                                </span>
+                            )}
                         </div>
-                        <Pagination
-                            currentPage={activePage}
-                            totalPages={activeTotalPages}
-                            onPageChange={(p) => { setActivePage(p); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                        />
-                    </>
-                ) : (
-                    <div className="bg-white rounded-[24px] border border-gray-200 p-10 text-center shadow-sm">
-                        <div className="w-16 h-16 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <Briefcase className="w-8 h-8" />
-                        </div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">No Active Services</h3>
-                        <p className="text-gray-500">You don't have any ongoing services at the moment.</p>
-                    </div>
-                )}
-            </section>
-
-            {/* Service History Section */}
-            <section>
-                <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center">
-                        <div className="w-2 h-8 bg-gray-300 rounded-full mr-3" />
-                        <h2 className="text-2xl font-bold text-gray-900">Service History</h2>
-                        {history.length > 0 && (
-                            <span className="ml-3 px-2.5 py-0.5 bg-gray-100 text-gray-600 text-xs font-bold rounded-full">
-                                {history.length}
+                        {historyTotalPages > 1 && (
+                            <span className="text-xs text-gray-400">
+                                Page {historyPage} of {historyTotalPages}
                             </span>
                         )}
                     </div>
-                    {historyTotalPages > 1 && (
-                        <span className="text-xs text-gray-400">
-                            Page {historyPage} of {historyTotalPages}
-                        </span>
+
+                    {history.length > 0 ? (
+                        <>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 opacity-90">
+                                {pagedHistory.map(service => renderServiceCard(service, false))}
+                            </div>
+                            <Pagination
+                                currentPage={historyPage}
+                                totalPages={historyTotalPages}
+                                onPageChange={(p) => { setHistoryPage(p); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                            />
+                        </>
+                    ) : (
+                        <div className="bg-white rounded-[24px] border border-gray-200 p-10 text-center shadow-sm">
+                            <div className="w-16 h-16 bg-gray-50 text-gray-400 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <Clock className="w-8 h-8" />
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-900 mb-2">No History</h3>
+                            <p className="text-gray-500">Your past services will appear here.</p>
+                        </div>
                     )}
-                </div>
+                </>
+            )}
 
-                {history.length > 0 ? (
-                    <>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 opacity-90">
-                            {pagedHistory.map(service => renderServiceCard(service, false))}
+            {/* ── Cancelled Services ── */}
+            {activeTab === 'cancelled' && (
+                <section>
+                    {cancelled.length > 0 ? (
+                        <>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 opacity-90">
+                                {pagedCancelled.map(service => renderServiceCard(service, false))}
+                            </div>
+                            <Pagination
+                                currentPage={cancelledPage}
+                                totalPages={cancelledTotalPages}
+                                onPageChange={(p) => { setCancelledPage(p); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                            />
+                        </>
+                    ) : (
+                        <div className="bg-white rounded-[24px] border border-gray-200 p-10 text-center shadow-sm">
+                            <div className="w-16 h-16 bg-red-50 text-red-400 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <Ban className="w-8 h-8" />
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-900 mb-2">No Cancelled Services</h3>
+                            <p className="text-gray-500">You haven't cancelled any services.</p>
                         </div>
-                        <Pagination
-                            currentPage={historyPage}
-                            totalPages={historyTotalPages}
-                            onPageChange={(p) => { setHistoryPage(p); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                        />
-                    </>
-                ) : (
-                    <div className="bg-white rounded-[24px] border border-gray-200 p-10 text-center shadow-sm">
-                        <div className="w-16 h-16 bg-gray-50 text-gray-400 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <Clock className="w-8 h-8" />
-                        </div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">No History</h3>
-                        <p className="text-gray-500">Your past services will appear here.</p>
-                    </div>
-                )}
-            </section>
+                    )}
+                </section>
+            )}
 
-            {/* Service Details Modal */}
+            {/* ── Service Details Modal ── */}
             {selectedService && (
                 <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
                     <div className="bg-white rounded-[24px] max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-in fade-in zoom-in duration-200">
@@ -254,6 +384,132 @@ export default function ClientServicesView({ ongoing, history, workerMap }: Prop
                                     <span className="font-bold text-gray-900">{selectedService.paymentStatus}</span>
                                 </div>
                             </div>
+
+                            {/* Cancel button — only for cancellable active services */}
+                            {isCancellable(selectedService) && (
+                                <div className="pt-2 border-t border-gray-100">
+                                    <button
+                                        id={`cancel-service-modal-btn-${selectedService.serviceId}`}
+                                        onClick={() => {
+                                            setCancelModal({ service: selectedService, step: 'reason', reason: '', isSubmitting: false });
+                                            setSelectedService(null);
+                                        }}
+                                        className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl border-2 border-red-200 bg-red-50 text-red-600 font-bold text-sm hover:bg-red-100 hover:border-red-300 transition-all active:scale-[0.98]"
+                                    >
+                                        <XCircle className="w-4 h-4" />
+                                        Cancel This Service
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* ── Cancel Confirmation Modal ── */}
+            {cancelModal && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
+                    <div className="bg-white rounded-[24px] max-w-md w-full shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+
+                        {/* Header */}
+                        <div className="flex items-center justify-between p-5 border-b border-gray-100">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center">
+                                    <AlertTriangle className="w-5 h-5 text-red-500" />
+                                </div>
+                                <h3 className="font-bold text-gray-900 text-lg">
+                                    {cancelModal.step === 'reason' ? 'Cancel Service' : 'Confirm Cancellation'}
+                                </h3>
+                            </div>
+                            <button
+                                onClick={closeCancelModal}
+                                disabled={cancelModal.isSubmitting}
+                                className="p-2 hover:bg-gray-100 rounded-full transition-colors disabled:opacity-40"
+                            >
+                                <X className="w-5 h-5 text-gray-400" />
+                            </button>
+                        </div>
+
+                        <div className="p-5 space-y-4">
+                            {/* Service Info pill */}
+                            <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100">
+                                <p className="text-xs text-gray-400 font-semibold mb-1 uppercase tracking-wider">Service</p>
+                                <p className="font-bold text-gray-900">{cancelModal.service.category}</p>
+                                <p className="text-sm text-gray-500 mt-0.5">{formatDate(cancelModal.service.scheduledDate)}</p>
+                            </div>
+
+                            {cancelModal.step === 'reason' ? (
+                                <>
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-2">
+                                            Reason for cancellation <span className="text-red-500">*</span>
+                                        </label>
+                                        <textarea
+                                            id="cancel-reason-input"
+                                            rows={4}
+                                            value={cancelModal.reason}
+                                            onChange={(e) => setCancelModal(prev => prev ? { ...prev, reason: e.target.value } : prev)}
+                                            placeholder="Please tell us why you're cancelling this service..."
+                                            className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-300 focus:border-red-300 resize-none transition-all"
+                                        />
+                                        <p className="text-xs text-gray-400 mt-1">{cancelModal.reason.length}/500 characters</p>
+                                    </div>
+                                    <div className="flex gap-3 pt-1">
+                                        <button
+                                            onClick={closeCancelModal}
+                                            className="flex-1 py-3 rounded-xl border-2 border-gray-200 text-gray-600 font-bold text-sm hover:bg-gray-50 transition-all active:scale-95"
+                                        >
+                                            Keep Service
+                                        </button>
+                                        <button
+                                            id="cancel-reason-next-btn"
+                                            onClick={handleCancelSubmit}
+                                            disabled={!cancelModal.reason.trim()}
+                                            className="flex-1 py-3 rounded-xl bg-red-500 hover:bg-red-600 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white font-bold text-sm transition-all active:scale-95 shadow-sm"
+                                        >
+                                            Continue
+                                        </button>
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+                                    <div className="bg-red-50 border border-red-100 rounded-2xl p-4 space-y-1">
+                                        <p className="text-sm font-bold text-red-700">Are you sure you want to cancel?</p>
+                                        <p className="text-xs text-red-500">This action cannot be undone. The slot will be freed for others.</p>
+                                    </div>
+                                    <div className="bg-gray-50 rounded-xl p-3 border border-gray-100">
+                                        <p className="text-xs font-semibold text-gray-500 mb-1">Your reason:</p>
+                                        <p className="text-sm text-gray-700 italic">"{cancelModal.reason}"</p>
+                                    </div>
+                                    <div className="flex gap-3 pt-1">
+                                        <button
+                                            onClick={() => setCancelModal(prev => prev ? { ...prev, step: 'reason' } : prev)}
+                                            disabled={cancelModal.isSubmitting}
+                                            className="flex-1 py-3 rounded-xl border-2 border-gray-200 text-gray-600 font-bold text-sm hover:bg-gray-50 transition-all active:scale-95 disabled:opacity-40"
+                                        >
+                                            Back
+                                        </button>
+                                        <button
+                                            id="cancel-confirm-btn"
+                                            onClick={handleCancelSubmit}
+                                            disabled={cancelModal.isSubmitting}
+                                            className="flex-1 py-3 rounded-xl bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white font-bold text-sm transition-all active:scale-95 shadow-sm flex items-center justify-center gap-2"
+                                        >
+                                            {cancelModal.isSubmitting ? (
+                                                <>
+                                                    <RotateCcw className="w-4 h-4 animate-spin" />
+                                                    Cancelling...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <XCircle className="w-4 h-4" />
+                                                    Yes, Cancel Service
+                                                </>
+                                            )}
+                                        </button>
+                                    </div>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>

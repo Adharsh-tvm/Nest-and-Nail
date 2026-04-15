@@ -108,3 +108,40 @@ export async function getClientServiceByIdApi(serviceId: string): Promise<ApiRes
         };
     }
 }
+
+export async function cancelServiceApi(serviceId: string, reason: string): Promise<ApiResponse<null>> {
+    try {
+        const response = await axiosInstance.patch<BackendResponse<null>>(
+            `/api/client/services/${serviceId}/cancel`,
+            { reason },
+            { withCredentials: true }
+        );
+
+        if (!response.data.success) {
+            return {
+                error: response.data.error || null,
+                success: false,
+                message: response.data.message || "Failed to cancel service",
+            };
+        }
+
+        return {
+            payload: null,
+            success: true,
+            message: response.data.message || "Service cancelled successfully",
+        };
+    } catch (error: unknown) {
+        if (axios.isAxiosError(error)) {
+            return {
+                error: error.response?.data?.error || null,
+                success: false,
+                message: error.response?.data?.message || 'Failed to cancel service',
+            };
+        }
+        return {
+            error: null,
+            success: false,
+            message: 'An unexpected error occurred',
+        };
+    }
+}

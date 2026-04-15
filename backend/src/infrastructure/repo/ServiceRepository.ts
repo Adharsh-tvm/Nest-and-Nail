@@ -259,4 +259,20 @@ export class ServiceRepository implements IServiceRepository {
             .findById(serviceId)
             .populate("clientId workerId");
     }
+
+    async cancelService(
+        serviceId: string,
+        data: { cancelledAt: Date; reason?: string }
+    ): Promise<void> {
+        await ServiceModel.updateOne(
+            { serviceId },
+            {
+                $set: {
+                    status: ServiceStatus.CANCELLED,
+                    cancelledAt: data.cancelledAt,
+                    cancellationReason: data.reason,
+                },
+            }
+        );
+    }
 }

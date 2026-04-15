@@ -12,7 +12,7 @@ import {
   ServiceResponseDTO
 } from "@/shared/types/serviceTypes";
 import {
-  getClientOngoingServicesApi, getClientServiceHistoryApi, getClientServiceByIdApi
+  getClientOngoingServicesApi, getClientServiceHistoryApi, getClientServiceByIdApi, cancelServiceApi
 } from "@/sources/api/client/service.api";
 
 export async function getWorkerAvailabilityAction(
@@ -99,5 +99,21 @@ export async function getClientServiceByIdAction(serviceId: string): Promise<{ s
     } catch (error: any) {
         console.error(`Failed to fetch service details for ${serviceId}`, error);
         return { success: false, error: error.message || "Failed to fetch service details" };
+    }
+}
+
+export async function cancelServiceAction(
+    serviceId: string,
+    reason: string
+): Promise<{ success: boolean; error?: string }> {
+    try {
+        const response = await cancelServiceApi(serviceId, reason);
+        if (!response.success) {
+            return { success: false, error: response.message };
+        }
+        return { success: true };
+    } catch (error: any) {
+        console.error(`Failed to cancel service ${serviceId}`, error);
+        return { success: false, error: error.message || "Failed to cancel service" };
     }
 }

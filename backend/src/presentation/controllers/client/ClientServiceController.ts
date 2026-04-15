@@ -6,13 +6,15 @@ import { IBookWorkerUseCase } from "../../../domain/repositories/IBookWorkerUseC
 import { HttpStatusCode } from "../../../shared/enums/httpCodes";
 import { ResponseHandler } from "../../../shared/responses/ApiResponse";
 import { RESPONSE_MESSAGES } from "../../../shared/responses/ResponseMessages";
+import { ICancelServiceUseCase } from "../../../application/interfaces/service/ICancelServiceUseCase";
 
 export class ClientServiceController {
     constructor(
         private readonly _getHistoryUseCase: IGetClientServiceHistoryUseCase,
         private readonly _getByIdUseCase: IGetClientServiceByIdUseCase,
         private readonly _getOngoingUseCase: IGetClientOngoingServicesUseCase,
-        private readonly _bookWorkerUseCase: IBookWorkerUseCase
+        private readonly _bookWorkerUseCase: IBookWorkerUseCase,
+        private readonly _cancelServiceUseCase: ICancelServiceUseCase
     ) { }
 
     bookWorker = async (req: Request, res: Response, next: NextFunction) => {
@@ -85,7 +87,7 @@ export class ClientServiceController {
                 ResponseHandler.success(result, "Worker booked successfully")
             );
         } catch (error) {
-            next(error); 
+            next(error);
         }
     };
 
@@ -131,4 +133,18 @@ export class ClientServiceController {
             next(error);
         }
     };
+
+    async cancelService(req: Request, res: Response): Promise<void> {
+        try {
+            const userId = req.user.id;
+            const { serviceId } = req.params;
+            const { reason } = req.body;
+
+            await this._cancelServiceUseCase.execute(serviceId, userId, reason);
+
+            res.status(HttpStatusCode.OK).json(ResponseHandler.success(null, "Service cancelled successfully"));
+        } catch (error: any) {
+            res.status(HttpStatusCode.BAD_REQUEST).json(ResponseHandler.error(error.message, error));
+        }
+    }
 }

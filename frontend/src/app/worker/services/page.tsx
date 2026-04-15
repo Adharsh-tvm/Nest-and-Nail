@@ -96,6 +96,7 @@ export default function ServicesPage() {
     { id: ServiceStatus.CONFIRMED, label: "Confirmed" },
     { id: ServiceStatus.IN_PROGRESS, label: "In Progress" },
     { id: ServiceStatus.COMPLETED, label: "Completed" },
+    { id: ServiceStatus.CANCELLED, label: "Cancelled" },
   ];
 
   const containerVariants: Variants = {

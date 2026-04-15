@@ -18,5 +18,7 @@ export function createClientServiceRoutes(
 
     router.get("/:serviceId", authMiddleware.verify.bind(authMiddleware), (req, res, next) => clientServiceController.getServiceByClientId(req, res, next));
 
+    router.patch("/:serviceId/cancel", authMiddleware.verify.bind(authMiddleware), (req, res) => clientServiceController.cancelService(req, res));
+
     return router;
 }
