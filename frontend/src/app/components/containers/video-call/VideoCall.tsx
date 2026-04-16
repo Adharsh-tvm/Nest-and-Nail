@@ -6,7 +6,9 @@ import io, { Socket } from "socket.io-client";
 import { createPortal } from "react-dom";
 import { Mic, MicOff, Video as VideoIcon, VideoOff, LogOut, Loader2, Users } from "lucide-react";
 
-export default function VideoCall({ roomId, role }: { roomId: string; role: string }) {
+export default function VideoCall({ roomId, role, workerName, clientName }: { roomId: string; role: string; workerName?: string; clientName?: string }) {
+  const myName = role === "WORKER" ? (workerName || "Worker") : (clientName || "Client");
+  const otherName = role === "WORKER" ? (clientName || "Client") : (workerName || "Worker");
   const localVideo = useRef<HTMLVideoElement>(null);
   const remoteVideo = useRef<HTMLVideoElement>(null);
   const pcRef = useRef<RTCPeerConnection | null>(null);
@@ -300,7 +302,7 @@ export default function VideoCall({ roomId, role }: { roomId: string; role: stri
                 <Users className="w-10 h-10 text-slate-500" />
               </div>
               <p className="text-lg font-medium animate-pulse">
-                Waiting for {role === "WORKER" ? "Client" : "Worker"}...
+                Waiting for {otherName}...
               </p>
             </div>
           )}
@@ -329,7 +331,7 @@ export default function VideoCall({ roomId, role }: { roomId: string; role: stri
             className="w-full h-full object-cover -scale-x-100"
           />
           <div className="absolute bottom-2 left-2 bg-black/50 backdrop-blur-md px-2 py-0.5 rounded-full text-xs font-semibold text-white">
-            You ({role})
+            {myName} (You)
           </div>
         </div>
       </div>

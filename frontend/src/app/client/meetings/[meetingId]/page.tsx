@@ -25,6 +25,7 @@ export default async function ClientMeetingDetailPage({ params }: { params: Prom
 
   const meeting = res.data;
   const worker = (meeting as any).worker;
+  const client = (meeting as any).client;
 
   const formatDate = (d: string | Date) =>
     new Date(d).toLocaleDateString("en-US", {
@@ -89,35 +90,30 @@ export default async function ClientMeetingDetailPage({ params }: { params: Prom
               </div>
             </div>
 
-            {/* Worker Info */}
-            {worker && (
-              <div className="mb-6 p-5 rounded-2xl bg-slate-50 border border-slate-100">
-                <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-3">Worker</p>
-                <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-full bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center border-2 border-white shadow overflow-hidden shrink-0">
-                    {(worker.profilePictureUrl || worker.profileImageUrl) ? (
-                      <img
-                        src={
-                          (worker.profilePictureUrl || worker.profileImageUrl)?.startsWith("http")
-                            ? (worker.profilePictureUrl || worker.profileImageUrl)
-                            : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}/${(worker.profilePictureUrl || worker.profileImageUrl || "").replace(/^\//, "")}`
-                        }
-                        alt={worker.name}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <span className="font-bold text-slate-500 text-sm">
-                        {worker.name?.substring(0, 2).toUpperCase() || "W"}
-                      </span>
-                    )}
-                  </div>
+            {/* Participants Info */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              {/* Client Info (You) */}
+              {client && (
+                <div className="p-5 rounded-2xl bg-emerald-50 border border-emerald-100">
+                  <p className="text-xs font-semibold text-emerald-600 uppercase tracking-widest mb-2">Client (You)</p>
                   <div>
-                    <p className="font-bold text-slate-800">{worker.name}</p>
+                    <p className="font-bold text-slate-800 text-lg">{client.name}</p>
+                    {client.email && <p className="text-sm text-slate-500">{client.email}</p>}
+                  </div>
+                </div>
+              )}
+
+              {/* Worker Info */}
+              {worker && (
+                <div className="p-5 rounded-2xl bg-slate-50 border border-slate-100">
+                  <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Worker</p>
+                  <div>
+                    <p className="font-bold text-slate-800 text-lg">{worker.name}</p>
                     {worker.email && <p className="text-sm text-slate-500">{worker.email}</p>}
                   </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
 
             {/* Info Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

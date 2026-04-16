@@ -87,6 +87,8 @@ export class ServiceRepository implements IServiceRepository {
             {
                 $project: {
                     serviceId: 1,
+                    clientId: 1,
+                    workerId: 1,
                     category: 1,
                     status: 1,
                     paymentStatus: 1,
@@ -98,13 +100,17 @@ export class ServiceRepository implements IServiceRepository {
                     client: {
                         userId: "$client.userId",
                         name: "$client.name",
-                        email: "$client.email"
+                        email: "$client.email",
+                        profilePictureUrl: "$client.profilePictureUrl",
+                        profileImageUrl: "$client.profileImageUrl"
                     },
 
                     worker: {
                         userId: "$worker.userId",
                         name: "$worker.name",
-                        rating: "$worker.rating"
+                        rating: "$worker.rating",
+                        profilePictureUrl: "$worker.profilePictureUrl",
+                        profileImageUrl: "$worker.profileImageUrl"
                     }
                 }
             },
@@ -143,6 +149,8 @@ export class ServiceRepository implements IServiceRepository {
             {
                 $project: {
                     serviceId: 1,
+                    clientId: 1,
+                    workerId: 1,
                     category: 1,
                     status: 1,
                     paymentStatus: 1,
@@ -162,14 +170,18 @@ export class ServiceRepository implements IServiceRepository {
                         name: "$client.name",
                         email: "$client.email",
                         phone: "$client.phone",
-                        address: "$client.address"
+                        address: "$client.address",
+                        profilePictureUrl: "$client.profilePictureUrl",
+                        profileImageUrl: "$client.profileImageUrl"
                     },
 
                     worker: {
                         userId: "$worker.userId",
                         name: "$worker.name",
                         rating: "$worker.rating",
-                        skills: "$worker.skills"
+                        skills: "$worker.skills",
+                        profilePictureUrl: "$worker.profilePictureUrl",
+                        profileImageUrl: "$worker.profileImageUrl"
                     }
                 }
             }

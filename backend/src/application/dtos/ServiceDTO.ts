@@ -58,6 +58,12 @@ export interface ServiceResponseDTO {
     phone?: number;
     profilePictureUrl?: string;
   };
+  worker?: {
+    name: string;
+    email?: string;
+    rating?: number;
+    profilePictureUrl?: string;
+  };
   location?: {
     type: "Point" | string;
     coordinates: number[];

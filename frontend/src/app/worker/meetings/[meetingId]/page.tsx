@@ -23,6 +23,7 @@ export default async function WorkerMeetingDetailPage({ params }: { params: Prom
 
   const meeting = res.data;
   const client = (meeting as any).client;
+  const worker = (meeting as any).worker;
 
   const formatDate = (d: string | Date) =>
     new Date(d).toLocaleDateString("en-US", {
@@ -85,35 +86,30 @@ export default async function WorkerMeetingDetailPage({ params }: { params: Prom
               </div>
             </div>
 
-            {/* Client Info */}
-            {client && (
-              <div className="mb-6 p-5 rounded-2xl bg-slate-50 border border-slate-100">
-                <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-3">Client</p>
-                <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-full bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center border-2 border-white shadow overflow-hidden shrink-0">
-                    {client.profilePictureUrl || client.profileImageUrl ? (
-                      <img
-                        src={
-                          (client.profilePictureUrl || client.profileImageUrl)?.startsWith("http")
-                            ? (client.profilePictureUrl || client.profileImageUrl)
-                            : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}/${(client.profilePictureUrl || client.profileImageUrl || "").replace(/^\//, "")}`
-                        }
-                        alt={client.name}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <span className="font-bold text-slate-500 text-sm">
-                        {client.name?.substring(0, 2).toUpperCase() || "C"}
-                      </span>
-                    )}
-                  </div>
+            {/* Participants Info */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              {/* Client Info */}
+              {client && (
+                <div className="p-5 rounded-2xl bg-slate-50 border border-slate-100">
+                  <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Client</p>
                   <div>
-                    <p className="font-bold text-slate-800">{client.name}</p>
-                    <p className="text-sm text-slate-500">{client.email}</p>
+                    <p className="font-bold text-slate-800 text-lg">{client.name}</p>
+                    {client.email && <p className="text-sm text-slate-500">{client.email}</p>}
                   </div>
                 </div>
-              </div>
-            )}
+              )}
+
+              {/* Worker Info (You) */}
+              {worker && (
+                <div className="p-5 rounded-2xl bg-emerald-50 border border-emerald-100">
+                  <p className="text-xs font-semibold text-emerald-600 uppercase tracking-widest mb-2">Worker (You)</p>
+                  <div>
+                    <p className="font-bold text-slate-800 text-lg">{worker.name}</p>
+                    {worker.email && <p className="text-sm text-slate-500">{worker.email}</p>}
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* Info Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

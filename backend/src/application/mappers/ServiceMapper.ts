@@ -62,7 +62,7 @@ export class ServiceMapper {
     };
   }
 
-  static toResponse(service: Service): ServiceResponseDTO {
+  static toResponse(service: any): ServiceResponseDTO {
     return {
       serviceId: service.serviceId,
       clientId: service.clientId,
@@ -75,6 +75,8 @@ export class ServiceMapper {
       totalAmount: service.totalAmount,
       paymentStatus: service.paymentStatus,
       createdAt: service.createdAt,
+      client: service.client,
+      worker: service.worker,
       location: service.location ? {
         type: service.location.type,
         coordinates: service.location.coordinates
