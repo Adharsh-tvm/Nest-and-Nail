@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import io, { Socket } from "socket.io-client";
 import { createPortal } from "react-dom";
-import { Mic, MicOff, Video as VideoIcon, VideoOff, LogOut, Loader2, Users } from "lucide-react";
+import { Mic, MicOff, Video as VideoIcon, VideoOff, LogOut, Loader2, Users, AlertCircle } from "lucide-react";
 
 export default function VideoCall({ roomId, role, workerName, clientName }: { roomId: string; role: string; workerName?: string; clientName?: string }) {
   const myName = role === "WORKER" ? (workerName || "Worker") : (clientName || "Client");
@@ -22,7 +22,7 @@ export default function VideoCall({ roomId, role, workerName, clientName }: { ro
   const [mounted, setMounted] = useState(false);
   const [isMicOn, setIsMicOn] = useState(true);
   const [isVideoOn, setIsVideoOn] = useState(true);
-  const [connectionState, setConnectionState] = useState<"connecting" | "waiting" | "connected">("connecting");
+  const [connectionState, setConnectionState] = useState<"connecting" | "waiting" | "connected" | "duplicate">("connecting");
   const [showLeaveModal, setShowLeaveModal] = useState(false);
 
   // Flush any ICE candidates buffered before remoteDescription was ready
@@ -118,6 +118,13 @@ export default function VideoCall({ roomId, role, workerName, clientName }: { ro
 
         socket.on("waiting-for-offer", () => {
           setConnectionState("waiting");
+        });
+
+        socket.on("duplicate-tab", () => {
+          setConnectionState("duplicate");
+          localStreamRef.current?.getTracks().forEach((track) => track.stop());
+          pcRef.current?.close();
+          socket.disconnect();
         });
 
         // First user creates offer when second user joins
@@ -271,6 +278,29 @@ export default function VideoCall({ roomId, role, workerName, clientName }: { ro
   };
 
   if (!mounted) return null;
+
+  if (connectionState === "duplicate") {
+    return createPortal(
+      <div className="fixed inset-0 bg-slate-900 z-[9999] flex flex-col items-center justify-center p-4">
+        <div className="bg-slate-800 border border-slate-700 rounded-3xl p-8 max-w-md w-full shadow-2xl flex flex-col items-center text-center">
+          <div className="w-16 h-16 bg-rose-500/10 rounded-full flex items-center justify-center mb-6">
+            <AlertCircle className="w-8 h-8 text-rose-500" />
+          </div>
+          <h3 className="text-2xl font-bold text-white mb-2">Already Joined</h3>
+          <p className="text-slate-300 mb-8">
+            You are already in this meeting from another tab or device. Please close this tab and return to your active session.
+          </p>
+          <button
+            onClick={() => window.location.href = `/${role.toLowerCase()}/meetings/${roomId}`}
+            className="w-full py-3 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-semibold transition-colors"
+          >
+            Go Back
+          </button>
+        </div>
+      </div>,
+      document.body
+    );
+  }
 
   return createPortal(
     <div className="fixed inset-0 bg-slate-900 z-[9999] flex flex-col items-center justify-center p-4">

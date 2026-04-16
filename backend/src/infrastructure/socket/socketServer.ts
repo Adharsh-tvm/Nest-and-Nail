@@ -14,7 +14,7 @@ export const initSocketServer = (server: http.Server) => {
     io.on("connection", (socket) => {
         console.log("User connected:", socket.id);
 
-        socket.on("join-room", ({ roomId, userId }) => {
+        socket.on("join-room", ({ roomId, userId, role }) => {
             socket.join(roomId);
 
             if (!roomUsers.has(roomId)) {
@@ -22,6 +22,25 @@ export const initSocketServer = (server: http.Server) => {
             }
 
             const users = roomUsers.get(roomId)!;
+
+            // Prevent duplicate roles (e.g. multiple tabs for same user)
+            if (role) {
+                let isDuplicate = false;
+                for (const existingUserId of users.values()) {
+                    if (existingUserId.startsWith(`${role}-`)) {
+                        isDuplicate = true;
+                        break;
+                    }
+                }
+
+                if (isDuplicate) {
+                    console.log(`[join-room] Rejected duplicate role=${role} for roomId=${roomId}`);
+                    socket.emit("duplicate-tab");
+                    socket.leave(roomId);
+                    return;
+                }
+            }
+
             users.set(socket.id, userId);
 
             console.log(`[join-room] roomId=${roomId}, userId=${userId}, total=${users.size}`);
