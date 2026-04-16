@@ -247,14 +247,46 @@ export function CalendarSelector({
                 if (isPast || isUnavailable) return;
                 
                 if (isDateSelected(dateObj)) {
-                  // If already selected, clicking the DATE toggles it off
-                  const newSlots = { ...selectedSlots };
-                  delete newSlots[key];
-                  onSlotChange(newSlots);
-                  if (focusedDate === key) setFocusedDate(null);
+                  if (focusedDate === key) {
+                    // If already focused, clicking again toggles it off
+                    const newSlots = { ...selectedSlots };
+                    delete newSlots[key];
+                    onSlotChange(newSlots);
+                    setFocusedDate(null);
+                  } else {
+                    // Selected but not focused: open the slot picker to allow changing the slot!
+                    setFocusedDate(key);
+                  }
                 } else {
-                  // Not selected. Focus it to show the panel.
-                  setFocusedDate(key);
+                  if (numberOfDays > 1) {
+                    let newSlots = { ...selectedSlots };
+                    // If already fully selected, reset and start over from this click
+                    if (Object.keys(newSlots).length >= numberOfDays) {
+                      newSlots = {};
+                    }
+                    
+                    const needed = numberOfDays - Object.keys(newSlots).length;
+                    let current = new Date(dateObj);
+                    
+                    for (let i = 0; i < needed; i++) {
+                       const cKey = toDateKey(current.getFullYear(), current.getMonth(), current.getDate());
+                       const avail = availabilityData[cKey];
+                       
+                       const isPastCheck = current < today;
+                       if (isPastCheck || isDateUnavailable(cKey, avail) || !avail?.fullDayAvailable || isSlotWithin12Hours(cKey, SlotType.FULL_DAY) || newSlots[cKey]) {
+                           break; // Hit a blocked day, stop auto-selecting
+                       }
+                       
+                       newSlots[cKey] = SlotType.FULL_DAY;
+                       current.setDate(current.getDate() + 1);
+                    }
+                    
+                    onSlotChange(newSlots);
+                    setFocusedDate(null);
+                  } else {
+                    // Not selected. Focus it to show the panel.
+                    setFocusedDate(key);
+                  }
                 }
               }}
             >
@@ -384,6 +416,23 @@ export function CalendarSelector({
                 <span>Full Day</span>
                 <span className="text-xs font-medium opacity-80">(8-9 hrs)</span>
              </button>
+           </div>
+           
+           <div className="flex flex-col sm:flex-row sm:items-center justify-between mt-4 border-t border-gray-200 pt-3 gap-2">
+             <span className="text-xs text-gray-500">Tip: You can also click the date cell again to deselect it.</span>
+             {selectedSlots[focusedDate] && (
+               <button 
+                 onClick={() => {
+                   const newSlots = { ...selectedSlots };
+                   delete newSlots[focusedDate];
+                   onSlotChange(newSlots);
+                   setFocusedDate(null);
+                 }}
+                 className="text-red-600 hover:text-red-700 font-bold text-xs px-3 py-1.5 rounded-lg bg-red-50 border border-red-100 hover:bg-red-100 transition-colors"
+               >
+                 Remove Date
+               </button>
+             )}
            </div>
         </div>
       )}
