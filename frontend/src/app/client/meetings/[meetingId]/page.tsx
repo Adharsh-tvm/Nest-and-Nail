@@ -8,6 +8,8 @@ import {
   CheckCircle2, AlertCircle, Timer, XCircle, User
 } from "lucide-react";
 import EndMeetingButton from "@/app/components/containers/meetings/EndMeetingButton";
+import CancelMeetingButton from "@/app/components/containers/meetings/CancelMeetingButton";
+import { cancelServiceAction } from "@/app/actions/client/service-actions";
 
 export async function generateMetadata({ params }: { params: Promise<{ meetingId: string }> }) {
   return { title: `Meeting Details | Client` };
@@ -41,6 +43,8 @@ export default async function ClientMeetingDetailPage({ params }: { params: Prom
     CANCELLED_BY_CLIENT: { label: "Cancelled by You", color: "text-rose-700", bg: "bg-rose-50 border-rose-200", icon: <XCircle className="w-4 h-4" /> },
     CANCELLED_BY_WORKER: { label: "Cancelled by Worker", color: "text-rose-700", bg: "bg-rose-50 border-rose-200", icon: <XCircle className="w-4 h-4" /> },
   };
+
+  const isCancellable = ["PENDING", "CONFIRMED"].includes(meeting.status);
 
   const statusInfo = statusConfig[meeting.status] ?? { label: meeting.status, color: "text-slate-700", bg: "bg-slate-50 border-slate-200", icon: null };
 
@@ -191,14 +195,35 @@ export default async function ClientMeetingDetailPage({ params }: { params: Prom
                     <Video className="w-4 h-4" />
                     Join Now
                   </Link>
-                  <EndMeetingButton
-                    serviceId={meeting.serviceId}
-                    videoCallStatus={meeting.videoCall?.status}
-                    endMeetingAction={endMeetingAction}
-                  />
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <EndMeetingButton
+                        serviceId={meeting.serviceId}
+                        videoCallStatus={meeting.videoCall?.status}
+                        endMeetingAction={endMeetingAction}
+                    />
+                    <CancelMeetingButton
+                        serviceId={meeting.serviceId}
+                        category={meeting.category}
+                        scheduledDate={meeting.scheduledDate}
+                        cancelServiceAction={cancelServiceAction}
+                    />
+                  </div>
                 </div>
               </div>
             )}
+
+            {/* If Pending, allow cancellation */}
+            {meeting.status === "PENDING" && (
+                <div className="mt-6 flex justify-end">
+                    <CancelMeetingButton
+                        serviceId={meeting.serviceId}
+                        category={meeting.category}
+                        scheduledDate={meeting.scheduledDate}
+                        cancelServiceAction={cancelServiceAction}
+                    />
+                </div>
+            )}
+
           </div>
         </div>
 
