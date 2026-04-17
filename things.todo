@@ -285,3 +285,27 @@ Next
 ☐ add service cancelation reason in db
 ☐  add the validation like if the created time is 6 hrs greater than the current time, the service cannot be deleted. And also the refund will be 50%. 
 and if the client cancels before 1 hour, the refund will be 90%. and if the client cancels before 15 minutes, full amount will be refunded. 
+
+
+
+
+
+
+⁡⁢⁣⁢​‌‌‌COMPLETION WEEK​⁡
+
+
+☐ video call ring feature
+☐ service location in maps - booking details page
+☐ video call history
+☐ category management - bug
+☐ routes in constant
+
+☐ Implement the wallet system along with transaction management.
+☐ Complete the service option module for workers.
+☐ Add a concern-raising feature for users.
+☐ Store meeting history along with call duration details.
+☐ Implement ratings and reviews functionality for workers.
+☐ Add notifications for workers regarding scheduled meetings.
+☐ Develop real-time chat functionality between users and workers.
+
+communication is okay
