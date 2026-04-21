@@ -1,5 +1,4 @@
 import { Router } from "express";
-import { AdminServiceController } from "../../controllers/admin/AdminServiceController";
 import { AuthMiddleware } from "../../middlewares/AuthMiddleware";
 import { AdminMeetingController } from "../../controllers/admin/AdminMeetingController";
 
