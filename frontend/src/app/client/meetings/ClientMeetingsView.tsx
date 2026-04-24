@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { ServiceResponseDTO, ServiceStatus, SLOT_LABELS } from '@/shared/types/serviceTypes';
-import { Calendar, Clock, ChevronRight, Video } from 'lucide-react';
+import { Calendar, Clock, ChevronRight, Video, Timer } from 'lucide-react';
 import { User } from '@/shared/types/userTypes';
 import Pagination from '@/app/components/ui/Pagination';
 import Link from 'next/link';
@@ -98,6 +98,7 @@ export default function ClientMeetingsView({ scheduled, history, workerMap }: Pr
                             <Clock className="w-4 h-4 mr-2 text-gray-400" />
                             <span className="font-bold text-gray-700">{slotLabel}</span>
                         </div>
+
                     </div>
 
                     <div className="flex items-center justify-end text-emerald-600 font-semibold text-sm group-hover:text-emerald-700 transition-colors">

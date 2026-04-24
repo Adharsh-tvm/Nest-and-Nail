@@ -202,6 +202,15 @@ const AdminMeetingsPage = () => {
       ),
     },
     {
+      header: "Duration",
+      accessorKey: "duration",
+      cell: (row) => (
+        <div className="text-sm font-bold text-emerald-600">
+          {row.videoCall?.duration || "—"}
+        </div>
+      ),
+    },
+    {
       header: "Payment",
       accessorKey: "paymentStatus",
       cell: (row) => (

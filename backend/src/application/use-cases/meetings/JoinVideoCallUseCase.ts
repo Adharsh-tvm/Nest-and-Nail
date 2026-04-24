@@ -17,9 +17,9 @@ export class JoinVideoCallUseCase implements IJoinVideoCallUseCase {
             throw new Error("Unauthorized");
         }
 
-        if (!service.videoCall.startedAt) {
-            service.videoCall.startedAt = new Date();
-        }
+        // if (!service.videoCall.startedAt) {
+        //     service.videoCall.startedAt = new Date();
+        // }
 
         if (service.videoCall.joinedUsers?.includes(userId)) {
             return {
@@ -43,7 +43,6 @@ export class JoinVideoCallUseCase implements IJoinVideoCallUseCase {
 
         let joinedUsers = service.videoCall.joinedUsers || [];
 
-        // ✅ Prevent duplicate join
         if (joinedUsers.includes(userId)) {
             return {
                 roomId: service.videoCall.roomId,
@@ -52,10 +51,8 @@ export class JoinVideoCallUseCase implements IJoinVideoCallUseCase {
             };
         }
 
-        // ✅ Add user
         joinedUsers.push(userId);
 
-        // ✅ Set status + startedAt
         let startedAt = service.videoCall.startedAt;
         let status = service.videoCall.status;
 
@@ -65,13 +62,17 @@ export class JoinVideoCallUseCase implements IJoinVideoCallUseCase {
         }
 
         await this.serviceRepository.updateVideoCall(serviceId, {
+            ...service.videoCall,
             roomId: service.videoCall.roomId,
             startTime: service.videoCall.startTime,
             endTime: service.videoCall.endTime,
             meetingLink: service.videoCall.meetingLink,
             joinedUsers,
             status,
-            startedAt
+            startedAt,
+            accumulatedDuration: service.videoCall.accumulatedDuration,
+            duration: service.videoCall.duration,
+            endedAt: service.videoCall.endedAt
         });
 
         return {

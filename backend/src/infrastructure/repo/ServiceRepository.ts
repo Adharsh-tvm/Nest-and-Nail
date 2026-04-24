@@ -164,6 +164,7 @@ export class ServiceRepository implements IServiceRepository {
 
                     createdAt: 1,
                     updatedAt: 1,
+                    videoCall: 1,
 
                     client: {
                         userId: "$client.userId",

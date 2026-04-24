@@ -247,7 +247,9 @@ export default function WorkerMeetingsPage() {
                     </div>
                   )}
                   
-                  {meeting.status !== "CONFIRMED" && (
+
+
+                  {meeting.status !== "CONFIRMED" && meeting.status !== ServiceStatus.COMPLETED && (
                       <div className="flex items-center gap-3 text-slate-600">
                         <CreditCard className="w-4 h-4 text-slate-400" />
                         <span className="text-sm font-medium">{meeting.paymentStatus}</span>

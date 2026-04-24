@@ -72,6 +72,8 @@ export interface Service {
 
     startedAt?: Date;
     endedAt?: Date;
+    duration?: string;
+    accumulatedDuration?: number
   };
 
   createdAt: Date;

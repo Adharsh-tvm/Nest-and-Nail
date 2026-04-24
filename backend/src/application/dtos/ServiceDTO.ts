@@ -81,12 +81,15 @@ export interface ServiceResponseDTO {
   numberOfDays?: number;
   numberOfWorkers?: number;
 
-  videoCall?: {
-    roomId: string;
-    startTime: Date;
-    endTime: Date;
-    meetingLink?: string;
-  };
+    videoCall?: {
+      roomId: string;
+      startTime: Date;
+      endTime: Date;
+      meetingLink?: string;
+      startedAt?: Date;
+      endedAt?: Date;
+      duration?: string;
+    };
 }
 
 export interface AdminServiceResponseDTO {
@@ -119,4 +122,13 @@ export interface AdminServiceResponseDTO {
   };
 
   createdAt: Date;
+  videoCall?: {
+    roomId: string;
+    startTime: Date;
+    endTime: Date;
+    meetingLink?: string;
+    startedAt?: Date;
+    endedAt?: Date;
+    duration?: string;
+  };
 }

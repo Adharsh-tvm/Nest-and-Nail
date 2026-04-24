@@ -10,4 +10,6 @@ export interface UpdateVideoCallDTO {
 
   startedAt?: Date;
   endedAt?: Date;
+  duration?: string;
+  accumulatedDuration?: number;
 }

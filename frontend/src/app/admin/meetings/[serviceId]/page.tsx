@@ -251,11 +251,21 @@ const AdminMeetingDetailsPage = () => {
                 <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest">Meeting Type</h3>
              </div>
              
-             <div className="bg-gray-50 p-3 rounded-xl border border-gray-100">
-               <span className="text-xs text-gray-500 uppercase tracking-wider font-bold block mb-1">Mode</span>
-               <p className="text-gray-700 font-mono text-sm break-all font-bold">
-                  Virtual Video Call
-               </p>
+             <div className="bg-gray-50 p-3 rounded-xl border border-gray-100 space-y-2">
+               <div>
+                 <span className="text-[10px] text-gray-500 uppercase tracking-wider font-bold block mb-0.5">Mode</span>
+                 <p className="text-gray-700 font-mono text-sm break-all font-bold">
+                    Virtual Video Call
+                 </p>
+               </div>
+               {meeting.videoCall?.duration && (
+                 <div>
+                   <span className="text-[10px] text-emerald-500 uppercase tracking-wider font-bold block mb-0.5">Actual Duration</span>
+                   <p className="text-emerald-700 font-bold text-sm">
+                      {meeting.videoCall.duration}
+                   </p>
+                 </div>
+               )}
              </div>
           </div>
 

@@ -44,7 +44,7 @@ async function bootstrap() {
 
   const server = http.createServer(app);
 
-  initSocketServer(server);
+  initSocketServer(server, container);
 
   // Start server
   const PORT = env.PORT;

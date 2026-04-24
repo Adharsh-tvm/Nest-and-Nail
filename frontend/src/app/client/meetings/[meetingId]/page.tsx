@@ -153,6 +153,16 @@ export default async function ClientMeetingDetailPage({ params }: { params: Prom
                   <p className="font-bold text-slate-800 text-sm">{formatTime(meeting.videoCall.endTime)}</p>
                 </div>
               )}
+              
+              {meeting.videoCall?.duration && (
+                <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-100">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Timer className="w-4 h-4 text-emerald-500" />
+                    <span className="text-xs font-semibold text-emerald-600 uppercase tracking-wide">Duration</span>
+                  </div>
+                  <p className="font-bold text-slate-800 text-sm">{meeting.videoCall.duration}</p>
+                </div>
+              )}
 
               <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100">
                 <div className="flex items-center gap-2 mb-1">

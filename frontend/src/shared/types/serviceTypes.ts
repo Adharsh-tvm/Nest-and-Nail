@@ -147,14 +147,17 @@ export interface ServiceResponseDTO {
   description?: string;
   numberOfDays?: number;
 
-  videoCall?: {
-    roomId?: string;
-    startTime?: string | Date;
-    endTime?: string | Date;
-    joinUrl?: string;
-    meetingLink?: string;
-    status: string
-  };
+    videoCall?: {
+        roomId?: string;
+        startTime?: string | Date;
+        endTime?: string | Date;
+        joinUrl?: string;
+        meetingLink?: string;
+        status: string;
+        startedAt?: string | Date;
+        endedAt?: string | Date;
+        duration?: string;
+    };
 }
 
 export interface AdminServiceResponseDTO {
@@ -202,4 +205,14 @@ export interface AdminServiceResponseDTO {
 
   createdAt: string;
   updatedAt?: string;
+  videoCall?: {
+    roomId?: string;
+    startTime?: string | Date;
+    endTime?: string | Date;
+    meetingLink?: string;
+    status: string;
+    startedAt?: string | Date;
+    endedAt?: string | Date;
+    duration?: string;
+  };
 }

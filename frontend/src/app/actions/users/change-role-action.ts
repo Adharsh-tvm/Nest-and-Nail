@@ -7,13 +7,11 @@ import { cookies } from "next/headers";
 export async function changeRoleAction(role: "client" | "worker") {
   const res = await userApi.updateUserMode(role);
 
-  // ✅ Narrow the union
   if (!res.success) {
     console.error("Error switching role:", res.message);
     throw new Error(res.message || "Failed to switch role");
   }
 
-  // ✅ Now payload is safe
   const {
     user,
     accessToken: newAccess,
