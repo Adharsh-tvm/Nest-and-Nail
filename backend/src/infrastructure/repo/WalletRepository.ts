@@ -32,33 +32,36 @@ export class WalletRepository implements IWalletRepository {
         return this.toEntity(doc);
     }
 
-    async updateBalance(userId: string, balance: number): Promise<Wallet | null> {
-        const doc = await WalletModel.findOneAndUpdate(
-            { userId },
-            { $set: { balance } },
-            { new: true }
-        );
-        if (!doc) return null;
-        return this.toEntity(doc);
-    }
-
-    async creditBalance(userId: string, amount: number): Promise<Wallet | null> {
+    async creditBalance(userId: string, amount: number): Promise<Wallet> {
         const doc = await WalletModel.findOneAndUpdate(
             { userId },
             { $inc: { balance: amount } },
             { new: true }
         );
-        if (!doc) return null;
+
+        if (!doc) {
+            throw new Error("Wallet not found");
+        }
+
         return this.toEntity(doc);
     }
 
-    async debitBalance(userId: string, amount: number): Promise<Wallet | null> {
+    async debitBalance(userId: string, amount: number): Promise<Wallet> {
         const doc = await WalletModel.findOneAndUpdate(
-            { userId },
-            { $inc: { balance: -amount } },
+            {
+                userId,
+                balance: { $gte: amount }
+            },
+            {
+                $inc: { balance: -amount }
+            },
             { new: true }
         );
-        if (!doc) return null;
+
+        if (!doc) {
+            throw new Error("Insufficient wallet balance");
+        }
+
         return this.toEntity(doc);
     }
 }

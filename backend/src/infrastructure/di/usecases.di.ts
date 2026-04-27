@@ -769,7 +769,8 @@ export class UseCaseDI {
       this._processWalletPaymentUseCase = new ProcessWalletPaymentUseCase(
         this.infra.paymentRepository,
         this.infra.serviceRepository,
-        this.infra.walletRepository
+        this.infra.walletRepository,
+        this.infra.transactionRepository
       );
     }
     return this._processWalletPaymentUseCase;
