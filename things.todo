@@ -307,3 +307,10 @@ and if the client cancels before 1 hour, the refund will be 90%. and if the clie
 ☐ Implement ratings and reviews functionality for workers.
 ☐ Add notifications for workers regarding scheduled meetings.
 ☐ Develop real-time chat functionality between users and workers.
+
+☐ any lint errors
+☐ mappers
+☐ routes in constant
+☐ category management bug
+☐ relative path
+ 

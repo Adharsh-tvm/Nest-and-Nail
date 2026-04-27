@@ -16,6 +16,7 @@ async function ClientSignup({ }: Props) {
           fill
           className="object-cover opacity-40 mix-blend-overlay"
           priority
+          unoptimized
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0f291e] via-transparent to-transparent opacity-80" />
 

@@ -2,8 +2,6 @@ import { Router } from "express";
 import { AuthMiddleware } from "../../middlewares/AuthMiddleware";
 import { PaymentController } from "../../controllers/payment/PaymentController";
 
-const router = Router();
-
 export function createPaymentRoutes(
     authMiddleware: AuthMiddleware,
     paymentController: PaymentController
