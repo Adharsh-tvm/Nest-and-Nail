@@ -37,6 +37,8 @@ import { RazorpayGateway } from "../adapters/RazorpayGateway";
 import { PaymentModel } from "../database/models/PaymentModel";
 import { IWalletRepository } from "../../domain/repositories/IWalletRepository";
 import { WalletRepository } from "../repo/WalletRepository";
+import { ITransactionRepository } from "../../domain/repositories/ITransactionRepository";
+import { TransactionRepository } from "../repo/TransactionRepository";
 
 export class InfrastructureDI {
   private _userRepositoryFactory?: IUserRepositoryFactory;
@@ -49,6 +51,7 @@ export class InfrastructureDI {
   private _serviceRepository?: IServiceRepository;
   private _paymentRepository?: IPaymentRepository;
   private _walletRepository?: IWalletRepository;
+  private _transactionRepository ?: ITransactionRepository;
 
   private _paymentGateway?: IPaymentGateway;
 
@@ -206,5 +209,12 @@ export class InfrastructureDI {
       this._walletRepository = new WalletRepository();
     }
     return this._walletRepository;
+  }
+
+  get transactionRepository(): ITransactionRepository {
+    if(!this._transactionRepository) {
+      this._transactionRepository = new TransactionRepository();
+    }
+    return this._transactionRepository;
   }
 }

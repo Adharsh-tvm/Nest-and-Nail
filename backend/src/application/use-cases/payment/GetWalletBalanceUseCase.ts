@@ -10,7 +10,6 @@ export class GetWalletBalanceUseCase implements IGetWalletBalanceUseCase {
         let wallet = await this.walletRepo.findByUserId(userId);
 
         if (!wallet) {
-            // Auto-create wallet with 0 balance on first access
             wallet = await this.walletRepo.create({
                 walletId: uuidv4(),
                 userId,

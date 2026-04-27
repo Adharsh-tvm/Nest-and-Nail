@@ -9,10 +9,12 @@ export function createWalletRoutes(
     const router = Router();
 
     router.get(
-        "/wallet/balance",
+        "/balance",
         authMiddleware.verify.bind(authMiddleware),
         walletController.getBalance
     );
+
+    router.get("/transactions", authMiddleware.verify.bind(authMiddleware), walletController.getTransactions);
 
     return router;
 }

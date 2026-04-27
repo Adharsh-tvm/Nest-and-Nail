@@ -123,6 +123,8 @@ import { IGetAllMeetingsForAdminUseCase } from "../../application/interfaces/mee
 import { GetAllMeetingsForAdminUseCase } from "../../application/use-cases/meetings/admin/GetAllMeetingsForAdminUseCase";
 import { ICancelServiceUseCase } from "../../application/interfaces/service/ICancelServiceUseCase";
 import { CancelServiceUseCase } from "../../application/use-cases/service/CancelServiceUseCase";
+import { IGetTransactionsUseCase } from "../../application/interfaces/payment/IGetTransactionsUseCase";
+import { GetTransactionsUseCase } from "../../application/use-cases/payment/GetTransactionsUseCase";
 
 
 
@@ -200,6 +202,7 @@ export class UseCaseDI {
   private _verifyPaymentUseCase?: IVerifyPaymentUseCase;
   private _processWalletPaymentUseCase?: ProcessWalletPaymentUseCase;
   private _getWalletBalanceUseCase?: IGetWalletBalanceUseCase;
+  private _getTransactionsUseCase?: IGetTransactionsUseCase;
 
   private _getMeetingByIdForAdminUseCase?: IGetMeetingByIdForAdminUseCase;
   private _getAllMeetingsForAdminUseCase?: IGetAllMeetingsForAdminUseCase;
@@ -807,5 +810,14 @@ export class UseCaseDI {
       )
     }
     return this._cancelServiceUseCase
+  }
+
+  get getTransactionsUseCase(): IGetTransactionsUseCase {
+    if(!this._getTransactionsUseCase) {
+      this._getTransactionsUseCase = new GetTransactionsUseCase(
+        this.infra.transactionRepository
+      )
+    }
+    return this._getTransactionsUseCase
   }
 }

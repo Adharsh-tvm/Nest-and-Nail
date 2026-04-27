@@ -3,11 +3,13 @@ import { IGetWalletBalanceUseCase } from "../../../application/interfaces/paymen
 import { HttpStatusCode } from "../../../shared/enums/httpCodes";
 import { ResponseHandler } from "../../../shared/responses/ApiResponse";
 import { RESPONSE_MESSAGES } from "../../../shared/responses/ResponseMessages";
+import { IGetTransactionsUseCase } from "../../../application/interfaces/payment/IGetTransactionsUseCase";
 
 export class WalletController {
   constructor(
-    private getWalletBalanceUseCase: IGetWalletBalanceUseCase
-  ) {}
+    private readonly _getWalletBalanceUseCase: IGetWalletBalanceUseCase,
+    private readonly _getTransactionsUseCase: IGetTransactionsUseCase
+  ) { }
 
   getBalance = async (req: Request, res: Response): Promise<void> => {
     const userId = req.user?.id;
@@ -19,7 +21,7 @@ export class WalletController {
       return;
     }
 
-    const wallet = await this.getWalletBalanceUseCase.execute(userId);
+    const wallet = await this._getWalletBalanceUseCase.execute(userId);
 
     res.status(HttpStatusCode.OK).json(
       ResponseHandler.success(
@@ -30,6 +32,26 @@ export class WalletController {
           currency: wallet.currency,
         },
         "Wallet balance fetched successfully"
+      )
+    );
+  };
+
+  getTransactions = async (req: Request, res: Response): Promise<void> => {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      res.status(HttpStatusCode.UNAUTHORIZED).json(
+        ResponseHandler.error(RESPONSE_MESSAGES.UNAUTHORIZED)
+      );
+      return;
+    }
+
+    const transactions = await this._getTransactionsUseCase.execute(userId);
+
+    res.status(HttpStatusCode.OK).json(
+      ResponseHandler.success(
+        transactions,
+        "Transactions fetched successfully"
       )
     );
   };
