@@ -125,8 +125,9 @@ import { ICancelServiceUseCase } from "../../application/interfaces/service/ICan
 import { CancelServiceUseCase } from "../../application/use-cases/service/CancelServiceUseCase";
 import { IGetTransactionsUseCase } from "../../application/interfaces/payment/IGetTransactionsUseCase";
 import { GetTransactionsUseCase } from "../../application/use-cases/payment/GetTransactionsUseCase";
-
-
+import { CreateRechargeOrderUseCase } from "../../application/use-cases/payment/CreateRechargeOrderUseCase";
+import { VerifyRechargePaymentUseCase, IVerifyRechargePaymentUseCase } from "../../application/use-cases/payment/VerifyRechargePaymentUseCase";
+import { ICreateRechargeOrderUseCase } from "../../application/interfaces/payment/ICreateRechargeOrderUseCase";
 
 export class UseCaseDI {
 
@@ -203,6 +204,8 @@ export class UseCaseDI {
   private _processWalletPaymentUseCase?: ProcessWalletPaymentUseCase;
   private _getWalletBalanceUseCase?: IGetWalletBalanceUseCase;
   private _getTransactionsUseCase?: IGetTransactionsUseCase;
+  private _createRechargeOrderUseCase?: ICreateRechargeOrderUseCase;
+  private _verifyRechargePaymentUseCase?: IVerifyRechargePaymentUseCase;
 
   private _getMeetingByIdForAdminUseCase?: IGetMeetingByIdForAdminUseCase;
   private _getAllMeetingsForAdminUseCase?: IGetAllMeetingsForAdminUseCase;
@@ -758,8 +761,10 @@ export class UseCaseDI {
       this._verifyPaymentUseCase = new VerifyPaymentUseCase(
         this.infra.paymentRepository,
         this.infra.paymentGateway,
-        this.infra.serviceRepository
-      );
+        this.infra.serviceRepository,
+        this.infra.walletRepository,
+        this.infra.transactionRepository
+      )
     }
     return this._verifyPaymentUseCase;
   }
@@ -783,6 +788,26 @@ export class UseCaseDI {
       );
     }
     return this._getWalletBalanceUseCase;
+  }
+
+  get createRechargeOrderUseCase(): ICreateRechargeOrderUseCase {
+    if (!this._createRechargeOrderUseCase) {
+      this._createRechargeOrderUseCase = new CreateRechargeOrderUseCase(
+        this.infra.paymentGateway
+      );
+    }
+    return this._createRechargeOrderUseCase;
+  }
+
+  get verifyRechargePaymentUseCase(): IVerifyRechargePaymentUseCase {
+    if (!this._verifyRechargePaymentUseCase) {
+      this._verifyRechargePaymentUseCase = new VerifyRechargePaymentUseCase(
+        this.infra.paymentGateway,
+        this.infra.walletRepository,
+        this.infra.transactionRepository
+      );
+    }
+    return this._verifyRechargePaymentUseCase;
   }
 
   get getMeetingByIdForAdminUseCase(): IGetMeetingByIdForAdminUseCase {

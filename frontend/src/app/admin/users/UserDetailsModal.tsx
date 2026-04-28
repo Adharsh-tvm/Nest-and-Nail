@@ -23,6 +23,36 @@ import {
 } from "lucide-react";
 import { VerificationStatus } from "@/shared/enums/authEnums";
 import { User as UserType } from "@/shared/types/userTypes";
+import { getUserWalletBalanceByAdminAction } from "@/app/actions/admin/admin-actions";
+
+const WalletBalanceDisplay = ({ userId }: { userId: string }) => {
+    const [balance, setBalance] = useState<number | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        let mounted = true;
+        setLoading(true);
+        getUserWalletBalanceByAdminAction(userId).then(res => {
+            if (mounted && res.success && res.data) {
+                setBalance(res.data.balance);
+            }
+            if (mounted) setLoading(false);
+        });
+        return () => { mounted = false };
+    }, [userId]);
+
+    return (
+        <div className="flex items-center gap-3 p-3 bg-purple-50 rounded-xl border border-purple-100">
+            <div className="p-2 bg-white rounded-lg text-purple-700 shadow-sm"><span className="font-bold">₹</span></div>
+            <div>
+                <p className="text-xs text-purple-400 font-medium uppercase tracking-wider">Current Balance</p>
+                <p className="text-sm font-bold text-purple-900">
+                    {loading ? "Loading..." : balance !== null ? `₹${balance.toLocaleString()}` : "No Wallet"}
+                </p>
+            </div>
+        </div>
+    );
+};
 
 interface UserDetailsModalProps {
     isOpen: boolean;
@@ -176,6 +206,10 @@ const UserDetailsModal = ({ isOpen, onClose, user }: UserDetailsModalProps) => {
                                                     </div>
                                                 </div>
                                             )}
+                                        </div>
+                                        <h4 className="text-sm font-bold text-gray-400 uppercase tracking-wider mt-4">Wallet</h4>
+                                        <div className="space-y-3">
+                                            <WalletBalanceDisplay userId={user.id} />
                                         </div>
                                     </div>
 

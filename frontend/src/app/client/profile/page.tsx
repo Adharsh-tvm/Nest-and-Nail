@@ -791,16 +791,112 @@ const AddressesView: React.FC<ViewProps> = ({ user, setUser }) => {
 
 const WalletView: React.FC<ViewProps> = ({ user }) => {
   const [balance, setBalance] = useState<number>(0);
+  const [transactions, setTransactions] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRecharging, setIsRecharging] = useState(false);
+  const [rechargeAmount, setRechargeAmount] = useState<string>("1000");
+
+  const fetchWallet = async () => {
+    setIsLoading(true);
+    const balanceRes = await getWalletBalanceAction();
+    if (balanceRes.success && balanceRes.data) {
+      setBalance(balanceRes.data.balance);
+    }
+    const { getTransactionsAction } = await import("@/app/actions/client/wallet-actions");
+    const txRes = await getTransactionsAction();
+    if (txRes.success && txRes.data) {
+      setTransactions(txRes.data);
+    }
+    setIsLoading(false);
+  };
 
   useEffect(() => {
-    getWalletBalanceAction().then((res) => {
-      if (res.success && res.data) {
-        setBalance(res.data.balance);
-      }
-      setIsLoading(false);
-    });
+    fetchWallet();
   }, []);
+
+  const handleRecharge = async () => {
+    const amount = Number(rechargeAmount);
+    if (isNaN(amount) || amount <= 0) {
+      toast.error("Please enter a valid amount");
+      return;
+    }
+
+    setIsRecharging(true);
+    try {
+      const { loadRazorpay } = await import("@/utils/loadRazorpay");
+      const { createRechargeOrderAction, verifyRechargePaymentAction } = await import("@/app/actions/client/wallet-actions");
+
+      const res = await loadRazorpay();
+      if (!res) {
+        toast.error("Razorpay SDK failed to load. Are you online?");
+        setIsRecharging(false);
+        return;
+      }
+
+      const orderRes = await createRechargeOrderAction(amount);
+      if (!orderRes.success) {
+        toast.error(orderRes.error || "Failed to create recharge order");
+        setIsRecharging(false);
+        return;
+      }
+
+      const { orderId, amount: orderAmount, currency } = orderRes.data;
+
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY || "rzp_test_YourKeyHere",
+        amount: orderAmount.toString(),
+        currency: currency,
+        name: "Nest & Nail Wallet",
+        description: "Wallet Recharge",
+        order_id: orderId,
+        handler: async function (response: any) {
+          try {
+            setIsRecharging(true);
+            const verifyRes = await verifyRechargePaymentAction({
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_signature: response.razorpay_signature,
+              amount: amount
+            });
+
+            if (verifyRes.success) {
+              toast.success(`Successfully added ₹${amount} to wallet!`);
+              fetchWallet();
+            } else {
+              toast.error("Payment verification failed.");
+            }
+          } catch (error) {
+            toast.error("An error occurred during verification.");
+          } finally {
+            setIsRecharging(false);
+          }
+        },
+        prefill: {
+          name: user?.name,
+          email: user?.email,
+          contact: user?.phone_number?.toString()
+        },
+        theme: { color: "#1B4332" },
+        modal: {
+          ondismiss: function () {
+            setIsRecharging(false);
+            toast.error("Payment was cancelled.");
+          }
+        }
+      };
+
+      const paymentObject = new (window as any).Razorpay(options);
+      paymentObject.on("payment.failed", function (response: any) {
+        toast.error(response.error?.description || "Payment failed");
+        setIsRecharging(false);
+      });
+      paymentObject.open();
+
+    } catch (err: any) {
+      toast.error(err.message || "An error occurred");
+      setIsRecharging(false);
+    }
+  };
 
   return (
     <div className="grid lg:grid-cols-3 gap-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
@@ -818,10 +914,24 @@ const WalletView: React.FC<ViewProps> = ({ user }) => {
               </div>
               <WalletIcon className="text-emerald-400/20" size={40} />
             </div>
-            <div className="grid gap-4 mt-8">
-               <div className="bg-white/10 text-emerald-100 py-3 rounded-lg text-sm font-bold text-center border border-white/20">
-                Wallet Active
+            <div className="mt-8 flex flex-col gap-3">
+              <div className="flex bg-white/10 p-1 rounded-lg border border-white/20">
+                <span className="flex items-center justify-center px-3 text-white/70 font-bold">₹</span>
+                <input 
+                  type="number" 
+                  value={rechargeAmount}
+                  onChange={(e) => setRechargeAmount(e.target.value)}
+                  placeholder="Amount"
+                  className="w-full bg-transparent text-white placeholder-white/50 outline-none font-bold"
+                />
               </div>
+              <button 
+                onClick={handleRecharge}
+                disabled={isRecharging}
+                className="w-full bg-white text-[#1B4332] py-3 rounded-lg text-sm font-bold text-center shadow-md hover:bg-gray-50 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {isRecharging ? "Processing..." : "Add Money to Wallet"}
+              </button>
             </div>
           </div>
           {/* Decorative circles */}
@@ -837,11 +947,42 @@ const WalletView: React.FC<ViewProps> = ({ user }) => {
             Recent Transactions
           </h3>
         </div>
-        <div className="p-8 flex flex-col items-center justify-center text-center h-full min-h-[250px]">
-             <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-               <WalletIcon size={32} className="text-gray-400" />
-             </div>
-             <p className="text-gray-500 font-medium">No recent transactions</p>
+        <div className="p-0 flex flex-col h-full">
+          {isLoading ? (
+            <div className="p-8 flex items-center justify-center text-center h-full min-h-[250px]">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1B4332]"></div>
+            </div>
+          ) : transactions.length === 0 ? (
+            <div className="p-8 flex flex-col items-center justify-center text-center h-full min-h-[250px]">
+              <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+                <WalletIcon size={32} className="text-gray-400" />
+              </div>
+              <p className="text-gray-500 font-medium">No recent transactions</p>
+            </div>
+          ) : (
+            <div className="divide-y divide-gray-100 max-h-[400px] overflow-y-auto">
+              {transactions.map((tx: any, idx: number) => (
+                <div key={idx} className="p-6 flex items-center justify-between hover:bg-gray-50/50 transition-colors">
+                  <div className="flex items-center gap-4">
+                    <div className={`p-3 rounded-full ${tx.type === "CREDIT" ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"}`}>
+                       {tx.type === "CREDIT" ? <WalletIcon size={20} /> : <CreditCard size={20} />}
+                    </div>
+                    <div>
+                      <p className="font-bold text-gray-900 capitalize">
+                        {tx.source.replace("_", " ").toLowerCase()}
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        {new Date(tx.createdAt).toLocaleDateString()} at {new Date(tx.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                      </p>
+                    </div>
+                  </div>
+                  <div className={`font-bold ${tx.type === "CREDIT" ? "text-green-600" : "text-gray-900"}`}>
+                    {tx.type === "CREDIT" ? "+" : "-"}₹{tx.amount}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

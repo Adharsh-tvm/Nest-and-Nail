@@ -240,3 +240,8 @@ export async function fetchAdminMeetingDetails(serviceId: string): Promise<Admin
     throw new Error(error.response?.data?.message || error.message || "Failed to fetch admin meeting details");
   }
 }
+
+export const fetchUserWalletBalanceByAdmin = async (userId: string) => {
+  const response = await axiosInstance.get(`/api/wallet/admin/${userId}/balance`);
+  return response.data?.payload ?? response.data;
+};

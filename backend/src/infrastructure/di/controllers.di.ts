@@ -276,7 +276,9 @@ export class ControllerDI {
         if (!this._walletController) {
             this._walletController = new WalletController(
                 this._useCases.getWalletBalanceUseCase,
-                this._useCases.getTransactionsUseCase
+                this._useCases.getTransactionsUseCase,
+                this._useCases.createRechargeOrderUseCase,
+                this._useCases.verifyRechargePaymentUseCase
             );
         }
         return this._walletController;

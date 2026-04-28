@@ -36,3 +36,13 @@ export async function toggleUserAccessAction(
 export async function getAllUsers(params: UserQueryParams = {}) {
   return await fetchAllUsers(params);
 }
+
+export async function getUserWalletBalanceByAdminAction(userId: string) {
+  try {
+    const { fetchUserWalletBalanceByAdmin } = await import("@/sources/api/admin.api");
+    const res = await fetchUserWalletBalanceByAdmin(userId);
+    return { success: true, data: res };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}

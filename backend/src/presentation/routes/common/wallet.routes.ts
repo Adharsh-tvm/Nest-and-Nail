@@ -14,7 +14,16 @@ export function createWalletRoutes(
         walletController.getBalance
     );
 
+    router.get(
+        "/admin/:userId/balance",
+        authMiddleware.adminOnly.bind(authMiddleware),
+        walletController.getBalanceByUserId
+    );
+
     router.get("/transactions", authMiddleware.verify.bind(authMiddleware), walletController.getTransactions);
+
+    router.post("/recharge/create-order", authMiddleware.verify.bind(authMiddleware), walletController.createRechargeOrder);
+    router.post("/recharge/verify", authMiddleware.verify.bind(authMiddleware), walletController.verifyRechargePayment);
 
     return router;
 }

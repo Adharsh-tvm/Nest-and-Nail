@@ -2,11 +2,9 @@ import { IPaymentRepository } from "../../../domain/repositories/IPaymentReposit
 import { IServiceRepository } from "../../../domain/repositories/IServiceRepository";
 import { IWalletRepository } from "../../../domain/repositories/IWalletRepository";
 import { ITransactionRepository } from "../../../domain/repositories/ITransactionRepository";
-
 import { PaymentStatus } from "../../../shared/enums/paymentEnums";
 import { ServiceStatus } from "../../../shared/enums/serviceEnums";
 import { v4 as uuidv4 } from "uuid";
-
 import { IProcessWalletPaymentUseCase } from "../../interfaces/payment/IProcessWalletPaymentUseCase";
 import { transactionSource, transactionStatus, transactionType } from "../../../shared/enums/transactionEnums";
 
@@ -51,6 +49,32 @@ export class ProcessWalletPaymentUseCase implements IProcessWalletPaymentUseCase
       walletId: updatedWallet.walletId,
       userId: clientId,
       type: transactionType.DEBIT,
+      amount,
+      source: transactionSource.SERVICE_PAYMENT,
+      serviceId,
+      status: transactionStatus.SUCCESS,
+      createdAt: new Date(),
+    });
+
+    // Credit Worker
+    const workerId = service.workerId;
+    let workerWallet = await this._walletRepo.findByUserId(workerId);
+    if (!workerWallet) {
+      workerWallet = await this._walletRepo.create({
+        walletId: uuidv4(),
+        userId: workerId,
+        balance: 0,
+        currency: "INR",
+      });
+    }
+
+    const updatedWorkerWallet = await this._walletRepo.creditBalance(workerId, amount);
+
+    await this._transactionRepo.create({
+      transactionId: uuidv4(),
+      walletId: updatedWorkerWallet.walletId,
+      userId: workerId,
+      type: transactionType.CREDIT,
       amount,
       source: transactionSource.SERVICE_PAYMENT,
       serviceId,
