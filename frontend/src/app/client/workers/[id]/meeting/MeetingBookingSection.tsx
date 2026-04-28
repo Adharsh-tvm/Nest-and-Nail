@@ -213,16 +213,29 @@ export function MeetingBookingSection({ worker }: MeetingBookingSectionProps) {
 
     // Compute meeting total for display
     const slotsArr = Object.entries(selectedSlots).map(([date, slotType]) => ({ date, slotType }));
-    const meetingTotal = slotsArr.reduce((sum, s) => sum + (SLOT_PRICES[s.slotType] || 0), 0);
+    const baseAmount = slotsArr.reduce((sum, s) => sum + (SLOT_PRICES[s.slotType] || 0), 0);
+    const meetingTotal = baseAmount + 10; // +₹10 platform fee
     const walletSufficient = walletBalance >= meetingTotal;
 
     return (
-      <div className="bg-white rounded-xl border border-purple-100 p-6 shadow-sm text-center animate-in zoom-in-95 duration-500 mt-4">
-        <h2 className="text-xl font-black text-gray-900 mb-2">Complete Payment</h2>
-        <p className="text-sm text-gray-500 mb-1">
-          Total: <span className="font-bold text-purple-600 text-lg">₹{meetingTotal}</span>
-        </p>
-        <p className="text-xs text-gray-400 mb-5">Full payment required to confirm your meeting.</p>
+      <div className="bg-white rounded-xl border border-purple-100 p-6 shadow-sm animate-in zoom-in-95 duration-500 mt-4">
+        <h2 className="text-xl font-black text-gray-900 mb-4 text-center">Complete Payment</h2>
+
+        {/* Amount Breakdown */}
+        <div className="bg-gray-50 rounded-xl p-4 mb-5 space-y-2">
+          <div className="flex justify-between text-sm text-gray-600">
+            <span>Consultation slot</span>
+            <span className="font-semibold">₹{baseAmount}</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span className="text-amber-700 font-medium">Platform fee</span>
+            <span className="font-semibold text-amber-700">+ ₹10</span>
+          </div>
+          <div className="flex justify-between text-base font-black text-purple-700 pt-2 border-t border-gray-200">
+            <span>Total Payable</span>
+            <span>₹{meetingTotal}</span>
+          </div>
+        </div>
 
         {/* Payment Method Selector */}
         <div className="flex gap-3 mb-6 justify-center">
@@ -370,6 +383,7 @@ export function MeetingBookingSection({ worker }: MeetingBookingSectionProps) {
             address={undefined}
             isBooking={bookingState.status === "loading"}
             onConfirm={handleConfirm}
+            platformFee={10}
           />
         )}
 

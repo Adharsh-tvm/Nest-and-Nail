@@ -8,7 +8,8 @@ import { getVideoSlotTime } from "../../utils/getVideoSlotTime";
 export class ServiceMapper {
 
   static toEntity(dto: CreateServiceDTO): Service {
-    const totalAmount = dto.pricePerWorker * dto.numberOfWorkers;
+    const basePlatformFee = dto.category === "VIDEO_CALL" ? 10 : 50;
+    const totalAmount = dto.pricePerWorker * dto.numberOfWorkers + basePlatformFee;
 
     let videoCall;
 

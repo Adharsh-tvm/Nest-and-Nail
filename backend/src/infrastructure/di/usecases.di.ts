@@ -763,7 +763,9 @@ export class UseCaseDI {
         this.infra.paymentGateway,
         this.infra.serviceRepository,
         this.infra.walletRepository,
-        this.infra.transactionRepository
+        this.infra.transactionRepository,
+        this.infra.workerScheduleRepo,
+        this.infra.userRepositoryFactory
       )
     }
     return this._verifyPaymentUseCase;
@@ -775,7 +777,9 @@ export class UseCaseDI {
         this.infra.paymentRepository,
         this.infra.serviceRepository,
         this.infra.walletRepository,
-        this.infra.transactionRepository
+        this.infra.transactionRepository,
+        this.infra.workerScheduleRepo,
+        this.infra.userRepositoryFactory
       );
     }
     return this._processWalletPaymentUseCase;

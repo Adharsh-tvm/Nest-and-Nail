@@ -16,6 +16,7 @@ interface BookingSummaryStepProps {
   isBooking: boolean;
   onConfirm: () => void;
   onBackReq?: () => void;
+  platformFee?: number;
 }
 
 export function BookingSummaryStep({
@@ -31,6 +32,7 @@ export function BookingSummaryStep({
   address,
   isBooking,
   onConfirm,
+  platformFee = 50,
 }: BookingSummaryStepProps) {
   
   if (!selectedSlots || selectedSlots.length === 0) return null;
@@ -100,9 +102,23 @@ export function BookingSummaryStep({
             <p className="text-xs text-gray-500 mt-1">₹{pricePerWorkerPerDay} per worker / day</p>
           </div>
            <div className="text-right">
-            <p className="text-sm font-bold text-gray-500 mb-1">Total Expected</p>
-            <p className="text-xl font-bold text-emerald-600">₹{totalAmount}</p>
+            <p className="text-sm font-bold text-gray-500 mb-1">Service Total</p>
+            <p className="text-xl font-bold text-gray-800">₹{totalAmount}</p>
           </div>
+        </div>
+
+        {/* Platform fee breakdown */}
+        <div className="flex justify-between items-center pt-3 border-t border-dashed border-gray-200">
+          <div>
+            <p className="text-sm font-bold text-gray-500 mb-0.5">Platform Fee</p>
+            <p className="text-xs text-gray-400">One-time convenience fee</p>
+          </div>
+          <p className="text-base font-bold text-amber-600">+ ₹{platformFee}</p>
+        </div>
+
+        <div className="flex justify-between items-center pt-3 border-t border-gray-200">
+          <p className="text-sm font-bold text-gray-700">Total Payable</p>
+          <p className="text-2xl font-black text-emerald-600">₹{totalAmount + platformFee}</p>
         </div>
       </div>
 

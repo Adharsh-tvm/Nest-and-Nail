@@ -57,7 +57,7 @@ export interface DateAvailabilitySummary {
 
 export const SLOT_PRICES: Record<SlotType, number> = {
   [SlotType.MORNING_HALF]: 700,
-  [SlotType.EVENING_HALF]: 750,
+  [SlotType.EVENING_HALF]: 700,
   [SlotType.FULL_DAY]: 1300,
   [SlotType.VIDEO_SLOT_1]: 50,
   [SlotType.VIDEO_SLOT_2]: 50,

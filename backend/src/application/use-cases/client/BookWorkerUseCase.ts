@@ -97,14 +97,9 @@ export class BookWorkerUseCase implements IBookWorkerUseCase {
 
     const created = await this._serviceRepo.create(serviceEntity);
 
-    for (const slot of dto.selectedSlots) {
-      await this._scheduleRepo.markAsBooked(
-        dto.workerId,
-        slot.date,
-        slot.slotType,
-        created.serviceId
-      );
-    }
+    // NOTE: Worker schedule slots are NOT marked as booked here.
+    // They will be marked as booked only after payment succeeds
+    // in VerifyPaymentUseCase (Razorpay) or ProcessWalletPaymentUseCase (Wallet).
 
     return ServiceMapper.toResponse(created);
   }

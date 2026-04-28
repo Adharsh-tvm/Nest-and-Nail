@@ -51,6 +51,7 @@ export function BookingSection({ worker }: BookingSectionProps) {
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [walletBalance, setWalletBalance] = useState(0);
+  const [isWalletConfirmOpen, setIsWalletConfirmOpen] = useState(false);
 
   const {
     selectedDate,
@@ -230,7 +231,7 @@ export function BookingSection({ worker }: BookingSectionProps) {
 
   const handlePayment = (bookingData: any) => {
     if (paymentMethod === "wallet") {
-      handleWalletPayment(bookingData);
+      setIsWalletConfirmOpen(true);
     } else {
       handleRazorpayPayment(bookingData);
     }
@@ -253,70 +254,133 @@ export function BookingSection({ worker }: BookingSectionProps) {
     } else {
       // Compute totals for display
       const slotsArr = Object.entries(selectedSlots).map(([date, slotType]) => ({ date, slotType }));
-      const totalAmount = slotsArr.reduce((sum, s) => sum + SLOT_PRICES[s.slotType], 0) * numberOfWorkers;
+      const baseAmount = slotsArr.reduce((sum, s) => sum + SLOT_PRICES[s.slotType], 0) * numberOfWorkers;
+      const totalAmount = baseAmount + 50; // +₹50 platform fee
       const walletSufficient = walletBalance >= totalAmount;
 
       return (
-        <div className="bg-white rounded-xl border border-emerald-200 p-6 shadow-sm text-center animate-in zoom-in-95 duration-500">
-          <h2 className="text-xl font-black text-gray-900 mb-1">Complete Payment</h2>
-          <p className="text-sm text-gray-500 mb-2">Total amount: <span className="font-bold text-emerald-600 text-lg">₹{totalAmount}</span></p>
-          <p className="text-xs text-gray-400 mb-5">Full payment required to confirm your booking.</p>
+        <>
+          <div className="bg-white rounded-xl border border-emerald-200 p-6 shadow-sm animate-in zoom-in-95 duration-500">
+            <h2 className="text-xl font-black text-gray-900 mb-4 text-center">Complete Payment</h2>
 
-          {/* Payment Method Selector */}
-          <div className="flex gap-3 mb-6 justify-center">
-            {/* Razorpay Option */}
-            <button
-              onClick={() => setPaymentMethod("razorpay")}
-              className={`flex-1 max-w-[160px] flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${
-                paymentMethod === "razorpay"
-                  ? "border-emerald-500 bg-emerald-50 shadow-sm"
-                  : "border-gray-200 bg-white hover:border-gray-300"
-              }`}
-            >
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${paymentMethod === "razorpay" ? "bg-emerald-100" : "bg-gray-100"}`}>
-                <CreditCard className={`w-4 h-4 ${paymentMethod === "razorpay" ? "text-emerald-600" : "text-gray-400"}`} />
+            {/* Amount Breakdown */}
+            <div className="bg-gray-50 rounded-xl p-4 mb-5 space-y-2">
+              <div className="flex justify-between text-sm text-gray-600">
+                <span>Service total ({numberOfWorkers} worker{numberOfWorkers > 1 ? "s" : ""})</span>
+                <span className="font-semibold">₹{baseAmount}</span>
               </div>
-              <span className={`text-sm font-bold ${paymentMethod === "razorpay" ? "text-emerald-700" : "text-gray-500"}`}>Razorpay</span>
-              <span className="text-[10px] text-gray-400">UPI, Cards, NetBanking</span>
-              {paymentMethod === "razorpay" && <CheckCircle2 className="w-4 h-4 text-emerald-500" />}
-            </button>
+              <div className="flex justify-between text-sm">
+                <span className="text-amber-700 font-medium">Platform fee</span>
+                <span className="font-semibold text-amber-700">+ ₹50</span>
+              </div>
+              <div className="flex justify-between text-base font-black text-emerald-700 pt-2 border-t border-gray-200">
+                <span>Total Payable</span>
+                <span>₹{totalAmount}</span>
+              </div>
+            </div>
 
-            {/* Wallet Option */}
-            <button
-              onClick={() => setPaymentMethod("wallet")}
-              className={`flex-1 max-w-[160px] flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${
-                paymentMethod === "wallet"
-                  ? "border-purple-500 bg-purple-50 shadow-sm"
-                  : "border-gray-200 bg-white hover:border-gray-300"
-              }`}
-            >
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${paymentMethod === "wallet" ? "bg-purple-100" : "bg-gray-100"}`}>
-                <Wallet className={`w-4 h-4 ${paymentMethod === "wallet" ? "text-purple-600" : "text-gray-400"}`} />
+            {/* Payment Method Selector */}
+            <div className="flex gap-3 mb-6 justify-center">
+              {/* Razorpay Option */}
+              <button
+                onClick={() => setPaymentMethod("razorpay")}
+                className={`flex-1 max-w-[160px] flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${
+                  paymentMethod === "razorpay"
+                    ? "border-emerald-500 bg-emerald-50 shadow-sm"
+                    : "border-gray-200 bg-white hover:border-gray-300"
+                }`}
+              >
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${paymentMethod === "razorpay" ? "bg-emerald-100" : "bg-gray-100"}`}>
+                  <CreditCard className={`w-4 h-4 ${paymentMethod === "razorpay" ? "text-emerald-600" : "text-gray-400"}`} />
+                </div>
+                <span className={`text-sm font-bold ${paymentMethod === "razorpay" ? "text-emerald-700" : "text-gray-500"}`}>Razorpay</span>
+                <span className="text-[10px] text-gray-400">UPI, Cards, NetBanking</span>
+                {paymentMethod === "razorpay" && <CheckCircle2 className="w-4 h-4 text-emerald-500" />}
+              </button>
+
+              {/* Wallet Option */}
+              <button
+                onClick={() => setPaymentMethod("wallet")}
+                className={`flex-1 max-w-[160px] flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${
+                  paymentMethod === "wallet"
+                    ? "border-purple-500 bg-purple-50 shadow-sm"
+                    : "border-gray-200 bg-white hover:border-gray-300"
+                }`}
+              >
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${paymentMethod === "wallet" ? "bg-purple-100" : "bg-gray-100"}`}>
+                  <Wallet className={`w-4 h-4 ${paymentMethod === "wallet" ? "text-purple-600" : "text-gray-400"}`} />
+                </div>
+                <span className={`text-sm font-bold ${paymentMethod === "wallet" ? "text-purple-700" : "text-gray-500"}`}>Wallet</span>
+                <span className={`text-[10px] font-medium ${walletSufficient ? "text-gray-400" : "text-red-400"}`}>
+                  Balance: ₹{walletBalance}
+                </span>
+                {!walletSufficient && <span className="text-xs text-red-500 font-semibold">Insufficient</span>}
+                {paymentMethod === "wallet" && <CheckCircle2 className="w-4 h-4 text-purple-500" />}
+              </button>
+            </div>
+
+            {isProcessingPayment ? (
+              <div className="text-emerald-500 font-bold mb-4 flex items-center justify-center gap-2">
+                <RotateCcw className="w-4 h-4 animate-spin" /> Processing... Please do not refresh.
               </div>
-              <span className={`text-sm font-bold ${paymentMethod === "wallet" ? "text-purple-700" : "text-gray-500"}`}>Wallet</span>
-              <span className={`text-[10px] font-medium ${walletSufficient ? "text-gray-400" : "text-red-400"}`}>
-                Balance: ₹{walletBalance}
-              </span>
-              {!walletSufficient && <span className="text-xs text-red-500 font-semibold">Insufficient</span>}
-              {paymentMethod === "wallet" && <CheckCircle2 className="w-4 h-4 text-purple-500" />}
-            </button>
+            ) : (
+              <button
+                onClick={() => handlePayment(bookingState.data)}
+                disabled={paymentMethod === "wallet" && !walletSufficient}
+                className="w-full inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-xl transition-all shadow-sm hover:shadow-md active:scale-[0.98]"
+              >
+                {paymentMethod === "wallet" ? <Wallet className="w-5 h-5" /> : <CreditCard className="w-5 h-5" />}
+                {paymentMethod === "wallet" ? "Pay with Wallet" : "Pay with Razorpay"}
+              </button>
+            )}
           </div>
 
-          {isProcessingPayment ? (
-            <div className="text-emerald-500 font-bold mb-4 flex items-center justify-center gap-2">
-              <RotateCcw className="w-4 h-4 animate-spin" /> Processing... Please do not refresh.
+          {/* Wallet Confirmation Modal */}
+          {isWalletConfirmOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+              <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-xl animate-in zoom-in-95 duration-200">
+                <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mb-4 mx-auto">
+                  <Wallet className="w-6 h-6 text-purple-600" />
+                </div>
+                <h3 className="text-xl font-bold text-center text-gray-900 mb-4">Confirm Wallet Payment</h3>
+
+                {/* Fee breakdown inside modal */}
+                <div className="bg-gray-50 rounded-xl p-3 mb-4 space-y-1.5 text-sm">
+                  <div className="flex justify-between text-gray-600">
+                    <span>Service total</span>
+                    <span className="font-semibold">₹{baseAmount}</span>
+                  </div>
+                  <div className="flex justify-between text-amber-700 font-medium">
+                    <span>Platform fee</span>
+                    <span>+ ₹50</span>
+                  </div>
+                  <div className="flex justify-between font-black text-gray-900 pt-1.5 border-t border-gray-200">
+                    <span>Total</span>
+                    <span>₹{totalAmount}</span>
+                  </div>
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setIsWalletConfirmOpen(false)}
+                    className="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsWalletConfirmOpen(false);
+                      handleWalletPayment(bookingState.data);
+                    }}
+                    className="flex-1 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl transition-colors shadow-sm"
+                  >
+                    Confirm Pay
+                  </button>
+                </div>
+              </div>
             </div>
-          ) : (
-            <button
-              onClick={() => handlePayment(bookingState.data)}
-              disabled={paymentMethod === "wallet" && !walletSufficient}
-              className="w-full inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-xl transition-all shadow-sm hover:shadow-md active:scale-[0.98]"
-            >
-              {paymentMethod === "wallet" ? <Wallet className="w-5 h-5" /> : <CreditCard className="w-5 h-5" />}
-              {paymentMethod === "wallet" ? "Pay with Wallet" : "Pay with Razorpay"}
-            </button>
           )}
-        </div>
+        </>
       );
     }
   }
@@ -465,6 +529,7 @@ export function BookingSection({ worker }: BookingSectionProps) {
             {bookingState.message}
           </div>
         )}
+
       </div>
     </div>
   );
