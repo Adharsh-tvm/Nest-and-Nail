@@ -13,6 +13,18 @@ import { getWorkerDetailAction } from "@/app/actions/client/view-worker-actions"
 import clsx from "clsx";
 import toast from "react-hot-toast";
 
+// ── Refund tier helper (mirrors backend) ──────────────────────────────────────
+function getRefundInfo(createdAt: Date | string) {
+  const diffMs  = Date.now() - new Date(createdAt).getTime();
+  const diffMin = diffMs / (1000 * 60);
+  const diffHr  = diffMs / (1000 * 60 * 60);
+
+  if (diffHr > 6)   return { canCancel: false, refundPct: 0,   label: "Not Cancellable",  color: "text-red-700",    bg: "bg-red-50",    border: "border-red-200",    explanation: "The 6-hour cancellation window has expired." };
+  if (diffMin < 15)  return { canCancel: true,  refundPct: 100, label: "Full Refund (100%)", color: "text-emerald-700", bg: "bg-emerald-50", border: "border-emerald-200", explanation: "Within 15 min of booking — full refund to your wallet." };
+  if (diffHr < 1)   return { canCancel: true,  refundPct: 90,  label: "90% Refund",        color: "text-blue-700",   bg: "bg-blue-50",   border: "border-blue-200",   explanation: "Within 1 hour of booking — 90% refund to your wallet." };
+  return                   { canCancel: true,  refundPct: 50,  label: "50% Refund",        color: "text-amber-700",  bg: "bg-amber-50",  border: "border-amber-200",  explanation: "Between 1–6 hours from booking — 50% refund to your wallet." };
+}
+
 export default function ClientServiceDetailsPage() {
   const params = useParams();
   const router = useRouter();
@@ -55,6 +67,11 @@ export default function ClientServiceDetailsPage() {
   const handleCancelService = async () => {
       if (!cancelModal.reason.trim()) {
           toast.error("Reason is required");
+          return;
+      }
+      const refund = getRefundInfo(service?.createdAt ?? new Date());
+      if (!refund.canCancel) {
+          toast.error("Cancellation window has expired. Cannot cancel after 6 hours.");
           return;
       }
       setCancelModal(prev => ({ ...prev, loading: true }));
@@ -302,29 +319,56 @@ export default function ClientServiceDetailsPage() {
         </div>
       </div>
 
-      {cancelModal.open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-            <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl">
-                <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <AlertTriangle className="text-red-500 w-5 h-5" /> Cancel Service
-                </h3>
-                <p className="text-sm text-gray-600 mb-4">Are you sure you want to cancel this service? Please provide a reason.</p>
-                <textarea
-                    value={cancelModal.reason}
-                    onChange={(e) => setCancelModal(prev => ({ ...prev, reason: e.target.value }))}
-                    placeholder="Reason for cancellation..."
-                    className="w-full p-3 border border-gray-300 rounded-xl mb-4 focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm"
-                    rows={4}
-                />
-                <div className="flex gap-3">
-                    <button onClick={() => setCancelModal({ open: false, reason: "", loading: false })} className="flex-1 py-2.5 rounded-xl border border-gray-300 text-gray-700 font-bold text-sm">Keep Service</button>
-                    <button onClick={handleCancelService} disabled={cancelModal.loading} className="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-sm flex justify-center items-center gap-2">
-                        {cancelModal.loading && <Loader2 className="w-4 h-4 animate-spin" />} Cancel
-                    </button>
-                </div>
-            </div>
-        </div>
-      )}
+      {cancelModal.open && service && (() => {
+        const refund = getRefundInfo(service.createdAt);
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+              <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                      <AlertTriangle className="text-red-500 w-5 h-5" /> Cancel Service
+                  </h3>
+
+                  {/* Refund Policy Badge */}
+                  <div className={`flex items-start gap-3 rounded-xl border px-4 py-3 mb-4 ${refund.bg} ${refund.border}`}>
+                      <AlertTriangle className={`w-4 h-4 mt-0.5 shrink-0 ${refund.color}`} />
+                      <div>
+                          <p className={`text-xs font-extrabold uppercase tracking-wide ${refund.color}`}>
+                              Refund Policy · {refund.label}
+                          </p>
+                          <p className={`text-xs mt-0.5 leading-relaxed ${refund.color}`}>
+                              {refund.explanation}
+                          </p>
+                          {!refund.canCancel && (
+                              <p className="mt-1 text-xs font-bold text-red-600">
+                                  ⛔ Cancellation is no longer available.
+                              </p>
+                          )}
+                      </div>
+                  </div>
+
+                  <p className="text-sm text-gray-600 mb-4">Please provide a reason for cancellation.</p>
+                  <textarea
+                      value={cancelModal.reason}
+                      onChange={(e) => setCancelModal(prev => ({ ...prev, reason: e.target.value }))}
+                      disabled={!refund.canCancel}
+                      placeholder={refund.canCancel ? "Reason for cancellation..." : "Cancellation window has expired"}
+                      className="w-full p-3 border border-gray-300 rounded-xl mb-4 focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm disabled:bg-gray-50 disabled:cursor-not-allowed"
+                      rows={4}
+                  />
+                  <div className="flex gap-3">
+                      <button onClick={() => setCancelModal({ open: false, reason: "", loading: false })} className="flex-1 py-2.5 rounded-xl border border-gray-300 text-gray-700 font-bold text-sm">Keep Service</button>
+                      <button
+                          onClick={handleCancelService}
+                          disabled={cancelModal.loading || !refund.canCancel}
+                          className="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-sm flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                          {cancelModal.loading && <Loader2 className="w-4 h-4 animate-spin" />} Cancel
+                      </button>
+                  </div>
+              </div>
+          </div>
+        );
+      })()}
     </>
   );
 }

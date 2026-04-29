@@ -223,6 +223,7 @@ export default async function ClientMeetingDetailPage({ params }: { params: Prom
                         serviceId={meeting.serviceId}
                         category={meeting.category}
                         scheduledDate={meeting.scheduledDate}
+                        createdAt={meeting.createdAt}
                         cancelServiceAction={cancelServiceAction}
                     />
                   </div>
@@ -237,6 +238,7 @@ export default async function ClientMeetingDetailPage({ params }: { params: Prom
                         serviceId={meeting.serviceId}
                         category={meeting.category}
                         scheduledDate={meeting.scheduledDate}
+                        createdAt={meeting.createdAt}
                         cancelServiceAction={cancelServiceAction}
                     />
                 </div>

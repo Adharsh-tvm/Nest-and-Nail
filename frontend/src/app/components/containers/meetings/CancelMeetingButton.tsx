@@ -2,34 +2,105 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { XCircle, AlertTriangle, X, Loader2, CheckCircle2, RotateCcw } from "lucide-react";
+import { XCircle, AlertTriangle, X, Loader2, CheckCircle2, RotateCcw, Info } from "lucide-react";
 import toast from "react-hot-toast";
 
 interface CancelMeetingButtonProps {
   serviceId: string;
   category: string;
   scheduledDate: string;
+  createdAt: string;
   cancelServiceAction: (serviceId: string, reason: string) => Promise<{ success: boolean; error?: string }>;
 }
 
-export default function CancelMeetingButton({ 
-  serviceId, 
-  category, 
-  scheduledDate, 
-  cancelServiceAction 
+// ── Refund tier helper (mirrors backend logic) ──────────────────────────────
+function getRefundInfo(createdAt: string): {
+  canCancel: boolean;
+  refundPct: number;
+  label: string;
+  color: string;
+  bg: string;
+  border: string;
+  explanation: string;
+} {
+  const diffMs = Date.now() - new Date(createdAt).getTime();
+  const diffMin = diffMs / (1000 * 60);
+  const diffHr  = diffMs / (1000 * 60 * 60);
+
+  if (diffHr > 6) {
+    return {
+      canCancel: false,
+      refundPct: 0,
+      label: "Not Cancellable",
+      color: "text-red-700",
+      bg: "bg-red-50",
+      border: "border-red-200",
+      explanation: "The 6-hour cancellation window has expired. This booking can no longer be cancelled.",
+    };
+  }
+  if (diffMin < 15) {
+    return {
+      canCancel: true,
+      refundPct: 100,
+      label: "Full Refund (100%)",
+      color: "text-emerald-700",
+      bg: "bg-emerald-50",
+      border: "border-emerald-200",
+      explanation: "You are within 15 minutes of booking. You will receive a full refund to your wallet.",
+    };
+  }
+  if (diffHr < 1) {
+    return {
+      canCancel: true,
+      refundPct: 90,
+      label: "90% Refund",
+      color: "text-blue-700",
+      bg: "bg-blue-50",
+      border: "border-blue-200",
+      explanation: "You are within 1 hour of booking. You will receive a 90% refund to your wallet.",
+    };
+  }
+  return {
+    canCancel: true,
+    refundPct: 50,
+    label: "50% Refund",
+    color: "text-amber-700",
+    bg: "bg-amber-50",
+    border: "border-amber-200",
+    explanation: "You are between 1–6 hours from booking. You will receive a 50% refund to your wallet.",
+  };
+}
+
+export default function CancelMeetingButton({
+  serviceId,
+  category,
+  scheduledDate,
+  createdAt,
+  cancelServiceAction,
 }: CancelMeetingButtonProps) {
   const router = useRouter();
   const [showModal, setShowModal] = useState(false);
-  const [step, setStep] = useState<'reason' | 'confirm'>('reason');
+  const [step, setStep] = useState<"reason" | "confirm">("reason");
   const [reason, setReason] = useState("");
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short', day: 'numeric', year: 'numeric'
+  const formatDate = (dateString: string) =>
+    new Date(dateString).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
     });
+
+  const refund = getRefundInfo(createdAt);
+
+  const handleOpen = () => {
+    setShowModal(true);
+    setStep("reason");
+    setReason("");
+    setError(null);
+    setDone(false);
   };
 
   const handleNext = () => {
@@ -37,7 +108,7 @@ export default function CancelMeetingButton({
       toast.error("Please provide a reason for cancellation.");
       return;
     }
-    setStep('confirm');
+    setStep("confirm");
   };
 
   const handleConfirm = () => {
@@ -60,7 +131,7 @@ export default function CancelMeetingButton({
   const resetAndClose = () => {
     if (isPending) return;
     setShowModal(false);
-    setStep('reason');
+    setStep("reason");
     setReason("");
     setError(null);
     setDone(false);
@@ -71,7 +142,7 @@ export default function CancelMeetingButton({
       {/* Trigger Button */}
       <button
         id="cancel-meeting-btn"
-        onClick={() => setShowModal(true)}
+        onClick={handleOpen}
         className="inline-flex items-center gap-2 bg-white hover:bg-red-50 text-red-600 border-2 border-red-100 font-bold text-sm px-5 py-2.5 rounded-xl transition-all duration-200 active:scale-95 shrink-0"
       >
         <XCircle className="w-4 h-4" />
@@ -94,28 +165,41 @@ export default function CancelMeetingButton({
 
             <div className="p-8">
               {done ? (
-                /* Success state */
+                /* ── Success state ── */
                 <div className="flex flex-col items-center gap-4 py-4">
                   <div className="w-16 h-16 rounded-full bg-emerald-50 border-2 border-emerald-200 flex items-center justify-center">
                     <CheckCircle2 className="w-8 h-8 text-emerald-500" />
                   </div>
                   <p className="text-lg font-bold text-slate-800">Meeting Cancelled</p>
-                  <p className="text-sm text-slate-500 text-center">The meeting has been successfully cancelled and the slot is now free.</p>
+                  <p className="text-sm text-slate-500 text-center">
+                    The meeting has been successfully cancelled.{" "}
+                    {refund.refundPct > 0 && (
+                      <span className="font-semibold text-emerald-700">
+                        A {refund.refundPct}% refund has been credited to your wallet.
+                      </span>
+                    )}
+                  </p>
                 </div>
               ) : (
                 <>
                   {/* Header */}
-                  <div className="flex items-start justify-between mb-6">
+                  <div className="flex items-start justify-between mb-5">
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 rounded-2xl bg-red-50 border border-red-100 flex items-center justify-center shrink-0">
-                        {step === 'reason' ? <AlertTriangle className="w-6 h-6 text-red-500" /> : <XCircle className="w-6 h-6 text-red-500" />}
+                        {step === "reason" ? (
+                          <AlertTriangle className="w-6 h-6 text-red-500" />
+                        ) : (
+                          <XCircle className="w-6 h-6 text-red-500" />
+                        )}
                       </div>
                       <div>
                         <h2 className="text-lg font-bold text-slate-900 leading-tight">
-                          {step === 'reason' ? 'Cancel Meeting' : 'Confirm Cancellation'}
+                          {step === "reason" ? "Cancel Meeting" : "Confirm Cancellation"}
                         </h2>
                         <p className="text-xs text-slate-500 mt-0.5">
-                          {step === 'reason' ? 'Please provide a reason' : 'This action cannot be undone'}
+                          {step === "reason"
+                            ? "Please provide a reason"
+                            : "This action cannot be undone"}
                         </p>
                       </div>
                     </div>
@@ -128,14 +212,39 @@ export default function CancelMeetingButton({
                     </button>
                   </div>
 
-                  {/* Service Info Info pill */}
-                  <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100 mb-6">
-                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Meeting Details</p>
-                    <p className="font-bold text-slate-800 text-sm">{category.replace(/_/g, " ")}</p>
-                    <p className="text-xs text-slate-500 mt-0.5">{formatDate(scheduledDate)}</p>
+                  {/* Refund Policy Badge */}
+                  <div className={`flex items-start gap-3 rounded-2xl border px-4 py-3 mb-5 ${refund.bg} ${refund.border}`}>
+                    <Info className={`w-4 h-4 mt-0.5 shrink-0 ${refund.color}`} />
+                    <div>
+                      <p className={`text-xs font-extrabold uppercase tracking-wide ${refund.color}`}>
+                        Refund Policy · {refund.label}
+                      </p>
+                      <p className={`text-xs mt-0.5 leading-relaxed ${refund.color}`}>
+                        {refund.explanation}
+                      </p>
+                      {!refund.canCancel && (
+                        <p className="mt-2 text-xs font-bold text-red-600">
+                          ⛔ Cancellation is no longer available for this booking.
+                        </p>
+                      )}
+                    </div>
                   </div>
 
-                  {step === 'reason' ? (
+                  {/* Meeting Info pill */}
+                  <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100 mb-6">
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">
+                      Meeting Details
+                    </p>
+                    <p className="font-bold text-slate-800 text-sm">
+                      {category.replace(/_/g, " ")}
+                    </p>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      {formatDate(scheduledDate)}
+                    </p>
+                  </div>
+
+                  {/* ── Step: Reason ── */}
+                  {step === "reason" ? (
                     <div className="space-y-4">
                       <div>
                         <label className="block text-sm font-bold text-slate-700 mb-2">
@@ -145,10 +254,17 @@ export default function CancelMeetingButton({
                           rows={4}
                           value={reason}
                           onChange={(e) => setReason(e.target.value)}
-                          placeholder="Please tell us why you're cancelling..."
-                          className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-red-400/20 focus:border-red-400 resize-none transition-all"
+                          disabled={!refund.canCancel}
+                          placeholder={
+                            refund.canCancel
+                              ? "Please tell us why you're cancelling..."
+                              : "Cancellation window has expired"
+                          }
+                          className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-red-400/20 focus:border-red-400 resize-none transition-all disabled:bg-slate-50 disabled:cursor-not-allowed"
                         />
-                        <p className="text-[10px] text-slate-400 mt-1 font-medium">{reason.length}/500 characters</p>
+                        <p className="text-[10px] text-slate-400 mt-1 font-medium">
+                          {reason.length}/500 characters
+                        </p>
                       </div>
 
                       <div className="flex gap-3 pt-2">
@@ -160,7 +276,7 @@ export default function CancelMeetingButton({
                         </button>
                         <button
                           onClick={handleNext}
-                          disabled={!reason.trim()}
+                          disabled={!reason.trim() || !refund.canCancel}
                           className="flex-1 py-3 rounded-xl bg-red-500 hover:bg-red-600 disabled:bg-slate-100 disabled:text-slate-400 text-white font-bold text-sm transition-all active:scale-95 shadow-lg shadow-red-200/50"
                         >
                           Continue
@@ -168,16 +284,24 @@ export default function CancelMeetingButton({
                       </div>
                     </div>
                   ) : (
-                    <div className="space-y-6">
+                    /* ── Step: Confirm ── */
+                    <div className="space-y-5">
                       <div className="bg-red-50 border border-red-100 rounded-2xl p-4">
                         <p className="text-sm font-bold text-red-700 mb-1">Are you sure?</p>
                         <p className="text-xs text-red-600 leading-relaxed">
-                          By cancelling, this slot will be released and made available for other clients to book.
+                          By cancelling, this slot will be released.{" "}
+                          <span className="font-semibold">
+                            {refund.refundPct > 0
+                              ? `₹${refund.refundPct}% of the total amount will be refunded to your wallet.`
+                              : "No refund will be issued."}
+                          </span>
                         </p>
                       </div>
 
                       <div className="bg-slate-50 rounded-xl p-3 border border-slate-100">
-                        <p className="text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-wider">Your reason:</p>
+                        <p className="text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-wider">
+                          Your reason:
+                        </p>
                         <p className="text-sm text-slate-700 italic font-medium">"{reason}"</p>
                       </div>
 
@@ -189,7 +313,7 @@ export default function CancelMeetingButton({
 
                       <div className="flex gap-3">
                         <button
-                          onClick={() => setStep('reason')}
+                          onClick={() => setStep("reason")}
                           disabled={isPending}
                           className="flex-1 py-3 rounded-xl border-2 border-slate-100 text-slate-600 font-bold text-sm hover:bg-slate-50 transition-all active:scale-95 disabled:opacity-50"
                         >
