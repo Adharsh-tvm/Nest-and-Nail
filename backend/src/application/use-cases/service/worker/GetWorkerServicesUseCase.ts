@@ -15,7 +15,7 @@ export class GetWorkerServicesUseCase implements IGetWorkerServicesUseCase {
 
     console.log("workerId :", workerId);
 
-    services = services.filter(s => s.category !== "VIDEO_CALL");
+    services = services.filter(s => s.category !== "VIDEO_CALL" && s.status !== ServiceStatus.PENDING);
 
     if (status) {
       services = services.filter(s => s.status === status);

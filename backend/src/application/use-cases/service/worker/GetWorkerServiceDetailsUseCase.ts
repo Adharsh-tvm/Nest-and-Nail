@@ -3,6 +3,7 @@ import { IGetWorkerServiceDetailsUseCase } from "../../../interfaces/service/wor
 import { ServiceMapper } from "../../../mappers/ServiceMapper";
 import { IUserRepositoryFactory } from "../../../../domain/repositories/IUserRepositoryFactory";
 import { S3Service } from "../../../../infrastructure/adapters/S3service";
+import { ServiceStatus } from "../../../../shared/enums/serviceEnums";
 
 export class GetWorkerServiceDetailsUseCase implements IGetWorkerServiceDetailsUseCase {
 
@@ -22,6 +23,11 @@ export class GetWorkerServiceDetailsUseCase implements IGetWorkerServiceDetailsU
 
         if (service.workerId !== workerId) {
             throw new Error("Unauthorized access to service");
+        }
+
+        // A PENDING service has not been paid yet — treat it as non-existent
+        if (service.status === ServiceStatus.PENDING) {
+            throw new Error("Service not found");
         }
 
         const userRepo = this._userRepoFactory.getRepository("USER" as any);

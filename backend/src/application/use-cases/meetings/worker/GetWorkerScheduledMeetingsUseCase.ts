@@ -11,7 +11,7 @@ export class GetWorkerScheduledMeetingsUseCase implements IGetWorkerScheduledMee
         const services = await this.serviceRepo.getMeetingsByWorker(workerId);
 
         const filtered = services
-            .filter(s => ["OPEN", "PENDING", "CONFIRMED", "IN_PROGRESS"].includes(s.status))
+            .filter(s => ["CONFIRMED", "IN_PROGRESS"].includes(s.status))
             .map(ServiceMapper.toResponse);
         
         return filtered

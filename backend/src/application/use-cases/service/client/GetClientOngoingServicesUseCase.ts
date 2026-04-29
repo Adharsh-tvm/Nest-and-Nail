@@ -12,7 +12,8 @@ export class GetClientOngoingServicesUseCase implements IGetClientOngoingService
     const services = await this._serviceRepo.findByClientId(clientId);
 
     const ongoing = services.filter(
-      s => s.category !== "VIDEO_CALL" && 
+      s => s.category !== "VIDEO_CALL" &&
+        s.status !== ServiceStatus.PENDING &&
         (
           s.status === ServiceStatus.CONFIRMED ||
           s.status === ServiceStatus.IN_PROGRESS

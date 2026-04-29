@@ -158,7 +158,7 @@ const ServiceSchema = new Schema<IServiceDocument>(
     status: {
       type: String,
       enum: Object.values(ServiceStatus),
-      default: ServiceStatus.CONFIRMED,
+      default: ServiceStatus.PENDING,
     },
 
     paymentStatus: {

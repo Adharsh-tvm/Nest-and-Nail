@@ -1,6 +1,7 @@
 import { IServiceRepository } from "../../../../domain/repositories/IServiceRepository";
 import { IGetWorkerMeetingByIdUseCase } from "../../../interfaces/meetings/worker/IGetWorkerMeetingByIdUseCase";
 import { ServiceMapper } from "../../../mappers/ServiceMapper";
+import { ServiceStatus } from "../../../../shared/enums/serviceEnums";
 
 export class GetWorkerMeetingByIdUseCase implements IGetWorkerMeetingByIdUseCase {
 
@@ -20,6 +21,10 @@ export class GetWorkerMeetingByIdUseCase implements IGetWorkerMeetingByIdUseCase
 
     if (service.category !== "VIDEO_CALL") {
       throw new Error("Not a meeting");
+    }
+
+    if (service.status === ServiceStatus.PENDING) {
+      throw new Error("Meeting not found");
     }
 
     return ServiceMapper.toResponse(service);

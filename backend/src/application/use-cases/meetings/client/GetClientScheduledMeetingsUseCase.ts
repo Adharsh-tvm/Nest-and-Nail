@@ -13,7 +13,7 @@ export class GetClientScheduledMeetingsUseCase implements IGetClientScheduledMee
     const now = new Date();
 
     const scheduled = services.filter(s =>
-      ["OPEN", "PENDING", "CONFIRMED", "IN_PROGRESS"].includes(s.status)
+      ["CONFIRMED", "IN_PROGRESS"].includes(s.status)
     );
 
     return scheduled.map(ServiceMapper.toResponse);
