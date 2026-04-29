@@ -20,14 +20,28 @@ export class CategoryController implements ICategoryController {
     ) { }
 
     create = async (req: Request, res: Response) => {
-        const { name } = req.body;
-        const category = await this._createCategoryUseCase.execute(name);
-        res.status(HttpStatusCode.CREATED).json(ResponseHandler.success(category, RESPONSE_MESSAGES.UPDATED));
+        try {
+            const { name } = req.body;
+            const category = await this._createCategoryUseCase.execute(name);
+            res.status(HttpStatusCode.CREATED).json(ResponseHandler.success(category, RESPONSE_MESSAGES.UPDATED));
+        } catch (error: any) {
+            console.error("[CategoryController.create]", error);
+            res.status(HttpStatusCode.BAD_REQUEST).json(
+                ResponseHandler.error(error.message || "Failed to create category")
+            );
+        }
     };
 
     getAll = async (_req: Request, res: Response) => {
-        const categories = await this._getAllCategoriesUseCase.execute();
-        res.status(HttpStatusCode.OK).json(ResponseHandler.success(categories, RESPONSE_MESSAGES.UPDATED));
+        try {
+            const categories = await this._getAllCategoriesUseCase.execute();
+            res.status(HttpStatusCode.OK).json(ResponseHandler.success(categories, RESPONSE_MESSAGES.UPDATED));
+        } catch (error: any) {
+            console.error("[CategoryController.getAll]", error);
+            res.status(HttpStatusCode.INTERNAL_SERVER).json(
+                ResponseHandler.error(error.message || "Failed to fetch categories")
+            );
+        }
     };
 
     async update(req: Request, res: Response): Promise<void> {
@@ -55,37 +69,51 @@ export class CategoryController implements ICategoryController {
     }
 
     updateStatus = async (req: Request, res: Response) => {
-        const { id } = req.params;
+        try {
+            const { id } = req.params;
 
-        const updatedCategory =
-            await this._updateCategoryStatusUseCase.execute(id);
+            const updatedCategory =
+                await this._updateCategoryStatusUseCase.execute(id);
 
-        res.status(HttpStatusCode.OK).json(
-            ResponseHandler.success(updatedCategory, RESPONSE_MESSAGES.UPDATED)
-        );
+            res.status(HttpStatusCode.OK).json(
+                ResponseHandler.success(updatedCategory, RESPONSE_MESSAGES.UPDATED)
+            );
+        } catch (error: any) {
+            console.error("[CategoryController.updateStatus]", error);
+            res.status(HttpStatusCode.BAD_REQUEST).json(
+                ResponseHandler.error(error.message || "Failed to update category status")
+            );
+        }
     };
 
     updateUserCategories = async (req: Request, res: Response): Promise<void> => {
-        const userId = req.params.userId;
-        const { categoryIds } = req.body;
+        try {
+            const userId = req.params.userId;
+            const { categoryIds } = req.body;
 
-        if (!Array.isArray(categoryIds)) {
-            res.status(HttpStatusCode.BAD_REQUEST).json(
-                ResponseHandler.error("categoryIds must be an array")
+            if (!Array.isArray(categoryIds)) {
+                res.status(HttpStatusCode.BAD_REQUEST).json(
+                    ResponseHandler.error("categoryIds must be an array")
+                );
+                return;
+            }
+
+            const updatedUser = await this._updateWorkerCategoriesUseCase.execute(
+                userId,
+                categoryIds
             );
-            return;
+
+            res.status(HttpStatusCode.OK).json(
+                ResponseHandler.success(
+                    updatedUser,
+                    RESPONSE_MESSAGES.UPDATED
+                )
+            );
+        } catch (error: any) {
+            console.error("[CategoryController.updateUserCategories]", error);
+            res.status(HttpStatusCode.BAD_REQUEST).json(
+                ResponseHandler.error(error.message || "Failed to update user categories")
+            );
         }
-
-        const updatedUser = await this._updateWorkerCategoriesUseCase.execute(
-            userId,
-            categoryIds
-        );
-
-        res.status(HttpStatusCode.OK).json(
-            ResponseHandler.success(
-                updatedUser,
-                RESPONSE_MESSAGES.UPDATED
-            )
-        );
     }
 }

@@ -315,6 +315,6 @@ and if the client cancels before 1 hour, the refund will be 90%. and if the clie
 ☐ relative path
 
 ☐ chat options after booking a service
-☐ without payment meeting is scheduled avoid that
+✔ without payment meeting is scheduled avoid that @done (4/29/2026, 12:20:58 PM)
 ☐ when one user ends meeting, both should be ended
 ☐ cancel refund

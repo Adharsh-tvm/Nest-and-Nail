@@ -1,4 +1,4 @@
-"use server";
+
 
 import axiosInstance from "@/lib/axiosInstance";
 import { ApiResponse } from "@/shared/types/responseTypes";

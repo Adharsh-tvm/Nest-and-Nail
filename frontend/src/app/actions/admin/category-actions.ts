@@ -19,10 +19,12 @@ export async function getAllCategoriesAction(): Promise<ApiResponse<Category[]>>
             payload: categories,
         };
     } catch (error: any) {
+        console.error("Fetch Categories Action Error:", error);
+        const errorMessage = error.response?.data?.message || error.message || "Failed to fetch categories";
         return {
             success: false,
-            message: error.message || "Failed to fetch categories",
-            error,
+            message: String(errorMessage),
+            error: null,
         };
     }
 }
@@ -39,10 +41,12 @@ export async function createCategoryAction(
             payload: category,
         };
     } catch (error: any) {
+        console.error("Create Category Action Error:", error);
+        const errorMessage = error.response?.data?.message || error.message || "Failed to create category";
         return {
             success: false,
-            message: error.message || "Failed to create category",
-            error,
+            message: String(errorMessage),
+            error: null,
         };
     }
 }
@@ -61,10 +65,12 @@ export async function updateCategoryAction(
             payload: category,
         };
     } catch (error: any) {
+        console.error("Update Category Action Error:", error);
+        const errorMessage = error.response?.data?.message || error.message || "Failed to update category";
         return {
             success: false,
-            message: error.message || "Failed to update category",
-            error,
+            message: String(errorMessage),
+            error: null,
         };
     }
 }
@@ -81,10 +87,12 @@ export async function toggleCategoryStatusAction(
             payload: category,
         };
     } catch (error: any) {
+        console.error("Toggle Category Status Action Error:", error);
+        const errorMessage = error.response?.data?.message || error.message || "Failed to update category status";
         return {
             success: false,
-            message: error.message || "Failed to update category status",
-            error,
+            message: String(errorMessage),
+            error: null,
         };
     }
 }
