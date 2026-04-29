@@ -7,6 +7,7 @@ import { User } from '@/shared/types/userTypes';
 import Pagination from '@/app/components/ui/Pagination';
 import { cancelServiceAction } from '@/app/actions/client/service-actions';
 import toast from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
 
 const ACTIVE_PAGE_SIZE = 6;
 const HISTORY_PAGE_SIZE = 6;
@@ -37,6 +38,7 @@ export default function ClientServicesView({ ongoing, history, cancelled, worker
     const [cancelledPage, setCancelledPage] = useState(1);
     const [cancelModal, setCancelModal] = useState<CancelModalState | null>(null);
     const [localOngoing, setLocalOngoing] = useState<ServiceResponseDTO[]>(ongoing);
+    const router = useRouter();
 
     const activeTotalPages = Math.ceil(localOngoing.length / ACTIVE_PAGE_SIZE);
     const historyTotalPages = Math.ceil(history.length / HISTORY_PAGE_SIZE);
@@ -124,7 +126,7 @@ export default function ClientServicesView({ ongoing, history, cancelled, worker
         return (
             <div
                 key={service.serviceId}
-                onClick={() => setSelectedService(service)}
+                onClick={() => router.push(`/client/services/${service.serviceId}`)}
                 className={`bg-white rounded-[20px] transition-all cursor-pointer overflow-hidden border ${isActive ? 'border-blue-200 shadow-md hover:shadow-lg' : 'border-gray-200 shadow-sm hover:border-gray-300'}`}
             >
                 <div className="p-5">
@@ -317,93 +319,6 @@ export default function ClientServicesView({ ongoing, history, cancelled, worker
                         </div>
                     )}
                 </section>
-            )}
-
-            {/* ── Service Details Modal ── */}
-            {selectedService && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-[24px] max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-in fade-in zoom-in duration-200">
-                        <div className="sticky top-0 bg-white/80 backdrop-blur-md border-b border-gray-100 p-4 flex items-center justify-between z-10">
-                            <h3 className="font-bold text-lg text-gray-900">Service Details</h3>
-                            <button onClick={() => setSelectedService(null)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                                <X className="w-5 h-5 text-gray-500" />
-                            </button>
-                        </div>
-
-                        <div className="p-6 space-y-6">
-                            <div className="flex items-center justify-between">
-                                <span className="font-mono text-sm text-gray-400">ID: {selectedService.serviceId.substring(0, 8)}</span>
-                                {getStatusBadge(selectedService.status)}
-                            </div>
-
-                            {workerMap[selectedService.workerId] && (
-                                <div className="flex items-center gap-4 bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                                    <div className="w-14 h-14 rounded-full overflow-hidden bg-white border border-gray-200 shadow-sm shrink-0">
-                                        <img
-                                            src={
-                                                ((workerMap[selectedService.workerId].profileImageUrl || workerMap[selectedService.workerId].profilePictureUrl) as string)?.startsWith('http')
-                                                ? ((workerMap[selectedService.workerId].profileImageUrl || workerMap[selectedService.workerId].profilePictureUrl) as string)
-                                                : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/${((workerMap[selectedService.workerId].profileImageUrl || workerMap[selectedService.workerId].profilePictureUrl) as string || '').replace(/^\//, '')}`
-                                            }
-                                            alt="Worker" className="w-full h-full object-cover"
-                                            onError={(e) => { e.currentTarget.src = 'https://ui-avatars.com/api/?name=Worker&background=random'; }}
-                                        />
-                                    </div>
-                                    <div>
-                                        <h4 className="font-bold text-gray-900">{workerMap[selectedService.workerId].name}</h4>
-                                        <p className="text-sm font-medium text-gray-500">{selectedService.category}</p>
-                                    </div>
-                                </div>
-                            )}
-
-                            <div>
-                                <h4 className="font-bold text-gray-900 mb-3 flex items-center"><Calendar className="w-4 h-4 mr-2" /> Booking Schedule</h4>
-                                <div className="bg-emerald-50 text-emerald-800 p-4 rounded-2xl border border-emerald-100 space-y-3">
-                                    <div className="flex justify-between items-center text-sm">
-                                        <span className="font-semibold">Start Date</span>
-                                        <span className="font-bold">{formatDate(selectedService.scheduledDate)}</span>
-                                    </div>
-                                    <hr className="border-emerald-200/50" />
-                                    <div>
-                                        <span className="font-semibold text-sm block mb-2">Selected Slots</span>
-                                        <div className="flex flex-wrap gap-2">
-                                            {selectedService.selectedSlots.map((slot, idx) => (
-                                                <div key={idx} className="bg-white px-3 py-1.5 rounded-lg text-xs font-bold border border-emerald-200 shadow-sm">
-                                                    {formatDate(slot.date)} - {slot.slotType.replace('_', ' ')}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div>
-                                <h4 className="font-bold text-gray-900 mb-3 flex items-center"><IndianRupee className="w-4 h-4 mr-2" /> Payment Info</h4>
-                                <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 flex justify-between items-center">
-                                    <span className="font-medium text-gray-600">Status</span>
-                                    <span className="font-bold text-gray-900">{selectedService.paymentStatus}</span>
-                                </div>
-                            </div>
-
-                            {/* Cancel button — only for cancellable active services */}
-                            {isCancellable(selectedService) && (
-                                <div className="pt-2 border-t border-gray-100">
-                                    <button
-                                        id={`cancel-service-modal-btn-${selectedService.serviceId}`}
-                                        onClick={() => {
-                                            setCancelModal({ service: selectedService, step: 'reason', reason: '', isSubmitting: false });
-                                            setSelectedService(null);
-                                        }}
-                                        className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl border-2 border-red-200 bg-red-50 text-red-600 font-bold text-sm hover:bg-red-100 hover:border-red-300 transition-all active:scale-[0.98]"
-                                    >
-                                        <XCircle className="w-4 h-4" />
-                                        Cancel This Service
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
             )}
 
             {/* ── Cancel Confirmation Modal ── */}

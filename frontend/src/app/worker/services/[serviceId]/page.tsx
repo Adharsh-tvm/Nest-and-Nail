@@ -517,7 +517,7 @@ export default function WorkerServiceDetailsPage() {
                       <span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 text-xs font-bold uppercase rounded-md border border-emerald-100">
                         {service.category}
                       </span>
-                      {service.paymentStatus === PaymentStatus.COMPLETED && (
+                      {service.paymentStatus === PaymentStatus.SUCCESS && (
                         <span className="flex items-center text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md border border-emerald-100">
                           <CheckCircle2 className="w-3 h-3 mr-1" /> Paid
                         </span>
@@ -589,6 +589,27 @@ export default function WorkerServiceDetailsPage() {
                   </div>
                 </div>
 
+                {/* Pricing Breakdown */}
+                <div className="mt-6 bg-gray-50 rounded-xl p-5 border border-gray-100">
+                  <h4 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <CreditCard className="w-4 h-4 text-emerald-600" /> Payment Summary
+                  </h4>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm text-gray-600">
+                      <span>Rate (Per worker/day)</span>
+                      <span className="font-medium">₹{service.pricePerWorker || 0}</span>
+                    </div>
+                    <div className="flex justify-between text-sm text-gray-600">
+                      <span>Workers × Days</span>
+                      <span className="font-medium">{service.numberOfWorkers || 1} × {service.numberOfDays || 1}</span>
+                    </div>
+                    <div className="flex justify-between text-base font-black text-gray-900 pt-2 border-t border-gray-200">
+                      <span>Total Amount Paid</span>
+                      <span className="text-emerald-600">₹{service.totalAmount}</span>
+                    </div>
+                  </div>
+                </div>
+
                 {/* ── Start Service button inside card ── */}
                 {canStart && (
                   <motion.div
@@ -615,32 +636,57 @@ export default function WorkerServiceDetailsPage() {
               </div>
 
               {/* Footer card */}
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="flex items-center space-x-3 text-sm text-gray-600">
-                  <CreditCard className="w-5 h-5 text-gray-400" />
-                  <span>
-                    Payment Status:{" "}
-                    <strong
-                      className={
-                        service.paymentStatus === PaymentStatus.COMPLETED
-                          ? "text-emerald-600"
-                          : "text-amber-600"
-                      }
-                    >
-                      {service.paymentStatus}
-                    </strong>
-                  </span>
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col space-y-4">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-gray-100 pb-4">
+                  <div className="flex items-center space-x-3 text-sm text-gray-600">
+                    <CreditCard className="w-5 h-5 text-gray-400" />
+                    <span>
+                      Payment Status:{" "}
+                      <strong
+                        className={
+                          service.paymentStatus === PaymentStatus.SUCCESS
+                            ? "text-emerald-600"
+                            : "text-amber-600"
+                        }
+                      >
+                        {service.paymentStatus}
+                      </strong>
+                    </span>
+                  </div>
                 </div>
-                <p className="text-xs text-gray-400">
-                  Created:{" "}
-                  {new Date(service.createdAt).toLocaleString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </p>
+                
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
+                  <div>
+                    <p className="text-gray-400 uppercase font-semibold mb-1 tracking-wider">Created</p>
+                    <p className="font-medium text-gray-800">
+                      {new Date(service.createdAt).toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                    </p>
+                  </div>
+                  {service.startedAt && (
+                    <div>
+                      <p className="text-gray-400 uppercase font-semibold mb-1 tracking-wider">Started</p>
+                      <p className="font-medium text-gray-800">
+                        {new Date(service.startedAt).toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                      </p>
+                    </div>
+                  )}
+                  {service.completedAt && (
+                    <div>
+                      <p className="text-gray-400 uppercase font-semibold mb-1 tracking-wider">Completed</p>
+                      <p className="font-medium text-gray-800">
+                        {new Date(service.completedAt).toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                      </p>
+                    </div>
+                  )}
+                  {service.updatedAt && (
+                    <div>
+                      <p className="text-gray-400 uppercase font-semibold mb-1 tracking-wider">Updated</p>
+                      <p className="font-medium text-gray-800">
+                        {new Date(service.updatedAt).toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
 
 

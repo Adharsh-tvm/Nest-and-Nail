@@ -100,6 +100,7 @@ export enum PaymentStatus {
   PENDING = "PENDING",
   PARTIAL = "PARTIAL",
   COMPLETED = "COMPLETED",
+  SUCCESS = "SUCCESS",
   FAILED = "FAILED",
   REFUNDED = "REFUNDED"
 }
@@ -146,6 +147,10 @@ export interface ServiceResponseDTO {
   title?: string;
   description?: string;
   numberOfDays?: number;
+  numberOfWorkers?: number;
+  startedAt?: string | Date;
+  completedAt?: string | Date;
+  updatedAt?: string | Date;
 
     videoCall?: {
         roomId?: string;

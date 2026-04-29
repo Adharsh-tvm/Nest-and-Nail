@@ -1,7 +1,7 @@
 import React from "react";
 import { notFound } from "next/navigation";
 import { getWorkerMeetingByIdAction, endMeetingAction } from "@/app/actions/worker/meeting-actions";
-import { SLOT_LABELS } from "@/shared/types/serviceTypes";
+import { PaymentStatus, SLOT_LABELS } from "@/shared/types/serviceTypes";
 import Link from "next/link";
 import { 
   CalendarDays, Clock, Video, CreditCard, ArrowLeft, 
@@ -160,21 +160,33 @@ export default async function WorkerMeetingDetailPage({ params }: { params: Prom
                 </div>
               )}
 
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100">
-                <div className="flex items-center gap-2 mb-1">
-                  <CreditCard className="w-4 h-4 text-slate-500" />
-                  <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Payment</span>
-                </div>
-                <p className="font-bold text-slate-800 text-sm">{meeting.paymentStatus}</p>
-              </div>
-
+              {/* Cost Breakdown */}
               {meeting.totalAmount !== undefined && (
-                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100">
-                  <div className="flex items-center gap-2 mb-1">
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 sm:col-span-2">
+                  <div className="flex items-center gap-2 mb-3">
                     <CreditCard className="w-4 h-4 text-slate-500" />
-                    <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Amount</span>
+                    <span className="text-xs font-bold text-slate-700 uppercase tracking-wide">Payment Summary</span>
                   </div>
-                  <p className="font-bold text-slate-800 text-sm">₹{meeting.totalAmount}</p>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between text-slate-600">
+                      <span>Base Meeting Fee</span>
+                      <span className="font-medium">₹{meeting.pricePerWorker || 0}</span>
+                    </div>
+                    <div className="flex justify-between text-slate-600">
+                      <span>Platform Fee</span>
+                      <span className="font-medium">₹10</span>
+                    </div>
+                    <div className="flex justify-between text-slate-900 font-bold pt-2 border-t border-slate-200 mt-2">
+                      <span>Total Paid (By Client)</span>
+                      <span className="text-emerald-600">₹{meeting.totalAmount}</span>
+                    </div>
+                  </div>
+                  <div className="mt-3 text-xs text-slate-500 flex items-center justify-between">
+                    <span>Payment Status:</span>
+                    <span className={`font-bold uppercase tracking-wider ${meeting.paymentStatus === PaymentStatus.SUCCESS ? 'text-emerald-600' : 'text-amber-600'}`}>
+                      {meeting.paymentStatus}
+                    </span>
+                  </div>
                 </div>
               )}
             </div>
