@@ -3,6 +3,7 @@ import { ICreateConcernUseCase } from "../../../application/interfaces/concern/I
 import { IGetUserConcernsUseCase } from "../../../application/interfaces/concern/IGetUserConcernsUseCase";
 import { HttpStatusCode } from "../../../shared/enums/httpCodes";
 import { ResponseHandler } from "../../../shared/responses/ApiResponse";
+import { concernBy } from "../../../shared/enums/concernEnums";
 
 export class ConcernController {
   constructor(
@@ -14,7 +15,7 @@ export class ConcernController {
     try {
       const userId = req.user?.id;
       const { serviceId, message } = req.body;
-      const role = req.user.role;
+      const role = req.user.role?.toUpperCase() as concernBy;
 
       if (!userId) {
         return res.status(HttpStatusCode.UNAUTHORIZED)

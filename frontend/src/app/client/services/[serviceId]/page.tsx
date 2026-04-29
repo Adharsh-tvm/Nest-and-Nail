@@ -12,6 +12,7 @@ import { getClientServiceByIdAction, cancelServiceAction } from "@/app/actions/c
 import { getWorkerDetailAction } from "@/app/actions/client/view-worker-actions";
 import clsx from "clsx";
 import toast from "react-hot-toast";
+import RaiseConcernButton from "@/app/components/containers/services/RaiseConcernButton";
 
 // ── Refund tier helper (mirrors backend) ──────────────────────────────────────
 function getRefundInfo(createdAt: Date | string) {
@@ -278,6 +279,13 @@ export default function ClientServiceDetailsPage() {
                            <XCircle className="w-4 h-4"/> Cancel Service
                        </button>
                    </div>
+                )}
+
+                {/* Raise Concern — only after completion */}
+                {service.status === ServiceStatus.COMPLETED && (
+                  <div className="mt-6 pt-6 border-t border-gray-100">
+                    <RaiseConcernButton serviceId={serviceId} />
+                  </div>
                 )}
               </div>
 

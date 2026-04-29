@@ -27,6 +27,7 @@ import { VideoCallController } from "../../presentation/controllers/common/video
 import { PaymentController } from "../../presentation/controllers/payment/PaymentController";
 import { AdminMeetingController } from "../../presentation/controllers/admin/AdminMeetingController";
 import { WalletController } from "../../presentation/controllers/wallet/WalletController";
+import { ConcernController } from "../../presentation/controllers/concern/ConcernController";
 
 export class ControllerDI {
     private _authController?: IAuthController;
@@ -55,6 +56,7 @@ export class ControllerDI {
     private _paymentController?: PaymentController;
     private _adminMeetingController ?: AdminMeetingController;
     private _walletController?: WalletController;
+    private _concernController?: ConcernController;
 
     constructor(
         private _useCases: UseCaseDI,
@@ -283,5 +285,14 @@ export class ControllerDI {
         }
         return this._walletController;
     }
-}
 
+    get concernController(): ConcernController {
+        if (!this._concernController) {
+            this._concernController = new ConcernController(
+                this._useCases.createConcernUseCase,
+                this._useCases.getUserConcernsUseCase
+            );
+        }
+        return this._concernController;
+    }
+}

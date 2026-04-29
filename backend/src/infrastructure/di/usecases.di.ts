@@ -128,6 +128,10 @@ import { GetTransactionsUseCase } from "../../application/use-cases/payment/GetT
 import { CreateRechargeOrderUseCase } from "../../application/use-cases/payment/CreateRechargeOrderUseCase";
 import { VerifyRechargePaymentUseCase, IVerifyRechargePaymentUseCase } from "../../application/use-cases/payment/VerifyRechargePaymentUseCase";
 import { ICreateRechargeOrderUseCase } from "../../application/interfaces/payment/ICreateRechargeOrderUseCase";
+import { ICreateConcernUseCase } from "../../application/interfaces/concern/ICreateConcernUseCase";
+import { IGetUserConcernsUseCase } from "../../application/interfaces/concern/IGetUserConcernsUseCase";
+import { CreateConcernUseCase } from "../../application/use-cases/concern/CreateConcernUseCase";
+import { GetUserConcernsUseCase } from "../../application/use-cases/concern/GetUserConcernsUseCase";
 
 export class UseCaseDI {
 
@@ -209,6 +213,9 @@ export class UseCaseDI {
 
   private _getMeetingByIdForAdminUseCase?: IGetMeetingByIdForAdminUseCase;
   private _getAllMeetingsForAdminUseCase?: IGetAllMeetingsForAdminUseCase;
+
+  private _createConcernUseCase?: ICreateConcernUseCase;
+  private _getUserConcernsUseCase?: IGetUserConcernsUseCase;
 
 
 
@@ -850,5 +857,24 @@ export class UseCaseDI {
       )
     }
     return this._getTransactionsUseCase
+  }
+
+  get createConcernUseCase(): ICreateConcernUseCase {
+    if (!this._createConcernUseCase) {
+      this._createConcernUseCase = new CreateConcernUseCase(
+        this.infra.concernRepository,
+        this.infra.serviceRepository
+      );
+    }
+    return this._createConcernUseCase;
+  }
+
+  get getUserConcernsUseCase(): IGetUserConcernsUseCase {
+    if (!this._getUserConcernsUseCase) {
+      this._getUserConcernsUseCase = new GetUserConcernsUseCase(
+        this.infra.concernRepository
+      );
+    }
+    return this._getUserConcernsUseCase;
   }
 }

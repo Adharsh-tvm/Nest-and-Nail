@@ -25,6 +25,7 @@ import { ServiceResponseDTO, ServiceStatus, PaymentStatus } from "@/shared/types
 import { getWorkerServiceDetailsAction, startWorkerServiceAction } from "@/app/actions/worker/service-actions";
 import clsx from "clsx";
 import toast from "react-hot-toast";
+import RaiseConcernButton from "@/app/components/containers/services/RaiseConcernButton";
 
 /* ─────────────────────────────────────────────────────────────── */
 /*  Types                                                          */
@@ -632,6 +633,13 @@ export default function WorkerServiceDetailsPage() {
                       Your location will be verified before the service begins
                     </p>
                   </motion.div>
+                )}
+
+                {/* ── Raise Concern — only after completion ── */}
+                {service.status === ServiceStatus.COMPLETED && (
+                  <div className="mt-6 pt-6 border-t border-gray-100">
+                    <RaiseConcernButton serviceId={serviceId} />
+                  </div>
                 )}
               </div>
 

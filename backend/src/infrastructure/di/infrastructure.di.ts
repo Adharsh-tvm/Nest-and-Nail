@@ -39,6 +39,8 @@ import { IWalletRepository } from "../../domain/repositories/IWalletRepository";
 import { WalletRepository } from "../repo/WalletRepository";
 import { ITransactionRepository } from "../../domain/repositories/ITransactionRepository";
 import { TransactionRepository } from "../repo/TransactionRepository";
+import { IConcernRepository } from "../../domain/repositories/IConcernRepository";
+import { ConcernRepository } from "../repo/ConcernRepository";
 
 export class InfrastructureDI {
   private _userRepositoryFactory?: IUserRepositoryFactory;
@@ -52,6 +54,7 @@ export class InfrastructureDI {
   private _paymentRepository?: IPaymentRepository;
   private _walletRepository?: IWalletRepository;
   private _transactionRepository ?: ITransactionRepository;
+  private _concernRepository?: IConcernRepository;
 
   private _paymentGateway?: IPaymentGateway;
 
@@ -216,5 +219,12 @@ export class InfrastructureDI {
       this._transactionRepository = new TransactionRepository();
     }
     return this._transactionRepository;
+  }
+
+  get concernRepository(): IConcernRepository {
+    if (!this._concernRepository) {
+      this._concernRepository = new ConcernRepository();
+    }
+    return this._concernRepository;
   }
 }
