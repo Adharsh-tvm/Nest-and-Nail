@@ -283,8 +283,8 @@ Next
 ☐ button disabled should be enable when waiting for other to join 
 ☐ webhook your domain
 ☐ add service cancelation reason in db
-☐  add the validation like if the created time is 6 hrs greater than the current time, the service cannot be deleted. And also the refund will be 50%. 
-and if the client cancels before 1 hour, the refund will be 90%. and if the client cancels before 15 minutes, full amount will be refunded. 
+☐  When cancelling a service or meeting add the validation like if the created time is 6 hrs greater than the current time, the service cannot be cancelled, and also the refund will be 50% if cancels before 6 hours. 
+If the client cancels before 1 hour, the refund will be 90% if it is cancelled before 1 hour after creation. and if the client cancels before 15 minutes, full amount will be refunded. 
 
 
 

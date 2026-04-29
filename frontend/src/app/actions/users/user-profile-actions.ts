@@ -131,10 +131,7 @@ export async function addUSerAddressAction(
         error?.response?.data?.message ||
         error?.message ||
         "Failed to add address",
-      error: {
-        status: error?.response?.status,
-        data: error?.response?.data,
-      },
+      error: null,
     };
   }
 }
@@ -153,10 +150,7 @@ export async function editUserAddressAction(
         error?.response?.data?.message ||
         error?.message ||
         "Failed to edit address",
-      error: {
-        status: error?.response?.status,
-        data: error?.response?.data,
-      },
+      error: null,
     };
   }
 }
@@ -174,10 +168,7 @@ export async function deleteUserAddressAction(
         error?.response?.data?.message ||
         error?.message ||
         "Failed to delete address",
-      error: {
-        status: error?.response?.status,
-        data: error?.response?.data,
-      },
+      error: null,
     };
   }
 }
