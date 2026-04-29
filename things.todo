@@ -317,4 +317,13 @@ If the client cancels before 1 hour, the refund will be 90% if it is cancelled b
 ☐ chat options after booking a service
 ✔ without payment meeting is scheduled avoid that @done (4/29/2026, 12:20:58 PM)
 ☐ when one user ends meeting, both should be ended
-☐ cancel refund
+☐ cancel refund 
+☐ resolve concern by flag or warning :
+resolutionType:
+  - WARNING
+  - FLAG
+  - SUSPEND
+  - REFUND
+  - NO_ACTION
+
+☐ 
