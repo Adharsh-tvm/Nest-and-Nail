@@ -300,7 +300,7 @@ and if the client cancels before 1 hour, the refund will be 90%. and if the clie
 ☐ category management - bug
 ☐ routes in constant
 
-☐ Implement the wallet system along with transaction management.
+✔ Implement the wallet system along with transaction management. @done (4/28/2026, 11:36:54 PM)
 ☐ Complete the service option module for workers.
 ☐ Add a concern-raising feature for users.
 ☐ Store meeting history along with call duration details.
