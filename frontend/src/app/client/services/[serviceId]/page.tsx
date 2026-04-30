@@ -13,6 +13,7 @@ import { getWorkerDetailAction } from "@/app/actions/client/view-worker-actions"
 import clsx from "clsx";
 import toast from "react-hot-toast";
 import RaiseConcernButton from "@/app/components/containers/services/RaiseConcernButton";
+import AddReviewButton from "@/app/components/containers/services/AddReviewButton";
 
 // ── Refund tier helper (mirrors backend) ──────────────────────────────────────
 function getRefundInfo(createdAt: Date | string) {
@@ -281,10 +282,11 @@ export default function ClientServiceDetailsPage() {
                    </div>
                 )}
 
-                {/* Raise Concern — only after completion */}
+                {/* Actions after completion */}
                 {service.status === ServiceStatus.COMPLETED && (
-                  <div className="mt-6 pt-6 border-t border-gray-100">
+                  <div className="mt-6 pt-6 border-t border-gray-100 flex flex-col gap-3">
                     <RaiseConcernButton serviceId={serviceId} />
+                    <AddReviewButton serviceId={serviceId} />
                   </div>
                 )}
               </div>

@@ -132,6 +132,8 @@ import { ICreateConcernUseCase } from "../../application/interfaces/concern/ICre
 import { IGetUserConcernsUseCase } from "../../application/interfaces/concern/IGetUserConcernsUseCase";
 import { CreateConcernUseCase } from "../../application/use-cases/concern/CreateConcernUseCase";
 import { GetUserConcernsUseCase } from "../../application/use-cases/concern/GetUserConcernsUseCase";
+import { IAddReviewUseCase } from "../../application/interfaces/review/IAddReviewUseCase";
+import { AddReviewUseCase } from "../../application/use-cases/review/AddReviewUseCase";
 
 export class UseCaseDI {
 
@@ -216,6 +218,7 @@ export class UseCaseDI {
 
   private _createConcernUseCase?: ICreateConcernUseCase;
   private _getUserConcernsUseCase?: IGetUserConcernsUseCase;
+  private _addReviewUseCase?: IAddReviewUseCase;
 
 
 
@@ -876,5 +879,16 @@ export class UseCaseDI {
       );
     }
     return this._getUserConcernsUseCase;
+  }
+
+  get addReviewUseCase(): IAddReviewUseCase {
+    if(!this._addReviewUseCase) {
+      this._addReviewUseCase = new AddReviewUseCase(
+        this.infra.reviewRepository,
+        this.infra.serviceRepository,
+        this.infra.workerRepository
+      )
+    }
+    return this._addReviewUseCase;
   }
 }

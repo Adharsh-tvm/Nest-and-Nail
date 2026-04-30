@@ -28,6 +28,7 @@ import { PaymentController } from "../../presentation/controllers/payment/Paymen
 import { AdminMeetingController } from "../../presentation/controllers/admin/AdminMeetingController";
 import { WalletController } from "../../presentation/controllers/wallet/WalletController";
 import { ConcernController } from "../../presentation/controllers/concern/ConcernController";
+import { ClientReviewController } from "../../presentation/controllers/client/ClientReviewController";
 
 export class ControllerDI {
     private _authController?: IAuthController;
@@ -54,9 +55,10 @@ export class ControllerDI {
 
     private _videoCallController?: VideoCallController;
     private _paymentController?: PaymentController;
-    private _adminMeetingController ?: AdminMeetingController;
+    private _adminMeetingController?: AdminMeetingController;
     private _walletController?: WalletController;
     private _concernController?: ConcernController;
+    private _clientReviewController?: ClientReviewController;
 
     constructor(
         private _useCases: UseCaseDI,
@@ -265,7 +267,7 @@ export class ControllerDI {
     }
 
     get adminMeetingController(): AdminMeetingController {
-        if(!this._adminMeetingController) {
+        if (!this._adminMeetingController) {
             this._adminMeetingController = new AdminMeetingController(
                 this._useCases.getAllMeetingsForAdminUseCase,
                 this._useCases.getMeetingByIdForAdminUseCase
@@ -294,5 +296,14 @@ export class ControllerDI {
             );
         }
         return this._concernController;
+    }
+
+    get clientReviewController(): ClientReviewController {
+        if(!this._clientReviewController) {
+            this._clientReviewController = new ClientReviewController(
+                this._useCases.addReviewUseCase
+            )
+        }
+        return this._clientReviewController
     }
 }

@@ -41,6 +41,8 @@ import { ITransactionRepository } from "../../domain/repositories/ITransactionRe
 import { TransactionRepository } from "../repo/TransactionRepository";
 import { IConcernRepository } from "../../domain/repositories/IConcernRepository";
 import { ConcernRepository } from "../repo/ConcernRepository";
+import { IReviewRepository } from "../../domain/repositories/IReviewRepository";
+import { ReviewRepository } from "../repo/ReviewRepository";
 
 export class InfrastructureDI {
   private _userRepositoryFactory?: IUserRepositoryFactory;
@@ -53,8 +55,9 @@ export class InfrastructureDI {
   private _serviceRepository?: IServiceRepository;
   private _paymentRepository?: IPaymentRepository;
   private _walletRepository?: IWalletRepository;
-  private _transactionRepository ?: ITransactionRepository;
+  private _transactionRepository?: ITransactionRepository;
   private _concernRepository?: IConcernRepository;
+  private _reviewRepository?: IReviewRepository;
 
   private _paymentGateway?: IPaymentGateway;
 
@@ -215,7 +218,7 @@ export class InfrastructureDI {
   }
 
   get transactionRepository(): ITransactionRepository {
-    if(!this._transactionRepository) {
+    if (!this._transactionRepository) {
       this._transactionRepository = new TransactionRepository();
     }
     return this._transactionRepository;
@@ -226,5 +229,12 @@ export class InfrastructureDI {
       this._concernRepository = new ConcernRepository();
     }
     return this._concernRepository;
+  }
+
+  get reviewRepository(): IReviewRepository {
+    if (!this._reviewRepository) {
+      this._reviewRepository = new ReviewRepository();
+    }
+    return this._reviewRepository
   }
 }
