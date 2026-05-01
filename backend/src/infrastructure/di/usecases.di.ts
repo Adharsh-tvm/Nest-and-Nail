@@ -134,6 +134,8 @@ import { CreateConcernUseCase } from "../../application/use-cases/concern/Create
 import { GetUserConcernsUseCase } from "../../application/use-cases/concern/GetUserConcernsUseCase";
 import { IAddReviewUseCase } from "../../application/interfaces/review/IAddReviewUseCase";
 import { AddReviewUseCase } from "../../application/use-cases/review/AddReviewUseCase";
+import { ISendNotificationUseCase } from "../../application/interfaces/notifications/ISendNotificationUseCase";
+import { SendNotificationUseCase } from "../../application/use-cases/notification/SendNotificationUseCase";
 
 export class UseCaseDI {
 
@@ -219,6 +221,8 @@ export class UseCaseDI {
   private _createConcernUseCase?: ICreateConcernUseCase;
   private _getUserConcernsUseCase?: IGetUserConcernsUseCase;
   private _addReviewUseCase?: IAddReviewUseCase;
+
+  private _sendNotificationUseCase?: ISendNotificationUseCase;
 
 
 
@@ -566,7 +570,8 @@ export class UseCaseDI {
       this._bookWorkerUseCase = new BookWorkerUseCase(
         this.infra.serviceRepository,
         this.infra.workerRepository,
-        this.infra.workerScheduleRepo
+        this.infra.workerScheduleRepo,
+        this.sendNotificationUseCase
       )
     }
     return this._bookWorkerUseCase;
@@ -854,7 +859,7 @@ export class UseCaseDI {
   }
 
   get getTransactionsUseCase(): IGetTransactionsUseCase {
-    if(!this._getTransactionsUseCase) {
+    if (!this._getTransactionsUseCase) {
       this._getTransactionsUseCase = new GetTransactionsUseCase(
         this.infra.transactionRepository
       )
@@ -882,7 +887,7 @@ export class UseCaseDI {
   }
 
   get addReviewUseCase(): IAddReviewUseCase {
-    if(!this._addReviewUseCase) {
+    if (!this._addReviewUseCase) {
       this._addReviewUseCase = new AddReviewUseCase(
         this.infra.reviewRepository,
         this.infra.serviceRepository,
@@ -890,5 +895,15 @@ export class UseCaseDI {
       )
     }
     return this._addReviewUseCase;
+  }
+
+  get sendNotificationUseCase(): ISendNotificationUseCase {
+    if (!this._sendNotificationUseCase) {
+      this._sendNotificationUseCase = new SendNotificationUseCase(
+        this.infra.realtimeService,
+        this.infra.notificationRepository
+      )
+    }
+    return this._sendNotificationUseCase
   }
 }

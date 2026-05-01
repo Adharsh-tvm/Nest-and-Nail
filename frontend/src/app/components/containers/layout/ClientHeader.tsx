@@ -22,6 +22,7 @@ import toast from "react-hot-toast";
 import { useRouter, usePathname } from "next/navigation";
 import SwitchRoleConfirmationModal from "./SwitchRoleConfirmationModal";
 import { Spinner } from "@/app/components/ui/spinner";
+import NotificationBell from "./NotificationBell";
 
 const ClientHeader: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -293,6 +294,9 @@ const ClientHeader: React.FC = () => {
                   </div>
                 )}
                 <div className="h-6 w-px bg-gray-200 mx-2" />
+
+                {/* Notification Bell */}
+                <NotificationBell />
 
                 {/* User dropdown */}
                 <div className="relative" ref={userMenuRef}>

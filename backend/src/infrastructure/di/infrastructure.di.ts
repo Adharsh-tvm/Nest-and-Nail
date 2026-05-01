@@ -43,6 +43,9 @@ import { IConcernRepository } from "../../domain/repositories/IConcernRepository
 import { ConcernRepository } from "../repo/ConcernRepository";
 import { IReviewRepository } from "../../domain/repositories/IReviewRepository";
 import { ReviewRepository } from "../repo/ReviewRepository";
+import { IRealtimeService } from "../../application/interfaces/socket/IRealtimeService";
+import { INotificationRepository } from "../../domain/repositories/INotificationRepository";
+import { NotificationRepository } from "../repo/NotificationRepository";
 
 export class InfrastructureDI {
   private _userRepositoryFactory?: IUserRepositoryFactory;
@@ -73,6 +76,8 @@ export class InfrastructureDI {
 
   private _s3Service?: S3Service;
 
+  private _realtimeService?: IRealtimeService;
+  private _notificationRepository?: INotificationRepository;
 
 
 
@@ -236,5 +241,23 @@ export class InfrastructureDI {
       this._reviewRepository = new ReviewRepository();
     }
     return this._reviewRepository
+  }
+
+  setRealtimeService(service: IRealtimeService) {
+    this._realtimeService = service;
+  }
+
+  get realtimeService(): IRealtimeService {
+    if (!this._realtimeService) {
+      throw new Error("RealtimeService not initialized");
+    }
+    return this._realtimeService;
+  }
+
+  get notificationRepository(): INotificationRepository {
+    if (!this._notificationRepository) {
+      this._notificationRepository = new NotificationRepository();
+    }
+    return this._notificationRepository;
   }
 }

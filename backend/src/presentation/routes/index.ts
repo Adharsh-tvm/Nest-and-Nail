@@ -20,6 +20,7 @@ import { createAdminMeetingRoutes } from "./admin/admin.meeting.routes";
 import { createWalletRoutes } from "./common/wallet.routes";
 import { concernRoutes } from "./concern/concern.routes";
 import { clientReviewRoutes } from "./review/review.routes";
+import { notificationRoutes } from "./notification/notification.routes";
 
 export const createRoutes = (container: DIContainer): Router => {
   const router = Router();
@@ -67,6 +68,8 @@ export const createRoutes = (container: DIContainer): Router => {
   router.use("/api/concerns", concernRoutes(container.controllers.authMiddleware, container.controllers.concernController));
   
   router.use("/api/review", clientReviewRoutes(container.controllers.authMiddleware, container.controllers.clientReviewController));
+
+  router.use("/api/notifications", notificationRoutes(container.controllers.authMiddleware, container.controllers.notificationController));
 
 
   return router;

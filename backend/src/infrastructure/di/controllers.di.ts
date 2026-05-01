@@ -29,6 +29,9 @@ import { AdminMeetingController } from "../../presentation/controllers/admin/Adm
 import { WalletController } from "../../presentation/controllers/wallet/WalletController";
 import { ConcernController } from "../../presentation/controllers/concern/ConcernController";
 import { ClientReviewController } from "../../presentation/controllers/client/ClientReviewController";
+import { NotificationController } from "../../presentation/controllers/notification/NotificationController";
+import { GetUserNotificationsUseCase } from "../../application/use-cases/notification/GetUserNotificationsUseCase";
+import { MarkNotificationReadUseCase } from "../../application/use-cases/notification/MarkNotificationReadUseCase";
 
 export class ControllerDI {
     private _authController?: IAuthController;
@@ -59,6 +62,7 @@ export class ControllerDI {
     private _walletController?: WalletController;
     private _concernController?: ConcernController;
     private _clientReviewController?: ClientReviewController;
+    private _notificationController?: NotificationController;
 
     constructor(
         private _useCases: UseCaseDI,
@@ -305,5 +309,15 @@ export class ControllerDI {
             )
         }
         return this._clientReviewController
+    }
+
+    get notificationController(): NotificationController {
+        if (!this._notificationController) {
+            this._notificationController = new NotificationController(
+                new GetUserNotificationsUseCase(this._infra.notificationRepository),
+                new MarkNotificationReadUseCase(this._infra.notificationRepository)
+            );
+        }
+        return this._notificationController;
     }
 }

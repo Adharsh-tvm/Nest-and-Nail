@@ -8,7 +8,9 @@ import { RequestLogger } from "./presentation/middlewares/RequestLogger";
 import { DIContainer } from "./infrastructure/di/DIContainer";
 import { createRoutes } from "./presentation/routes";
 import http from "http";
-import { initSocketServer } from "./infrastructure/socket/socketServer";
+import { Server } from "socket.io";
+import { SocketServer } from "./infrastructure/socket/socketServer";
+import { RealtimeService } from "./infrastructure/socket/socket-services/RealtimeService";
 
 
 
@@ -35,17 +37,30 @@ async function bootstrap() {
 
   // Initialize Dependency Injection Container
   const container = new DIContainer();
-
-  // Routes
-  app.use("/", createRoutes(container));
-
-  // Error Handler
-  app.use(errorHandler);
-
   const server = http.createServer(app);
 
-  initSocketServer(server, container);
+  const io = new Server(server, {
+    cors: {
+      origin: "*",
+      credentials: true,
+    },
+  });
 
+  
+  // Error Handler
+  app.use(errorHandler);
+  
+  
+  const socketServer = new SocketServer(io);
+  socketServer.initialize();
+  
+  const realtimeService = new RealtimeService(socketServer);
+  
+  container.infra.setRealtimeService(realtimeService);
+  
+  // Routes
+  app.use("/", createRoutes(container));
+  
   // Start server
   const PORT = env.PORT;
   server.listen(PORT, () => {
