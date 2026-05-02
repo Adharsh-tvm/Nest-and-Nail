@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { X, Send, MessageCircle } from "lucide-react";
 import io, { Socket } from "socket.io-client";
 import { getMessagesAction, sendMessageAction } from "@/app/actions/chat-actions";
 import { useUserStore } from "@/store/userStore";
-import toast from "react-hot-toast";
 
 interface Message {
   messageId?: string;
@@ -31,6 +30,8 @@ export default function ChatDrawer({ chatId, receiverId, receiverName }: ChatDra
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const socketRef = useRef<Socket | null>(null);
+  // Ref to track isOpen without stale closures inside socket callbacks
+  const isOpenRef = useRef(false);
 
   // Initial fetch
   useEffect(() => {
@@ -48,7 +49,12 @@ export default function ChatDrawer({ chatId, receiverId, receiverName }: ChatDra
     fetchMessages();
   }, [chatId]);
 
-  // Socket connection
+  // Keep isOpenRef in sync with state so socket callbacks always read the latest value
+  useEffect(() => {
+    isOpenRef.current = isOpen;
+  }, [isOpen]);
+
+  // Socket connection — depends only on chatId so it never reconnects on open/close
   useEffect(() => {
     if (!chatId) return;
 
@@ -61,17 +67,11 @@ export default function ChatDrawer({ chatId, receiverId, receiverName }: ChatDra
     });
 
     socket.on("receive-message", (message: Message) => {
-      setMessages((prev) => {
-        // Prevent duplicate if we already have it (optional, but since we removed optimistic updates, this is safe)
-        return [...prev, message];
-      });
+      setMessages((prev) => [...prev, message]);
 
-      // Show notification if it's from the other person
-      if (user && message.senderId !== user.id) {
-        if (!isOpen) {
-          setUnreadCount((prev) => prev + 1);
-          toast.success(`New message from ${receiverName || "User"}`);
-        }
+      // Use ref so we always read the current isOpen value, not a stale closure
+      if (message.senderId !== user?.id && !isOpenRef.current) {
+        setUnreadCount((prev) => prev + 1);
       }
     });
 
@@ -79,7 +79,8 @@ export default function ChatDrawer({ chatId, receiverId, receiverName }: ChatDra
       socket.disconnect();
       socketRef.current = null;
     };
-  }, [chatId, isOpen, user, receiverName]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chatId]);
 
   // Clear unread count when opening
   useEffect(() => {
