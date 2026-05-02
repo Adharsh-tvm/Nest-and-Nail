@@ -14,7 +14,7 @@ const dailyRotateTransport = new DailyRotateFile({
   filename: "logs/application-%DATE%.log",
   datePattern: "YYYY-MM-DD",
   zippedArchive: true,
-  maxSize: "20m",
+  maxSize: env.LOG_MAX_SIZE,
   maxFiles: env.LOG_RETENTION_DAYS
     ? `${env.LOG_RETENTION_DAYS}d`
     : "30d",
@@ -26,7 +26,7 @@ const errorRotateTransport = new DailyRotateFile({
   level: "error",
   datePattern: "YYYY-MM-DD",
   zippedArchive: true,
-  maxSize: "10m",
+  maxSize: env.ERROR_LOG_MAX_SIZE,
   maxFiles: env.LOG_RETENTION_DAYS
     ? `${env.LOG_RETENTION_DAYS}d`
     : "30d",

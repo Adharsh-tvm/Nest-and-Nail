@@ -10,7 +10,8 @@ const envSchema = z.object({
 
   // Logging
   LOG_RETENTION_DAYS: z.coerce.number().int().positive().default(14),
-
+  LOG_MAX_SIZE: z.string().default("20m"),
+  ERROR_LOG_MAX_SIZE: z.string().default("10m"),
   // Database
   MONGO_URI: z.string().min(1, "MONGO_URI is required"),
 
