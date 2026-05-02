@@ -32,6 +32,7 @@ import { ClientReviewController } from "../../presentation/controllers/client/Cl
 import { NotificationController } from "../../presentation/controllers/notification/NotificationController";
 import { GetUserNotificationsUseCase } from "../../application/use-cases/notification/GetUserNotificationsUseCase";
 import { MarkNotificationReadUseCase } from "../../application/use-cases/notification/MarkNotificationReadUseCase";
+import { ChatController } from "../../presentation/controllers/chat/ChatController";
 
 export class ControllerDI {
     private _authController?: IAuthController;
@@ -63,6 +64,7 @@ export class ControllerDI {
     private _concernController?: ConcernController;
     private _clientReviewController?: ClientReviewController;
     private _notificationController?: NotificationController;
+    private _chatController?: ChatController;
 
     constructor(
         private _useCases: UseCaseDI,
@@ -303,7 +305,7 @@ export class ControllerDI {
     }
 
     get clientReviewController(): ClientReviewController {
-        if(!this._clientReviewController) {
+        if (!this._clientReviewController) {
             this._clientReviewController = new ClientReviewController(
                 this._useCases.addReviewUseCase
             )
@@ -319,5 +321,15 @@ export class ControllerDI {
             );
         }
         return this._notificationController;
+    }
+
+    get chatController(): ChatController {
+        if (!this._chatController) {
+            this._chatController = new ChatController(
+                this._useCases.sendMessageUseCase,
+                this._useCases.getMessagesUseCase
+            )
+        }
+        return this._chatController
     }
 }

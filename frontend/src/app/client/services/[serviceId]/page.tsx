@@ -14,6 +14,8 @@ import clsx from "clsx";
 import toast from "react-hot-toast";
 import RaiseConcernButton from "@/app/components/containers/services/RaiseConcernButton";
 import AddReviewButton from "@/app/components/containers/services/AddReviewButton";
+import ChatDrawer from "@/app/components/containers/chat/ChatDrawer";
+import { MessageCircle } from "lucide-react";
 
 // ── Refund tier helper (mirrors backend) ──────────────────────────────────────
 function getRefundInfo(createdAt: Date | string) {
@@ -379,6 +381,14 @@ export default function ClientServiceDetailsPage() {
           </div>
         );
       })()}
+
+      {service && worker && !["COMPLETED", "CANCELLED", "CANCELLED_BY_CLIENT", "CANCELLED_BY_WORKER"].includes(service.status) && (
+        <ChatDrawer
+          chatId={serviceId}
+          receiverId={service.workerId}
+          receiverName={worker?.name}
+        />
+      )}
     </>
   );
 }

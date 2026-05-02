@@ -10,6 +10,7 @@ import { ServiceStatus } from "../../../shared/enums/serviceEnums";
 import { v4 as uuidv4 } from "uuid";
 import { IProcessWalletPaymentUseCase } from "../../interfaces/payment/IProcessWalletPaymentUseCase";
 import { transactionSource, transactionStatus, transactionType } from "../../../shared/enums/transactionEnums";
+import { ISendNotificationUseCase } from "../../interfaces/notifications/ISendNotificationUseCase";
 
 export class ProcessWalletPaymentUseCase implements IProcessWalletPaymentUseCase {
   constructor(
@@ -18,7 +19,8 @@ export class ProcessWalletPaymentUseCase implements IProcessWalletPaymentUseCase
     private readonly _walletRepo: IWalletRepository,
     private readonly _transactionRepo: ITransactionRepository,
     private readonly _scheduleRepo: IWorkerScheduleRepository,
-    private readonly _userRepoFactory: IUserRepositoryFactory
+    private readonly _userRepoFactory: IUserRepositoryFactory,
+    private readonly _sendNotificationUseCase: ISendNotificationUseCase
   ) {}
 
   async execute(serviceId: string, clientId: string) {
@@ -148,6 +150,25 @@ export class ProcessWalletPaymentUseCase implements IProcessWalletPaymentUseCase
         service.serviceId
       );
     }
+
+    // Notify worker after wallet payment confirmed
+    await this._sendNotificationUseCase.execute({
+      userId: service.workerId,
+      title: service.category === "VIDEO_CALL"
+        ? "Meeting Confirmed"
+        : "Service Confirmed",
+      message: service.category === "VIDEO_CALL"
+        ? "A client has paid for a video call with you"
+        : "A client has paid and confirmed a service booking with you",
+      type: service.category === "VIDEO_CALL"
+        ? "MEETING_BOOKED"
+        : "SERVICE_BOOKED",
+      data: {
+        serviceId: service.serviceId,
+        clientId: service.clientId,
+        category: service.category
+      }
+    });
 
     return {
       success: true,

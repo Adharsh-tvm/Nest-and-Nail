@@ -297,17 +297,15 @@ If the client cancels before 1 hour, the refund will be 90% if it is cancelled b
 ☐ video call ring feature
 ☐ service location in maps - booking details page
 ✔ video call history @done (4/27/2026, 11:49:42 AM)
-☐ category management - bug
+✔ category management - bug @done (5/2/2026, 7:29:36 AM)
 ☐ routes in constant
-
 ✔ Implement the wallet system along with transaction management. @done (4/28/2026, 11:36:54 PM)
 ☐ Complete the service option module for workers.
-☐ Add a concern-raising feature for users.
-☐ Store meeting history along with call duration details.
-☐ Implement ratings and reviews functionality for workers.
-☐ Add notifications for workers regarding scheduled meetings.
+✔ Add a concern-raising feature for users. @done (5/2/2026, 7:29:42 AM)
+✔ Store meeting history along with call duration details. @done (5/2/2026, 7:29:44 AM)
+✔ Implement ratings and reviews functionality for workers. @done (5/2/2026, 7:29:45 AM)
+✔ Add notifications for workers regarding scheduled meetings. @done (5/2/2026, 7:29:46 AM)
 ☐ Develop real-time chat functionality between users and workers.
-
 ☐ any lint errors
 ☐ mappers
 ☐ routes in constant
@@ -325,5 +323,26 @@ resolutionType:
   - SUSPEND
   - REFUND
   - NO_ACTION
+☐ refund transaction
 
-☐ 
+
+NEXT REVIEW PENDINGS
+
+☐ video call ring feature
+☐ service location in maps - booking details page
+✔ video call history @done (5/2/2026, 7:31:08 AM)
+✔ category management - bug @done (5/2/2026, 7:31:09 AM)
+☐ routes in constant
+✔ Implement the wallet system along with transaction management. @done (5/2/2026, 7:31:23 AM)
+✔ Complete the service option module for workers. @done (5/2/2026, 7:31:32 AM)
+✔ Add a concern-raising feature for users. @done (5/2/2026, 7:31:42 AM)
+✔ Store meeting history along with call duration details. @done (5/2/2026, 7:31:44 AM)
+✔ Implement ratings and reviews functionality for workers. @done (5/2/2026, 7:31:45 AM)
+✔ Add notifications for workers regarding scheduled meetings. @done (5/2/2026, 7:31:46 AM)
+☐ logger refactoring
+☐ configure env
+☐ relative path
+☐ Develop real-time chat functionality between users and workers.
+☐ transaction
+☐ any
+☐ mapping

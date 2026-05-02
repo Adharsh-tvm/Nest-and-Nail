@@ -4,7 +4,6 @@ import { IBookWorkerUseCase } from "../../../domain/repositories/IBookWorkerUseC
 import { IServiceRepository } from "../../../domain/repositories/IServiceRepository";
 import { IWorkerRepository } from "../../../domain/repositories/IWorkerRepository";
 import { IWorkerScheduleRepository } from "../../../domain/repositories/IWorkerScheduleRepository";
-import { ISendNotificationUseCase } from "../../interfaces/notifications/ISendNotificationUseCase";
 
 
 
@@ -13,8 +12,7 @@ export class BookWorkerUseCase implements IBookWorkerUseCase {
   constructor(
     private readonly _serviceRepo: IServiceRepository,
     private readonly _workerRepo: IWorkerRepository,
-    private readonly _scheduleRepo: IWorkerScheduleRepository,
-    private readonly _sendNotificationUseCase: ISendNotificationUseCase
+    private readonly _scheduleRepo: IWorkerScheduleRepository
   ) { }
 
   async execute(dto: CreateServiceDTO): Promise<ServiceResponseDTO> {
@@ -99,28 +97,10 @@ export class BookWorkerUseCase implements IBookWorkerUseCase {
 
     const created = await this._serviceRepo.create(serviceEntity);
 
-    // SEND NOTIFICATION TO WORKER
-    await this._sendNotificationUseCase.execute({
-      userId: dto.workerId,
-      title: dto.category === "VIDEO_CALL"
-        ? "New Meeting Booked"
-        : "New Service Booking",
-      message: dto.category === "VIDEO_CALL"
-        ? "A client scheduled a video call with you"
-        : "A client booked your service",
-      type: dto.category === "VIDEO_CALL"
-        ? "MEETING_BOOKED"
-        : "SERVICE_BOOKED",
-      data: {
-        serviceId: created.serviceId,
-        clientId: dto.clientId,
-        category: dto.category
-      }
-    });
-
     // NOTE: Worker schedule slots are NOT marked as booked here.
     // They will be marked as booked only after payment succeeds
     // in VerifyPaymentUseCase (Razorpay) or ProcessWalletPaymentUseCase (Wallet).
+    // Notification to worker is also deferred until payment is confirmed.
 
     return ServiceMapper.toResponse(created);
   }

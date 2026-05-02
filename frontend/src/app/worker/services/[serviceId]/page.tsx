@@ -26,6 +26,8 @@ import { getWorkerServiceDetailsAction, startWorkerServiceAction } from "@/app/a
 import clsx from "clsx";
 import toast from "react-hot-toast";
 import RaiseConcernButton from "@/app/components/containers/services/RaiseConcernButton";
+import ChatDrawer from "@/app/components/containers/chat/ChatDrawer";
+import { MessageCircle } from "lucide-react";
 
 /* ─────────────────────────────────────────────────────────────── */
 /*  Types                                                          */
@@ -405,8 +407,6 @@ export default function WorkerServiceDetailsPage() {
               >
                 {service.status.replace(/_/g, " ")}
               </span>
-
-
             </div>
           </motion.div>
 
@@ -702,6 +702,14 @@ export default function WorkerServiceDetailsPage() {
           </div>
         </div>
       </div>
+
+      {service && service.client && !["COMPLETED", "CANCELLED", "CANCELLED_BY_CLIENT", "CANCELLED_BY_WORKER"].includes(service.status) && (
+        <ChatDrawer
+          chatId={serviceId}
+          receiverId={service.clientId}
+          receiverName={service.client?.name}
+        />
+      )}
     </>
   );
 }

@@ -9,7 +9,7 @@ export class ServiceMapper {
 
   static toEntity(dto: CreateServiceDTO): Service {
     const basePlatformFee = dto.category === "VIDEO_CALL" ? 10 : 50;
-    const totalAmount = dto.pricePerWorker * dto.numberOfWorkers + basePlatformFee;
+    const totalAmount = dto.pricePerWorker * dto.numberOfWorkers * (dto.numberOfDays || 1) + basePlatformFee;
 
     let videoCall;
 

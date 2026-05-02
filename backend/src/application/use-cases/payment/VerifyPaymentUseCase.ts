@@ -11,6 +11,7 @@ import { ServiceStatus } from "../../../shared/enums/serviceEnums";
 import { v4 as uuidv4 } from "uuid";
 import { transactionSource, transactionStatus, transactionType } from "../../../shared/enums/transactionEnums";
 import { IVerifyPaymentUseCase } from "../../interfaces/payment/IVerifyPaymentUseCase";
+import { ISendNotificationUseCase } from "../../interfaces/notifications/ISendNotificationUseCase";
 
 export class VerifyPaymentUseCase implements IVerifyPaymentUseCase {
     constructor(
@@ -20,7 +21,8 @@ export class VerifyPaymentUseCase implements IVerifyPaymentUseCase {
         private readonly _walletRepo: IWalletRepository,
         private readonly _transactionRepo: ITransactionRepository,
         private readonly _scheduleRepo: IWorkerScheduleRepository,
-        private readonly _userRepoFactory: IUserRepositoryFactory
+        private readonly _userRepoFactory: IUserRepositoryFactory,
+        private readonly _sendNotificationUseCase: ISendNotificationUseCase
     ) { }
 
     async execute(data: {
@@ -126,6 +128,25 @@ export class VerifyPaymentUseCase implements IVerifyPaymentUseCase {
                     createdAt: new Date(),
                 });
             }
+
+            // Notify worker after payment confirmed
+            await this._sendNotificationUseCase.execute({
+                userId: service.workerId,
+                title: service.category === "VIDEO_CALL"
+                    ? "Meeting Payment Confirmed"
+                    : "Service Payment Confirmed",
+                message: service.category === "VIDEO_CALL"
+                    ? "A client has paid for a video call with you"
+                    : "A client has paid and confirmed a service booking with you",
+                type: service.category === "VIDEO_CALL"
+                    ? "MEETING_BOOKED"
+                    : "SERVICE_BOOKED",
+                data: {
+                    serviceId: service.serviceId,
+                    clientId: service.clientId,
+                    category: service.category
+                }
+            });
         }
 
         return { success: true };

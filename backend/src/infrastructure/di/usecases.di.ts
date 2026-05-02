@@ -136,6 +136,10 @@ import { IAddReviewUseCase } from "../../application/interfaces/review/IAddRevie
 import { AddReviewUseCase } from "../../application/use-cases/review/AddReviewUseCase";
 import { ISendNotificationUseCase } from "../../application/interfaces/notifications/ISendNotificationUseCase";
 import { SendNotificationUseCase } from "../../application/use-cases/notification/SendNotificationUseCase";
+import { ISendMessageUseCase } from "../../application/interfaces/chat/ISendMessageUseCase";
+import { IGetMessagesUseCase } from "../../application/interfaces/chat/IGetMessagesUseCase";
+import { SendMessageUseCase } from "../../application/use-cases/chat/SendMessageUseCase";
+import { GetMessagesUseCase } from "../../application/use-cases/chat/GetMessagesUseCase";
 
 export class UseCaseDI {
 
@@ -223,6 +227,8 @@ export class UseCaseDI {
   private _addReviewUseCase?: IAddReviewUseCase;
 
   private _sendNotificationUseCase?: ISendNotificationUseCase;
+  private _sendMessageUseCase?: ISendMessageUseCase;
+  private _getMessagesUseCase?: IGetMessagesUseCase;
 
 
 
@@ -570,8 +576,7 @@ export class UseCaseDI {
       this._bookWorkerUseCase = new BookWorkerUseCase(
         this.infra.serviceRepository,
         this.infra.workerRepository,
-        this.infra.workerScheduleRepo,
-        this.sendNotificationUseCase
+        this.infra.workerScheduleRepo
       )
     }
     return this._bookWorkerUseCase;
@@ -780,7 +785,8 @@ export class UseCaseDI {
         this.infra.walletRepository,
         this.infra.transactionRepository,
         this.infra.workerScheduleRepo,
-        this.infra.userRepositoryFactory
+        this.infra.userRepositoryFactory,
+        this.sendNotificationUseCase
       )
     }
     return this._verifyPaymentUseCase;
@@ -794,7 +800,8 @@ export class UseCaseDI {
         this.infra.walletRepository,
         this.infra.transactionRepository,
         this.infra.workerScheduleRepo,
-        this.infra.userRepositoryFactory
+        this.infra.userRepositoryFactory,
+        this.sendNotificationUseCase
       );
     }
     return this._processWalletPaymentUseCase;
@@ -906,4 +913,24 @@ export class UseCaseDI {
     }
     return this._sendNotificationUseCase
   }
+
+  get sendMessageUseCase(): ISendMessageUseCase {
+    if (!this._sendMessageUseCase) {
+      this._sendMessageUseCase = new SendMessageUseCase(
+        this.infra.chatRepository,
+        this.infra.realtimeService
+      )
+    }
+    return this._sendMessageUseCase;
+  }
+
+  get getMessagesUseCase(): IGetMessagesUseCase {
+    if (!this._getMessagesUseCase) {
+      this._getMessagesUseCase = new GetMessagesUseCase(
+        this.infra.chatRepository,
+      )
+    }
+    return this._getMessagesUseCase;
+  }
+
 }

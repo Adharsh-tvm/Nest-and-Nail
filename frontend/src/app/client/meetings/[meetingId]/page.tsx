@@ -10,6 +10,7 @@ import {
 import EndMeetingButton from "@/app/components/containers/meetings/EndMeetingButton";
 import CancelMeetingButton from "@/app/components/containers/meetings/CancelMeetingButton";
 import { cancelServiceAction } from "@/app/actions/client/service-actions";
+import ChatDrawer from "@/app/components/containers/chat/ChatDrawer";
 
 export async function generateMetadata({ params }: { params: Promise<{ meetingId: string }> }) {
   return { title: `Meeting Details | Client` };
@@ -84,9 +85,11 @@ export default async function ClientMeetingDetailPage({ params }: { params: Prom
                   </p>
                 </div>
               </div>
-              <div className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full border text-sm font-bold ${statusInfo.bg} ${statusInfo.color}`}>
-                {statusInfo.icon}
-                {statusInfo.label}
+              <div className="flex items-center gap-3">
+                <div className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full border text-sm font-bold ${statusInfo.bg} ${statusInfo.color}`}>
+                  {statusInfo.icon}
+                  {statusInfo.label}
+                </div>
               </div>
             </div>
 
@@ -269,6 +272,13 @@ export default async function ClientMeetingDetailPage({ params }: { params: Prom
         </div>
 
       </div>
+      {!["COMPLETED", "CANCELLED", "CANCELLED_BY_CLIENT", "CANCELLED_BY_WORKER"].includes(meeting.status) && (
+        <ChatDrawer
+          chatId={meeting.serviceId}
+          receiverId={meeting.workerId}
+          receiverName={worker?.name}
+        />
+      )}
     </div>
   );
 }

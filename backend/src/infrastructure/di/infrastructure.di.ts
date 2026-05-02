@@ -46,6 +46,8 @@ import { ReviewRepository } from "../repo/ReviewRepository";
 import { IRealtimeService } from "../../application/interfaces/socket/IRealtimeService";
 import { INotificationRepository } from "../../domain/repositories/INotificationRepository";
 import { NotificationRepository } from "../repo/NotificationRepository";
+import { IChatRepository } from "../../domain/repositories/IChatRepository";
+import { ChatRepository } from "../repo/ChatRepository";
 
 export class InfrastructureDI {
   private _userRepositoryFactory?: IUserRepositoryFactory;
@@ -78,7 +80,7 @@ export class InfrastructureDI {
 
   private _realtimeService?: IRealtimeService;
   private _notificationRepository?: INotificationRepository;
-
+  private _chatRepository?: IChatRepository;
 
 
   get userRepositoryFactory(): IUserRepositoryFactory {
@@ -259,5 +261,12 @@ export class InfrastructureDI {
       this._notificationRepository = new NotificationRepository();
     }
     return this._notificationRepository;
+  }
+
+  get chatRepository(): IChatRepository {
+    if (!this._chatRepository) {
+      this._chatRepository = new ChatRepository()
+    }
+    return this._chatRepository;
   }
 }
