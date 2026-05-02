@@ -1,9 +1,11 @@
 import { IServiceRepository } from "../../../domain/repositories/IServiceRepository";
 import { IWorkerScheduleRepository } from "../../../domain/repositories/IWorkerScheduleRepository";
 import { IWalletRepository } from "../../../domain/repositories/IWalletRepository";
+import { ITransactionRepository } from "../../../domain/repositories/ITransactionRepository";
 import { ICancelServiceUseCase } from "../../interfaces/service/ICancelServiceUseCase";
 import { ServiceStatus } from "../../../shared/enums/serviceEnums";
 import { PaymentStatus } from "../../../shared/enums/paymentEnums";
+import { transactionSource, transactionStatus, transactionType } from "../../../shared/enums/transactionEnums";
 import { ServiceMapper } from "../../mappers/ServiceMapper";
 import { ServiceResponseDTO } from "../../dtos/ServiceDTO";
 
@@ -28,7 +30,8 @@ export class CancelServiceUseCase implements ICancelServiceUseCase {
     constructor(
         private readonly _serviceRepo: IServiceRepository,
         private readonly _scheduleRepo: IWorkerScheduleRepository,
-        private readonly _walletRepo: IWalletRepository
+        private readonly _walletRepo: IWalletRepository,
+        private readonly _transactionRepo: ITransactionRepository
     ) { }
 
     async execute(serviceId: string, userId: string, reason?: string): Promise<ServiceResponseDTO> {
@@ -89,6 +92,19 @@ export class CancelServiceUseCase implements ICancelServiceUseCase {
                         });
                     }
                     await this._walletRepo.creditBalance(service.clientId, refundAmount);
+
+                    // Add transaction record
+                    await this._transactionRepo.create({
+                        transactionId: `txn_refund_${serviceId}_${Date.now()}`,
+                        walletId: wallet ? wallet.walletId : `wallet_${service.clientId}`,
+                        userId: service.clientId,
+                        type: transactionType.CREDIT,
+                        amount: refundAmount,
+                        source: transactionSource.REFUND,
+                        serviceId: serviceId,
+                        status: transactionStatus.SUCCESS,
+                        createdAt: new Date()
+                    });
                 } catch (walletErr) {
                     // Wallet credit failure should not block the cancellation
                     console.error("Refund wallet credit failed:", walletErr);

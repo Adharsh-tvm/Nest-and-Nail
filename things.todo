@@ -342,7 +342,7 @@ NEXT REVIEW PENDINGS
 ☐ logger refactoring
 ☐ configure env
 ☐ relative path
-☐ Develop real-time chat functionality between users and workers.
+✔ Develop real-time chat functionality between users and workers. @done (5/2/2026, 5:29:03 PM)
 ☐ transaction
 ☐ any
 ☐ mapping

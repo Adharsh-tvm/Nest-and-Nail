@@ -859,7 +859,8 @@ export class UseCaseDI {
       this._cancelServiceUseCase = new CancelServiceUseCase(
         this.infra.serviceRepository,
         this.infra.workerScheduleRepo,
-        this.infra.walletRepository
+        this.infra.walletRepository,
+        this.infra.transactionRepository
       )
     }
     return this._cancelServiceUseCase
