@@ -82,7 +82,8 @@ export class ControllerDI {
                 this._useCases.forgotPasswordUseCase,
                 this._useCases.resetPasswordUseCase,
                 this._useCases.validateUserUseCase,
-                this._useCases.changePasswordUseCase
+                this._useCases.changePasswordUseCase,
+                this._infra.logger
             );
         }
         return this._authController;

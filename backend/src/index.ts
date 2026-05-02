@@ -30,7 +30,6 @@ async function bootstrap() {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
   app.use(cookieParser());
-  app.use(RequestLogger);
 
   // Connect to MongoDB
   await connectDB(env.MONGO_URI);
@@ -38,6 +37,9 @@ async function bootstrap() {
   // Initialize Dependency Injection Container
   const container = new DIContainer();
   const server = http.createServer(app);
+  
+  // Use logger middleware after container initialization
+  app.use(RequestLogger(container.infra.logger));
 
   const io = new Server(server, {
     cors: {

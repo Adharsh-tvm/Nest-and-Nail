@@ -14,4 +14,7 @@ export class WinstonLogger implements ILogger {
   debug(message: string): void {
     loggerInstance.debug(message);
   }
+  http(message: string): void {
+    loggerInstance.http?.(message);
+  }
 }

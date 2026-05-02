@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { HttpStatusCode } from "../../../shared/enums/httpCodes";
-import { loggerInstance } from "../../../infrastructure/logger/Logger";
 import { IAuthController } from "../../interfaces/IAuthController";
+import { ILogger } from "../../../infrastructure/logger/ILogger";
 import { IRegisterUserUseCase } from "../../../application/interfaces/auth/IRegisterUserUseCase";
 import { ILoginUserUseCase } from "../../../application/interfaces/auth/ILoginUserUseCase";
 import { ISendOtpUseCase } from "../../../application/interfaces/auth/ISendOtpUseCase";
@@ -25,7 +25,8 @@ export class AuthController implements IAuthController {
     private readonly _forgotPasswordUseCase: IForgotPasswordUseCase,
     private readonly _resetPasswordUseCase: IResetPasswordUseCase,
     private readonly _validateUserUseCase: IValidateUserUseCase,
-    private readonly _changePasswordUseCase: IChangePasswordUseCase
+    private readonly _changePasswordUseCase: IChangePasswordUseCase,
+    private readonly _logger: ILogger
   ) { }
 
   // ---------------- REGISTER ----------------
@@ -39,7 +40,7 @@ export class AuthController implements IAuthController {
         );
       }
 
-      loggerInstance.info(`[AuthController] Register request for ${email_address}`);
+      this._logger.info(`[AuthController] Register request for ${email_address}`);
 
       await this._registerUserUseCase.execute(req.body);
 
@@ -60,7 +61,7 @@ export class AuthController implements IAuthController {
       );
 
     } catch (error: unknown) {
-      loggerInstance.error("[AuthController] Register error:", error);
+      this._logger.error("[AuthController] Register error:", error);
 
       res.status(HttpStatusCode.BAD_REQUEST).json(
         ResponseHandler.error(RESPONSE_MESSAGES.BAD_REQUEST, error)
@@ -96,7 +97,7 @@ export class AuthController implements IAuthController {
       );
 
     } catch (error: unknown) {
-      loggerInstance.error("[AuthController] Login error:", error);
+      this._logger.error("[AuthController] Login error:", error);
 
       res.status(HttpStatusCode.UNAUTHORIZED).json(
         ResponseHandler.error(RESPONSE_MESSAGES.INVALID_CREDENTIALS, error)

@@ -3,4 +3,5 @@ export interface ILogger {
   error(message: string, error?: unknown): void;
   warn(message: string): void;
   debug(message: string): void;
+  http?(message: string): void;
 }

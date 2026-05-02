@@ -1,7 +1,9 @@
 import { Request, Response, NextFunction } from "express";
-import { loggerInstance } from "../../infrastructure/logger/Logger"; 
+import { ILogger } from "../../infrastructure/logger/ILogger"; 
 
-export function RequestLogger(req: Request, res: Response, next: NextFunction) {
-  loggerInstance.http?.(`${req.method} ${req.originalUrl}`);
-  next();
+export function RequestLogger(logger: ILogger) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    logger.http?.(`${req.method} ${req.originalUrl}`);
+    next();
+  };
 }
