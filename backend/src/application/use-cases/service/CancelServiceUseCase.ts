@@ -2,6 +2,8 @@ import { IServiceRepository } from "../../../domain/repositories/IServiceReposit
 import { IWorkerScheduleRepository } from "../../../domain/repositories/IWorkerScheduleRepository";
 import { IWalletRepository } from "../../../domain/repositories/IWalletRepository";
 import { ITransactionRepository } from "../../../domain/repositories/ITransactionRepository";
+import { IUserRepositoryFactory } from "../../../domain/repositories/IUserRepositoryFactory";
+import { Role } from "../../../shared/enums/authEnums";
 import { ICancelServiceUseCase } from "../../interfaces/service/ICancelServiceUseCase";
 import { ServiceStatus } from "../../../shared/enums/serviceEnums";
 import { PaymentStatus } from "../../../shared/enums/paymentEnums";
@@ -31,7 +33,8 @@ export class CancelServiceUseCase implements ICancelServiceUseCase {
         private readonly _serviceRepo: IServiceRepository,
         private readonly _scheduleRepo: IWorkerScheduleRepository,
         private readonly _walletRepo: IWalletRepository,
-        private readonly _transactionRepo: ITransactionRepository
+        private readonly _transactionRepo: ITransactionRepository,
+        private readonly _userRepoFactory: IUserRepositoryFactory
     ) { }
 
     async execute(serviceId: string, userId: string, reason?: string): Promise<ServiceResponseDTO> {
@@ -105,6 +108,34 @@ export class CancelServiceUseCase implements ICancelServiceUseCase {
                         status: transactionStatus.SUCCESS,
                         createdAt: new Date()
                     });
+
+                    // Debit admin wallet
+                    const adminRepo = this._userRepoFactory.getRepository(Role.ADMIN);
+                    const admins = await adminRepo.findAll();
+                    const admin = admins[0];
+
+                    if (admin) {
+                        let adminWallet = await this._walletRepo.findByUserId(admin.userId);
+                        if (adminWallet) {
+                            try {
+                                const updatedAdminWallet = await this._walletRepo.debitBalance(admin.userId, refundAmount);
+                                
+                                await this._transactionRepo.create({
+                                    transactionId: `txn_refund_debit_${serviceId}_${Date.now()}`,
+                                    walletId: updatedAdminWallet.walletId,
+                                    userId: admin.userId,
+                                    type: transactionType.DEBIT,
+                                    amount: refundAmount,
+                                    source: transactionSource.REFUND,
+                                    serviceId: serviceId,
+                                    status: transactionStatus.SUCCESS,
+                                    createdAt: new Date(),
+                                });
+                            } catch (err) {
+                                console.error("Failed to debit admin wallet:", err);
+                            }
+                        }
+                    }
                 } catch (walletErr) {
                     // Wallet credit failure should not block the cancellation
                     console.error("Refund wallet credit failed:", walletErr);

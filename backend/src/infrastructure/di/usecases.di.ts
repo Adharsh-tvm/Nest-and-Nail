@@ -668,7 +668,10 @@ export class UseCaseDI {
   get completeServiceUseCase(): ICompleteServiceUseCase {
     if (!this._completeServiceUseCase) {
       this._completeServiceUseCase = new CompleteServiceUseCase(
-        this.infra.serviceRepository
+        this.infra.serviceRepository,
+        this.infra.walletRepository,
+        this.infra.transactionRepository,
+        this.infra.userRepositoryFactory
       )
     }
     return this._completeServiceUseCase
@@ -759,7 +762,10 @@ export class UseCaseDI {
   get endVideoCallUseCase(): IEndVideoCallUseCase {
     if (!this._endVideoCallUseCase) {
       this._endVideoCallUseCase = new EndVideoCallUseCase(
-        this.infra.serviceRepository
+        this.infra.serviceRepository,
+        this.infra.walletRepository,
+        this.infra.transactionRepository,
+        this.infra.userRepositoryFactory
       );
     }
     return this._endVideoCallUseCase;
@@ -860,7 +866,8 @@ export class UseCaseDI {
         this.infra.serviceRepository,
         this.infra.workerScheduleRepo,
         this.infra.walletRepository,
-        this.infra.transactionRepository
+        this.infra.transactionRepository,
+        this.infra.userRepositoryFactory
       )
     }
     return this._cancelServiceUseCase

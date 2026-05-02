@@ -69,36 +69,7 @@ export class VerifyPaymentUseCase implements IVerifyPaymentUseCase {
                 );
             }
 
-            // Calculate platform fee and worker share
-            const platformFee = service.category === "VIDEO_CALL" ? 10 : 50;
-            const workerShare = payment.amount - platformFee;
-
-            const workerId = service.workerId;
-            let workerWallet = await this._walletRepo.findByUserId(workerId);
-            if (!workerWallet) {
-                workerWallet = await this._walletRepo.create({
-                    walletId: uuidv4(),
-                    userId: workerId,
-                    balance: 0,
-                    currency: "INR"
-                });
-            }
-
-            const updatedWorkerWallet = await this._walletRepo.creditBalance(workerId, workerShare);
-
-            await this._transactionRepo.create({
-              transactionId: uuidv4(),
-              walletId: updatedWorkerWallet.walletId,
-              userId: workerId,
-              type: transactionType.CREDIT,
-              amount: workerShare,
-              source: transactionSource.SERVICE_PAYMENT,
-              serviceId: payment.serviceId,
-              status: transactionStatus.SUCCESS,
-              createdAt: new Date(),
-            });
-
-            // Credit admin wallet with platform fee
+            // Credit full amount to Admin wallet initially
             const adminRepo = this._userRepoFactory.getRepository(Role.ADMIN);
             const admins = await adminRepo.findAll();
             const admin = admins[0];
@@ -114,14 +85,14 @@ export class VerifyPaymentUseCase implements IVerifyPaymentUseCase {
                     });
                 }
 
-                const updatedAdminWallet = await this._walletRepo.creditBalance(admin.userId, platformFee);
+                const updatedAdminWallet = await this._walletRepo.creditBalance(admin.userId, payment.amount);
 
                 await this._transactionRepo.create({
                     transactionId: uuidv4(),
                     walletId: updatedAdminWallet.walletId,
                     userId: admin.userId,
                     type: transactionType.CREDIT,
-                    amount: platformFee,
+                    amount: payment.amount,
                     source: transactionSource.SERVICE_PAYMENT,
                     serviceId: payment.serviceId,
                     status: transactionStatus.SUCCESS,
