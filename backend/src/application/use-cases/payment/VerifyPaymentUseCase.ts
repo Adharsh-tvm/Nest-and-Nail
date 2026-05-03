@@ -100,6 +100,30 @@ export class VerifyPaymentUseCase implements IVerifyPaymentUseCase {
                 });
             }
 
+            // Ensure client has a wallet to record the transaction
+            let clientWallet = await this._walletRepo.findByUserId(payment.clientId);
+            if (!clientWallet) {
+                clientWallet = await this._walletRepo.create({
+                    walletId: uuidv4(),
+                    userId: payment.clientId,
+                    balance: 0,
+                    currency: "INR"
+                });
+            }
+
+            // Record the transaction for the client
+            await this._transactionRepo.create({
+                transactionId: uuidv4(),
+                walletId: clientWallet.walletId,
+                userId: payment.clientId,
+                type: transactionType.DEBIT,
+                amount: payment.amount,
+                source: transactionSource.RAZORPAY,
+                serviceId: payment.serviceId,
+                status: transactionStatus.SUCCESS,
+                createdAt: new Date(),
+            });
+
             // Notify worker after payment confirmed
             await this._sendNotificationUseCase.execute({
                 userId: service.workerId,

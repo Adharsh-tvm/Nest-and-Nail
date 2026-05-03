@@ -965,7 +965,8 @@ const WalletView: React.FC<ViewProps> = ({ user }) => {
     const { getTransactionsAction } = await import("@/app/actions/client/wallet-actions");
     const txRes = await getTransactionsAction();
     if (txRes.success && txRes.data) {
-      setTransactions(txRes.data);
+      const txData = Array.isArray(txRes.data) ? txRes.data : txRes.data.transactions || [];
+      setTransactions(txData);
     }
     setIsLoading(false);
   };
@@ -1129,7 +1130,7 @@ const WalletView: React.FC<ViewProps> = ({ user }) => {
                     </div>
                     <div>
                       <p className="font-bold text-gray-900 capitalize">
-                        {tx.source.replace("_", " ").toLowerCase()}
+                        {tx.source.replace(/_/g, " ").toLowerCase()}
                       </p>
                       <p className="text-sm text-gray-500">
                         {new Date(tx.createdAt).toLocaleDateString()} at {new Date(tx.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}

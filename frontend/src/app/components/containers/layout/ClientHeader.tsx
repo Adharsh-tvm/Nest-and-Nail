@@ -179,7 +179,7 @@ const ClientHeader: React.FC = () => {
                     Workers
                   </Link>
                 )}
-                 {userMode === "worker" && (
+                {userMode === "worker" && (
                   <Link
                     href="/worker/services"
                     className={`text-sm font-medium transition-all ${
@@ -341,7 +341,11 @@ const ClientHeader: React.FC = () => {
                       </div>
 
                       <div className="p-1.5 space-y-0.5">
-                        <Link href={profileHref} className="block" onClick={() => setIsUserMenuOpen(false)}>
+                        <Link
+                          href={profileHref}
+                          className="block"
+                          onClick={() => setIsUserMenuOpen(false)}
+                        >
                           <div className="w-full flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-[#1B4332] rounded-lg transition-colors text-left group cursor-pointer">
                             <User
                               size={16}

@@ -8,15 +8,63 @@ export class TransactionRepository implements ITransactionRepository {
     return created.toObject();
   }
 
-  async findByUserId(userId: string): Promise<Transaction[]> {
-    return TransactionModel.find({ userId })
-      .sort({ createdAt: -1 })
-      .lean();
+  async findByUserId(userId: string, page: number, limit: number) {
+    const skip = (page - 1) * limit;
+
+    const [transactions, total] = await Promise.all([
+      TransactionModel.find({ userId })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+
+      TransactionModel.countDocuments({ userId })
+    ]);
+
+    return {
+      transactions,
+      total,
+      totalPages: Math.ceil(total / limit)
+    };
   }
 
-  async findByWalletId(walletId: string): Promise<Transaction[]> {
-    return TransactionModel.find({ walletId })
-      .sort({ createdAt: -1 })
-      .lean();
+  async findByWalletId(walletId: string, page: number, limit: number) {
+    const skip = (page - 1) * limit;
+
+    const [transactions, total] = await Promise.all([
+      TransactionModel.find({ walletId })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+
+      TransactionModel.countDocuments({ walletId })
+    ]);
+
+    return {
+      transactions,
+      total,
+      totalPages: Math.ceil(total / limit)
+    };
+  }
+
+  async findAll(page: number, limit: number) {
+    const skip = (page - 1) * limit;
+
+    const [transactions, total] = await Promise.all([
+      TransactionModel.find()
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+
+      TransactionModel.countDocuments()
+    ]);
+
+    return {
+      transactions,
+      total,
+      totalPages: Math.ceil(total / limit)
+    };
   }
 }

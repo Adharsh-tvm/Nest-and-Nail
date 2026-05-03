@@ -11,5 +11,6 @@ export enum transactionSource {
 
 export enum transactionStatus {
     SUCCESS = "SUCCESS",
-    FAILED = "FAILED"
+    FAILED = "FAILED",
+    PENDING = "PENDING"
 }

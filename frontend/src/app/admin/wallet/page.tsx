@@ -17,7 +17,8 @@ export default function AdminWalletPage() {
     }
     const txRes = await getTransactionsAction();
     if (txRes.success && txRes.data) {
-      setTransactions(txRes.data);
+      const txData = Array.isArray(txRes.data) ? txRes.data : txRes.data.transactions || [];
+      setTransactions(txData);
     }
     setIsLoading(false);
   };

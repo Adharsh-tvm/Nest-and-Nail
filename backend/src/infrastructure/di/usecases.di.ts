@@ -124,7 +124,13 @@ import { GetAllMeetingsForAdminUseCase } from "../../application/use-cases/meeti
 import { ICancelServiceUseCase } from "../../application/interfaces/service/ICancelServiceUseCase";
 import { CancelServiceUseCase } from "../../application/use-cases/service/CancelServiceUseCase";
 import { IGetTransactionsUseCase } from "../../application/interfaces/payment/IGetTransactionsUseCase";
+import { IGetClientTransactionsUseCase } from "../../application/interfaces/payment/IGetClientTransactionsUseCase";
+import { IGetWorkerTransactionsUseCase } from "../../application/interfaces/payment/IGetWorkerTransactionsUseCase";
+import { IGetAllTransactionsUseCase } from "../../application/interfaces/payment/IGetAllTransactionsUseCase";
 import { GetTransactionsUseCase } from "../../application/use-cases/payment/GetTransactionsUseCase";
+import { GetClientTransactionsUseCase } from "../../application/use-cases/payment/GetClientTransactionsUseCase";
+import { GetWorkerTransactionsUseCase } from "../../application/use-cases/payment/GetWorkerTransactionsUseCase";
+import { GetAllTransactionsUseCase } from "../../application/use-cases/payment/GetAllTransactionsUseCase";
 import { CreateRechargeOrderUseCase } from "../../application/use-cases/payment/CreateRechargeOrderUseCase";
 import { VerifyRechargePaymentUseCase, IVerifyRechargePaymentUseCase } from "../../application/use-cases/payment/VerifyRechargePaymentUseCase";
 import { ICreateRechargeOrderUseCase } from "../../application/interfaces/payment/ICreateRechargeOrderUseCase";
@@ -216,6 +222,9 @@ export class UseCaseDI {
   private _processWalletPaymentUseCase?: ProcessWalletPaymentUseCase;
   private _getWalletBalanceUseCase?: IGetWalletBalanceUseCase;
   private _getTransactionsUseCase?: IGetTransactionsUseCase;
+  private _getClientTransactionsUseCase?: IGetClientTransactionsUseCase;
+  private _getWorkerTransactionsUseCase?: IGetWorkerTransactionsUseCase;
+  private _getAllTransactionsUseCase?: IGetAllTransactionsUseCase;
   private _createRechargeOrderUseCase?: ICreateRechargeOrderUseCase;
   private _verifyRechargePaymentUseCase?: IVerifyRechargePaymentUseCase;
 
@@ -880,6 +889,33 @@ export class UseCaseDI {
       )
     }
     return this._getTransactionsUseCase
+  }
+
+  get getClientTransactionsUseCase(): IGetClientTransactionsUseCase {
+    if (!this._getClientTransactionsUseCase) {
+      this._getClientTransactionsUseCase = new GetClientTransactionsUseCase(
+        this.infra.transactionRepository
+      );
+    }
+    return this._getClientTransactionsUseCase;
+  }
+
+  get getWorkerTransactionsUseCase(): IGetWorkerTransactionsUseCase {
+    if (!this._getWorkerTransactionsUseCase) {
+      this._getWorkerTransactionsUseCase = new GetWorkerTransactionsUseCase(
+        this.infra.transactionRepository
+      );
+    }
+    return this._getWorkerTransactionsUseCase;
+  }
+
+  get getAllTransactionsUseCase(): IGetAllTransactionsUseCase {
+    if (!this._getAllTransactionsUseCase) {
+      this._getAllTransactionsUseCase = new GetAllTransactionsUseCase(
+        this.infra.transactionRepository
+      );
+    }
+    return this._getAllTransactionsUseCase;
   }
 
   get createConcernUseCase(): ICreateConcernUseCase {

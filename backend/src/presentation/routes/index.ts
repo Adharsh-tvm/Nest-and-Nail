@@ -22,6 +22,7 @@ import { concernRoutes } from "./concern/concern.routes";
 import { clientReviewRoutes } from "./review/review.routes";
 import { notificationRoutes } from "./notification/notification.routes";
 import { chatRoutes } from "./chat/chat.routes";
+import { createTransactionRoutes } from "./payment/transaction.routes";
 
 export const createRoutes = (container: DIContainer): Router => {
   const router = Router();
@@ -74,6 +75,7 @@ export const createRoutes = (container: DIContainer): Router => {
 
   router.use("/api/chat", chatRoutes(container.controllers.authMiddleware, container.controllers.chatController));
 
+  router.use("/api/transactions", createTransactionRoutes(container.controllers.authMiddleware, container.controllers.transactionController));
 
   return router;
 };

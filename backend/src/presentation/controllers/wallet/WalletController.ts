@@ -67,6 +67,8 @@ export class WalletController {
 
   getTransactions = async (req: Request, res: Response): Promise<void> => {
     const userId = req.user?.id;
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
 
     if (!userId) {
       res.status(HttpStatusCode.UNAUTHORIZED).json(
@@ -75,7 +77,7 @@ export class WalletController {
       return;
     }
 
-    const transactions = await this._getTransactionsUseCase.execute(userId);
+    const transactions = await this._getTransactionsUseCase.execute(userId, page, limit);
 
     res.status(HttpStatusCode.OK).json(
       ResponseHandler.success(

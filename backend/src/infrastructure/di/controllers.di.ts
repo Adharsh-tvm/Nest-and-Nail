@@ -33,6 +33,7 @@ import { NotificationController } from "../../presentation/controllers/notificat
 import { GetUserNotificationsUseCase } from "../../application/use-cases/notification/GetUserNotificationsUseCase";
 import { MarkNotificationReadUseCase } from "../../application/use-cases/notification/MarkNotificationReadUseCase";
 import { ChatController } from "../../presentation/controllers/chat/ChatController";
+import { TransactionController } from "../../presentation/controllers/payment/TransactionController";
 
 export class ControllerDI {
     private _authController?: IAuthController;
@@ -65,6 +66,7 @@ export class ControllerDI {
     private _clientReviewController?: ClientReviewController;
     private _notificationController?: NotificationController;
     private _chatController?: ChatController;
+    private _transactionController?: TransactionController;
 
     constructor(
         private _useCases: UseCaseDI,
@@ -332,5 +334,16 @@ export class ControllerDI {
             )
         }
         return this._chatController
+    }
+
+    get transactionController(): TransactionController {
+        if (!this._transactionController) {
+            this._transactionController = new TransactionController(
+                this._useCases.getClientTransactionsUseCase,
+                this._useCases.getWorkerTransactionsUseCase,
+                this._useCases.getAllTransactionsUseCase
+            );
+        }
+        return this._transactionController;
     }
 }
