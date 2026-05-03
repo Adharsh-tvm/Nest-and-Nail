@@ -1,6 +1,6 @@
 "use server";
 
-import userApi from "@/sources/api/user.api";
+import userApi from "@/sources/api/user/user.api";
 import { ApiResponse } from "@/shared/types/responseTypes";
 import { User } from "@/shared/types/userTypes";
 
@@ -19,7 +19,7 @@ export async function updateUserCategoriesAction(
 
 export async function fetchCategoriesAction() {
     try {
-        const { fetchAllCategories } = await import("@/sources/api/category.api");
+        const { fetchAllCategories } = await import("@/sources/api/category/category.api");
         return await fetchAllCategories();
     } catch (error: any) {
         console.error("Fetch categories error:", error);

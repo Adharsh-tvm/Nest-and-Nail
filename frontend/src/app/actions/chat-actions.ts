@@ -1,6 +1,6 @@
 "use server";
 
-import { getMessagesApi, sendMessageApi } from "@/sources/api/chat.api";
+import { getMessagesApi, sendMessageApi } from "@/sources/api/user/chat.api";
 
 export async function getMessagesAction(chatId: string) {
   try {

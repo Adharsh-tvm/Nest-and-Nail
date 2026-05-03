@@ -1,6 +1,6 @@
 "use server";
 
-import userApi from "@/sources/api/user.api";
+import userApi from "@/sources/api/user/user.api";
 import { Address } from "@/shared/types/addressType";
 import { ApiResponse } from "@/shared/types/responseTypes";
 import { User } from "@/shared/types/userTypes";

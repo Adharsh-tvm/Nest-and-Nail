@@ -1,6 +1,6 @@
 "use server";
 
-import { addReviewApi } from "@/sources/api/review.api";
+import { addReviewApi } from "@/sources/api/client/review.api";
 
 export async function addReviewAction(
   serviceId: string,

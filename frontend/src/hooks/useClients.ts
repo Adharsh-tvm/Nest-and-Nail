@@ -1,7 +1,7 @@
 "use client";
 
 import { getAllClientsAction } from "@/app/actions/admin/admin-actions";
-import { Client } from "@/sources/api/admin.api";
+import { Client } from "@/sources/api/admin/admin.api";
 import { useEffect, useState } from "react";
 
 type UseClientsResult = {

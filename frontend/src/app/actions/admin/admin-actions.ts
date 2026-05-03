@@ -7,7 +7,7 @@ import {
   rejectVerification,
   toggleUserAccess,
   fetchAllUsers,
-} from "@/sources/api/admin.api";
+} from "@/sources/api/admin/admin.api";
 import { User, UserQueryParams } from "@/shared/types/userTypes";
 
 
@@ -39,7 +39,7 @@ export async function getAllUsers(params: UserQueryParams = {}) {
 
 export async function getUserWalletBalanceByAdminAction(userId: string) {
   try {
-    const { fetchUserWalletBalanceByAdmin } = await import("@/sources/api/admin.api");
+    const { fetchUserWalletBalanceByAdmin } = await import("@/sources/api/admin/admin.api");
     const res = await fetchUserWalletBalanceByAdmin(userId);
     return { success: true, data: res };
   } catch (error: any) {

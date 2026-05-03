@@ -1,6 +1,6 @@
 "use server";
 
-import { getWalletBalanceApi, WalletData } from "@/sources/api/wallet.api";
+import { getWalletBalanceApi, WalletData } from "@/sources/api/user/wallet.api";
 
 export async function getWalletBalanceAction(): Promise<{
     success: boolean;

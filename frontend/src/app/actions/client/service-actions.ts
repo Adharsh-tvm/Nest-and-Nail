@@ -4,7 +4,7 @@ import {
   getWorkerAvailabilityApi,
   getWorkerAvailabilityBulkApi,
   bookWorkerApi,
-} from "@/sources/api/service.api";
+} from "@/sources/api/service/service.api";
 import {
   BookingPayload,
   BookingResult,

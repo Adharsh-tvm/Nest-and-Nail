@@ -1,6 +1,6 @@
 "use server";
 
-import { createPaymentOrderApi, verifyPaymentApi, processWalletPaymentApi } from "@/sources/api/payment.api";
+import { createPaymentOrderApi, verifyPaymentApi, processWalletPaymentApi } from "@/sources/api/user/payment.api";
 
 export async function createPaymentOrderAction(
   serviceId: string

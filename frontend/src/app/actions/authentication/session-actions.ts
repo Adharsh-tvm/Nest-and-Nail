@@ -1,7 +1,7 @@
 "use server"
 
 import axiosInstance from "@/lib/axiosInstance";
-import authApi from "@/sources/api/auth.api";
+import authApi from "@/sources/api/user/auth.api";
 import { JwtPayload } from "@/shared/types/JwtPayload";
 import { jwtVerify } from "jose";
 import { cookies } from "next/headers";

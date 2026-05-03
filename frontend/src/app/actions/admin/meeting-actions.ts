@@ -1,7 +1,7 @@
 "use server";
 
 import { AdminServiceResponseDTO } from "@/shared/types/serviceTypes";
-import { fetchAdminMeetingDetails, fetchAllAdminMeetings } from "@/sources/api/admin.api";
+import { fetchAdminMeetingDetails, fetchAllAdminMeetings } from "@/sources/api/admin/admin.api";
 
 export async function getAdminMeetingsAction(): Promise<{ success: boolean; data?: AdminServiceResponseDTO[]; error?: string }> {
     try {

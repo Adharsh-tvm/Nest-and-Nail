@@ -1,6 +1,6 @@
 "use server";
 
-import { getClientTransactionsApi, getWorkerTransactionsApi, getAdminTransactionsApi } from "@/sources/api/transaction.api";
+import { getClientTransactionsApi, getWorkerTransactionsApi, getAdminTransactionsApi } from "@/sources/api/transaction/transaction.api";
 
 export async function getClientTransactionsAction(page: number = 1, limit: number = 10) {
     try {

@@ -1,6 +1,6 @@
 "use client";
 
-import { fetchAllWorkers, Worker } from "@/sources/api/admin.api";
+import { fetchAllWorkers, Worker } from "@/sources/api/admin/admin.api";
 import { useEffect, useState } from "react";
 
 

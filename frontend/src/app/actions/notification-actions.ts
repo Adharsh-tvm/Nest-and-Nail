@@ -1,6 +1,6 @@
 "use server";
 
-import { getNotificationsApi, markNotificationReadApi, NotificationDTO } from "@/sources/api/notification.api";
+import { getNotificationsApi, markNotificationReadApi, NotificationDTO } from "@/sources/api/user/notification.api";
 
 export async function getNotificationsAction(): Promise<{
   success: boolean;

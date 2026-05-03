@@ -1,6 +1,6 @@
 "use server";
 
-import { raiseConcernApi, ConcernDTO } from "@/sources/api/concern.api";
+import { raiseConcernApi, ConcernDTO } from "@/sources/api/user/concern.api";
 
 export async function raiseConcernAction(
   serviceId: string,

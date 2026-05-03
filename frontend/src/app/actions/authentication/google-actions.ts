@@ -1,6 +1,6 @@
 "use server";
 
-import authApi from "@/sources/api/auth.api";
+import authApi from "@/sources/api/user/auth.api";
 import { OAuth2Client } from "google-auth-library";
 import { cookies } from "next/headers";
 

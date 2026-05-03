@@ -5,7 +5,7 @@ import {
     createCategory,
     updateCategory,
     toggleCategoryStatus,
-} from "@/sources/api/category.api";
+} from "@/sources/api/category/category.api";
 import { Category, CategoryInput } from "@/shared/types/categoryTypes";
 import { ApiResponse } from "@/shared/types/responseTypes";
 

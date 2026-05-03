@@ -1,6 +1,6 @@
 "use server";
 
-import authApi from "@/sources/api/auth.api";
+import authApi from "@/sources/api/user/auth.api";
 import { AxiosError } from "axios";
 
 type OtpResponse = {
@@ -101,7 +101,7 @@ export async function forgotPasswordAction(email_address: string) {
     // Map internal messages to user-friendly ones
     const userMessage =
       rawMessage.toLowerCase().includes("not found") ||
-      rawMessage.toLowerCase().includes("user not found")
+        rawMessage.toLowerCase().includes("user not found")
         ? "No account found with this email address. Please check and try again."
         : rawMessage;
 
