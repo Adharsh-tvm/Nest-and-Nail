@@ -2,6 +2,7 @@
 
 import axiosInstance from "@/lib/axiosInstance";
 import { ApiResponse } from "@/shared/types/responseTypes";
+import { MEDIA_ROUTES } from "@/sources/constant-api";
 
 export async function getMediaUploadUrlApi(
     fileName: string,
@@ -19,7 +20,7 @@ export async function getMediaUploadUrlApi(
             fileUrl: string;
             signedUrl: string;
         }>
-    >("/api/media/s3-upload-url", {
+    >(MEDIA_ROUTES.S3_UPLOAD, {
         params: {
             fileName,
             contentType,
