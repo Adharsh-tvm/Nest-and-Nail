@@ -1,5 +1,6 @@
 import axiosInstance from "@/lib/axiosInstance";
 import { ApiResponse } from "@/shared/types/responseTypes";
+import { REVIEW_ROUTES } from "@/sources/constant-api";
 import axios from 'axios';
 
 interface BackendResponse<T> {
@@ -12,7 +13,7 @@ interface BackendResponse<T> {
 export async function addReviewApi(serviceId: string, rating: number, review?: string): Promise<ApiResponse<null>> {
     try {
         const response = await axiosInstance.post<BackendResponse<null>>(
-            `/api/review/${serviceId}`,
+            REVIEW_ROUTES.ADD(serviceId),
             { rating, review },
             { withCredentials: true }
         );

@@ -1,6 +1,7 @@
 import axiosInstance from "@/lib/axiosInstance";
 import { ApiResponse } from "@/shared/types/responseTypes";
 import { ServiceResponseDTO } from "@/shared/types/serviceTypes";
+import { CLIENT_ROUTES, VIDEO_ROUTES } from "@/sources/constant-api";
 import axios from 'axios';
 
 interface BackendResponse<T> {
@@ -12,7 +13,7 @@ interface BackendResponse<T> {
 
 export async function getClientScheduledMeetingsApi(): Promise<ApiResponse<ServiceResponseDTO[]>> {
     try {
-        const response = await axiosInstance.get<BackendResponse<ServiceResponseDTO[]>>('/api/client/meetings/scheduled', { withCredentials: true });
+        const response = await axiosInstance.get<BackendResponse<ServiceResponseDTO[]>>(CLIENT_ROUTES.MEETINGS_SCHEDULED, { withCredentials: true });
         
         if (!response.data.success) {
             return { error: response.data.error || null, success: false, message: response.data.message || "Failed" };
@@ -29,7 +30,7 @@ export async function getClientScheduledMeetingsApi(): Promise<ApiResponse<Servi
 
 export async function getClientMeetingsHistoryApi(): Promise<ApiResponse<ServiceResponseDTO[]>> {
     try {
-        const response = await axiosInstance.get<BackendResponse<ServiceResponseDTO[]>>('/api/client/meetings/history', { withCredentials: true });
+        const response = await axiosInstance.get<BackendResponse<ServiceResponseDTO[]>>(CLIENT_ROUTES.MEETINGS_HISTORY, { withCredentials: true });
         
         if (!response.data.success) {
             return { error: response.data.error || null, success: false, message: response.data.message || "Failed" };
@@ -46,7 +47,7 @@ export async function getClientMeetingsHistoryApi(): Promise<ApiResponse<Service
 
 export async function getClientMeetingByIdApi(serviceId: string): Promise<ApiResponse<ServiceResponseDTO>> {
     try {
-        const response = await axiosInstance.get<BackendResponse<ServiceResponseDTO>>(`/api/client/meetings/${serviceId}`, { withCredentials: true });
+        const response = await axiosInstance.get<BackendResponse<ServiceResponseDTO>>(CLIENT_ROUTES.MEETING_BY_ID(serviceId), { withCredentials: true });
         if (!response.data.success) {
             return { error: response.data.error || null, success: false, message: response.data.message || "Failed" };
         }
@@ -61,7 +62,7 @@ export async function getClientMeetingByIdApi(serviceId: string): Promise<ApiRes
 
 export async function endMeetingApi(serviceId: string): Promise<ApiResponse<{ message: string }>> {
     try {
-        const response = await axiosInstance.post<BackendResponse<{ message: string }>>(`/api/video-call/end/${serviceId}`, {}, { withCredentials: true });
+        const response = await axiosInstance.post<BackendResponse<{ message: string }>>(VIDEO_ROUTES.END_MEETING(serviceId), {}, { withCredentials: true });
         if (!response.data.success) {
             return { error: response.data.error || null, success: false, message: response.data.message || "Failed" };
         }

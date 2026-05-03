@@ -1,6 +1,7 @@
 import axiosInstance from "@/lib/axiosInstance";
 import { ApiResponse } from "@/shared/types/responseTypes";
 import { ServiceResponseDTO } from "@/shared/types/serviceTypes";
+import { CLIENT_ROUTES } from "@/sources/constant-api";
 import axios from 'axios';
 
 interface BackendResponse<T> {
@@ -12,7 +13,7 @@ interface BackendResponse<T> {
 
 export async function getClientOngoingServicesApi(): Promise<ApiResponse<ServiceResponseDTO[]>> {
     try {
-        const response = await axiosInstance.get<BackendResponse<ServiceResponseDTO[]>>('/api/client/services/ongoing', { withCredentials: true });
+        const response = await axiosInstance.get<BackendResponse<ServiceResponseDTO[]>>(CLIENT_ROUTES.SERVICES_ONGOING, { withCredentials: true });
         
         if (!response.data.success) {
             return {
@@ -45,7 +46,7 @@ export async function getClientOngoingServicesApi(): Promise<ApiResponse<Service
 
 export async function getClientServiceHistoryApi(): Promise<ApiResponse<ServiceResponseDTO[]>> {
     try {
-        const response = await axiosInstance.get<BackendResponse<ServiceResponseDTO[]>>('/api/client/services/history', { withCredentials: true });
+        const response = await axiosInstance.get<BackendResponse<ServiceResponseDTO[]>>(CLIENT_ROUTES.SERVICES_HISTORY, { withCredentials: true });
         
         if (!response.data.success) {
             return {
@@ -78,7 +79,7 @@ export async function getClientServiceHistoryApi(): Promise<ApiResponse<ServiceR
 
 export async function getClientServiceByIdApi(serviceId: string): Promise<ApiResponse<ServiceResponseDTO>> {
     try {
-        const response = await axiosInstance.get<BackendResponse<ServiceResponseDTO>>(`/api/client/services/${serviceId}`, { withCredentials: true });
+        const response = await axiosInstance.get<BackendResponse<ServiceResponseDTO>>(CLIENT_ROUTES.SERVICE_BY_ID(serviceId), { withCredentials: true });
         
         if (!response.data.success) {
             return {
@@ -112,7 +113,7 @@ export async function getClientServiceByIdApi(serviceId: string): Promise<ApiRes
 export async function cancelServiceApi(serviceId: string, reason: string): Promise<ApiResponse<null>> {
     try {
         const response = await axiosInstance.patch<BackendResponse<null>>(
-            `/api/client/services/${serviceId}/cancel`,
+            CLIENT_ROUTES.CANCEL_SERVICE(serviceId),
             { reason },
             { withCredentials: true }
         );
