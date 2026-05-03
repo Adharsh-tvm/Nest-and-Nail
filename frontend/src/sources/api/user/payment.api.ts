@@ -1,8 +1,9 @@
 import axiosInstance from "@/lib/axiosInstance";
+import { PAYMENT_ROUTES } from "@/sources/constant-api";
 
 export const createPaymentOrderApi = async (serviceId: string) => {
     try {
-        const response = await axiosInstance.post("/api/payment/create-order", { serviceId });
+        const response = await axiosInstance.post(PAYMENT_ROUTES.CREATE_ORDER, { serviceId });
         return { success: true, payload: response.data };
     } catch (error: any) {
         console.error("createPaymentOrderApi error:", error);
@@ -12,7 +13,7 @@ export const createPaymentOrderApi = async (serviceId: string) => {
 
 export const verifyPaymentApi = async (paymentData: any) => {
     try {
-        const response = await axiosInstance.post("/api/payment/verify", paymentData);
+        const response = await axiosInstance.post(PAYMENT_ROUTES.VERIFY, paymentData);
         return { success: true, payload: response.data };
     } catch (error: any) {
         console.error("verifyPaymentApi error:", error);
@@ -22,7 +23,7 @@ export const verifyPaymentApi = async (paymentData: any) => {
 
 export const processWalletPaymentApi = async (serviceId: string) => {
     try {
-        const response = await axiosInstance.post("/api/payment/wallet", { serviceId });
+        const response = await axiosInstance.post(PAYMENT_ROUTES.WALLET_PAYMENT, { serviceId });
         return { success: true, payload: response.data };
     } catch (error: any) {
         console.error("processWalletPaymentApi error:", error);

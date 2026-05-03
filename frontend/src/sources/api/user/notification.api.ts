@@ -1,4 +1,5 @@
 import axiosInstance from "@/lib/axiosInstance";
+import { NOTIFICATION_ROUTES } from "@/sources/constant-api";
 import axios from "axios";
 
 interface BackendResponse<T> {
@@ -26,7 +27,7 @@ export async function getNotificationsApi(): Promise<{
 }> {
   try {
     const response = await axiosInstance.get<BackendResponse<NotificationDTO[]>>(
-      "/api/notifications",
+      NOTIFICATION_ROUTES.GET,
       { withCredentials: true }
     );
     if (!response.data.success) {
@@ -50,7 +51,7 @@ export async function markNotificationReadApi(notificationId: string): Promise<{
 }> {
   try {
     const response = await axiosInstance.patch<BackendResponse<null>>(
-      `/api/notifications/${notificationId}/read`,
+      NOTIFICATION_ROUTES.MARK_READ(notificationId),
       {},
       { withCredentials: true }
     );

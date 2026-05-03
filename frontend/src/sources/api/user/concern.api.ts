@@ -1,4 +1,5 @@
 import axiosInstance from "@/lib/axiosInstance";
+import { CONCERN_ROUTES } from "@/sources/constant-api";
 import axios from "axios";
 
 interface BackendResponse<T> {
@@ -24,7 +25,7 @@ export async function raiseConcernApi(
 ): Promise<{ success: boolean; data?: ConcernDTO; message?: string; error?: string }> {
   try {
     const response = await axiosInstance.post<BackendResponse<ConcernDTO>>(
-      "/api/concerns",
+      CONCERN_ROUTES.CREATE,
       { serviceId, message },
       { withCredentials: true }
     );

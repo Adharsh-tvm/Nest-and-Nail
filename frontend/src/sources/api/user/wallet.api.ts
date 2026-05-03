@@ -1,4 +1,5 @@
 import axiosInstance from "@/lib/axiosInstance";
+import { WALLET_ROUTES } from "@/sources/constant-api";
 
 export type WalletData = {
     walletId: string;
@@ -14,18 +15,18 @@ export type WalletResponse = {
 };
 
 export const getWalletBalanceApi = async (): Promise<WalletData> => {
-    const response = await axiosInstance.get("/api/wallet/balance");
+    const response = await axiosInstance.get(WALLET_ROUTES.BALANCE);
     // Backend wraps data as: { success, message, payload: actualData }
     return response.data?.payload ?? response.data;
 };
 
 export const getTransactionsApi = async () => {
-    const response = await axiosInstance.get("/api/wallet/transactions");
+    const response = await axiosInstance.get(WALLET_ROUTES.TRANSACTIONS);
     return response.data?.payload ?? response.data;
 };
 
 export const createRechargeOrderApi = async (amount: number) => {
-    const response = await axiosInstance.post("/api/wallet/recharge/create-order", { amount });
+    const response = await axiosInstance.post(WALLET_ROUTES.RECHARGE_ORDER, { amount });
     return response.data?.payload ?? response.data;
 };
 
@@ -35,6 +36,6 @@ export const verifyRechargePaymentApi = async (data: {
     razorpay_signature: string;
     amount: number;
 }) => {
-    const response = await axiosInstance.post("/api/wallet/recharge/verify", data);
+    const response = await axiosInstance.post(WALLET_ROUTES.VERIFY_RECHARGE, data);
     return response.data?.payload ?? response.data;
 };
