@@ -1,6 +1,7 @@
 // services/upload/upload.api.ts
 import axiosInstance from "@/lib/axiosInstance";
 import { ApiResponse } from "@/shared/types/responseTypes";
+import { UPLOAD_ROUTES } from "@/sources/constant-api";
 
 /* ---------------- TYPES ---------------- */
 
@@ -19,7 +20,7 @@ export async function uploadWorkerIdDocument(
   formData.append("file", file);
 
   const res = await axiosInstance.post<ApiResponse<UploadResponse>>(
-    `/api/upload/worker/${workerId}/document`,
+    UPLOAD_ROUTES.WORKER_DOC(workerId),
     formData,
     {
       headers: {
@@ -39,7 +40,7 @@ export async function uploadWorkerCertDocument(
   formData.append("file", file);
 
   const res = await axiosInstance.post<ApiResponse<UploadResponse>>(
-    `/api/upload/worker/${workerId}/document`,
+    UPLOAD_ROUTES.WORKER_DOC(workerId),
     formData,
     {
       headers: {

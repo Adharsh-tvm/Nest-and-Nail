@@ -1,11 +1,12 @@
 import axiosInstance from "@/lib/axiosInstance";
 import { ApiResponse } from "@/shared/types/responseTypes";
+import { WORKER_ROUTES } from "@/sources/constant-api";
 import axios from "axios";
 
 export async function blockWorkerDatesApi(dates: string[], slotTypes: string[]): Promise<ApiResponse<any>> {
   try {
     const response = await axiosInstance.post(
-      "/api/worker/slot/block-dates",
+      WORKER_ROUTES.BLOCK_DATES,
       { dates, slotTypes },
       { withCredentials: true }
     );
@@ -43,7 +44,7 @@ export async function blockWorkerDatesApi(dates: string[], slotTypes: string[]):
 export async function getWorkerBlockedDatesApi(): Promise<ApiResponse<any>> {
   try {
     const response = await axiosInstance.get(
-      "/api/worker/slot/blocked-dates",
+      WORKER_ROUTES.BLOCKED_DATES,
       { withCredentials: true }
     );
 

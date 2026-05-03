@@ -1,6 +1,7 @@
 import axiosInstance from "@/lib/axiosInstance";
 import { ApiResponse } from "@/shared/types/responseTypes";
 import { ServiceResponseDTO } from "@/shared/types/serviceTypes";
+import { WORKER_ROUTES } from "@/sources/constant-api";
 import axios from "axios";
 
 /**
@@ -10,7 +11,7 @@ import axios from "axios";
 export async function getActiveWorkerServiceApi(): Promise<ApiResponse<ServiceResponseDTO | null>> {
   try {
     const response = await axiosInstance.get<ApiResponse<ServiceResponseDTO | null>>(
-      "/api/worker/services/active",
+      WORKER_ROUTES.ACTIVE_SERVICE,
       { withCredentials: true }
     );
 
@@ -38,7 +39,7 @@ export async function getActiveWorkerServiceApi(): Promise<ApiResponse<ServiceRe
 export async function getWorkerServicesApi(status?: string): Promise<ApiResponse<ServiceResponseDTO[]>> {
   try {
     const response = await axiosInstance.get<ApiResponse<ServiceResponseDTO[]>>(
-      "/api/worker/services",
+      WORKER_ROUTES.SERVICES,
       {
         params: status ? { status } : {},
         withCredentials: true,
@@ -73,7 +74,7 @@ export async function startWorkerServiceApi(
 ): Promise<ApiResponse<ServiceResponseDTO>> {
   try {
     const response = await axiosInstance.patch(
-      `/api/worker/services/${serviceId}/start`,
+      WORKER_ROUTES.START_SERVICE(serviceId),
       { lat, lng },
       { withCredentials: true }
     );
@@ -114,7 +115,7 @@ export async function startWorkerServiceApi(
  */
 export async function getWorkerServiceDetailsApi(serviceId: string): Promise<ApiResponse<ServiceResponseDTO>> {
   try {
-    const response = await axiosInstance.get(`/api/worker/services/${serviceId}`, {
+    const response = await axiosInstance.get(WORKER_ROUTES.SERVICE_DETAILS(serviceId), {
       withCredentials: true,
     });
 
@@ -155,7 +156,7 @@ export async function getWorkerServiceDetailsApi(serviceId: string): Promise<Api
 export async function completeWorkerServiceApi(serviceId: string): Promise<ApiResponse<ServiceResponseDTO>> {
   try {
     const response = await axiosInstance.patch(
-      `/api/worker/services/${serviceId}/complete`,
+      WORKER_ROUTES.COMPLETE_SERVICE(serviceId),
       {},
       { withCredentials: true }
     );
