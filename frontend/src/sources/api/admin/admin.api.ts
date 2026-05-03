@@ -6,6 +6,7 @@ import { mapUserFromApi } from "@/shared/mappers/user.mapper";
 import { ApiResponse } from "@/shared/types/responseTypes";
 import { User, UserQueryParams } from "@/shared/types/userTypes";
 import { AdminServiceResponseDTO } from "@/shared/types/serviceTypes";
+import { ADMIN_ROUTES, WALLET_ROUTES } from "@/sources/constant-api";
 
 /* ---------------- TYPES ---------------- */
 
@@ -62,7 +63,7 @@ function normalizeVerification(value: any): VerificationStatus {
 export async function fetchAllClients(): Promise<Client[]> {
   try {
     const res = await axiosInstance.get<ApiResponse<any[]>>(
-      "/api/admin/clients"
+      ADMIN_ROUTES.CLIENTS
     );
 
     if (!res.data.success) {
@@ -83,7 +84,7 @@ export async function fetchAllClients(): Promise<Client[]> {
 export async function fetchAllWorkers(): Promise<Worker[]> {
   try {
     const res = await axiosInstance.get<ApiResponse<any[]>>(
-      "/api/admin/workers"
+      ADMIN_ROUTES.WORKERS
     );
 
     if (!res.data.success) {
@@ -160,7 +161,7 @@ export async function fetchAllUsers(
 
 export async function approveVerification(userId: string): Promise<void> {
   const res = await axiosInstance.patch<ApiResponse<null>>(
-    `/api/admin/verify/${userId}`
+    ADMIN_ROUTES.VERIFY(userId)
   );
 
   if (!res.data.success) {
@@ -173,7 +174,7 @@ export async function rejectVerification(
   reason: string
 ): Promise<void> {
   const res = await axiosInstance.patch<ApiResponse<null>>(
-    `/api/admin/reject/${userId}`,
+    ADMIN_ROUTES.REJECT(userId),
     { reason }
   );
 
@@ -184,7 +185,7 @@ export async function rejectVerification(
 
 export async function toggleUserAccess(userId: string): Promise<User> {
   const res = await axiosInstance.patch<ApiResponse<null>>(
-    `/api/admin/access/${userId}`
+    ADMIN_ROUTES.ACCESS(userId)
   );
 
   if (!res.data.success) {
@@ -195,7 +196,7 @@ export async function toggleUserAccess(userId: string): Promise<User> {
 
 export async function fetchAllAdminServices(): Promise<AdminServiceResponseDTO[]> {
   try {
-    const res = await axiosInstance.get<ApiResponse<AdminServiceResponseDTO[]>>("/api/admin/services");
+    const res = await axiosInstance.get<ApiResponse<AdminServiceResponseDTO[]>>(ADMIN_ROUTES.SERVICES);
     if (!res.data.success) {
       throw new Error(res.data.message || "Failed to fetch admin services");
     }
@@ -207,7 +208,7 @@ export async function fetchAllAdminServices(): Promise<AdminServiceResponseDTO[]
 
 export async function fetchAdminServiceDetails(serviceId: string): Promise<AdminServiceResponseDTO> {
   try {
-    const res = await axiosInstance.get<ApiResponse<AdminServiceResponseDTO>>(`/api/admin/services/${serviceId}`);
+    const res = await axiosInstance.get<ApiResponse<AdminServiceResponseDTO>>(ADMIN_ROUTES.SERVICE_DETAILS(serviceId));
     if (!res.data.success) {
       throw new Error(res.data.message || "Failed to fetch admin service details");
     }
@@ -219,7 +220,7 @@ export async function fetchAdminServiceDetails(serviceId: string): Promise<Admin
 
 export async function fetchAllAdminMeetings(): Promise<AdminServiceResponseDTO[]> {
   try {
-    const res = await axiosInstance.get<ApiResponse<AdminServiceResponseDTO[]>>("/api/admin/meetings");
+    const res = await axiosInstance.get<ApiResponse<AdminServiceResponseDTO[]>>(ADMIN_ROUTES.MEETINGS);
     if (!res.data.success) {
       throw new Error(res.data.message || "Failed to fetch admin meetings");
     }
@@ -231,7 +232,7 @@ export async function fetchAllAdminMeetings(): Promise<AdminServiceResponseDTO[]
 
 export async function fetchAdminMeetingDetails(serviceId: string): Promise<AdminServiceResponseDTO> {
   try {
-    const res = await axiosInstance.get<ApiResponse<AdminServiceResponseDTO>>(`/api/admin/meetings/${serviceId}`);
+    const res = await axiosInstance.get<ApiResponse<AdminServiceResponseDTO>>(ADMIN_ROUTES.MEETING_DETAILS(serviceId));
     if (!res.data.success) {
       throw new Error(res.data.message || "Failed to fetch admin meeting details");
     }
@@ -242,6 +243,6 @@ export async function fetchAdminMeetingDetails(serviceId: string): Promise<Admin
 }
 
 export const fetchUserWalletBalanceByAdmin = async (userId: string) => {
-  const response = await axiosInstance.get(`/api/wallet/admin/${userId}/balance`);
+  const response = await axiosInstance.get(WALLET_ROUTES.ADMIN_BALANCE(userId));
   return response.data?.payload ?? response.data;
 };
