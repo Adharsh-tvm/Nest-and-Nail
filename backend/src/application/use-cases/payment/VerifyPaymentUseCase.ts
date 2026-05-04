@@ -128,8 +128,8 @@ export class VerifyPaymentUseCase implements IVerifyPaymentUseCase {
             await this._sendNotificationUseCase.execute({
                 userId: service.workerId,
                 title: service.category === "VIDEO_CALL"
-                    ? "Meeting Payment Confirmed"
-                    : "Service Payment Confirmed",
+                    ? "Meeting Confirmed"
+                    : "Service Confirmed",
                 message: service.category === "VIDEO_CALL"
                     ? "A client has paid for a video call with you"
                     : "A client has paid and confirmed a service booking with you",
