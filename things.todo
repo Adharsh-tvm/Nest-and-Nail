@@ -328,21 +328,24 @@ resolutionType:
 
 NEXT REVIEW PENDINGS
 
+☐ avoid usage of any
+☐ keep retention for logs
+☐ elsint -improve rules
+☐ eslint issue need to improve
 ☐ video call ring feature
-☐ service location in maps - booking details page
-✔ video call history @done (5/2/2026, 7:31:08 AM)
-✔ category management - bug @done (5/2/2026, 7:31:09 AM)
-☐ routes in constant
-✔ Implement the wallet system along with transaction management. @done (5/2/2026, 7:31:23 AM)
-✔ Complete the service option module for workers. @done (5/2/2026, 7:31:32 AM)
-✔ Add a concern-raising feature for users. @done (5/2/2026, 7:31:42 AM)
-✔ Store meeting history along with call duration details. @done (5/2/2026, 7:31:44 AM)
-✔ Implement ratings and reviews functionality for workers. @done (5/2/2026, 7:31:45 AM)
-✔ Add notifications for workers regarding scheduled meetings. @done (5/2/2026, 7:31:46 AM)
-✔ logger refactoring @done (5/2/2026, 6:59:52 PM)
-✔ configure env @done (5/2/2026, 7:05:33 PM)
-☐ relative path
-✔ Develop real-time chat functionality between users and workers. @done (5/2/2026, 5:29:03 PM)
-☐ transaction
-☐ any
-☐ mapping
+☐ video call history
+☐ Store meeting history
+☐ along with call duration details.
+☐ search in category
+☐ service location in maps - booking details page -within applicatio
+☐ wallet system need pagination
+☐ Complete the service option module for workers.in profile
+☐ show already reviews details in page
+☐ list review and rating in user side
+☐ Add a concern-raising feature for users.-option to add attachment
+☐ concern listing need list in admin
+☐ based concern -admin can do action
+☐ notification for all action like meeting cancelled e.t.c
+☐ real time chatting issue in message while reloading
+☐ Admin Dashboard not completed
+☐ worker dashboard needed
