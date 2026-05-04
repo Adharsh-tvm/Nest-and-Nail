@@ -22,7 +22,7 @@ export async function getWalletBalanceAction(): Promise<{
 
 export async function getTransactionsAction() {
     try {
-        const { getTransactionsApi } = require("@/sources/api/wallet.api");
+        const { getTransactionsApi } = require("@/sources/api/user/wallet.api");
         const res = await getTransactionsApi();
         return { success: true, data: res };
     } catch (error: any) {
@@ -32,7 +32,7 @@ export async function getTransactionsAction() {
 
 export async function createRechargeOrderAction(amount: number) {
     try {
-        const { createRechargeOrderApi } = require("@/sources/api/wallet.api");
+        const { createRechargeOrderApi } = require("@/sources/api/user/wallet.api");
         const res = await createRechargeOrderApi(amount);
         return { success: true, data: res };
     } catch (error: any) {
@@ -47,7 +47,7 @@ export async function verifyRechargePaymentAction(data: {
     amount: number;
 }) {
     try {
-        const { verifyRechargePaymentApi } = require("@/sources/api/wallet.api");
+        const { verifyRechargePaymentApi } = require("@/sources/api/user/wallet.api");
         const res = await verifyRechargePaymentApi(data);
         return { success: true, data: res };
     } catch (error: any) {
