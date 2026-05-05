@@ -54,7 +54,8 @@ import { User } from "@/shared/types/userTypes";
 import { Category } from "@/shared/types/categoryTypes";
 import { AddAddressModal } from "@/app/components/containers/layout/AddAddressModal";
 import { ChangePasswordModal } from "@/app/components/containers/auth/ChangePasswordModal";
-import { getWalletBalanceAction } from "@/app/actions/client/wallet-actions";
+import { getWalletBalanceAction, getTransactionsAction } from "@/app/actions/client/wallet-actions";
+import Pagination from "@/app/components/ui/Pagination";
 
 import { Address } from "@/shared/types/addressType";
 import { blockWorkerDatesAction, getWorkerBlockedDatesAction } from "@/app/actions/worker/slot-actions";
@@ -955,25 +956,33 @@ const WalletView: React.FC<ViewProps> = ({ user }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isRecharging, setIsRecharging] = useState(false);
   const [rechargeAmount, setRechargeAmount] = useState<string>("1000");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [limit] = useState(5); // Show 5 transactions per page
 
-  const fetchWallet = async () => {
+  const fetchWallet = async (page: number = 1) => {
     setIsLoading(true);
     const balanceRes = await getWalletBalanceAction();
     if (balanceRes.success && balanceRes.data) {
       setBalance(balanceRes.data.balance);
     }
-    const { getTransactionsAction } = await import("@/app/actions/client/wallet-actions");
-    const txRes = await getTransactionsAction();
+    
+    const txRes = await getTransactionsAction(page, limit);
     if (txRes.success && txRes.data) {
-      const txData = Array.isArray(txRes.data) ? txRes.data : txRes.data.transactions || [];
+      const txData = txRes.data.transactions || (Array.isArray(txRes.data) ? txRes.data : []);
       setTransactions(txData);
+      setTotalPages(txRes.data.totalPages || 1);
     }
     setIsLoading(false);
   };
 
   useEffect(() => {
-    fetchWallet();
-  }, []);
+    fetchWallet(currentPage);
+  }, [currentPage]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
   const handleRecharge = async () => {
     const amount = Number(rechargeAmount);
@@ -1145,6 +1154,15 @@ const WalletView: React.FC<ViewProps> = ({ user }) => {
             </div>
           )}
         </div>
+        {!isLoading && transactions.length > 0 && (
+          <div className="p-6 border-t border-gray-100 bg-gray-50/30">
+            <Pagination 
+              currentPage={currentPage} 
+              totalPages={totalPages} 
+              onPageChange={handlePageChange} 
+            />
+          </div>
+        )}
       </div>
     </div>
   );

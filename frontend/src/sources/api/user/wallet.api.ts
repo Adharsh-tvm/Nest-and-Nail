@@ -20,8 +20,10 @@ export const getWalletBalanceApi = async (): Promise<WalletData> => {
     return response.data?.payload ?? response.data;
 };
 
-export const getTransactionsApi = async () => {
-    const response = await axiosInstance.get(WALLET_ROUTES.TRANSACTIONS);
+export const getTransactionsApi = async (page: number = 1, limit: number = 10) => {
+    const response = await axiosInstance.get(WALLET_ROUTES.TRANSACTIONS, {
+        params: { page, limit }
+    });
     return response.data?.payload ?? response.data;
 };
 

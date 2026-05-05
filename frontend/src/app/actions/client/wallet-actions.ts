@@ -20,10 +20,10 @@ export async function getWalletBalanceAction(): Promise<{
     }
 }
 
-export async function getTransactionsAction() {
+export async function getTransactionsAction(page: number = 1, limit: number = 10) {
     try {
         const { getTransactionsApi } = require("@/sources/api/user/wallet.api");
-        const res = await getTransactionsApi();
+        const res = await getTransactionsApi(page, limit);
         return { success: true, data: res };
     } catch (error: any) {
         return { success: false, error: error.message || "Failed to fetch transactions" };
