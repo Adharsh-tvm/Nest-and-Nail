@@ -14,18 +14,21 @@ export class ClientController {
 
   getAvailableWorkers = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { category, lat, lng, search, isOnline } = req.query;
+      const { category, lat, lng, search, isOnline, page, limit, sort } = req.query;
 
-      const workers = await this._getAvailableWorkersUseCase.execute(
+      const { workers, total } = await this._getAvailableWorkersUseCase.execute(
         category as string,
-        Number(lat),
-        Number(lng),
+        lat ? Number(lat) : undefined,
+        lng ? Number(lng) : undefined,
         search as string | undefined,
-        isOnline === "true" ? true : undefined
+        isOnline === "true" ? true : undefined,
+        page ? parseInt(page as string) : undefined,
+        limit ? parseInt(limit as string) : undefined,
+        sort as string
       );
 
       res.status(HttpStatusCode.OK).json(
-        ResponseHandler.success(workers, "Workers fetched successfully")
+        ResponseHandler.success({ workers, total }, "Workers fetched successfully")
       );
     } catch (error) {
       next(error);

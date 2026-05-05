@@ -15,23 +15,63 @@ export class CategoryRepository implements ICategoryRepository {
             doc.name,
             doc.slug,
             doc.isActive,
-            doc.createdAt
+            doc.createdAt,
+            doc.updatedAt
         );
     }
 
-    async findAll(): Promise<Category[]> {
-        const docs = await CategoryModel.find().sort({ name: 1 });
+    async findAll(options?: {
+        search?: string;
+        page?: number;
+        limit?: number;
+        sortBy?: string;
+        sortOrder?: "asc" | "desc";
+    }): Promise<{
+        categories: Category[];
+        total: number;
+        activeCount: number;
+        inactiveCount: number;
+    }> {
+        const query: any = {};
 
-        return docs.map(
+        if (options?.search) {
+            query.$or = [
+                { name: { $regex: options.search, $options: "i" } },
+                { slug: { $regex: options.search, $options: "i" } },
+            ];
+        }
+
+        const total = await CategoryModel.countDocuments(query);
+        const activeCount = await CategoryModel.countDocuments({ ...query, isActive: true });
+        const inactiveCount = total - activeCount;
+
+        const sortField = options?.sortBy || "name";
+        const sortOrder = options?.sortOrder === "desc" ? -1 : 1;
+        const sortOptions: any = { [sortField]: sortOrder };
+
+        let mongoQuery = CategoryModel.find(query).sort(sortOptions);
+
+        if (options?.page && options?.limit) {
+            mongoQuery = mongoQuery
+                .skip((options.page - 1) * options.limit)
+                .limit(options.limit);
+        }
+
+        const docs = await mongoQuery;
+
+        const categories = docs.map(
             (doc) =>
                 new Category(
                     doc.id,
                     doc.name,
                     doc.slug,
                     doc.isActive,
-                    doc.createdAt
+                    doc.createdAt,
+                    doc.updatedAt
                 )
         );
+
+        return { categories, total, activeCount, inactiveCount };
     }
 
     async findBySlug(slug: string): Promise<Category | null> {
@@ -43,7 +83,8 @@ export class CategoryRepository implements ICategoryRepository {
             doc.name,
             doc.slug,
             doc.isActive,
-            doc.createdAt
+            doc.createdAt,
+            doc.updatedAt
         );
     }
 
@@ -60,7 +101,8 @@ export class CategoryRepository implements ICategoryRepository {
                     doc.name,
                     doc.slug,
                     doc.isActive,
-                    doc.createdAt
+                    doc.createdAt,
+                    doc.updatedAt
                 )
         );
     }
@@ -74,7 +116,8 @@ export class CategoryRepository implements ICategoryRepository {
             doc.name,
             doc.slug,
             doc.isActive,
-            doc.createdAt
+            doc.createdAt,
+            doc.updatedAt
         );
     }
 
@@ -105,7 +148,8 @@ export class CategoryRepository implements ICategoryRepository {
             updated.name,
             updated.slug,
             updated.isActive,
-            updated.createdAt
+            updated.createdAt,
+            updated.updatedAt
         );
     }
 

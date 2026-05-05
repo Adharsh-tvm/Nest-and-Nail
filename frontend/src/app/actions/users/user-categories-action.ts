@@ -20,7 +20,8 @@ export async function updateUserCategoriesAction(
 export async function fetchCategoriesAction() {
     try {
         const { fetchAllCategories } = await import("@/sources/api/category/category.api");
-        return await fetchAllCategories();
+        const res = await fetchAllCategories();
+        return res.categories;
     } catch (error: any) {
         console.error("Fetch categories error:", error);
         return [];

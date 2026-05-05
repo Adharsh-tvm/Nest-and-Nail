@@ -15,6 +15,7 @@ export type Column<T = any> = {
   className?: string;
   cell?: (row: T) => React.ReactNode;
   sortable?: boolean;
+  sortKey?: string;
 };
 
 export interface DataTableProps<T = any> {
@@ -31,6 +32,9 @@ export interface DataTableProps<T = any> {
   page?: number;
   totalPages?: number;
   onPageChange?: (page: number) => void;
+  onSort?: (key: string, order: "asc" | "desc") => void;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
   onFilterClick?: () => void;
   total?: number;
 }
@@ -48,6 +52,9 @@ const DataTable = <T,>({
   page = 1,
   totalPages = 1,
   onPageChange,
+  onSort,
+  sortBy,
+  sortOrder,
   onFilterClick,
   total,
 }: DataTableProps<T>) => {
@@ -61,6 +68,18 @@ const DataTable = <T,>({
       onSearchChange?.(e.target.value);
     } else {
       setInternalSearch(e.target.value);
+    }
+  };
+
+  const handleSort = (col: Column<T>) => {
+    if (!col.sortable || !onSort) return;
+    const key = col.sortKey || col.accessorKey;
+    if (!key) return;
+
+    if (sortBy === key) {
+      onSort(key, sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      onSort(key, "asc");
     }
   };
 
@@ -169,12 +188,18 @@ const DataTable = <T,>({
                   className={`px-6 py-5 text-xs font-bold text-gray-400 uppercase tracking-wider first:pl-2 ${col.className || ""
                     }`}
                 >
-                  <div className="flex items-center gap-2 group cursor-pointer hover:text-gray-600">
+                  <div
+                    onClick={() => handleSort(col)}
+                    className={`flex items-center gap-2 group ${col.sortable ? "cursor-pointer hover:text-gray-600" : ""}`}
+                  >
                     {col.header}
                     {col.sortable && (
                       <ArrowUpDown
                         size={12}
-                        className="opacity-0 group-hover:opacity-100 transition-opacity"
+                        className={`transition-all ${sortBy === (col.sortKey || col.accessorKey)
+                          ? "opacity-100 text-[#1B4332] scale-110"
+                          : "opacity-0 group-hover:opacity-40"
+                          } ${sortBy === (col.sortKey || col.accessorKey) && sortOrder === "desc" ? "rotate-180" : ""}`}
                       />
                     )}
                   </div>

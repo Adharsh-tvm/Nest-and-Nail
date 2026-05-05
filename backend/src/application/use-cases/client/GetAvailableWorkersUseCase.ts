@@ -15,15 +15,21 @@ export class GetAvailableWorkersUseCase implements IGetAvailableWorkersUseCase {
     lat?: number,
     lng?: number,
     search?: string,
-    isOnline?: boolean
-  ): Promise<Worker[]> {
+    isOnline?: boolean,
+    page?: number,
+    limit?: number,
+    sortBy?: string
+  ): Promise<{ workers: Worker[]; total: number }> {
 
-    const workers = await this._workerRepository.findAvailableWorkers(
+    const { workers, total } = await this._workerRepository.findAvailableWorkers(
       categoryId,
       lat,
       lng,
       search,
-      isOnline
+      isOnline,
+      page,
+      limit,
+      sortBy
     );
 
     // Map through workers and generate presigned URLs for their profile pictures
@@ -40,6 +46,6 @@ export class GetAvailableWorkersUseCase implements IGetAvailableWorkersUseCase {
       return worker;
     }));
 
-    return workersWithPresignedUrls;
+    return { workers: workersWithPresignedUrls, total };
   }
 }

@@ -9,14 +9,25 @@ import {
 import { Category, CategoryInput } from "@/shared/types/categoryTypes";
 import { ApiResponse } from "@/shared/types/responseTypes";
 
-export async function getAllCategoriesAction(): Promise<ApiResponse<Category[]>> {
+export async function getAllCategoriesAction(params?: {
+    search?: string;
+    page?: number;
+    limit?: number;
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+}): Promise<ApiResponse<{
+    categories: Category[];
+    total: number;
+    activeCount: number;
+    inactiveCount: number;
+}>> {
     try {
-        const categories = await fetchAllCategories();
+        const payload = await fetchAllCategories(params);
 
         return {
             success: true,
             message: "Categories fetched successfully",
-            payload: categories,
+            payload: payload,
         };
     } catch (error: any) {
         console.error("Fetch Categories Action Error:", error);

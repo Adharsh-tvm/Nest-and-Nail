@@ -7,8 +7,11 @@ export interface IWorkerRepository extends IBaseRepository<Worker> {
         categoryId?: string,
         lat?: number,
         lng?: number,
-        search?: string,      // filter by worker name (partial match)
-        isOnline?: boolean    // filter by online status
-    ): Promise<Worker[]>;
+        search?: string,
+        isOnline?: boolean,
+        page?: number,
+        limit?: number,
+        sortBy?: string
+    ): Promise<{ workers: Worker[]; total: number }>;
 
 }

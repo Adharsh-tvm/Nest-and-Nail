@@ -38,8 +38,11 @@ export class WorkerRepository extends BaseRepository<Worker, IWorkerDocument> im
         lat?: number,
         lng?: number,
         search?: string,
-        isOnline?: boolean
-    ): Promise<Worker[]> {
+        isOnline?: boolean,
+        page?: number,
+        limit?: number,
+        sortBy?: string
+    ): Promise<{ workers: Worker[]; total: number }> {
 
         const pipeline: any[] = [];
 
@@ -89,12 +92,35 @@ export class WorkerRepository extends BaseRepository<Worker, IWorkerDocument> im
             });
         }
 
-        // ── 5. Sort by rating ──
-        pipeline.push({ $sort: { rating: -1 } });
+        // ── 5. Determine Sort Stage ──
+        const sortStage: any = { $sort: {} };
+        if (sortBy === 'rating_desc') {
+            sortStage.$sort.rating = -1;
+        } else if (sortBy === 'distance_asc' && lat && lng) {
+            sortStage.$sort.distance = 1;
+        } else {
+            sortStage.$sort.rating = -1; // Default
+        }
 
-        const workers = await WorkerModel.aggregate(pipeline);
+        // ── 6. Facet for count and data ──
+        const dataPipeline: any[] = [sortStage];
+        if (page && limit) {
+            dataPipeline.push({ $skip: (page - 1) * limit });
+            dataPipeline.push({ $limit: limit });
+        }
 
-        return workers.map((doc: any) => {
+        pipeline.push({
+            $facet: {
+                data: dataPipeline,
+                total: [{ $count: "count" }]
+            }
+        });
+
+        const result = await WorkerModel.aggregate(pipeline);
+        const workersRaw = result[0].data || [];
+        const total = result[0].total[0]?.count || 0;
+
+        const workers = workersRaw.map((doc: any) => {
             const { _id, __v, categories, categoryDocs, ...rest } = doc;
             return {
                 ...rest,
@@ -103,5 +129,7 @@ export class WorkerRepository extends BaseRepository<Worker, IWorkerDocument> im
                 distance: rest.distance,
             } as Worker;
         });
+
+        return { workers, total };
     }
 }

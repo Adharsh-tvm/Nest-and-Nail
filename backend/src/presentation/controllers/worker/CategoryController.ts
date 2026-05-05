@@ -32,10 +32,24 @@ export class CategoryController implements ICategoryController {
         }
     };
 
-    getAll = async (_req: Request, res: Response) => {
+    getAll = async (req: Request, res: Response) => {
         try {
-            const categories = await this._getAllCategoriesUseCase.execute();
-            res.status(HttpStatusCode.OK).json(ResponseHandler.success(categories, RESPONSE_MESSAGES.UPDATED));
+            const { search, page, limit, sortBy, sortOrder } = req.query;
+
+            const { categories, total, activeCount, inactiveCount } = await this._getAllCategoriesUseCase.execute({
+                search: search as string,
+                page: page ? parseInt(page as string) : undefined,
+                limit: limit ? parseInt(limit as string) : undefined,
+                sortBy: sortBy as string,
+                sortOrder: sortOrder as "asc" | "desc",
+            });
+
+            res.status(HttpStatusCode.OK).json(ResponseHandler.success({
+                categories,
+                total,
+                activeCount,
+                inactiveCount
+            }, RESPONSE_MESSAGES.UPDATED));
         } catch (error: any) {
             console.error("[CategoryController.getAll]", error);
             res.status(HttpStatusCode.INTERNAL_SERVER).json(
