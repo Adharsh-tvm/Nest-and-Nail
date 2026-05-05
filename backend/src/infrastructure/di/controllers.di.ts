@@ -258,7 +258,8 @@ export class ControllerDI {
         if (!this._videoCallController) {
             this._videoCallController = new VideoCallController(
                 this._useCases.joinVideoCallUseCase,
-                this._useCases.endVideoCallUseCase
+                this._useCases.endVideoCallUseCase,
+                this._useCases.leaveVideoCallUseCase
             );
         }
         return this._videoCallController;

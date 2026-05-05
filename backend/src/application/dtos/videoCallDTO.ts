@@ -8,7 +8,7 @@ export interface UpdateVideoCallDTO {
 
   joinedUsers?: string[];
 
-  startedAt?: Date;
+  startedAt?: Date | null;
   endedAt?: Date;
   duration?: string;
   accumulatedDuration?: number;

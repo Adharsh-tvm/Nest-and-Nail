@@ -108,8 +108,10 @@ import { GetClientMeetingByIdUseCase } from "../../application/use-cases/meeting
 import { GetWorkerMeetingByIdUseCase } from "../../application/use-cases/meetings/worker/GetWorkerMeetingByIdUseCase";
 import { IJoinVideoCallUseCase } from "../../application/interfaces/meetings/IJoinVideoCallUseCase";
 import { IEndVideoCallUseCase } from "../../application/interfaces/meetings/IEndVideoCallUseCase";
+import { ILeaveVideoCallUseCase } from "../../application/interfaces/meetings/ILeaveVideoCallUseCase";
 import { JoinVideoCallUseCase } from "../../application/use-cases/meetings/JoinVideoCallUseCase";
 import { EndVideoCallUseCase } from "../../application/use-cases/meetings/EndVideoCallUseCase";
+import { LeaveVideoCallUseCase } from "../../application/use-cases/meetings/LeaveVideoCallUseCase";
 import { ICreatePaymentUseCase } from "../../application/interfaces/payment/ICreatePaymentUseCase";
 import { IVerifyPaymentUseCase } from "../../application/interfaces/payment/IVerifyPaymentUseCase";
 import { CreatePaymentUseCase } from "../../application/use-cases/payment/CreatePaymentUseCase";
@@ -216,6 +218,7 @@ export class UseCaseDI {
 
   private _joinVideoCallUseCase?: IJoinVideoCallUseCase;
   private _endVideoCallUseCase?: IEndVideoCallUseCase;
+  private _leaveVideoCallUseCase?: ILeaveVideoCallUseCase;
 
   private _createPaymentUseCase?: ICreatePaymentUseCase;
   private _verifyPaymentUseCase?: IVerifyPaymentUseCase;
@@ -778,6 +781,15 @@ export class UseCaseDI {
       );
     }
     return this._endVideoCallUseCase;
+  }
+
+  get leaveVideoCallUseCase(): ILeaveVideoCallUseCase {
+    if (!this._leaveVideoCallUseCase) {
+      this._leaveVideoCallUseCase = new LeaveVideoCallUseCase(
+        this.infra.serviceRepository
+      );
+    }
+    return this._leaveVideoCallUseCase;
   }
 
   get createPaymentUseCase(): ICreatePaymentUseCase {

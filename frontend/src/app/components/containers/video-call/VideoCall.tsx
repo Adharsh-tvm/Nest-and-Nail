@@ -6,7 +6,21 @@ import io, { Socket } from "socket.io-client";
 import { createPortal } from "react-dom";
 import { Mic, MicOff, Video as VideoIcon, VideoOff, LogOut, Loader2, Users, AlertCircle } from "lucide-react";
 
-export default function VideoCall({ roomId, role, workerName, clientName }: { roomId: string; role: string; workerName?: string; clientName?: string }) {
+export default function VideoCall({ 
+  roomId, 
+  role, 
+  workerName, 
+  clientName,
+  onJoin,
+  onLeave
+}: { 
+  roomId: string; 
+  role: string; 
+  workerName?: string; 
+  clientName?: string;
+  onJoin?: (roomId: string) => Promise<any>;
+  onLeave?: (roomId: string) => Promise<any>;
+}) {
   const myName = role === "WORKER" ? (workerName || "Worker") : (clientName || "Client");
   const otherName = role === "WORKER" ? (clientName || "Client") : (workerName || "Worker");
   const localVideo = useRef<HTMLVideoElement>(null);
@@ -103,6 +117,10 @@ export default function VideoCall({ roomId, role, workerName, clientName }: { ro
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
     const socket = io(apiUrl, { transports: ["websocket", "polling"] });
     socketRef.current = socket;
+
+    if (onJoin) {
+      onJoin(roomId).catch(err => console.error("Error calling join API:", err));
+    }
 
     const start = async () => {
       try {
@@ -248,8 +266,16 @@ export default function VideoCall({ roomId, role, workerName, clientName }: { ro
     if (track) { track.enabled = !track.enabled; setIsVideoOn(track.enabled); }
   };
 
-  const executeLeave = () => {
+  const executeLeave = async () => {
     window.removeEventListener("beforeunload", onBeforeUnload);
+
+    if (onLeave) {
+      try {
+        await onLeave(roomId);
+      } catch (err) {
+        console.error("Error calling leave API:", err);
+      }
+    }
 
     // 1. Null out video srcObjects first — this signals the browser to release the camera/mic indicator
     if (localVideo.current) localVideo.current.srcObject = null;

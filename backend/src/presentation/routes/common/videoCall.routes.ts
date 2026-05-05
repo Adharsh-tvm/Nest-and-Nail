@@ -15,5 +15,7 @@ export function createUsersVideoCallRoutes(
 
     router.post("/end/:serviceId", authMiddleware.verify.bind(authMiddleware), videoCallController.endCall);
 
+    router.post("/leave/:serviceId", authMiddleware.verify.bind(authMiddleware), videoCallController.leaveCall);
+
     return router;
 }

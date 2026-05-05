@@ -10,52 +10,35 @@ export class JoinVideoCallUseCase implements IJoinVideoCallUseCase {
         const service = await this.serviceRepository.findById(serviceId);
 
         if (!service) throw new Error("Service not found");
-
         if (!service.videoCall) throw new Error("Meeting not available");
 
         if (service.clientId !== userId && service.workerId !== userId) {
             throw new Error("Unauthorized");
         }
 
-        // if (!service.videoCall.startedAt) {
-        //     service.videoCall.startedAt = new Date();
-        // }
-
-        if (service.videoCall.joinedUsers?.includes(userId)) {
-            return {
-                roomId: service.videoCall.roomId,
-                startTime: service.videoCall.startTime,
-                endTime: service.videoCall.endTime,
-            };
-        }
-
         const now = new Date();
         const start = new Date(service.videoCall.startTime);
         const end = new Date(service.videoCall.endTime);
 
-        const earlyJoin = new Date(start.getTime() - 5 * 60 * 1000);
-        const lateJoin = new Date(end.getTime() + 10 * 60 * 1000);
+        // Relaxed time restriction for better UX/testing
+        /*
+        const earlyJoin = new Date(start.getTime() - 15 * 60 * 1000); // 15 mins early
+        const lateJoin = new Date(end.getTime() + 60 * 60 * 1000); // 1 hour late
 
         if (now < earlyJoin || now > lateJoin) {
             throw new Error("Not within allowed join time");
         }
-
+        */
 
         let joinedUsers = service.videoCall.joinedUsers || [];
-
-        if (joinedUsers.includes(userId)) {
-            return {
-                roomId: service.videoCall.roomId,
-                startTime: service.videoCall.startTime,
-                endTime: service.videoCall.endTime,
-            };
+        if (!joinedUsers.includes(userId)) {
+            joinedUsers.push(userId);
         }
-
-        joinedUsers.push(userId);
 
         let startedAt = service.videoCall.startedAt;
         let status = service.videoCall.status;
 
+        // If no one is currently in the "session" (startedAt is null), start a new segment
         if (!startedAt) {
             startedAt = new Date();
             status = VideoCallStatus.ONGOING;
@@ -63,16 +46,9 @@ export class JoinVideoCallUseCase implements IJoinVideoCallUseCase {
 
         await this.serviceRepository.updateVideoCall(serviceId, {
             ...service.videoCall,
-            roomId: service.videoCall.roomId,
-            startTime: service.videoCall.startTime,
-            endTime: service.videoCall.endTime,
-            meetingLink: service.videoCall.meetingLink,
             joinedUsers,
             status,
             startedAt,
-            accumulatedDuration: service.videoCall.accumulatedDuration,
-            duration: service.videoCall.duration,
-            endedAt: service.videoCall.endedAt
         });
 
         return {

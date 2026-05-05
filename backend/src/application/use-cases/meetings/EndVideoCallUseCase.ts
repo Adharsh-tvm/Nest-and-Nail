@@ -44,7 +44,6 @@ export class EndVideoCallUseCase implements IEndVideoCallUseCase {
     }
 
     const endedAt = new Date();
-
     let totalSeconds = service.videoCall.accumulatedDuration ?? 0;
 
     if (service.videoCall.startedAt) {
@@ -55,16 +54,12 @@ export class EndVideoCallUseCase implements IEndVideoCallUseCase {
     const duration = totalSeconds > 0 ? formatDuration(totalSeconds) : "0s";
 
     const updatedVideoCall = {
-      roomId: service.videoCall.roomId,
-      startTime: service.videoCall.startTime,
-      endTime: service.videoCall.endTime,
-      meetingLink: service.videoCall.meetingLink,
-      joinedUsers: service.videoCall.joinedUsers || [],
+      ...service.videoCall,
       status: VideoCallStatus.ENDED,
-      startedAt: service.videoCall.startedAt,
       endedAt,
       duration,
       accumulatedDuration: totalSeconds,
+      startedAt: null, // Clear startedAt
     };
 
     const updated = await this.serviceRepository.updateVideoCall(serviceId, updatedVideoCall);
