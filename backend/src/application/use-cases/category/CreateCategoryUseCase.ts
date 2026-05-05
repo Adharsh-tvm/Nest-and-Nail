@@ -21,6 +21,7 @@ export class CreateCategoryUseCase implements ICreateCategoryUseCase {
       name,
       slug,
       true,
+      new Date(),
       new Date()
     );
 
