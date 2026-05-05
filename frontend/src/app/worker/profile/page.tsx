@@ -1492,7 +1492,7 @@ const SlotView: React.FC<ViewProps> = ({ user, setUser }) => {
                Booked by Client
              </div>
              <div className="flex items-center gap-2 font-medium">
-               <span className="w-3.5 h-3.5 rounded-md bg-red-50 ring-1 ring-red-400 inline-block shadow-sm flex items-end justify-center pb-0.5"><span className="w-1.5 h-1.5 rounded-full bg-red-500"></span></span> 
+               <span className="w-3.5 h-3.5 rounded-md bg-red-50 ring-1 ring-red-400 inline-block shadow-sm items-end justify-center pb-0.5"><span className="w-1.5 h-1.5 rounded-full bg-red-500"></span></span> 
                Selected to Block
              </div>
           </div>
