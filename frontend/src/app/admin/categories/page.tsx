@@ -38,6 +38,8 @@ const CategoriesPage = () => {
   );
   const [actionLoading, setActionLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
 
   const fetchCategories = async () => {
     try {
@@ -148,6 +150,19 @@ const CategoriesPage = () => {
       c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       c.slug.toLowerCase().includes(searchQuery.toLowerCase()),
   );
+
+  // Pagination logic
+  const totalItems = filteredCategories.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const paginatedCategories = filteredCategories.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage,
+  );
+
+  // Reset to first page when search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
 
   // Stats
   const totalCategories = categories.length;
@@ -295,9 +310,15 @@ const CategoriesPage = () => {
         <DataTable<Category>
           title="Categories"
           columns={columns}
-          data={filteredCategories}
+          data={paginatedCategories}
           isLoading={loading}
           searchPlaceholder="Search categories..."
+          searchValue={searchQuery}
+          onSearchChange={setSearchQuery}
+          page={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+          total={totalItems}
           actions={
             <button
               onClick={handleCreate}

@@ -32,6 +32,7 @@ export interface DataTableProps<T = any> {
   totalPages?: number;
   onPageChange?: (page: number) => void;
   onFilterClick?: () => void;
+  total?: number;
 }
 
 const DataTable = <T,>({
@@ -48,6 +49,7 @@ const DataTable = <T,>({
   totalPages = 1,
   onPageChange,
   onFilterClick,
+  total,
 }: DataTableProps<T>) => {
   // Use internal state if no controlled props provided
   const [internalSearch, setInternalSearch] = React.useState("");
@@ -261,9 +263,9 @@ const DataTable = <T,>({
       <div className="p-6 md:p-8 flex items-center justify-between text-xs text-gray-500 bg-white border-t border-gray-50">
         <div className="flex items-center gap-2">
           <span className="font-medium bg-gray-100 px-2 py-1 rounded text-gray-600">
-            {data ? data.length : 0}
+            {total !== undefined ? total : (data ? data.length : 0)}
           </span>
-          <span>records showing</span>
+          <span>records {total !== undefined ? "total" : "showing"}</span>
         </div>
 
         <div className="flex items-center gap-2">
