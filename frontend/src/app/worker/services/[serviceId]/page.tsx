@@ -28,6 +28,34 @@ import toast from "react-hot-toast";
 import RaiseConcernButton from "@/app/components/containers/services/RaiseConcernButton";
 import ChatDrawer from "@/app/components/containers/chat/ChatDrawer";
 import { MessageCircle } from "lucide-react";
+import dynamic from "next/dynamic";
+
+const ServiceRouteMap = dynamic(
+  () => import("@/app/components/containers/layout/ServiceRouteMap").then((mod) => mod.ServiceRouteMap),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[280px] w-full flex flex-col items-center justify-center bg-gray-50 rounded-2xl border border-gray-100 text-gray-400 gap-2">
+        <Loader2 className="w-6 h-6 animate-spin text-indigo-500" />
+        <span className="text-xs font-semibold text-gray-500">Loading Route Map...</span>
+      </div>
+    ),
+  }
+);
+
+function getHaversineDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371; // km
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c; // Distance in km
+}
 
 /* ─────────────────────────────────────────────────────────────── */
 /*  Types                                                          */
@@ -244,6 +272,26 @@ export default function WorkerServiceDetailsPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [location, setLocation] = useState<LocationState>({ status: "idle" });
   const [starting, setStarting] = useState(false);
+  const [workerCoords, setWorkerCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [isMapModalOpen, setIsMapModalOpen] = useState(false);
+
+  // Auto-fetch worker current location for maps and distance directions
+  useEffect(() => {
+    if (typeof window !== "undefined" && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setWorkerCoords({
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+          });
+        },
+        (err) => {
+          console.warn("Unable to fetch worker location for directions routing map:", err);
+        },
+        { enableHighAccuracy: true, timeout: 10000 }
+      );
+    }
+  }, []);
 
   /* ── Fetch service details ── */
   useEffect(() => {
@@ -381,6 +429,66 @@ export default function WorkerServiceDetailsPage() {
         onClose={closeModal}
       />
 
+      {/* Large Map Modal */}
+      <AnimatePresence>
+        {isMapModalOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              key="map-backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm"
+              onClick={() => setIsMapModalOpen(false)}
+            />
+            {/* Modal */}
+            <motion.div
+              key="map-modal"
+              initial={{ opacity: 0, scale: 0.95, y: 24 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 24 }}
+              transition={{ type: "spring", stiffness: 320, damping: 25 }}
+              className="fixed inset-4 sm:inset-10 md:inset-16 z-[110] flex items-center justify-center p-2 sm:p-4"
+            >
+              <div className="bg-white w-full h-full rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-slate-150">
+                {/* Header */}
+                <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+                  <div>
+                    <h3 className="font-extrabold text-slate-900 flex items-center gap-2">
+                      <MapPin className="w-5 h-5 text-indigo-500" />
+                      Live Route & Directions Map
+                    </h3>
+                    <p className="text-xs text-slate-500 font-medium">
+                      Zoom, pan, and review actual street driving coordinates to the service site
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setIsMapModalOpen(false)}
+                    className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                {/* Map Area - 100% height */}
+                <div className="flex-1 w-full bg-slate-50 relative">
+                  {service.location?.coordinates && (
+                    <ServiceRouteMap
+                      serviceLat={service.location.coordinates[1]}
+                      serviceLng={service.location.coordinates[0]}
+                      workerLat={workerCoords?.lat}
+                      workerLng={workerCoords?.lng}
+                      height="100%"
+                    />
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
       <div className="min-h-[calc(100vh-4rem)] bg-[#F8FAFC] py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto space-y-6">
 
@@ -475,28 +583,46 @@ export default function WorkerServiceDetailsPage() {
                 </div>
               </div>
 
-              {/* Location Card */}
+              {/* Location Card with OSM and Directions */}
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-4">
-                <div className="flex items-center space-x-2 text-gray-900 font-semibold mb-2">
-                  <MapPin className="w-5 h-5 text-indigo-500" />
-                  <h3>Service Location</h3>
+                <div className="flex items-center justify-between gap-2 text-gray-900 font-semibold mb-1">
+                  <div className="flex items-center space-x-2">
+                    <MapPin className="w-5 h-5 text-indigo-500" />
+                    <h3>Service Location</h3>
+                  </div>
+                  <button
+                    onClick={() => setIsMapModalOpen(true)}
+                    className="text-[11px] font-extrabold text-indigo-700 hover:text-indigo-800 transition-all flex items-center gap-1 bg-indigo-50 hover:bg-indigo-100/70 px-2.5 py-1 rounded-lg border border-indigo-100 shadow-sm shrink-0"
+                  >
+                    🗺️ View Full Map
+                  </button>
                 </div>
+
                 {service.location?.coordinates ? (
-                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 text-center">
-                    <p className="text-sm font-mono text-gray-600">
-                      Lat: {service.location.coordinates[1]?.toFixed(6)}
-                    </p>
-                    <p className="text-sm font-mono text-gray-600">
-                      Lng: {service.location.coordinates[0]?.toFixed(6)}
-                    </p>
-                    <a
-                      href={`https://maps.google.com/?q=${service.location.coordinates[1]},${service.location.coordinates[0]}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-3 inline-block text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition-colors"
-                    >
-                      Open in Google Maps →
-                    </a>
+                  <div className="space-y-3">
+                    <ServiceRouteMap
+                      serviceLat={service.location.coordinates[1]}
+                      serviceLng={service.location.coordinates[0]}
+                      workerLat={workerCoords?.lat}
+                      workerLng={workerCoords?.lng}
+                    />
+                    
+                    <div className="bg-gray-50 rounded-xl p-3 border border-gray-100 text-center flex items-center justify-between gap-3 px-4">
+                      <div className="text-left">
+                        <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Coordinates</p>
+                        <p className="text-xs font-mono text-gray-600 mt-0.5">
+                          {service.location.coordinates[1]?.toFixed(6)}, {service.location.coordinates[0]?.toFixed(6)}
+                        </p>
+                      </div>
+                      <a
+                        href={`https://maps.google.com/?q=${service.location.coordinates[1]},${service.location.coordinates[0]}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center justify-center text-xs font-bold text-indigo-600 hover:text-indigo-800 transition-colors bg-white hover:bg-indigo-50/50 border border-slate-200 rounded-lg p-1.5 px-3 shadow-sm"
+                      >
+                        Navigate →
+                      </a>
+                    </div>
                   </div>
                 ) : (
                   <p className="text-sm text-gray-500 italic text-center py-4">No coordinates provided.</p>
