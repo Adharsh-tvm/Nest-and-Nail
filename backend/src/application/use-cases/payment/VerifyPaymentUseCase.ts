@@ -131,7 +131,7 @@ export class VerifyPaymentUseCase implements IVerifyPaymentUseCase {
                     ? "Meeting Confirmed"
                     : "Service Confirmed",
                 message: service.category === "VIDEO_CALL"
-                    ? "A client has paid for a video call with you"
+                    ? "A client has booked a video call with you"
                     : "A client has paid and confirmed a service booking with you",
                 type: service.category === "VIDEO_CALL"
                     ? "MEETING_BOOKED"
