@@ -61,10 +61,10 @@ const navItems = [
     href: "/admin/payments",
   },
   {
-    id: "complaints",
-    label: "Complaints",
+    id: "concerns",
+    label: "Concerns",
     icon: MessageSquare,
-    href: "/admin/complaints",
+    href: "/admin/concerns",
   },
   { id: "wallet", label: "Wallet", icon: Wallet, href: "/admin/wallet" },
 ];

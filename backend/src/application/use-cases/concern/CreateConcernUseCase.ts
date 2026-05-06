@@ -3,14 +3,22 @@ import { IServiceRepository } from "../../../domain/repositories/IServiceReposit
 import { IConcernRepository } from "../../../domain/repositories/IConcernRepository";
 import { ICreateConcernUseCase } from "../../interfaces/concern/ICreateConcernUseCase";
 import { concernBy, concernStatus } from "../../../shared/enums/concernEnums";
+import { S3Service } from "../../../infrastructure/adapters/S3service";
 
 export class CreateConcernUseCase implements ICreateConcernUseCase {
   constructor(
     private readonly _concernRepo: IConcernRepository,
-    private readonly _serviceRepo: IServiceRepository
+    private readonly _serviceRepo: IServiceRepository,
+    private readonly _s3Service: S3Service
   ) {}
 
-  async execute(serviceId: string, userId: string, role: concernBy, message: string) {
+  async execute(
+    serviceId: string,
+    userId: string,
+    role: concernBy,
+    message: string,
+    files?: { path: string; mimetype: string; originalname: string }[]
+  ) {
 
     const service = await this._serviceRepo.findById(serviceId);
 
@@ -20,6 +28,17 @@ export class CreateConcernUseCase implements ICreateConcernUseCase {
       throw new Error("Concern can be raised only after completion");
     }
 
+    const uploadedKeys: string[] = [];
+
+    if (files && files.length > 0) {
+      for (const file of files) {
+        const fileExtension = file.originalname.split(".").pop();
+        const key = `concerns/${serviceId}/${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExtension}`;
+        await this._s3Service.uploadFile(file.path, key, file.mimetype);
+        uploadedKeys.push(key);
+      }
+    }
+
     const concern = {
       concernId: uuidv4(),
       serviceId,
@@ -27,7 +46,8 @@ export class CreateConcernUseCase implements ICreateConcernUseCase {
       raisedBy: role,
       message,
       status: concernStatus.OPEN,
-      createdAt: new Date()
+      createdAt: new Date(),
+      images: uploadedKeys
     };
 
     return await this._concernRepo.create(concern);

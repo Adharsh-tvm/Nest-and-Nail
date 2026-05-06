@@ -17,17 +17,33 @@ export interface ConcernDTO {
   message: string;
   status: "OPEN" | "RESOLVED" | "REJECTED";
   createdAt: string;
+  images?: string[];
 }
 
 export async function raiseConcernApi(
   serviceId: string,
-  message: string
+  message: string,
+  files?: File[]
 ): Promise<{ success: boolean; data?: ConcernDTO; message?: string; error?: string }> {
   try {
+    const formData = new FormData();
+    formData.append("serviceId", serviceId);
+    formData.append("message", message);
+    if (files && files.length > 0) {
+      files.forEach((file) => {
+        formData.append("images", file);
+      });
+    }
+
     const response = await axiosInstance.post<BackendResponse<ConcernDTO>>(
       CONCERN_ROUTES.CREATE,
-      { serviceId, message },
-      { withCredentials: true }
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        withCredentials: true,
+      }
     );
     if (!response.data.success) {
       return { success: false, error: response.data.message || "Failed to raise concern" };

@@ -8,6 +8,9 @@ import {
   CheckCircle2,
   Loader2,
   Send,
+  UploadCloud,
+  Trash2,
+  Image as ImageIcon,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { raiseConcernAction } from "@/app/actions/concern-actions";
@@ -16,12 +19,19 @@ interface RaiseConcernButtonProps {
   serviceId: string;
 }
 
+interface ImageItem {
+  id: string;
+  file: File;
+  previewUrl: string;
+}
+
 export default function RaiseConcernButton({ serviceId }: RaiseConcernButtonProps) {
   const [showModal, setShowModal] = useState(false);
   const [message, setMessage] = useState("");
   const [isPending, startTransition] = useTransition();
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [images, setImages] = useState<ImageItem[]>([]);
 
   const MAX_CHARS = 1000;
 
@@ -31,6 +41,56 @@ export default function RaiseConcernButton({ serviceId }: RaiseConcernButtonProp
     setMessage("");
     setError(null);
     setDone(false);
+    images.forEach((img) => URL.revokeObjectURL(img.previewUrl));
+    setImages([]);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    const newFiles = Array.from(files);
+
+    if (images.length + newFiles.length > 5) {
+      toast.error("You can upload a maximum of 5 images.");
+      return;
+    }
+
+    const newItems: ImageItem[] = [];
+
+    for (const file of newFiles) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error(`${file.name} is too large (max 5MB).`);
+        continue;
+      }
+
+      const allowedTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
+      if (!allowedTypes.includes(file.type)) {
+        toast.error(`${file.name} must be an image (JPEG, PNG, or WEBP).`);
+        continue;
+      }
+
+      const tempId = Math.random().toString(36).substring(2, 9);
+      const previewUrl = URL.createObjectURL(file);
+
+      newItems.push({
+        id: tempId,
+        file,
+        previewUrl,
+      });
+    }
+
+    setImages((prev) => [...prev, ...newItems]);
+  };
+
+  const removeImage = (id: string) => {
+    setImages((prev) => {
+      const target = prev.find((item) => item.id === id);
+      if (target) {
+        URL.revokeObjectURL(target.previewUrl);
+      }
+      return prev.filter((item) => item.id !== id);
+    });
   };
 
   const handleSubmit = () => {
@@ -38,9 +98,17 @@ export default function RaiseConcernButton({ serviceId }: RaiseConcernButtonProp
       toast.error("Please describe your concern.");
       return;
     }
+
+    const formData = new FormData();
+    formData.append("serviceId", serviceId);
+    formData.append("message", message.trim());
+    images.forEach((img) => {
+      formData.append("images", img.file);
+    });
+
     setError(null);
     startTransition(async () => {
-      const res = await raiseConcernAction(serviceId, message.trim());
+      const res = await raiseConcernAction(formData);
       if (res.success) {
         setDone(true);
         toast.success("Concern raised successfully. Our team will review it.");
@@ -159,6 +227,62 @@ export default function RaiseConcernButton({ serviceId }: RaiseConcernButtonProp
                         {message.length}/{MAX_CHARS}
                       </span>
                     </div>
+                  </div>
+
+                  {/* Photo Upload Section */}
+                  <div className="mb-5">
+                    <label className="block text-sm font-bold text-slate-700 mb-2">
+                      Attachments <span className="text-slate-400 font-normal text-xs">(optional, max 5)</span>
+                    </label>
+                    
+                    {/* Upload Zone */}
+                    {images.length < 5 && (
+                      <div className="relative">
+                        <input
+                          type="file"
+                          multiple
+                          accept="image/png, image/jpeg, image/jpg, image/webp"
+                          onChange={handleFileChange}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                          disabled={isPending}
+                        />
+                        <div className="flex flex-col items-center justify-center border-2 border-dashed border-slate-200 hover:border-amber-400 focus-within:border-amber-400 rounded-2xl py-5 px-4 bg-slate-50/50 hover:bg-slate-50 transition-all text-center">
+                          <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center mb-2">
+                            <UploadCloud className="w-5 h-5 text-amber-500 animate-pulse" />
+                          </div>
+                          <p className="text-xs font-bold text-slate-700">Click or drag images to upload</p>
+                          <p className="text-[10px] text-slate-400 mt-1">JPEG, PNG, or WEBP up to 5MB each</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Previews Grid */}
+                    {images.length > 0 && (
+                      <div className="grid grid-cols-3 gap-3 mt-3">
+                        {images.map((img) => (
+                          <div
+                            key={img.id}
+                            className="relative group aspect-square rounded-2xl border border-slate-100 overflow-hidden bg-slate-50"
+                          >
+                            <img
+                              src={img.previewUrl}
+                              alt="Concern attachment"
+                              className="w-full h-full object-cover"
+                            />
+
+                            {/* Delete Button */}
+                            <button
+                              type="button"
+                              onClick={() => removeImage(img.id)}
+                              disabled={isPending}
+                              className="absolute top-1.5 right-1.5 p-1.5 rounded-xl bg-white/90 hover:bg-white text-slate-500 hover:text-red-500 shadow-sm border border-slate-100 transition-all active:scale-90"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   {/* Error */}

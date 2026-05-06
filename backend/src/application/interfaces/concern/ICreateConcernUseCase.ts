@@ -6,6 +6,7 @@ export interface ICreateConcernUseCase {
     serviceId: string,
     userId: string,
     role: concernBy,
-    message: string
+    message: string,
+    files?: { path: string; mimetype: string; originalname: string }[]
   ): Promise<Concern>;
 }

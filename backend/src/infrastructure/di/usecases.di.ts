@@ -138,8 +138,10 @@ import { VerifyRechargePaymentUseCase, IVerifyRechargePaymentUseCase } from "../
 import { ICreateRechargeOrderUseCase } from "../../application/interfaces/payment/ICreateRechargeOrderUseCase";
 import { ICreateConcernUseCase } from "../../application/interfaces/concern/ICreateConcernUseCase";
 import { IGetUserConcernsUseCase } from "../../application/interfaces/concern/IGetUserConcernsUseCase";
+import { IGetAllConcernsUseCase } from "../../application/interfaces/concern/IGetAllConcernsUseCase";
 import { CreateConcernUseCase } from "../../application/use-cases/concern/CreateConcernUseCase";
 import { GetUserConcernsUseCase } from "../../application/use-cases/concern/GetUserConcernsUseCase";
+import { GetAllConcernsUseCase } from "../../application/use-cases/concern/GetAllConcernsUseCase";
 import { IAddReviewUseCase } from "../../application/interfaces/review/IAddReviewUseCase";
 import { AddReviewUseCase } from "../../application/use-cases/review/AddReviewUseCase";
 import { ISendNotificationUseCase } from "../../application/interfaces/notifications/ISendNotificationUseCase";
@@ -236,6 +238,7 @@ export class UseCaseDI {
 
   private _createConcernUseCase?: ICreateConcernUseCase;
   private _getUserConcernsUseCase?: IGetUserConcernsUseCase;
+  private _getAllConcernsUseCase?: IGetAllConcernsUseCase;
   private _addReviewUseCase?: IAddReviewUseCase;
 
   private _sendNotificationUseCase?: ISendNotificationUseCase;
@@ -940,10 +943,23 @@ export class UseCaseDI {
     if (!this._createConcernUseCase) {
       this._createConcernUseCase = new CreateConcernUseCase(
         this.infra.concernRepository,
-        this.infra.serviceRepository
+        this.infra.serviceRepository,
+        this.infra.s3Service
       );
     }
     return this._createConcernUseCase;
+  }
+
+  get getAllConcernsUseCase(): IGetAllConcernsUseCase {
+    if (!this._getAllConcernsUseCase) {
+      this._getAllConcernsUseCase = new GetAllConcernsUseCase(
+        this.infra.concernRepository,
+        this.infra.serviceRepository,
+        this.infra.userRepositoryFactory,
+        this.infra.s3Service
+      );
+    }
+    return this._getAllConcernsUseCase;
   }
 
   get getUserConcernsUseCase(): IGetUserConcernsUseCase {

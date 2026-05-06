@@ -8,4 +8,5 @@ export interface Concern {
   message: string;
   status: concernStatus
   createdAt: Date;
+  images?: string[];
 }

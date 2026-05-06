@@ -22,11 +22,14 @@ export class ConcernController {
           .json(ResponseHandler.error("Unauthorized"));
       }
 
+      const files = req.files as any[] | undefined;
+
       const result = await this._createConcernUseCase.execute(
         serviceId,
         userId,
         role,
-        message
+        message,
+        files
       );
 
       res.status(HttpStatusCode.CREATED).json(

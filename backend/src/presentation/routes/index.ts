@@ -23,6 +23,7 @@ import { clientReviewRoutes } from "./review/review.routes";
 import { notificationRoutes } from "./notification/notification.routes";
 import { chatRoutes } from "./chat/chat.routes";
 import { createTransactionRoutes } from "./payment/transaction.routes";
+import { adminConcernRoutes } from "./admin/admin.concern.routes";
 
 export const createRoutes = (container: DIContainer): Router => {
   const router = Router();
@@ -40,6 +41,8 @@ export const createRoutes = (container: DIContainer): Router => {
   router.use("/api/admin/services", createAdminServiceRoutes(container.controllers.adminServiceController, container.controllers.authMiddleware))
 
   router.use("/api/admin/meetings", createAdminMeetingRoutes(container.controllers.adminMeetingController, container.controllers.authMiddleware))
+
+  router.use("/api/admin/concerns", container.controllers.authMiddleware.verify.bind(container.controllers.authMiddleware), adminConcernRoutes(container.controllers.adminConcernController));
 
   router.use("/api/upload", createUploadRoutes(container.controllers.uploadController, container.controllers.authMiddleware));
 

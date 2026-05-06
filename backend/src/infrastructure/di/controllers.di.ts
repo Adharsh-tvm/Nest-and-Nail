@@ -28,6 +28,7 @@ import { PaymentController } from "../../presentation/controllers/payment/Paymen
 import { AdminMeetingController } from "../../presentation/controllers/admin/AdminMeetingController";
 import { WalletController } from "../../presentation/controllers/wallet/WalletController";
 import { ConcernController } from "../../presentation/controllers/concern/ConcernController";
+import { AdminConcernController } from "../../presentation/controllers/admin/AdminConcernController ";
 import { ClientReviewController } from "../../presentation/controllers/client/ClientReviewController";
 import { NotificationController } from "../../presentation/controllers/notification/NotificationController";
 import { GetUserNotificationsUseCase } from "../../application/use-cases/notification/GetUserNotificationsUseCase";
@@ -63,6 +64,7 @@ export class ControllerDI {
     private _adminMeetingController?: AdminMeetingController;
     private _walletController?: WalletController;
     private _concernController?: ConcernController;
+    private _adminConcernController?: AdminConcernController;
     private _clientReviewController?: ClientReviewController;
     private _notificationController?: NotificationController;
     private _chatController?: ChatController;
@@ -306,6 +308,15 @@ export class ControllerDI {
             );
         }
         return this._concernController;
+    }
+
+    get adminConcernController(): AdminConcernController {
+        if (!this._adminConcernController) {
+            this._adminConcernController = new AdminConcernController(
+                this._useCases.getAllConcernsUseCase
+            );
+        }
+        return this._adminConcernController;
     }
 
     get clientReviewController(): ClientReviewController {

@@ -3,11 +3,14 @@
 import { raiseConcernApi, ConcernDTO } from "@/sources/api/user/concern.api";
 
 export async function raiseConcernAction(
-  serviceId: string,
-  message: string
+  formData: FormData
 ): Promise<{ success: boolean; data?: ConcernDTO; error?: string }> {
   try {
-    const res = await raiseConcernApi(serviceId, message);
+    const serviceId = formData.get("serviceId") as string;
+    const message = formData.get("message") as string;
+    const files = formData.getAll("images") as File[];
+
+    const res = await raiseConcernApi(serviceId, message, files);
     if (!res.success) {
       return { success: false, error: res.error || "Failed to raise concern" };
     }

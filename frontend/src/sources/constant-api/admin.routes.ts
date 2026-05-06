@@ -15,6 +15,8 @@ export const ADMIN_ROUTES = {
     MEETINGS: `${BASE}/meetings`,
     MEETING_DETAILS: (id: string) => `${BASE}/meetings/${id}`,
 
+    CONCERNS: `${BASE}/concerns`,
+
     CATEGORIES: `${BASE}/categories`,
     CATEGORY_BY_ID: (id: string) => `${BASE}/categories/${id}`,
     TOGGLE_CATEGORY: (id: string) =>
