@@ -3,10 +3,13 @@ import { IStartServiceUseCase } from "../../interfaces/service/IStartServiceUseC
 import { ServiceStatus } from "../../../shared/enums/serviceEnums";
 import { ServiceMapper } from "../../mappers/ServiceMapper";
 
+import { ISendNotificationUseCase } from "../../interfaces/notifications/ISendNotificationUseCase";
+
 export class StartServiceUseCase implements IStartServiceUseCase {
 
     constructor(
-        private readonly _serviceRepo: IServiceRepository
+        private readonly _serviceRepo: IServiceRepository,
+        private readonly _sendNotification: ISendNotificationUseCase
     ) { }
 
     async execute(
@@ -62,6 +65,19 @@ export class StartServiceUseCase implements IStartServiceUseCase {
 
         if (!updated) {
             throw new Error("Failed to start service");
+        }
+
+        //  Send Notification
+        try {
+            await this._sendNotification.execute({
+                userId: service.clientId,
+                title: "Service Started",
+                message: `Your service (ID: ${serviceId}) has been started by the worker.`,
+                type: "SERVICE_STARTED",
+                data: { serviceId }
+            });
+        } catch (notifErr) {
+            console.error("Failed to send start service notification:", notifErr);
         }
 
         return ServiceMapper.toResponse(updated);

@@ -1,5 +1,6 @@
 import { VerificationStatus } from "../enums/authEnums";
 import { Address } from "./addressType";
+import { Review } from "./reviewTypes";
 
 export type User = {
   id: string;
@@ -31,6 +32,7 @@ export type User = {
   iat?: number;
   exp?: number;
   distance?: number;
+  reviews?: Review[];
 };
 
 export type UserQueryParams = {

@@ -446,7 +446,8 @@ export class UseCaseDI {
       this._updateVerificationStatusUseCase = new UpdateVerificationStatusUseCase(
         this.infra.userRepositoryFactory,
         this.infra.emailService,
-        this.infra.logger
+        this.infra.logger,
+        this.sendNotificationUseCase
       );
     }
     return this._updateVerificationStatusUseCase;
@@ -568,6 +569,8 @@ export class UseCaseDI {
       this._getWorkerByIdUseCase = new GetWorkerByIdUseCase(
         this.infra.workerRepository,
         this.infra.categoryRepository,
+        this.infra.reviewRepository,
+        this.infra.userRepositoryFactory,
         this.infra.s3Service
       );
     }
@@ -671,7 +674,8 @@ export class UseCaseDI {
   get startServiceUseCase(): IStartServiceUseCase {
     if (!this._startServiceUseCase) {
       this._startServiceUseCase = new StartServiceUseCase(
-        this.infra.serviceRepository
+        this.infra.serviceRepository,
+        this.sendNotificationUseCase
       )
     }
     return this._startServiceUseCase
@@ -683,7 +687,8 @@ export class UseCaseDI {
         this.infra.serviceRepository,
         this.infra.walletRepository,
         this.infra.transactionRepository,
-        this.infra.userRepositoryFactory
+        this.infra.userRepositoryFactory,
+        this.sendNotificationUseCase
       )
     }
     return this._completeServiceUseCase
@@ -888,7 +893,8 @@ export class UseCaseDI {
         this.infra.workerScheduleRepo,
         this.infra.walletRepository,
         this.infra.transactionRepository,
-        this.infra.userRepositoryFactory
+        this.infra.userRepositoryFactory,
+        this.sendNotificationUseCase
       )
     }
     return this._cancelServiceUseCase

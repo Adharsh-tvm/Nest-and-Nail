@@ -10,12 +10,15 @@ import { Role } from "../../../shared/enums/authEnums";
 import { ServiceMapper } from "../../mappers/ServiceMapper";
 import { v4 as uuidv4 } from "uuid";
 
+import { ISendNotificationUseCase } from "../../interfaces/notifications/ISendNotificationUseCase";
+
 export class CompleteServiceUseCase implements ICompleteServiceUseCase {
     constructor(
         private readonly _serviceRepo: IServiceRepository,
         private readonly _walletRepo: IWalletRepository,
         private readonly _transactionRepo: ITransactionRepository,
-        private readonly _userRepoFactory: IUserRepositoryFactory
+        private readonly _userRepoFactory: IUserRepositoryFactory,
+        private readonly _sendNotification: ISendNotificationUseCase
     ) { }
 
     async execute(serviceId: string, workerId: string) {
@@ -26,12 +29,12 @@ export class CompleteServiceUseCase implements ICompleteServiceUseCase {
             throw new Error("Service not found");
         }
 
-        // 🔒 Authorization
+        //  Authorization
         if (service.workerId !== workerId) {
             throw new Error("Unauthorized");
         }
 
-        // 🔁 State validation
+        //  State validation
         if (service.status !== ServiceStatus.IN_PROGRESS) {
             throw new Error("Service not in progress");
         }
@@ -105,6 +108,19 @@ export class CompleteServiceUseCase implements ICompleteServiceUseCase {
                     }
                 }
             }
+        }
+
+        //  Send Notification
+        try {
+            await this._sendNotification.execute({
+                userId: service.clientId,
+                title: "Service Completed",
+                message: `Your service (ID: ${serviceId}) has been successfully completed.`,
+                type: "SERVICE_COMPLETED",
+                data: { serviceId }
+            });
+        } catch (notifErr) {
+            console.error("Failed to send completion notification:", notifErr);
         }
 
         return ServiceMapper.toResponse(updated);

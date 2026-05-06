@@ -508,7 +508,7 @@ export default async function WorkerDetailPage({
                                 </div>
                                 <div style={{ padding: '24px 28px' }}>
                                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
-                                        {worker.workPhotos.map((photo, idx) => {
+                                        {worker.workPhotos.map((photo: string, idx: number) => {
                                             const src = photo.startsWith('http') || photo.startsWith('blob:') || photo.startsWith('data:')
                                                 ? photo
                                                 : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/${photo.startsWith('/') ? photo.slice(1) : photo}`;
@@ -524,8 +524,6 @@ export default async function WorkerDetailPage({
                                                         src={src}
                                                         alt={`Work example ${idx + 1}`}
                                                         style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s ease' }}
-                                                        onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.08)')}
-                                                        onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
                                                     />
                                                 </div>
                                             );
@@ -534,6 +532,84 @@ export default async function WorkerDetailPage({
                                 </div>
                             </div>
                         )}
+
+                        {/* Ratings & Reviews */}
+                        <div style={{
+                            background: 'white', borderRadius: '28px',
+                            boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+                            border: '1px solid #e2e8f0', overflow: 'hidden',
+                        }}>
+                            <div style={{
+                                padding: '24px 28px 20px',
+                                borderBottom: '1px solid #f1f5f9',
+                                display: 'flex', alignItems: 'center', gap: '10px',
+                            }}>
+                                <div style={{
+                                    width: '36px', height: '36px', borderRadius: '10px',
+                                    background: 'linear-gradient(135deg, #fffbeb, #fef3c7)',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                }}>
+                                    <Star size={18} style={{ color: '#f59e0b', fill: '#f59e0b' }} />
+                                </div>
+                                <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.3px' }}>
+                                    Ratings & Reviews
+                                </h2>
+                                <span style={{
+                                    marginLeft: 'auto', background: '#fffbeb',
+                                    color: '#92400e', fontWeight: 700, fontSize: '12px',
+                                    padding: '3px 10px', borderRadius: '20px', border: '1px solid #fef3c7'
+                                }}>
+                                    {worker.totalRatings || 0} reviews
+                                </span>
+                            </div>
+
+                            <div style={{ padding: '24px 28px' }}>
+                                {worker.reviews && worker.reviews.length > 0 ? (
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                                        {worker.reviews.map((rev, idx) => (
+                                            <div key={idx} style={{ 
+                                                borderBottom: idx === worker.reviews!.length - 1 ? 'none' : '1px solid #f1f5f9',
+                                                paddingBottom: idx === worker.reviews!.length - 1 ? 0 : '24px'
+                                            }}>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', alignItems: 'center' }}>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                        <div style={{ 
+                                                            width: '32px', height: '32px', borderRadius: '50%', 
+                                                            background: '#f1f5f9', display: 'flex', alignItems: 'center', 
+                                                            justifyContent: 'center', fontSize: '12px', fontWeight: 700, color: '#64748b'
+                                                        }}>
+                                                            {rev.clientName?.substring(0, 1).toUpperCase()}
+                                                        </div>
+                                                        <span style={{ fontWeight: 700, color: '#1e293b', fontSize: '14px' }}>{rev.clientName}</span>
+                                                    </div>
+                                                    <div style={{ display: 'flex', gap: '2px' }}>
+                                                        {[...Array(5)].map((_, i) => (
+                                                            <Star key={i} size={14} style={{ 
+                                                                color: i < rev.rating ? '#f59e0b' : '#e2e8f0', 
+                                                                fill: i < rev.rating ? '#f59e0b' : '#e2e8f0' 
+                                                            }} />
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                                <p style={{ fontSize: '14px', color: '#475569', lineHeight: 1.6, margin: '0 0 8px 42px' }}>
+                                                    {rev.review || "No comment provided."}
+                                                </p>
+                                                <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 500, marginLeft: '42px' }}>
+                                                    {new Date(rev.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div style={{ textAlign: 'center', padding: '32px 0', color: '#94a3b8' }}>
+                                        <div style={{ marginBottom: '12px' }}>
+                                            <Star size={32} style={{ color: '#e2e8f0', margin: '0 auto' }} />
+                                        </div>
+                                        <p style={{ fontSize: '14px', fontWeight: 500 }}>No reviews yet for this worker.</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
 
                         {/* Bottom info strip */}
                         <div style={{

@@ -27,6 +27,8 @@ function getRefundPercentage(diffInMs: number): number {
     return 50;
 }
 
+import { ISendNotificationUseCase } from "../../interfaces/notifications/ISendNotificationUseCase";
+
 export class CancelServiceUseCase implements ICancelServiceUseCase {
 
     constructor(
@@ -34,7 +36,8 @@ export class CancelServiceUseCase implements ICancelServiceUseCase {
         private readonly _scheduleRepo: IWorkerScheduleRepository,
         private readonly _walletRepo: IWalletRepository,
         private readonly _transactionRepo: ITransactionRepository,
-        private readonly _userRepoFactory: IUserRepositoryFactory
+        private readonly _userRepoFactory: IUserRepositoryFactory,
+        private readonly _sendNotification: ISendNotificationUseCase
     ) { }
 
     async execute(serviceId: string, userId: string, reason?: string): Promise<ServiceResponseDTO> {
@@ -45,12 +48,12 @@ export class CancelServiceUseCase implements ICancelServiceUseCase {
             throw new Error("Service not found");
         }
 
-        // 🔒 Authorization
+        //  Authorization
         if (service.clientId !== userId && service.workerId !== userId) {
             throw new Error("Unauthorized");
         }
 
-        // ❌ Cannot cancel completed
+        //  Cannot cancel completed
         if (service.status === ServiceStatus.COMPLETED) {
             throw new Error("Cannot cancel completed service");
         }
@@ -60,7 +63,7 @@ export class CancelServiceUseCase implements ICancelServiceUseCase {
         const diffInMs = now.getTime() - createdAt.getTime();
         const diffInHours = diffInMs / (1000 * 60 * 60);
 
-        // ⛔ Cancellation window closed after 6 hours
+        //  Cancellation window closed after 6 hours
         if (diffInHours > 6) {
             throw new Error(
                 "Cannot cancel service after 6 hours of booking. The cancellation window has expired."
@@ -77,7 +80,7 @@ export class CancelServiceUseCase implements ICancelServiceUseCase {
             throw new Error("Failed to cancel service");
         }
 
-        // 💰 Process refund to client's wallet (only if payment was successful)
+        //  Process refund to client's wallet (only if payment was successful)
         if (service.paymentStatus === PaymentStatus.SUCCESS && service.totalAmount > 0) {
             const refundPct = getRefundPercentage(diffInMs);
             const refundAmount = Math.floor((service.totalAmount * refundPct) / 100);
@@ -143,7 +146,7 @@ export class CancelServiceUseCase implements ICancelServiceUseCase {
             }
         }
 
-        // 🗓️ Free up the worker's schedule slots
+        //  Free up the worker's schedule slots
         for (const slot of service.selectedSlots) {
             await this._scheduleRepo.unmarkAsBooked(
                 service.workerId,
@@ -152,6 +155,26 @@ export class CancelServiceUseCase implements ICancelServiceUseCase {
             );
         }
 
+        //  Send Notification
+        try {
+            const isClientCancelling = userId === service.clientId;
+            const targetUserId = isClientCancelling ? service.workerId : service.clientId;
+            const cancellerRole = isClientCancelling ? "Client" : "Worker";
+            const isVideoCall = service.category === "VIDEO_CALL";
+
+            await this._sendNotification.execute({
+                userId: targetUserId,
+                title: isVideoCall ? "Meeting Cancelled" : "Service Cancelled",
+                message: isVideoCall 
+                    ? `The video call (ID: ${serviceId}) has been cancelled by the ${cancellerRole}.`
+                    : `The service (ID: ${serviceId}) has been cancelled by the ${cancellerRole}.`,
+                type: isVideoCall ? "MEETING_CANCELLED" : "SERVICE_CANCELLED",
+                data: { serviceId }
+            });
+        } catch (notifErr) {
+            console.error("Failed to send cancellation notification:", notifErr);
+        }
+
         return ServiceMapper.toResponse(updated);
     }
-}
+}

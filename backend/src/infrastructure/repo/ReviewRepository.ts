@@ -10,10 +10,10 @@ export class ReviewRepository implements IReviewRepository {
   }
 
   async findByServiceId(serviceId: string): Promise<Review | null> {
-    return await ReviewModel.findOne({ serviceId });
+    return await ReviewModel.findOne({ serviceId }).lean().exec() as Review | null;
   }
 
   async findByWorkerId(workerId: string): Promise<Review[]> {
-    return await ReviewModel.find({ workerId });
+    return await ReviewModel.find({ workerId }).lean().exec() as Review[];
   }
 }
