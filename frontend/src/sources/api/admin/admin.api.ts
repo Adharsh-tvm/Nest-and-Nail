@@ -297,3 +297,14 @@ export async function fetchAllAdminConcerns(params?: {
   }
 }
 
+export async function fetchAdminDashboardData(): Promise<any> {
+  try {
+    const res = await axiosInstance.get<ApiResponse<any>>(ADMIN_ROUTES.DASHBOARD);
+    if (!res.data.success) {
+      throw new Error(res.data.message || "Failed to fetch dashboard data");
+    }
+    return res.data.payload;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || error.message || "Failed to fetch dashboard data");
+  }
+}

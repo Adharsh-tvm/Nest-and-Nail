@@ -11,6 +11,7 @@ export function createAdminRoutes(adminController: IAdminController, authMiddlew
     router.patch("/verify/:userId", authMiddleware.adminOnly.bind(authMiddleware), (req, res) => adminController.approveVerification(req, res));
     router.patch("/reject/:userId", authMiddleware.adminOnly.bind(authMiddleware), (req, res) => adminController.rejectVerification(req, res));
     router.patch("/access/:userId", authMiddleware.adminOnly.bind(authMiddleware), (req, res) => adminController.updateUserAccess(req, res));
+    router.get("/dashboard", authMiddleware.adminOnly.bind(authMiddleware), (req, res) => adminController.getDashboardData(req, res));
 
     return router;
 }

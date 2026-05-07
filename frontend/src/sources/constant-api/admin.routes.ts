@@ -21,4 +21,5 @@ export const ADMIN_ROUTES = {
     CATEGORY_BY_ID: (id: string) => `${BASE}/categories/${id}`,
     TOGGLE_CATEGORY: (id: string) =>
         `${BASE}/categories/${id}/toggle-status`,
+    DASHBOARD: `${BASE}/dashboard`,
 };

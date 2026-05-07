@@ -100,7 +100,8 @@ export class ControllerDI {
                 this._useCases.getAllWorkersUseCase,
                 this._useCases.updateVerificationStatusUseCase,
                 this._useCases.updateUserAccessUseCase,
-                this._useCases.getAllUsersUseCase
+                this._useCases.getAllUsersUseCase,
+                this._useCases.getAdminDashboardDataUseCase
             );
         }
         return this._adminController;

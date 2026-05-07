@@ -10,13 +10,16 @@ import { ResponseHandler } from "../../../shared/responses/ApiResponse";
 import { RESPONSE_MESSAGES } from "../../../shared/responses/ResponseMessages";
 import { IGetAllUsersUseCase } from "../../../application/interfaces/admin/IGetAllUsersUseCase";
 
+import { IGetAdminDashboardDataUseCase } from "../../../application/interfaces/admin/IGetAdminDashboardDataUseCase";
+
 export class AdminController implements IAdminController {
     constructor(
         private readonly _getAllClientsUseCase: IGetAllClientsUseCase,
         private readonly _getAllWorkersUseCase: IGetAllWorkersUseCase,
         private readonly _updateVerificationStatusUseCase: IUpdateVerificationStatusUseCase,
         private readonly _updateUserAccessUseCase: IUpdateUserAccessUseCase,
-        private readonly _getAllUsersUseCase: IGetAllUsersUseCase
+        private readonly _getAllUsersUseCase: IGetAllUsersUseCase,
+        private readonly _getAdminDashboardDataUseCase: IGetAdminDashboardDataUseCase
 
     ) { }
 
@@ -133,6 +136,16 @@ export class AdminController implements IAdminController {
 
             res.status(HttpStatusCode.OK).json(ResponseHandler.success(result, RESPONSE_MESSAGES.UPDATED));
 
+        } catch (error: any) {
+            console.error(error);
+            res.status(HttpStatusCode.INTERNAL_SERVER).json(ResponseHandler.error(RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR, error));
+        }
+    }
+
+    getDashboardData = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const data = await this._getAdminDashboardDataUseCase.execute();
+            res.status(HttpStatusCode.OK).json(ResponseHandler.success(data, "Dashboard data fetched successfully"));
         } catch (error: any) {
             console.error(error);
             res.status(HttpStatusCode.INTERNAL_SERVER).json(ResponseHandler.error(RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR, error));

@@ -8,6 +8,7 @@ import {
   toggleUserAccess,
   fetchAllUsers,
   fetchAllAdminConcerns,
+  fetchAdminDashboardData,
 } from "@/sources/api/admin/admin.api";
 import { User, UserQueryParams } from "@/shared/types/userTypes";
 
@@ -56,6 +57,15 @@ export async function getAllConcernsAction(params?: {
 }) {
   try {
     const res = await fetchAllAdminConcerns(params);
+    return { success: true, payload: res };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
+export async function getAdminDashboardDataAction() {
+  try {
+    const res = await fetchAdminDashboardData();
     return { success: true, payload: res };
   } catch (error: any) {
     return { success: false, error: error.message };

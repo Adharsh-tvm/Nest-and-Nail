@@ -29,6 +29,8 @@ import { IVerifyOtpUseCase } from "../../application/interfaces/auth/IVerifyOtpU
 import { GetAllClientsUseCase } from "../../application/use-cases/admin/GetAllClientsUseCase";
 import { GetAllUsersUseCase } from "../../application/use-cases/admin/GetAllUsersUseCase";
 import { GetAllWorkersUseCase } from "../../application/use-cases/admin/GetAllWorkersUseCase";
+import { GetAdminDashboardDataUseCase } from "../../application/use-cases/admin/GetAdminDashboardDataUseCase";
+import { IGetAdminDashboardDataUseCase } from "../../application/interfaces/admin/IGetAdminDashboardDataUseCase";
 import { UpdateUserAccessUseCase } from "../../application/use-cases/admin/UpdateUserAccessUseCase";
 import { UpdateVerificationStatusUseCase } from "../../application/use-cases/admin/UpdateVerificationStatusUseCase";
 import { UploadProfilePictureUseCase } from "../../application/use-cases/user/UploadProfilePictureUseCase";
@@ -166,6 +168,7 @@ export class UseCaseDI {
   private _getAllWorkersUseCase?: IGetAllWorkersUseCase;
   private _getAllUsersUseCase?: IGetAllUsersUseCase;
   private _getCurrentUserUseCase?: IGetCurrentUserUseCase;
+  private _getAdminDashboardDataUseCase?: IGetAdminDashboardDataUseCase;
 
   private _forgotpasswordUseCase?: IForgotPasswordUseCase;
   private _resetPasswordUseCase?: IResetPasswordUseCase;
@@ -280,6 +283,13 @@ export class UseCaseDI {
       this._getAllClientsUseCase = new GetAllClientsUseCase(this.infra.clientRepository);
     }
     return this._getAllClientsUseCase;
+  }
+
+  get getAdminDashboardDataUseCase(): IGetAdminDashboardDataUseCase {
+    if (!this._getAdminDashboardDataUseCase) {
+      this._getAdminDashboardDataUseCase = new GetAdminDashboardDataUseCase();
+    }
+    return this._getAdminDashboardDataUseCase;
   }
 
   get getAllWorkersUseCase(): IGetAllWorkersUseCase {
