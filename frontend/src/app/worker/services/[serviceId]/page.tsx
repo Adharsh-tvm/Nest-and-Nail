@@ -21,8 +21,15 @@ import {
   AlertTriangle,
   X,
 } from "lucide-react";
-import { ServiceResponseDTO, ServiceStatus, PaymentStatus } from "@/shared/types/serviceTypes";
-import { getWorkerServiceDetailsAction, startWorkerServiceAction } from "@/app/actions/worker/service-actions";
+import {
+  ServiceResponseDTO,
+  ServiceStatus,
+  PaymentStatus,
+} from "@/shared/types/serviceTypes";
+import {
+  getWorkerServiceDetailsAction,
+  startWorkerServiceAction,
+} from "@/app/actions/worker/service-actions";
 import clsx from "clsx";
 import toast from "react-hot-toast";
 import RaiseConcernButton from "@/app/components/containers/services/RaiseConcernButton";
@@ -31,19 +38,29 @@ import { MessageCircle } from "lucide-react";
 import dynamic from "next/dynamic";
 
 const ServiceRouteMap = dynamic(
-  () => import("@/app/components/containers/layout/ServiceRouteMap").then((mod) => mod.ServiceRouteMap),
+  () =>
+    import("@/app/components/containers/layout/ServiceRouteMap").then(
+      (mod) => mod.ServiceRouteMap,
+    ),
   {
     ssr: false,
     loading: () => (
       <div className="h-[280px] w-full flex flex-col items-center justify-center bg-gray-50 rounded-2xl border border-gray-100 text-gray-400 gap-2">
         <Loader2 className="w-6 h-6 animate-spin text-indigo-500" />
-        <span className="text-xs font-semibold text-gray-500">Loading Route Map...</span>
+        <span className="text-xs font-semibold text-gray-500">
+          Loading Route Map...
+        </span>
       </div>
     ),
-  }
+  },
 );
 
-function getHaversineDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+function getHaversineDistance(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number,
+): number {
   const R = 6371; // km
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
   const dLon = ((lon2 - lon1) * Math.PI) / 180;
@@ -124,7 +141,8 @@ function StartServiceModal({
                 </div>
                 <h2 className="text-xl font-bold text-white">Start Service</h2>
                 <p className="text-sm text-indigo-100 mt-1">
-                  We need your current location to verify you're at the service site.
+                  We need your current location to verify you're at the service
+                  site.
                 </p>
               </div>
 
@@ -135,9 +153,11 @@ function StartServiceModal({
                   className={clsx(
                     "rounded-xl border p-4 flex items-start gap-3 transition-all",
                     location.status === "idle" && "bg-gray-50 border-gray-200",
-                    location.status === "fetching" && "bg-blue-50 border-blue-200",
-                    location.status === "ready" && "bg-emerald-50 border-emerald-200",
-                    location.status === "error" && "bg-red-50 border-red-200"
+                    location.status === "fetching" &&
+                      "bg-blue-50 border-blue-200",
+                    location.status === "ready" &&
+                      "bg-emerald-50 border-emerald-200",
+                    location.status === "error" && "bg-red-50 border-red-200",
                   )}
                 >
                   {location.status === "idle" && (
@@ -156,7 +176,8 @@ function StartServiceModal({
                   <div className="flex-1 min-w-0">
                     {location.status === "idle" && (
                       <p className="text-sm text-gray-600">
-                        Your location has not been fetched yet. Click below to get it.
+                        Your location has not been fetched yet. Click below to
+                        get it.
                       </p>
                     )}
                     {location.status === "fetching" && (
@@ -179,7 +200,9 @@ function StartServiceModal({
                         <p className="text-sm font-semibold text-red-700">
                           Location error
                         </p>
-                        <p className="text-xs text-red-600 mt-0.5">{location.message}</p>
+                        <p className="text-xs text-red-600 mt-0.5">
+                          {location.message}
+                        </p>
                       </>
                     )}
                   </div>
@@ -197,7 +220,9 @@ function StartServiceModal({
                     ) : (
                       <Navigation className="w-4 h-4" />
                     )}
-                    {location.status === "error" ? "Retry Location" : "Get My Location"}
+                    {location.status === "error"
+                      ? "Retry Location"
+                      : "Get My Location"}
                   </button>
                 )}
 
@@ -228,7 +253,7 @@ function StartServiceModal({
                       "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold text-white transition-all",
                       location.status === "ready" && !starting
                         ? "bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 shadow-md hover:shadow-lg"
-                        : "bg-gray-300 cursor-not-allowed"
+                        : "bg-gray-300 cursor-not-allowed",
                     )}
                   >
                     {starting ? (
@@ -246,7 +271,8 @@ function StartServiceModal({
                 </div>
 
                 <p className="text-xs text-center text-gray-400">
-                  The backend verifies you must be within 150 m of the service location.
+                  The backend verifies you must be within 150 m of the service
+                  location.
                 </p>
               </div>
             </div>
@@ -272,7 +298,10 @@ export default function WorkerServiceDetailsPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [location, setLocation] = useState<LocationState>({ status: "idle" });
   const [starting, setStarting] = useState(false);
-  const [workerCoords, setWorkerCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [workerCoords, setWorkerCoords] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
   const [isMapModalOpen, setIsMapModalOpen] = useState(false);
 
   // Auto-fetch worker current location for maps and distance directions
@@ -286,9 +315,12 @@ export default function WorkerServiceDetailsPage() {
           });
         },
         (err) => {
-          console.warn("Unable to fetch worker location for directions routing map:", err);
+          console.warn(
+            "Unable to fetch worker location for directions routing map:",
+            err,
+          );
         },
-        { enableHighAccuracy: true, timeout: 10000 }
+        { enableHighAccuracy: true, timeout: 10000 },
       );
     }
   }, []);
@@ -317,7 +349,10 @@ export default function WorkerServiceDetailsPage() {
   /* ── Geolocation helper ── */
   const fetchLocation = useCallback(() => {
     if (!navigator.geolocation) {
-      setLocation({ status: "error", message: "Geolocation is not supported by your browser." });
+      setLocation({
+        status: "error",
+        message: "Geolocation is not supported by your browser.",
+      });
       return;
     }
     setLocation({ status: "fetching" });
@@ -331,12 +366,15 @@ export default function WorkerServiceDetailsPage() {
       },
       (err) => {
         let msg = "Unable to retrieve your location.";
-        if (err.code === err.PERMISSION_DENIED) msg = "Location permission denied. Please allow access in your browser settings.";
-        else if (err.code === err.POSITION_UNAVAILABLE) msg = "Location information is unavailable.";
+        if (err.code === err.PERMISSION_DENIED)
+          msg =
+            "Location permission denied. Please allow access in your browser settings.";
+        else if (err.code === err.POSITION_UNAVAILABLE)
+          msg = "Location information is unavailable.";
         else if (err.code === err.TIMEOUT) msg = "Location request timed out.";
         setLocation({ status: "error", message: msg });
       },
-      { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
+      { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 },
     );
   }, []);
 
@@ -357,7 +395,11 @@ export default function WorkerServiceDetailsPage() {
     if (location.status !== "ready") return;
     setStarting(true);
     try {
-      const result = await startWorkerServiceAction(serviceId, location.lat, location.lng);
+      const result = await startWorkerServiceAction(
+        serviceId,
+        location.lat,
+        location.lng,
+      );
       if (result.success && result.data) {
         setService(result.data);
         toast.success("Service started successfully! It is now In Progress.");
@@ -375,14 +417,20 @@ export default function WorkerServiceDetailsPage() {
   /* ── Status helpers ── */
   const getStatusColor = (status: ServiceStatus) => {
     switch (status) {
-      case ServiceStatus.COMPLETED:   return "bg-emerald-100 text-emerald-800 border-emerald-200";
-      case ServiceStatus.IN_PROGRESS: return "bg-blue-100 text-blue-800 border-blue-200";
+      case ServiceStatus.COMPLETED:
+        return "bg-emerald-100 text-emerald-800 border-emerald-200";
+      case ServiceStatus.IN_PROGRESS:
+        return "bg-blue-100 text-blue-800 border-blue-200";
       case ServiceStatus.CANCELLED:
       case ServiceStatus.CANCELLED_BY_CLIENT:
-      case ServiceStatus.CANCELLED_BY_WORKER: return "bg-red-100 text-red-800 border-red-200";
-      case ServiceStatus.PENDING:     return "bg-amber-100 text-amber-800 border-amber-200";
-      case ServiceStatus.CONFIRMED:   return "bg-indigo-100 text-indigo-800 border-indigo-200";
-      default:                        return "bg-gray-100 text-gray-800 border-gray-200";
+      case ServiceStatus.CANCELLED_BY_WORKER:
+        return "bg-red-100 text-red-800 border-red-200";
+      case ServiceStatus.PENDING:
+        return "bg-amber-100 text-amber-800 border-amber-200";
+      case ServiceStatus.CONFIRMED:
+        return "bg-indigo-100 text-indigo-800 border-indigo-200";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200";
     }
   };
 
@@ -403,8 +451,12 @@ export default function WorkerServiceDetailsPage() {
       <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-6">
         <div className="bg-white p-8 rounded-2xl shadow-sm text-center max-w-md w-full border border-gray-100">
           <Briefcase className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Service Not Found</h2>
-          <p className="text-gray-500 mb-6">We couldn't locate the details for this service assignment.</p>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            Service Not Found
+          </h2>
+          <p className="text-gray-500 mb-6">
+            We couldn't locate the details for this service assignment.
+          </p>
           <button
             onClick={() => router.back()}
             className="w-full inline-flex justify-center items-center py-2.5 bg-gray-900 text-white rounded-xl font-medium hover:bg-gray-800 transition-colors"
@@ -460,7 +512,8 @@ export default function WorkerServiceDetailsPage() {
                       Live Route & Directions Map
                     </h3>
                     <p className="text-xs text-slate-500 font-medium">
-                      Zoom, pan, and review actual street driving coordinates to the service site
+                      Zoom, pan, and review actual street driving coordinates to
+                      the service site
                     </p>
                   </div>
                   <button
@@ -491,7 +544,6 @@ export default function WorkerServiceDetailsPage() {
 
       <div className="min-h-[calc(100vh-4rem)] bg-[#F8FAFC] py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto space-y-6">
-
           {/* Header & Navigation */}
           <motion.div
             initial={{ opacity: 0, y: -10 }}
@@ -510,7 +562,7 @@ export default function WorkerServiceDetailsPage() {
               <span
                 className={clsx(
                   "px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border",
-                  getStatusColor(service.status)
+                  getStatusColor(service.status),
                 )}
               >
                 {service.status.replace(/_/g, " ")}
@@ -529,7 +581,8 @@ export default function WorkerServiceDetailsPage() {
               >
                 <span className="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse shrink-0" />
                 <p className="text-sm font-semibold">
-                  Service is currently <span className="text-blue-700">In Progress</span>
+                  Service is currently{" "}
+                  <span className="text-blue-700">In Progress</span>
                 </p>
               </motion.div>
             )}
@@ -537,7 +590,6 @@ export default function WorkerServiceDetailsPage() {
 
           {/* Main Content Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-
             {/* Left Column: Client Profile & Location */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
@@ -564,19 +616,25 @@ export default function WorkerServiceDetailsPage() {
                   <h3 className="text-lg font-bold text-gray-900 text-center">
                     {service.client?.name || "Client Details Not Provided"}
                   </h3>
-                  <p className="text-xs text-gray-500 uppercase font-semibold tracking-wider mb-4">Client</p>
+                  <p className="text-xs text-gray-500 uppercase font-semibold tracking-wider mb-4">
+                    Client
+                  </p>
 
                   <div className="w-full space-y-3 pt-4 border-t border-gray-100">
                     {service.client?.email && (
                       <div className="flex items-start space-x-3 text-sm">
                         <Mail className="w-4 h-4 text-gray-400 mt-0.5" />
-                        <span className="text-gray-600 break-all">{service.client.email}</span>
+                        <span className="text-gray-600 break-all">
+                          {service.client.email}
+                        </span>
                       </div>
                     )}
                     {service.client?.phone && (
                       <div className="flex items-center space-x-3 text-sm">
                         <Phone className="w-4 h-4 text-gray-400" />
-                        <span className="text-gray-600">{service.client.phone}</span>
+                        <span className="text-gray-600">
+                          {service.client.phone}
+                        </span>
                       </div>
                     )}
                   </div>
@@ -590,15 +648,78 @@ export default function WorkerServiceDetailsPage() {
                     <MapPin className="w-5 h-5 text-indigo-500" />
                     <h3>Service Location</h3>
                   </div>
-                  <button
-                    onClick={() => setIsMapModalOpen(true)}
-                    className="text-[11px] font-extrabold text-indigo-700 hover:text-indigo-800 transition-all flex items-center gap-1 bg-indigo-50 hover:bg-indigo-100/70 px-2.5 py-1 rounded-lg border border-indigo-100 shadow-sm shrink-0"
-                  >
-                    🗺️ View Full Map
-                  </button>
+                  {service.status !== ServiceStatus.COMPLETED && (
+                    <button
+                      onClick={() => setIsMapModalOpen(true)}
+                      className="text-[11px] font-extrabold text-indigo-700 hover:text-indigo-800 transition-all flex items-center gap-1 bg-indigo-50 hover:bg-indigo-100/70 px-2.5 py-1 rounded-lg border border-indigo-100 shadow-sm shrink-0"
+                    >
+                      🗺️ View Full Map
+                    </button>
+                  )}
                 </div>
 
-                {service.location?.coordinates ? (
+                {service.status === ServiceStatus.COMPLETED ? (
+                  /* Completed State: No Map, Only Address and Place Details */
+                  <div className="space-y-3.5 animate-in fade-in duration-300">
+                    <div className="bg-slate-50 border border-slate-100 rounded-xl p-4 space-y-3">
+                      <div className="flex items-start gap-2.5">
+                        <MapPin className="w-4 h-4 text-emerald-600 mt-1 shrink-0" />
+                        <div>
+                          <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                            Site Address
+                          </p>
+                          {service.address ? (
+                            <div className="mt-1 text-sm text-gray-700 font-semibold leading-relaxed">
+                              {service.address.label && (
+                                <span className="inline-block text-[10px] font-extrabold bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded mr-1.5 uppercase tracking-wide">
+                                  {service.address.label}
+                                </span>
+                              )}
+                              <span>{service.address.street || "N/A"}</span>
+                              <p className="text-xs text-gray-500 font-medium mt-0.5">
+                                {[
+                                  service.address.city,
+                                  service.address.state,
+                                  service.address.country,
+                                  service.address.zip,
+                                ]
+                                  .filter(Boolean)
+                                  .join(", ")}
+                              </p>
+                            </div>
+                          ) : (
+                            <p className="text-sm text-gray-500 italic mt-0.5">
+                              No address details stored.
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {service.location?.coordinates && (
+                      <div className="bg-gray-50 rounded-xl p-3 border border-gray-100 text-center flex items-center justify-between gap-3 px-4">
+                        <div className="text-left">
+                          <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">
+                            Coordinates
+                          </p>
+                          <p className="text-xs font-mono text-gray-600 mt-0.5">
+                            {service.location.coordinates[1]?.toFixed(6)},{" "}
+                            {service.location.coordinates[0]?.toFixed(6)}
+                          </p>
+                        </div>
+                        <a
+                          href={`https://maps.google.com/?q=${service.location.coordinates[1]},${service.location.coordinates[0]}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center justify-center text-xs font-bold text-indigo-600 hover:text-indigo-800 transition-colors bg-white hover:bg-indigo-50/50 border border-slate-200 rounded-lg p-1.5 px-3 shadow-sm"
+                        >
+                          Navigate →
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                ) : /* Not Completed State: Show Map and Directions */
+                service.location?.coordinates ? (
                   <div className="space-y-3">
                     <ServiceRouteMap
                       serviceLat={service.location.coordinates[1]}
@@ -606,12 +727,15 @@ export default function WorkerServiceDetailsPage() {
                       workerLat={workerCoords?.lat}
                       workerLng={workerCoords?.lng}
                     />
-                    
+
                     <div className="bg-gray-50 rounded-xl p-3 border border-gray-100 text-center flex items-center justify-between gap-3 px-4">
                       <div className="text-left">
-                        <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Coordinates</p>
+                        <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">
+                          Coordinates
+                        </p>
                         <p className="text-xs font-mono text-gray-600 mt-0.5">
-                          {service.location.coordinates[1]?.toFixed(6)}, {service.location.coordinates[0]?.toFixed(6)}
+                          {service.location.coordinates[1]?.toFixed(6)},{" "}
+                          {service.location.coordinates[0]?.toFixed(6)}
                         </p>
                       </div>
                       <a
@@ -625,7 +749,9 @@ export default function WorkerServiceDetailsPage() {
                     </div>
                   </div>
                 ) : (
-                  <p className="text-sm text-gray-500 italic text-center py-4">No coordinates provided.</p>
+                  <p className="text-sm text-gray-500 italic text-center py-4">
+                    No coordinates provided.
+                  </p>
                 )}
               </div>
             </motion.div>
@@ -651,7 +777,8 @@ export default function WorkerServiceDetailsPage() {
                       )}
                     </div>
                     <h1 className="text-2xl font-bold text-gray-900 leading-tight">
-                      {service.title || `Service Assignment: ${service.category}`}
+                      {service.title ||
+                        `Service Assignment: ${service.category}`}
                     </h1>
                   </div>
                 </div>
@@ -662,7 +789,8 @@ export default function WorkerServiceDetailsPage() {
                     Description
                   </div>
                   <p className="text-slate-600 text-sm leading-relaxed whitespace-pre-line">
-                    {service.description || "No description provided for this service."}
+                    {service.description ||
+                      "No description provided for this service."}
                   </p>
                 </div>
 
@@ -672,13 +800,18 @@ export default function WorkerServiceDetailsPage() {
                       <Calendar className="w-5 h-5 text-emerald-600" />
                     </div>
                     <div>
-                      <p className="text-xs font-medium text-gray-500 uppercase mb-0.5">Scheduled For</p>
+                      <p className="text-xs font-medium text-gray-500 uppercase mb-0.5">
+                        Scheduled For
+                      </p>
                       <p className="text-sm font-semibold text-gray-900">
-                        {new Date(service.scheduledDate).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric",
-                        })}
+                        {new Date(service.scheduledDate).toLocaleDateString(
+                          "en-US",
+                          {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          },
+                        )}
                       </p>
                     </div>
                   </div>
@@ -688,9 +821,12 @@ export default function WorkerServiceDetailsPage() {
                       <Clock className="w-5 h-5 text-teal-600" />
                     </div>
                     <div>
-                      <p className="text-xs font-medium text-gray-500 uppercase mb-0.5">Duration</p>
+                      <p className="text-xs font-medium text-gray-500 uppercase mb-0.5">
+                        Duration
+                      </p>
                       <p className="text-sm font-semibold text-gray-900">
-                        {service.numberOfDays || 1} {service.numberOfDays === 1 ? "Day" : "Days"}
+                        {service.numberOfDays || 1}{" "}
+                        {service.numberOfDays === 1 ? "Day" : "Days"}
                       </p>
                     </div>
                   </div>
@@ -700,14 +836,19 @@ export default function WorkerServiceDetailsPage() {
                       <Briefcase className="w-5 h-5 text-emerald-600" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-xs font-medium text-gray-500 uppercase mb-2">Selected Slots</p>
+                      <p className="text-xs font-medium text-gray-500 uppercase mb-2">
+                        Selected Slots
+                      </p>
                       <div className="flex flex-wrap gap-2">
                         {service.selectedSlots?.map((slot, index) => (
                           <span
                             key={index}
                             className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-gray-100 text-gray-800 border border-gray-200"
                           >
-                            {new Date(slot.date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}{" "}
+                            {new Date(slot.date).toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                            })}{" "}
                             &bull; {slot.slotType.replace(/_/g, " ")}
                           </span>
                         ))}
@@ -719,20 +860,28 @@ export default function WorkerServiceDetailsPage() {
                 {/* Pricing Breakdown */}
                 <div className="mt-6 bg-gray-50 rounded-xl p-5 border border-gray-100">
                   <h4 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <CreditCard className="w-4 h-4 text-emerald-600" /> Payment Summary
+                    <CreditCard className="w-4 h-4 text-emerald-600" /> Payment
+                    Summary
                   </h4>
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm text-gray-600">
                       <span>Rate (Per worker/day)</span>
-                      <span className="font-medium">₹{service.pricePerWorker || 0}</span>
+                      <span className="font-medium">
+                        ₹{service.pricePerWorker || 0}
+                      </span>
                     </div>
                     <div className="flex justify-between text-sm text-gray-600">
                       <span>Workers × Days</span>
-                      <span className="font-medium">{service.numberOfWorkers || 1} × {service.numberOfDays || 1}</span>
+                      <span className="font-medium">
+                        {service.numberOfWorkers || 1} ×{" "}
+                        {service.numberOfDays || 1}
+                      </span>
                     </div>
                     <div className="flex justify-between text-base font-black text-gray-900 pt-2 border-t border-gray-200">
                       <span>Total Amount Paid</span>
-                      <span className="text-emerald-600">₹{service.totalAmount}</span>
+                      <span className="text-emerald-600">
+                        ₹{service.totalAmount}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -788,54 +937,91 @@ export default function WorkerServiceDetailsPage() {
                     </span>
                   </div>
                 </div>
-                
+
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
                   <div>
-                    <p className="text-gray-400 uppercase font-semibold mb-1 tracking-wider">Created</p>
+                    <p className="text-gray-400 uppercase font-semibold mb-1 tracking-wider">
+                      Created
+                    </p>
                     <p className="font-medium text-gray-800">
-                      {new Date(service.createdAt).toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                      {new Date(service.createdAt).toLocaleString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                     </p>
                   </div>
                   {service.startedAt && (
                     <div>
-                      <p className="text-gray-400 uppercase font-semibold mb-1 tracking-wider">Started</p>
+                      <p className="text-gray-400 uppercase font-semibold mb-1 tracking-wider">
+                        Started
+                      </p>
                       <p className="font-medium text-gray-800">
-                        {new Date(service.startedAt).toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                        {new Date(service.startedAt).toLocaleString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
                       </p>
                     </div>
                   )}
                   {service.completedAt && (
                     <div>
-                      <p className="text-gray-400 uppercase font-semibold mb-1 tracking-wider">Completed</p>
+                      <p className="text-gray-400 uppercase font-semibold mb-1 tracking-wider">
+                        Completed
+                      </p>
                       <p className="font-medium text-gray-800">
-                        {new Date(service.completedAt).toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                        {new Date(service.completedAt).toLocaleString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
                       </p>
                     </div>
                   )}
                   {service.updatedAt && (
                     <div>
-                      <p className="text-gray-400 uppercase font-semibold mb-1 tracking-wider">Updated</p>
+                      <p className="text-gray-400 uppercase font-semibold mb-1 tracking-wider">
+                        Updated
+                      </p>
                       <p className="font-medium text-gray-800">
-                        {new Date(service.updatedAt).toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                        {new Date(service.updatedAt).toLocaleString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
                       </p>
                     </div>
                   )}
                 </div>
               </div>
-
-
             </motion.div>
           </div>
         </div>
       </div>
 
-      {service && service.client && !["COMPLETED", "CANCELLED", "CANCELLED_BY_CLIENT", "CANCELLED_BY_WORKER"].includes(service.status) && (
-        <ChatDrawer
-          chatId={serviceId}
-          receiverId={service.clientId}
-          receiverName={service.client?.name}
-        />
-      )}
+      {service &&
+        service.client &&
+        ![
+          "COMPLETED",
+          "CANCELLED",
+          "CANCELLED_BY_CLIENT",
+          "CANCELLED_BY_WORKER",
+        ].includes(service.status) && (
+          <ChatDrawer
+            chatId={serviceId}
+            receiverId={service.clientId}
+            receiverName={service.client?.name}
+          />
+        )}
     </>
   );
 }
