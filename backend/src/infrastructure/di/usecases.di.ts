@@ -96,6 +96,8 @@ import { IBlockWorkerDatesUseCase } from "../../application/interfaces/worker/pr
 import { BlockWorkerDatesUseCase } from "../../application/use-cases/worker/profile/BlockWorkerDatesUseCase";
 import { IGetWorkerBlockedDatesUseCase } from "../../application/interfaces/worker/profile/IGetWorkerBlockedDatesUseCase";
 import { GetWorkerBlockedDatesUseCase } from "../../application/use-cases/worker/profile/GetWorkerBlockedDatesUseCase";
+import { IGetWorkerDashboardDataUseCase } from "../../application/interfaces/worker/profile/IGetWorkerDashboardDataUseCase";
+import { GetWorkerDashboardDataUseCase } from "../../application/use-cases/worker/profile/GetWorkerDashboardDataUseCase";
 import { IGetClientScheduledMeetingsUseCase } from "../../application/interfaces/meetings/client/IGetClientScheduledVideoCallsUseCase";
 import { IGetClientMeetingsHistoryUseCase } from "../../application/interfaces/meetings/client/IGetClientVideoCallHistoryUseCase";
 import { IGetWorkerScheduledMeetingsUseCase } from "../../application/interfaces/meetings/worker/IGetWorkerScheduledMeetingsUseCase";
@@ -214,6 +216,7 @@ export class UseCaseDI {
   private _completeServiceUseCase?: ICompleteServiceUseCase;
   private _blockWorkerDatesUsecase?: IBlockWorkerDatesUseCase;
   private _getWorkerBlockedDatesUseCase?: IGetWorkerBlockedDatesUseCase;
+  private _getWorkerDashboardDataUseCase?: IGetWorkerDashboardDataUseCase;
   private _getClientScheduledMeetingsUseCase?: IGetClientScheduledMeetingsUseCase;
   private _getClientMeetingsHistoryUseCase?: IGetClientMeetingsHistoryUseCase;
   private _getWorkerScheduledMeetingsUseCase?: IGetWorkerScheduledMeetingsUseCase;
@@ -290,6 +293,13 @@ export class UseCaseDI {
       this._getAdminDashboardDataUseCase = new GetAdminDashboardDataUseCase();
     }
     return this._getAdminDashboardDataUseCase;
+  }
+
+  get getWorkerDashboardDataUseCase(): IGetWorkerDashboardDataUseCase {
+    if (!this._getWorkerDashboardDataUseCase) {
+      this._getWorkerDashboardDataUseCase = new GetWorkerDashboardDataUseCase();
+    }
+    return this._getWorkerDashboardDataUseCase;
   }
 
   get getAllWorkersUseCase(): IGetAllWorkersUseCase {

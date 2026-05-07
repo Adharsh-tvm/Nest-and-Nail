@@ -229,7 +229,8 @@ export class ControllerDI {
         if (!this._workerController) {
             this._workerController = new WorkerController(
                 this._useCases.blockWorkerDatesUsecase,
-                this._useCases.getWorkerBlockedDatesUseCase
+                this._useCases.getWorkerBlockedDatesUseCase,
+                this._useCases.getWorkerDashboardDataUseCase
             )
         }
         return this._workerController

@@ -13,4 +13,5 @@ export const WORKER_ROUTES = {
 
     BLOCK_DATES: `${BASE}/slot/block-dates`,
     BLOCKED_DATES: `${BASE}/slot/blocked-dates`,
+    DASHBOARD: `${BASE}/dashboard`,
 };

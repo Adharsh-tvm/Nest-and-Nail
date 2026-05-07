@@ -21,5 +21,11 @@ export function createWorkerRoutes(
         workerController.getBlockedDates
     );
 
+    router.get(
+        "/dashboard",
+        authMiddleware.verify.bind(authMiddleware),
+        workerController.getDashboardData
+    );
+
     return router;
 }

@@ -167,6 +167,18 @@ const ClientHeader: React.FC = () => {
                     Ongoing
                   </Link>
                 )}
+                {userMode === "worker" && (
+                  <Link
+                    href="/worker"
+                    className={`text-sm font-medium transition-all ${
+                      pathname === "/worker"
+                        ? "text-[#1B4332] border-b-2 border-[#1B4332] pb-1"
+                        : "text-gray-500 hover:text-[#1B4332]"
+                    }`}
+                  >
+                    Dashboard
+                  </Link>
+                )}
                 {userMode !== "worker" && (
                   <Link
                     href="/client/workers"

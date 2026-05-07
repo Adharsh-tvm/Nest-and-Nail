@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { IBlockWorkerDatesUseCase } from "../../../application/interfaces/worker/profile/IBlockWorkerDatesUseCase";
 import { IGetWorkerBlockedDatesUseCase } from "../../../application/interfaces/worker/profile/IGetWorkerBlockedDatesUseCase";
+import { IGetWorkerDashboardDataUseCase } from "../../../application/interfaces/worker/profile/IGetWorkerDashboardDataUseCase";
 import { HttpStatusCode } from "../../../shared/enums/httpCodes";
 import { ResponseHandler } from "../../../shared/responses/ApiResponse";
 import { RESPONSE_MESSAGES } from "../../../shared/responses/ResponseMessages";
@@ -8,7 +9,8 @@ import { RESPONSE_MESSAGES } from "../../../shared/responses/ResponseMessages";
 export class WorkerController {
   constructor(
     private readonly _blockWorkerDatesUseCase: IBlockWorkerDatesUseCase,
-    private readonly _getWorkerBlockedDatesUseCase: IGetWorkerBlockedDatesUseCase
+    private readonly _getWorkerBlockedDatesUseCase: IGetWorkerBlockedDatesUseCase,
+    private readonly _getWorkerDashboardDataUseCase: IGetWorkerDashboardDataUseCase
   ) {}
 
   blockDates = async (req: Request, res: Response): Promise<void> => {
@@ -55,5 +57,27 @@ export class WorkerController {
     res.status(HttpStatusCode.OK).json(
       ResponseHandler.success(result, "Blocked dates fetched successfully")
     );
+  };
+
+  getDashboardData = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const workerId = req.user?.id;
+      const months = req.query.months ? parseInt(req.query.months as string) : 6;
+
+      if (!workerId) {
+        res.status(HttpStatusCode.UNAUTHORIZED).json(
+          ResponseHandler.error(RESPONSE_MESSAGES.UNAUTHORIZED)
+        );
+        return;
+      }
+      const data = await this._getWorkerDashboardDataUseCase.execute(workerId, months);
+      res.status(HttpStatusCode.OK).json(
+        ResponseHandler.success(data, "Dashboard data fetched successfully")
+      );
+    } catch (error: any) {
+      res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json(
+        ResponseHandler.error(RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR, error.message)
+      );
+    }
   };
 }
