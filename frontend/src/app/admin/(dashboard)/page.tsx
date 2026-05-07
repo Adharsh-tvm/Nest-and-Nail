@@ -227,7 +227,7 @@ export default function DashboardPage() {
                 <Tooltip 
                   contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
                   itemStyle={{ color: '#1B4332', fontWeight: 'bold' }}
-                  formatter={(value: number) => [`₹${value.toLocaleString()}`, 'Revenue']}
+                  formatter={(value: any) => [`₹${value.toLocaleString()}`, 'Revenue']}
                 />
                 <Area type="monotone" dataKey="revenue" stroke="#1B4332" strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" />
               </AreaChart>
@@ -253,7 +253,7 @@ export default function DashboardPage() {
                 <Tooltip 
                   cursor={{fill: '#f0fdf4'}}
                   contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                  formatter={(value: number) => [value, 'Sales']}
+                  formatter={(value: any) => [value, 'Sales']}
                 />
                 <Bar dataKey="sales" fill="#34d399" radius={[6, 6, 0, 0]} barSize={40} />
               </BarChart>
@@ -290,7 +290,7 @@ export default function DashboardPage() {
                 </Pie>
                 <Tooltip 
                   contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
-                  formatter={(value: number) => [value, 'Services']}
+                  formatter={(value: any) => [value, 'Services']}
                 />
                 <Legend verticalAlign="bottom" height={36} iconType="circle" />
               </PieChart>
@@ -313,7 +313,7 @@ export default function DashboardPage() {
                 <Tooltip 
                   cursor={{fill: 'rgba(255,255,255,0.05)'}}
                   contentStyle={{ borderRadius: '12px', backgroundColor: '#064e3b', border: 'none', color: 'white' }}
-                  formatter={(value: number) => [value, 'Services']}
+                  formatter={(value: any) => [value, 'Services']}
                 />
                 <Bar dataKey="value" radius={[0, 6, 6, 0]} barSize={24}>
                   {(data?.charts?.topCategories || []).map((entry: any, index: number) => (
