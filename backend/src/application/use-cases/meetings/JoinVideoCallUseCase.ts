@@ -6,12 +6,12 @@ import { ISendNotificationUseCase } from "../../interfaces/notifications/ISendNo
 
 export class JoinVideoCallUseCase implements IJoinVideoCallUseCase {
     constructor(
-        private serviceRepository: IServiceRepository,
-        private sendNotificationUseCase: ISendNotificationUseCase
+        private readonly _serviceRepository: IServiceRepository,
+        private readonly _sendNotificationUseCase: ISendNotificationUseCase
     ) { }
 
     async execute(serviceId: string, userId: string) {
-        const service = await this.serviceRepository.findById(serviceId);
+        const service = await this._serviceRepository.findById(serviceId);
 
         if (!service) throw new Error("Service not found");
         if (!service.videoCall) throw new Error("Meeting not available");
@@ -48,7 +48,7 @@ export class JoinVideoCallUseCase implements IJoinVideoCallUseCase {
             status = VideoCallStatus.ONGOING;
         }
 
-        await this.serviceRepository.updateVideoCall(serviceId, {
+        await this._serviceRepository.updateVideoCall(serviceId, {
             ...service.videoCall,
             joinedUsers,
             status,
@@ -61,7 +61,7 @@ export class JoinVideoCallUseCase implements IJoinVideoCallUseCase {
         const joinerLabel = isClient ? "Client" : "Worker";
 
         if (otherUserId) {
-            await this.sendNotificationUseCase.execute({
+            await this._sendNotificationUseCase.execute({
                 userId: otherUserId,
                 title: "🔔 Meeting Room — Someone Joined!",
                 message: `${joinerLabel} has entered the video call room. Join now to connect!`,

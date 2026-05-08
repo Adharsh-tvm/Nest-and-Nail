@@ -75,7 +75,7 @@ export class WorkerController {
         ResponseHandler.success(data, "Dashboard data fetched successfully")
       );
     } catch (error: any) {
-      res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json(
+      res.status(HttpStatusCode.INTERNAL_SERVER).json(
         ResponseHandler.error(RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR, error.message)
       );
     }

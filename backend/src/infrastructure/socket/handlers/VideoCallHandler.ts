@@ -6,7 +6,7 @@ const roomParticipants = new Map<string, Set<string>>();
 const socketRooms = new Map<string, string>();
 
 export class VideoHandler {
-    constructor(private io: Server) { }
+    constructor(private _io: Server) { }
 
     handle(socket: Socket) {
         socket.on("join-room", ({ roomId, userId, role }: { roomId: string; userId: string; role: string }) => {
@@ -14,7 +14,7 @@ export class VideoHandler {
 
             // Detect duplicate join: reject if room already has 2 participants
             for (const existingSocketId of participants) {
-                const existingSocket = this.io.sockets.sockets.get(existingSocketId);
+                const existingSocket = this._io.sockets.sockets.get(existingSocketId);
                 if (existingSocket && existingSocketId !== socket.id) {
                     if (participants.size >= 2) {
                         socket.emit("duplicate-tab");
@@ -37,9 +37,9 @@ export class VideoHandler {
                 // Emit start-call to the first participant (not the one who just joined)
                 const firstSocketId = [...participants].find(id => id !== socket.id);
                 if (firstSocketId) {
-                    this.io.to(firstSocketId).emit("start-call");
+                    this._io.to(firstSocketId).emit("start-call");
                     //  Ring bell: tell the first participant who joined
-                    this.io.to(firstSocketId).emit("user-joined-ring", { role });
+                    this._io.to(firstSocketId).emit("user-joined-ring", { role });
                 }
                 // Tell second participant to wait for the offer
                 socket.emit("waiting-for-offer");
@@ -83,7 +83,7 @@ export class VideoHandler {
                 roomParticipants.delete(roomId);
             } else {
                 // Notify the remaining participant
-                this.io.to(roomId).emit("user-left");
+                this._io.to(roomId).emit("user-left");
             }
         }
         socketRooms.delete(socket.id);
