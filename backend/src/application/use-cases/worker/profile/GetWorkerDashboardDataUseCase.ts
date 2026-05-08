@@ -9,7 +9,7 @@ import { ServiceStatus } from "../../../../shared/enums/serviceEnums";
 import { transactionType, transactionStatus, transactionSource } from "../../../../shared/enums/transactionEnums";
 
 export class GetWorkerDashboardDataUseCase implements IGetWorkerDashboardDataUseCase {
-    async execute(workerId: string, months: number = 6): Promise<any> {
+    async execute(workerId: string, months = 6): Promise<any> {
         // Fetch worker stats
         const worker = await WorkerModel.findOne({ userId: workerId }).lean();
         if (!worker) {

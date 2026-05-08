@@ -38,7 +38,7 @@ export class VerifyPaymentUseCase implements IVerifyPaymentUseCase {
         const payment = await this._paymentRepo.findByOrderId(data.orderId);
         if (!payment) throw new Error("Payment not found");
 
-        if (payment.status === "SUCCESS") {
+        if (payment.status === PaymentStatus.SUCCESS) {
             return { success: true };
         }
 

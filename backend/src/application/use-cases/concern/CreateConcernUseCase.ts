@@ -4,6 +4,7 @@ import { IConcernRepository } from "../../../domain/repositories/IConcernReposit
 import { ICreateConcernUseCase } from "../../interfaces/concern/ICreateConcernUseCase";
 import { concernBy, concernStatus } from "../../../shared/enums/concernEnums";
 import { S3Service } from "../../../infrastructure/adapters/S3service";
+import { ServiceStatus } from "../../../shared/enums/serviceEnums";
 
 export class CreateConcernUseCase implements ICreateConcernUseCase {
   constructor(
@@ -24,7 +25,7 @@ export class CreateConcernUseCase implements ICreateConcernUseCase {
 
     if (!service) throw new Error("Service not found");
 
-    if (service.status !== "COMPLETED") {
+    if (service.status !== ServiceStatus.COMPLETED) {
       throw new Error("Concern can be raised only after completion");
     }
 

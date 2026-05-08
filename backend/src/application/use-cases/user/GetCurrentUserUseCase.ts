@@ -43,6 +43,7 @@ export class GetCurrentUserUseCase implements IGetCurrentUserUseCase {
                     this._logger.info(`[GetCurrentUserUseCase] User found as WORKER`);
                 }
             } catch (error) {
+                // Continue
             }
         }
 

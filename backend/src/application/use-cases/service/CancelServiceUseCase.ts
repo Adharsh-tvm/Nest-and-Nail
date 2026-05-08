@@ -118,7 +118,7 @@ export class CancelServiceUseCase implements ICancelServiceUseCase {
                     const admin = admins[0];
 
                     if (admin) {
-                        let adminWallet = await this._walletRepo.findByUserId(admin.userId);
+                        const adminWallet = await this._walletRepo.findByUserId(admin.userId);
                         if (adminWallet) {
                             try {
                                 const updatedAdminWallet = await this._walletRepo.debitBalance(admin.userId, refundAmount);

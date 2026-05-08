@@ -34,7 +34,7 @@ export class JoinVideoCallUseCase implements IJoinVideoCallUseCase {
         }
         */
 
-        let joinedUsers = service.videoCall.joinedUsers || [];
+        const joinedUsers = service.videoCall.joinedUsers || [];
         if (!joinedUsers.includes(userId)) {
             joinedUsers.push(userId);
         }

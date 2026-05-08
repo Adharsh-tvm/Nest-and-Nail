@@ -6,7 +6,7 @@ export class GetTransactionsUseCase implements IGetTransactionsUseCase {
     private readonly _transactionRepository: ITransactionRepository
   ) {}
 
-  async execute(userId: string, page: number = 1, limit: number = 10) {
+  async execute(userId: string, page = 1, limit = 10) {
     return this._transactionRepository.findByUserId(userId, page, limit);
   }
 }
