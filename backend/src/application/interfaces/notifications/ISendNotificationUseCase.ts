@@ -1,9 +1,5 @@
+import { SendNotificationDTO } from "../../dtos/common/notification/NotificationDTO";
+
 export interface ISendNotificationUseCase {
-    execute(data: {
-        userId: string;
-        title: string;
-        message: string;
-        type: string;
-        data?: any;
-    }): Promise<void>;
+    execute(data: SendNotificationDTO): Promise<void>;
 }

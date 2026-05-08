@@ -5,9 +5,10 @@ import { WorkerModel } from "../../../infrastructure/database/models/WorkerModel
 import { CategoryModel } from "../../../infrastructure/database/models/CategoryModel";
 import { ServiceStatus } from "../../../shared/enums/serviceEnums";
 import { transactionType, transactionSource, transactionStatus } from "../../../shared/enums/transactionEnums";
+import { AdminDashboardResponseDTO } from "../../dtos/admin/AdminDashboardDTO";
 
 export class GetAdminDashboardDataUseCase implements IGetAdminDashboardDataUseCase {
-    async execute(): Promise<any> {
+    async execute(): Promise<AdminDashboardResponseDTO> {
         const totalServices = await ServiceModel.countDocuments();
         const completedServices = await ServiceModel.countDocuments({ status: ServiceStatus.COMPLETED });
         const activeJobs = await ServiceModel.countDocuments({ status: ServiceStatus.IN_PROGRESS });
@@ -19,9 +20,9 @@ export class GetAdminDashboardDataUseCase implements IGetAdminDashboardDataUseCa
         const totalRevenue = completedServicesData.reduce((acc, service) => acc + (service.totalAmount || 0), 0);
 
         // Total Refunds
-        const refundedTransactions = await TransactionModel.find({ 
-            source: transactionSource.REFUND, 
-            status: transactionStatus.SUCCESS 
+        const refundedTransactions = await TransactionModel.find({
+            source: transactionSource.REFUND,
+            status: transactionStatus.SUCCESS
         });
         const totalRefunds = refundedTransactions.reduce((acc, tx) => acc + (tx.amount || 0), 0);
 
@@ -36,12 +37,12 @@ export class GetAdminDashboardDataUseCase implements IGetAdminDashboardDataUseCa
         const categories = await CategoryModel.find().lean();
         const categoryGraphData = await Promise.all(
             categories.map(async (cat) => {
-                const count = await ServiceModel.countDocuments({ category: cat._id.toString() }); 
+                const count = await ServiceModel.countDocuments({ category: cat._id.toString() });
                 const countByName = await ServiceModel.countDocuments({ category: cat.name });
                 return {
                     name: cat.name,
                     value: count + countByName,
-                    fill: `#${Math.floor(Math.random()*16777215).toString(16).padStart(6, '0')}` // Random color
+                    fill: `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')}` // Random color
                 };
             })
         );
@@ -73,7 +74,7 @@ export class GetAdminDashboardDataUseCase implements IGetAdminDashboardDataUseCa
         ]);
 
         const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-        
+
         // Ensure all 6 months are present
         const formattedMonthlyData = [];
         for (let i = 5; i >= 0; i--) {
@@ -81,7 +82,7 @@ export class GetAdminDashboardDataUseCase implements IGetAdminDashboardDataUseCa
             d.setMonth(d.getMonth() - i);
             const year = d.getFullYear();
             const month = d.getMonth() + 1; // 1-12
-            
+
             const found = monthlyData.find(m => m._id.year === year && m._id.month === month);
             formattedMonthlyData.push({
                 name: months[month - 1],
@@ -113,9 +114,9 @@ export class GetAdminDashboardDataUseCase implements IGetAdminDashboardDataUseCa
                 servicesByStatus: servicesByStatus
             },
             topWorkers: topWorkers.map(w => ({
-                id: w._id,
+                id: w._id.toString(),
                 name: w.name,
-                role: 'Worker', 
+                role: 'Worker',
                 rating: w.rating,
                 totalRatings: w.totalRatings,
                 profilePictureUrl: w.profilePictureUrl

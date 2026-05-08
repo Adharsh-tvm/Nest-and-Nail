@@ -3,6 +3,7 @@ import { HttpStatusCode } from "../../../shared/enums/httpCodes";
 import { ResponseHandler } from "../../../shared/responses/ApiResponse";
 import { IGetAllMeetingsForAdminUseCase } from "../../../application/interfaces/meetings/admin/IGetAllMeetingsForAdminUseCase";
 import { IGetMeetingByIdForAdminUseCase } from "../../../application/interfaces/meetings/admin/IGetMeetingByIdForAdminUseCase";
+import { ServiceStatus } from "../../../shared/enums/serviceEnums";
 
 export class AdminMeetingController {
     constructor(
@@ -16,7 +17,7 @@ export class AdminMeetingController {
                 page: req.query.page ? Number(req.query.page) : 1,
                 limit: req.query.limit ? Number(req.query.limit) : 10,
                 search: req.query.search as string,
-                status: req.query.status as string,
+                status: req.query.status as ServiceStatus,
             };
 
             const result = await this._getAllMeetingsUseCase.execute(query);

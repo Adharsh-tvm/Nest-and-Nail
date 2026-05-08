@@ -8,6 +8,7 @@ import { transactionSource, transactionStatus, transactionType } from "../../../
 import { Role } from "../../../shared/enums/authEnums";
 import { IEndVideoCallUseCase } from "../../interfaces/meetings/IEndVideoCallUseCase";
 import { v4 as uuidv4 } from "uuid";
+import { VideoCallResponseDTO } from "../../dtos/common/videocall/VideoCallResponseDTO";
 
 function formatDuration(totalSeconds: number): string {
   const hours = Math.floor(totalSeconds / 3600);
@@ -20,13 +21,16 @@ function formatDuration(totalSeconds: number): string {
 
 export class EndVideoCallUseCase implements IEndVideoCallUseCase {
   constructor(
-      private serviceRepository: IServiceRepository,
-      private readonly _walletRepo: IWalletRepository,
-      private readonly _transactionRepo: ITransactionRepository,
-      private readonly _userRepoFactory: IUserRepositoryFactory
-  ) {}
+    private serviceRepository: IServiceRepository,
+    private readonly _walletRepo: IWalletRepository,
+    private readonly _transactionRepo: ITransactionRepository,
+    private readonly _userRepoFactory: IUserRepositoryFactory
+  ) { }
 
-  async execute(serviceId: string, userId: string) {
+  async execute(
+    serviceId: string,
+    userId: string
+  ): Promise<VideoCallResponseDTO> {
     const service = await this.serviceRepository.findById(serviceId);
 
     if (!service) throw new Error("Service not found");
@@ -70,63 +74,63 @@ export class EndVideoCallUseCase implements IEndVideoCallUseCase {
 
     // Transfer funds from Admin to Worker if payment was successful
     if (service.paymentStatus === PaymentStatus.SUCCESS && service.totalAmount > 0) {
-        const platformFee = service.category === "VIDEO_CALL" ? 10 : 50;
-        const workerShare = service.totalAmount - platformFee;
+      const platformFee = service.category === "VIDEO_CALL" ? 10 : 50;
+      const workerShare = service.totalAmount - platformFee;
 
-        if (workerShare > 0) {
-            // Credit Worker
-            const workerId = service.workerId;
-            let workerWallet = await this._walletRepo.findByUserId(workerId);
-            if (!workerWallet) {
-                workerWallet = await this._walletRepo.create({
-                    walletId: uuidv4(),
-                    userId: workerId,
-                    balance: 0,
-                    currency: "INR"
-                });
-            }
-            
-            const updatedWorkerWallet = await this._walletRepo.creditBalance(workerId, workerShare);
-            await this._transactionRepo.create({
+      if (workerShare > 0) {
+        // Credit Worker
+        const workerId = service.workerId;
+        let workerWallet = await this._walletRepo.findByUserId(workerId);
+        if (!workerWallet) {
+          workerWallet = await this._walletRepo.create({
+            walletId: uuidv4(),
+            userId: workerId,
+            balance: 0,
+            currency: "INR"
+          });
+        }
+
+        const updatedWorkerWallet = await this._walletRepo.creditBalance(workerId, workerShare);
+        await this._transactionRepo.create({
+          transactionId: uuidv4(),
+          walletId: updatedWorkerWallet.walletId,
+          userId: workerId,
+          type: transactionType.CREDIT,
+          amount: workerShare,
+          source: transactionSource.SERVICE_PAYMENT,
+          serviceId: service.serviceId,
+          status: transactionStatus.SUCCESS,
+          createdAt: new Date(),
+        });
+
+        // Debit admin wallet
+        const adminRepo = this._userRepoFactory.getRepository(Role.ADMIN);
+        const admins = await adminRepo.findAll();
+        const admin = admins[0];
+
+        if (admin) {
+          const adminWallet = await this._walletRepo.findByUserId(admin.userId);
+          if (adminWallet) {
+            try {
+              const updatedAdminWallet = await this._walletRepo.debitBalance(admin.userId, workerShare);
+
+              await this._transactionRepo.create({
                 transactionId: uuidv4(),
-                walletId: updatedWorkerWallet.walletId,
-                userId: workerId,
-                type: transactionType.CREDIT,
+                walletId: updatedAdminWallet.walletId,
+                userId: admin.userId,
+                type: transactionType.DEBIT,
                 amount: workerShare,
                 source: transactionSource.SERVICE_PAYMENT,
                 serviceId: service.serviceId,
                 status: transactionStatus.SUCCESS,
                 createdAt: new Date(),
-            });
-
-            // Debit admin wallet
-            const adminRepo = this._userRepoFactory.getRepository(Role.ADMIN);
-            const admins = await adminRepo.findAll();
-            const admin = admins[0];
-
-            if (admin) {
-                const adminWallet = await this._walletRepo.findByUserId(admin.userId);
-                if (adminWallet) {
-                    try {
-                        const updatedAdminWallet = await this._walletRepo.debitBalance(admin.userId, workerShare);
-                        
-                        await this._transactionRepo.create({
-                            transactionId: uuidv4(),
-                            walletId: updatedAdminWallet.walletId,
-                            userId: admin.userId,
-                            type: transactionType.DEBIT,
-                            amount: workerShare,
-                            source: transactionSource.SERVICE_PAYMENT,
-                            serviceId: service.serviceId,
-                            status: transactionStatus.SUCCESS,
-                            createdAt: new Date(),
-                        });
-                    } catch (err) {
-                        console.error("Failed to debit admin wallet:", err);
-                    }
-                }
+              });
+            } catch (err) {
+              console.error("Failed to debit admin wallet:", err);
             }
+          }
         }
+      }
     }
 
     return {

@@ -1,5 +1,6 @@
 import { IServiceRepository } from "../../../domain/repositories/IServiceRepository";
 import { VideoCallStatus } from "../../../shared/enums/serviceEnums";
+import { JoinVideoCallResponseDTO } from "../../dtos/common/videocall/JoinVideoCallResponseDTO";
 import { IJoinVideoCallUseCase } from "../../interfaces/meetings/IJoinVideoCallUseCase";
 import { ISendNotificationUseCase } from "../../interfaces/notifications/ISendNotificationUseCase";
 
@@ -10,7 +11,10 @@ export class JoinVideoCallUseCase implements IJoinVideoCallUseCase {
         private readonly _sendNotificationUseCase: ISendNotificationUseCase
     ) { }
 
-    async execute(serviceId: string, userId: string) {
+    async execute(
+        serviceId: string,
+        userId: string
+    ): Promise<JoinVideoCallResponseDTO> {
         const service = await this._serviceRepository.findById(serviceId);
 
         if (!service) throw new Error("Service not found");
@@ -28,7 +32,7 @@ export class JoinVideoCallUseCase implements IJoinVideoCallUseCase {
         /*
         const earlyJoin = new Date(start.getTime() - 15 * 60 * 1000); // 15 mins early
         const lateJoin = new Date(end.getTime() + 60 * 60 * 1000); // 1 hour late
-
+ 
         if (now < earlyJoin || now > lateJoin) {
             throw new Error("Not within allowed join time");
         }

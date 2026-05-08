@@ -1,5 +1,8 @@
 import { AdminServiceResponseDTO } from "../../../dtos/ServiceDTO";
+import { GetAllMeetingsQuery } from "../../../../shared/queries/GetAllMeetingsQuery";
 
 export interface IGetAllMeetingsForAdminUseCase {
-    execute(query: any): Promise<AdminServiceResponseDTO[]>;
+    execute(
+        query: GetAllMeetingsQuery
+    ): Promise<AdminServiceResponseDTO[]>;
 }

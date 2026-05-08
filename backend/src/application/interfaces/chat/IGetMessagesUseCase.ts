@@ -1,3 +1,5 @@
+import { ChatMessage } from "../../../domain/entities/ChatMessage";
+
 export interface IGetMessagesUseCase {
-    execute(chatId: string): Promise<any[]>;
+    execute(chatId: string): Promise<ChatMessage[]>;
 }

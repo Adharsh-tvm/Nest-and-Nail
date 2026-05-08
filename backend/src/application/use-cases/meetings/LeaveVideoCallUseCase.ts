@@ -1,10 +1,14 @@
 import { IServiceRepository } from "../../../domain/repositories/IServiceRepository";
+import { LeaveVideoCallResponseDTO } from "../../dtos/common/videocall/LeaveVideoCallResponseDTO";
 import { ILeaveVideoCallUseCase } from "../../interfaces/meetings/ILeaveVideoCallUseCase";
 
 export class LeaveVideoCallUseCase implements ILeaveVideoCallUseCase {
-  constructor(private serviceRepository: IServiceRepository) {}
+  constructor(private serviceRepository: IServiceRepository) { }
 
-  async execute(serviceId: string, userId: string) {
+  async execute(
+    serviceId: string,
+    userId: string
+  ): Promise<LeaveVideoCallResponseDTO> {
     const service = await this.serviceRepository.findById(serviceId);
 
     if (!service) throw new Error("Service not found");

@@ -1,12 +1,28 @@
 import { IServiceRepository } from "../../../../domain/repositories/IServiceRepository";
+import { GetAllMeetingsQuery } from "../../../../shared/queries/GetAllMeetingsQuery";
+import { AdminServiceResponseDTO } from "../../../dtos/ServiceDTO";
 import { IGetAllMeetingsForAdminUseCase } from "../../../interfaces/meetings/admin/IGetAllMeetingsForAdminUseCase";
 
 export class GetAllMeetingsForAdminUseCase
     implements IGetAllMeetingsForAdminUseCase {
 
-    constructor(private serviceRepository: IServiceRepository) { }
+    constructor(
+        private readonly serviceRepository: IServiceRepository
+    ) { }
 
-    async execute(query: any) {
-        return await this.serviceRepository.getAllMeetingsForAdmin(query);
+    async execute(
+        query: GetAllMeetingsQuery
+    ): Promise<AdminServiceResponseDTO[]> {
+
+        const formattedQuery = {
+            page: query.page ?? 1,
+            limit: query.limit ?? 10,
+            search: query.search,
+            status: query.status,
+        };
+
+        return await this.serviceRepository.getAllMeetingsForAdmin(
+            formattedQuery
+        );
     }
 }

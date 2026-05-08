@@ -7,6 +7,7 @@ import { IPasswordHasher } from "../../contracts/IPasswordHasher";
 import { ITokenService } from "../../contracts/ITokenService";
 import { IUserRepositoryFactory } from "../../../domain/repositories/IUserRepositoryFactory";
 import { UserBlockedError } from "../../../domain/errors/DomainError";
+import { LoginResponseDTO } from "../../dtos/UserDTO";
 
 export class GoogleSignUpUseCase implements IGoogleSignUpUseCase {
     constructor(
@@ -20,7 +21,7 @@ export class GoogleSignUpUseCase implements IGoogleSignUpUseCase {
         email: string,
         name: string,
         role: string
-    ) {
+    ): Promise<LoginResponseDTO> {
         try {
             let user: User | null = null
             const clientRepository = this._userRepositoryFactory.getRepository(Role.CLIENT)
@@ -77,11 +78,7 @@ export class GoogleSignUpUseCase implements IGoogleSignUpUseCase {
             }
         } catch (error) {
             console.log("Reg GOog Use case error: ", error)
-            return {
-                user: null,
-                accessToken: "",
-                refreshToken: ""
-            }
+            throw error;
         }
     }
 }

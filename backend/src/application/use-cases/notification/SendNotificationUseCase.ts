@@ -1,21 +1,16 @@
 import { v4 as uuidv4 } from "uuid";
 import { INotificationRepository } from "../../../domain/repositories/INotificationRepository";
 import { IRealtimeService } from "../../interfaces/socket/IRealtimeService";
+import { SendNotificationDTO } from "../../dtos/common/notification/NotificationDTO";
 
 export class SendNotificationUseCase {
 
   constructor(
     private realtimeService: IRealtimeService,
     private notificationRepo: INotificationRepository
-  ) {}
+  ) { }
 
-  async execute(data: {
-    userId: string;
-    title: string;
-    message: string;
-    type: string;
-    data?: any;
-  }) {
+  async execute(data: SendNotificationDTO): Promise<void> {
 
     const notification = {
       notificationId: uuidv4(),
