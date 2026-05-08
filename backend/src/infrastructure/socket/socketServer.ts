@@ -5,7 +5,8 @@ import { PresenceHandler } from "./handlers/PresenceHandler";
 
 export class SocketServer {
     private io: Server;
-    private userSocketMap = new Map<string, string>();
+    // One user can have MULTIPLE open sockets (tabs, components)
+    private userSocketMap = new Map<string, Set<string>>();
 
     constructor(io: Server) {
         this.io = io;
@@ -15,7 +16,10 @@ export class SocketServer {
         this.io.on("connection", (socket: Socket) => {
 
             socket.on("register", (userId: string) => {
-                this.userSocketMap.set(userId, socket.id);
+                if (!this.userSocketMap.has(userId)) {
+                    this.userSocketMap.set(userId, new Set());
+                }
+                this.userSocketMap.get(userId)!.add(socket.id);
             });
 
             new ChatHandler(this.io).handle(socket);
@@ -29,19 +33,29 @@ export class SocketServer {
     }
 
     private removeUser(socketId: string) {
-        for (const [userId, id] of this.userSocketMap.entries()) {
-            if (id === socketId) {
-                this.userSocketMap.delete(userId);
+        for (const [userId, socketIds] of this.userSocketMap.entries()) {
+            if (socketIds.has(socketId)) {
+                socketIds.delete(socketId);
+                if (socketIds.size === 0) {
+                    this.userSocketMap.delete(userId);
+                }
                 break;
             }
         }
     }
 
-    getSocketId(userId: string) {
+    /** Returns all socket IDs registered for a user (may be multiple tabs/components) */
+    getSocketIds(userId: string): Set<string> | undefined {
         return this.userSocketMap.get(userId);
+    }
+
+    /** @deprecated Use getSocketIds */
+    getSocketId(userId: string): string | undefined {
+        const set = this.userSocketMap.get(userId);
+        return set ? [...set][0] : undefined;
     }
 
     getIO() {
         return this.io;
     }
-}
+}

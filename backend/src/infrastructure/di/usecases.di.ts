@@ -793,7 +793,8 @@ export class UseCaseDI {
   get joinVideoCallUseCase(): IJoinVideoCallUseCase {
     if (!this._joinVideoCallUseCase) {
       this._joinVideoCallUseCase = new JoinVideoCallUseCase(
-        this.infra.serviceRepository
+        this.infra.serviceRepository,
+        this.sendNotificationUseCase
       );
     }
     return this._joinVideoCallUseCase;

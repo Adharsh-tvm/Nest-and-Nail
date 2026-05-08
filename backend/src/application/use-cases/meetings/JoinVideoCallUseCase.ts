@@ -1,10 +1,14 @@
 import { IServiceRepository } from "../../../domain/repositories/IServiceRepository";
 import { VideoCallStatus } from "../../../shared/enums/serviceEnums";
 import { IJoinVideoCallUseCase } from "../../interfaces/meetings/IJoinVideoCallUseCase";
+import { ISendNotificationUseCase } from "../../interfaces/notifications/ISendNotificationUseCase";
 
 
 export class JoinVideoCallUseCase implements IJoinVideoCallUseCase {
-    constructor(private serviceRepository: IServiceRepository) { }
+    constructor(
+        private serviceRepository: IServiceRepository,
+        private sendNotificationUseCase: ISendNotificationUseCase
+    ) { }
 
     async execute(serviceId: string, userId: string) {
         const service = await this.serviceRepository.findById(serviceId);
@@ -50,6 +54,21 @@ export class JoinVideoCallUseCase implements IJoinVideoCallUseCase {
             status,
             startedAt,
         });
+
+        // Notify the OTHER participant that this user has joined (ring bell)
+        const isClient = service.clientId === userId;
+        const otherUserId = isClient ? service.workerId : service.clientId;
+        const joinerLabel = isClient ? "Client" : "Worker";
+
+        if (otherUserId) {
+            await this.sendNotificationUseCase.execute({
+                userId: otherUserId,
+                title: "🔔 Meeting Room — Someone Joined!",
+                message: `${joinerLabel} has entered the video call room. Join now to connect!`,
+                type: "MEETING_JOINED",
+                data: { serviceId, roomId: service.videoCall.roomId },
+            });
+        }
 
         return {
             roomId: service.videoCall.roomId,

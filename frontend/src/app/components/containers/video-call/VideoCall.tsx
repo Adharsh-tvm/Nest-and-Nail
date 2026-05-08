@@ -216,6 +216,11 @@ export default function VideoCall({
           pendingCandidates.current = [];
         });
 
+        // When the other participant joins the room, mark as connected immediately
+        socket.on("user-joined-ring", () => {
+          setConnectionState("connected");
+        });
+
         // 3. Join room AFTER all listeners are in place
         socket.emit("join-room", { roomId, userId: `${role}-${socket.id}`, role });
 

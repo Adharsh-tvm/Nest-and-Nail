@@ -11,6 +11,7 @@ import EndMeetingButton from "@/app/components/containers/meetings/EndMeetingBut
 import CancelMeetingButton from "@/app/components/containers/meetings/CancelMeetingButton";
 import { cancelServiceAction } from "@/app/actions/client/service-actions";
 import ChatDrawer from "@/app/components/containers/chat/ChatDrawer";
+import MeetingRingAlert from "@/app/components/containers/meetings/MeetingRingAlert";
 
 export async function generateMetadata({ params }: { params: Promise<{ meetingId: string }> }) {
   return { title: `Meeting Details | Client` };
@@ -277,6 +278,13 @@ export default async function ClientMeetingDetailPage({ params }: { params: Prom
           chatId={meeting.serviceId}
           receiverId={meeting.workerId}
           receiverName={worker?.name}
+        />
+      )}
+      {meeting.status === "CONFIRMED" && (
+        <MeetingRingAlert
+          serviceId={meeting.serviceId}
+          role="CLIENT"
+          callerName={worker?.name || "Worker"}
         />
       )}
     </div>

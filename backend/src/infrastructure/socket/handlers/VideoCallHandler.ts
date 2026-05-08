@@ -38,6 +38,8 @@ export class VideoHandler {
                 const firstSocketId = [...participants].find(id => id !== socket.id);
                 if (firstSocketId) {
                     this.io.to(firstSocketId).emit("start-call");
+                    //  Ring bell: tell the first participant who joined
+                    this.io.to(firstSocketId).emit("user-joined-ring", { role });
                 }
                 // Tell second participant to wait for the offer
                 socket.emit("waiting-for-offer");

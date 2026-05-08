@@ -60,6 +60,28 @@ export default function NotificationBell() {
 
     socket.on("notification", (notification: NotificationDTO) => {
       setNotifications((prev) => [notification, ...prev]);
+      // Play a ring sound for meeting join notifications
+      if (notification.type === "MEETING_JOINED") {
+        try {
+          const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+          const playTone = (freq: number, startTime: number, duration: number) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = "sine";
+            osc.frequency.setValueAtTime(freq, startTime);
+            gain.gain.setValueAtTime(0.4, startTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(startTime);
+            osc.stop(startTime + duration);
+          };
+          playTone(880, ctx.currentTime, 0.15);
+          playTone(1100, ctx.currentTime + 0.18, 0.15);
+          playTone(880, ctx.currentTime + 0.38, 0.15);
+          playTone(1100, ctx.currentTime + 0.56, 0.2);
+        } catch (_) { /* AudioContext not available */ }
+      }
     });
 
     return () => {
@@ -118,6 +140,8 @@ export default function NotificationBell() {
         return "🔧";
       case "MEETING_BOOKED":
         return "📹";
+      case "MEETING_JOINED":
+        return "🔔";
       default:
         return "🔔";
     }

@@ -6,14 +6,15 @@ export class RealtimeService implements IRealtimeService {
   constructor(private socketServer: SocketServer) {}
 
   emitToUser(userId: string, event: string, data: any): void {
-    const socketId = this.socketServer.getSocketId(userId);
-
-    if (socketId) {
-      this.socketServer.getIO().to(socketId).emit(event, data);
+    const socketIds = this.socketServer.getSocketIds(userId);
+    if (socketIds && socketIds.size > 0) {
+      for (const socketId of socketIds) {
+        this.socketServer.getIO().to(socketId).emit(event, data);
+      }
     }
   }
 
   emitToRoom(roomId: string, event: string, data: any): void {
     this.socketServer.getIO().to(roomId).emit(event, data);
   }
-}
+}

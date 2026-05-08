@@ -332,7 +332,7 @@ NEXT REVIEW PENDINGS
 ☐ keep retention for logs
 ☐ elsint -improve rules
 ☐ eslint issue need to improve
-☐ video call ring feature
+✔ video call ring feature @done (5/8/2026, 3:22:15 PM)
 ✔ video call history @done (5/5/2026, 10:30:55 AM)
 ✔ Store meeting history along with call duration details. @done (5/5/2026, 10:31:16 AM)
 ✔ search in category @done (5/5/2026, 1:14:36 PM)
@@ -346,5 +346,5 @@ NEXT REVIEW PENDINGS
 ☐ based concern -admin can do action
 ✔ notification for all action like meeting cancelled e.t.c @done (5/6/2026, 5:37:03 PM)
 ☐ real time chatting issue in message while reloading
-☐ Admin Dashboard not completed
-☐ worker dashboard needed
+✔ Admin Dashboard not completed @done (5/7/2026, 7:50:03 PM)
+✔ worker dashboard needed @done (5/7/2026, 7:50:02 PM)

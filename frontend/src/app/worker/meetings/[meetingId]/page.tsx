@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import EndMeetingButton from "@/app/components/containers/meetings/EndMeetingButton";
 import ChatDrawer from "@/app/components/containers/chat/ChatDrawer";
+import MeetingRingAlert from "@/app/components/containers/meetings/MeetingRingAlert";
 
 export async function generateMetadata({ params }: { params: Promise<{ meetingId: string }> }) {
   return { title: `Meeting Details | Worker` };
@@ -250,6 +251,13 @@ export default async function WorkerMeetingDetailPage({ params }: { params: Prom
           chatId={meeting.serviceId}
           receiverId={meeting.clientId}
           receiverName={client?.name}
+        />
+      )}
+      {meeting.status === "CONFIRMED" && (
+        <MeetingRingAlert
+          serviceId={meeting.serviceId}
+          role="WORKER"
+          callerName={client?.name || "Client"}
         />
       )}
     </div>
