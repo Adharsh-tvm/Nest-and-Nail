@@ -328,8 +328,8 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
       setSelectedProfilePic(null);
 
       toast.success("Profile details updated successfully");
-    } catch (err: any) {
-      toast.error(err.message || "Update failed");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Update failed");
     }
   };
 
@@ -350,8 +350,8 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
       }
 
       toast.success("Skills updated successfully");
-    } catch (err: any) {
-      toast.error(err.message || "Update failed");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Update failed");
     }
   };
 
@@ -396,8 +396,8 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
       }
 
       toast.success("Categories updated successfully");
-    } catch (err: any) {
-      toast.error(err.message || "Update failed");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Update failed");
     }
   };
 
@@ -816,9 +816,9 @@ const AddressesView: React.FC<ViewProps> = ({ user, setUser }) => {
       setUser(response.payload || oldUser);
       toast.success(isEditing ? "Address updated successfully" : "Address added successfully");
       router.refresh();
-    } catch (err: any) {
+    } catch (err: unknown) {
       setUser(oldUser);
-      toast.error(err.message || "Failed to save address");
+      toast.error(err instanceof Error ? err.message : "Failed to save address");
     } finally {
       setEditingAddress(null);
     }
@@ -852,9 +852,9 @@ const AddressesView: React.FC<ViewProps> = ({ user, setUser }) => {
       setUser(response.payload || oldUser);
       toast.success("Address deleted successfully");
       router.refresh();
-    } catch (err: any) {
+    } catch (err: unknown) {
       setUser(oldUser);
-      toast.error(err.message || "Failed to delete address");
+      toast.error(err instanceof Error ? err.message : "Failed to delete address");
     } finally {
       setAddressToDelete(null);
     }
@@ -914,7 +914,7 @@ const AddressesView: React.FC<ViewProps> = ({ user, setUser }) => {
                   </button>
                   <button
                     onClick={() => {
-                      const id = addr.addressId || (addr as any)._id;
+                      const id = addr.addressId || (addr as { _id?: string })._id;
                       if (id) {
                         handleDeleteClick(id);
                       } else {
@@ -950,9 +950,17 @@ const AddressesView: React.FC<ViewProps> = ({ user, setUser }) => {
   );
 };
 
+interface WalletTransaction {
+  id: string;
+  type: "CREDIT" | "DEBIT";
+  source: string;
+  createdAt: string;
+  amount: number;
+}
+
 const WalletView: React.FC<ViewProps> = ({ user }) => {
   const [balance, setBalance] = useState<number>(0);
-  const [transactions, setTransactions] = useState<any[]>([]);
+  const [transactions, setTransactions] = useState<WalletTransaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRecharging, setIsRecharging] = useState(false);
   const [rechargeAmount, setRechargeAmount] = useState<string>("1000");
@@ -1019,7 +1027,11 @@ const WalletView: React.FC<ViewProps> = ({ user }) => {
         name: "Nest & Nail Wallet",
         description: "Wallet Recharge",
         order_id: orderId,
-        handler: async function (response: any) {
+        handler: async function (response: {
+          razorpay_payment_id: string;
+          razorpay_order_id: string;
+          razorpay_signature: string;
+        }) {
           try {
             setIsRecharging(true);
             const verifyRes = await verifyRechargePaymentAction({
@@ -1055,15 +1067,15 @@ const WalletView: React.FC<ViewProps> = ({ user }) => {
         }
       };
 
-      const paymentObject = new (window as any).Razorpay(options);
-      paymentObject.on("payment.failed", function (response: any) {
+      const paymentObject = new (window as { Razorpay?: new (options: unknown) => { on: (event: string, callback: (errResponse: { error?: { description?: string } }) => void) => void; open: () => void } }).Razorpay!(options);
+      paymentObject.on("payment.failed", function (response: { error?: { description?: string } }) {
         toast.error(response.error?.description || "Payment failed");
         setIsRecharging(false);
       });
       paymentObject.open();
 
-    } catch (err: any) {
-      toast.error(err.message || "An error occurred");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "An error occurred");
       setIsRecharging(false);
     }
   };
@@ -1131,7 +1143,7 @@ const WalletView: React.FC<ViewProps> = ({ user }) => {
             </div>
           ) : (
             <div className="divide-y divide-gray-100 max-h-[400px] overflow-y-auto">
-              {transactions.map((tx: any, idx: number) => (
+              {transactions.map((tx: WalletTransaction, idx: number) => (
                 <div key={idx} className="p-6 flex items-center justify-between hover:bg-gray-50/50 transition-colors">
                   <div className="flex items-center gap-4">
                     <div className={`p-3 rounded-full ${tx.type === "CREDIT" ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"}`}>
@@ -1196,9 +1208,9 @@ const SettingsView: React.FC<ViewProps> = ({ user, setUser }) => {
         return;
       }
       toast.success(`Status updated to ${newStatus ? "Online" : "Offline"}`);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setUser({ ...user, isOnline: oldStatus });
-      toast.error(err.message || "Status update failed");
+      toast.error(err instanceof Error ? err.message : "Status update failed");
     } finally {
       setIsUpdating(false);
     }
@@ -1385,8 +1397,8 @@ const SlotView: React.FC<ViewProps> = ({ user, setUser }) => {
       } else {
         toast.error(response.message || "Failed to block dates");
       }
-    } catch (e: any) {
-      toast.error(e.message || "Error blocking dates");
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : "Error blocking dates");
     } finally {
       setIsSubmitting(false);
     }
@@ -1535,9 +1547,9 @@ const UserProfile = () => {
         return;
       }
       toast.success("Profile picture updated!");
-    } catch (err: any) {
+    } catch (err: unknown) {
       setUser({ ...currentUser, profileImageUrl: oldImage });
-      toast.error(err.message || "Image upload failed");
+      toast.error(err instanceof Error ? err.message : "Image upload failed");
     }
   };
 
@@ -1552,7 +1564,7 @@ const UserProfile = () => {
 
     // 1. Optimistic Update
     const oldStatus = safeUser.isOnline;
-    setUser({ ...currentUser, isOnline: newStatus } as any);
+    setUser({ ...currentUser, isOnline: newStatus } as unknown as User);
 
     try {
       // 2. Server Action
@@ -1562,14 +1574,14 @@ const UserProfile = () => {
 
       if (!response.success) {
         // Revert on failure
-        setUser({ ...currentUser, isOnline: oldStatus } as any);
+        setUser({ ...currentUser, isOnline: oldStatus } as unknown as User);
         toast.error(response.message);
         return;
       }
       toast.success(`Status updated to ${newStatus ? "Online" : "Offline"}`);
-    } catch (err: any) {
-      setUser({ ...currentUser, isOnline: oldStatus } as any);
-      toast.error(err.message || "Status update failed");
+    } catch (err: unknown) {
+      setUser({ ...currentUser, isOnline: oldStatus } as unknown as User);
+      toast.error(err instanceof Error ? err.message : "Status update failed");
     } finally {
       setIsUpdatingStatus(false);
     }

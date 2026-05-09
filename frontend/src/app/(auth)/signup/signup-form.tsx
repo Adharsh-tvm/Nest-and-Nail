@@ -20,7 +20,7 @@ import {
 } from "../../actions/authentication/signup-actions";
 import OtpVerificationForm from "../otp/page";
 import { redirect, useRouter } from "next/navigation";
-import { GoogleLogin } from "@react-oauth/google";
+import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
 import { handleGoogleSignIn } from "@/app/actions/authentication/google-actions";
 import { Toaster, toast } from "react-hot-toast";
 import { motion } from "framer-motion";
@@ -199,13 +199,14 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
     }
   };
 
-  async function onGoogleSuccess(credentialResponse: any) {
+  async function onGoogleSuccess(credentialResponse: CredentialResponse) {
     const token = credentialResponse.credential;
+    if (!token) return;
 
     const result = await handleGoogleSignIn(token, role);
 
     if (result?.success) {
-      const redirectPath = result.user.user_role;
+      const redirectPath = result.user?.user_role || "client";
       toast.success(result?.message)
       redirect(redirectPath);
     } else {

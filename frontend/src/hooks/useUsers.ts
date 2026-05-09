@@ -34,9 +34,9 @@ export const useUsers = (params: UserQueryParams = {}): UseUsersResult => {
                 setTotal(result.total);
                 setTotalPages(result.totalPages);
             }
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error("[useUsers] error:", err);
-            const msg = err?.message ?? "Failed to load users";
+            const msg = (err instanceof Error ? err.message : undefined) ?? "Failed to load users";
             if (mountedRef.current) setError(msg);
         } finally {
             if (mountedRef.current) setLoading(false);

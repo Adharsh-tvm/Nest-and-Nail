@@ -23,9 +23,9 @@ export async function getAvailableWorkersAction(
             workers: workerResponse.payload?.workers, 
             total: workerResponse.payload?.total 
         };
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Failed to fetch available workers", error);
-        return { success: false, error: error.message || "Failed to fetch available workers" };
+        return { success: false, error: (error instanceof Error ? error.message : undefined) || "Failed to fetch available workers" };
     }
 }
 
@@ -38,8 +38,8 @@ export async function getWorkerDetailAction(
             return { success: false, error: workerResponse.message };
         }
         return { success: true, data: workerResponse.payload };
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error(`Failed to fetch worker detail for id ${id}`, error);
-        return { success: false, error: error.message || "Failed to fetch worker details" };
+        return { success: false, error: (error instanceof Error ? error.message : undefined) || "Failed to fetch worker details" };
     }
 }

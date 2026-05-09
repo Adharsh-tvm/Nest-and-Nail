@@ -29,13 +29,15 @@ function getRefundInfo(createdAt: Date | string) {
   return                   { canCancel: true,  refundPct: 50,  label: "50% Refund",        color: "text-amber-700",  bg: "bg-amber-50",  border: "border-amber-200",  explanation: "Between 1–6 hours from booking — 50% refund to your wallet." };
 }
 
+import { User as UserType } from "@/shared/types/userTypes";
+
 export default function ClientServiceDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const serviceId = params?.serviceId as string;
 
   const [service, setService] = useState<ServiceResponseDTO | null>(null);
-  const [worker, setWorker] = useState<any>(null);
+  const [worker, setWorker] = useState<Partial<UserType> | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   // Cancellation State
@@ -53,7 +55,7 @@ export default function ClientServiceDetailsPage() {
           if (response.data.workerId) {
              const wRes = await getWorkerDetailAction(response.data.workerId);
              if (wRes.success) {
-                 setWorker(wRes.data);
+                 setWorker(wRes.data || null);
              }
           }
         } else {
@@ -153,11 +155,16 @@ export default function ClientServiceDetailsPage() {
                 <div className="bg-gradient-to-r from-blue-500 to-indigo-600 h-16" />
                 <div className="p-5 flex flex-col items-center relative">
                   <div className="w-20 h-20 bg-white rounded-full border-4 border-white shadow-md flex items-center justify-center -mt-14 mb-3 overflow-hidden">
-                    {worker?.profileImageUrl || worker?.profilePictureUrl ? (
-                      <img src={(worker.profileImageUrl || worker.profilePictureUrl).startsWith('http') ? (worker.profileImageUrl || worker.profilePictureUrl) : `${process.env.NEXT_PUBLIC_API_URL}/${(worker.profileImageUrl || worker.profilePictureUrl).replace(/^\//, '')}`} alt={worker?.name || "Worker"} className="w-full h-full object-cover" />
-                    ) : (
-                      <User className="w-8 h-8 text-gray-400" />
-                    )}
+                    {(() => {
+                      const imgPath = worker?.profileImageUrl || worker?.profilePictureUrl;
+                      if (imgPath) {
+                        const srcUrl = imgPath.startsWith("http")
+                          ? imgPath
+                          : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}/${imgPath.replace(/^\//, "")}`;
+                        return <img src={srcUrl} alt={worker?.name || "Worker"} className="w-full h-full object-cover" />;
+                      }
+                      return <User className="w-8 h-8 text-gray-400" />;
+                    })()}
                   </div>
                   <h3 className="text-lg font-bold text-gray-900 text-center">{worker?.name || "Loading worker..."}</h3>
                   <p className="text-xs text-gray-500 uppercase font-semibold tracking-wider mb-4">Assigned Worker</p>
@@ -168,10 +175,10 @@ export default function ClientServiceDetailsPage() {
                         <span className="text-gray-600 break-all">{worker.email}</span>
                       </div>
                     )}
-                    {worker?.phone && (
+                    {((worker as any).phone || worker?.phone_number) && (
                       <div className="flex items-center space-x-3 text-sm">
                         <Phone className="w-4 h-4 text-gray-400" />
-                        <span className="text-gray-600">{worker.phone}</span>
+                        <span className="text-gray-600">{(worker as any).phone || worker?.phone_number}</span>
                       </div>
                     )}
                   </div>

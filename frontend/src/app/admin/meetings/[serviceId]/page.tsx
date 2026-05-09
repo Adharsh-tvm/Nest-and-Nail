@@ -38,8 +38,8 @@ const AdminMeetingDetailsPage = () => {
           throw new Error(res.error || "Failed to load meeting details");
         }
         setMeeting(res.data);
-      } catch (error: any) {
-        toast.error(error.message);
+      } catch (error: unknown) {
+        toast.error(error instanceof Error ? error.message : "Failed to load meeting details");
         router.push("/admin/meetings");
       } finally {
         setLoading(false);

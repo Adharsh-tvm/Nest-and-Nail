@@ -44,8 +44,8 @@ export async function getUserWalletBalanceByAdminAction(userId: string) {
     const { fetchUserWalletBalanceByAdmin } = await import("@/sources/api/admin/admin.api");
     const res = await fetchUserWalletBalanceByAdmin(userId);
     return { success: true, data: res };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -58,8 +58,8 @@ export async function getAllConcernsAction(params?: {
   try {
     const res = await fetchAllAdminConcerns(params);
     return { success: true, payload: res };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -67,7 +67,7 @@ export async function getAdminDashboardDataAction() {
   try {
     const res = await fetchAdminDashboardData();
     return { success: true, payload: res };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }

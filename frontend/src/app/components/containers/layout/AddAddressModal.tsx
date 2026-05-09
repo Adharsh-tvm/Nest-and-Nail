@@ -127,7 +127,7 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
 
       // Automatically open address fields if hidden or ensure they are visible
       // (Currently they are always visible)
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Reverse geocoding error:", err);
       toast.error("Unable to fetch address details for this location");
     }
@@ -156,7 +156,7 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
 
       await reverseGeocode(lat, lng);
       toast.success("Location detected successfully");
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("GPS error:", err);
       toast.error("Unable to fetch location");
     } finally {
@@ -192,7 +192,7 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
     try {
       await onSave(formData as Address);
       onClose();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Failed to save address: ", error);
       toast.error("Failed to save address");
     } finally {

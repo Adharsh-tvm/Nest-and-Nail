@@ -4,9 +4,17 @@ import React, { useState, useEffect } from "react";
 import { Wallet as WalletIcon, CreditCard } from "lucide-react";
 import { getWalletBalanceAction, getTransactionsAction } from "@/app/actions/client/wallet-actions";
 
+interface Transaction {
+  type: "CREDIT" | "DEBIT";
+  source: string;
+  createdAt: string;
+  amount: number;
+  status: string;
+}
+
 export default function AdminWalletPage() {
   const [balance, setBalance] = useState<number>(0);
-  const [transactions, setTransactions] = useState<any[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchWallet = async () => {
@@ -17,7 +25,7 @@ export default function AdminWalletPage() {
     }
     const txRes = await getTransactionsAction();
     if (txRes.success && txRes.data) {
-      const txData = Array.isArray(txRes.data) ? txRes.data : txRes.data.transactions || [];
+      const txData = Array.isArray(txRes.data) ? txRes.data : (txRes.data as { transactions?: Transaction[] }).transactions || [];
       setTransactions(txData);
     }
     setIsLoading(false);
@@ -93,7 +101,7 @@ export default function AdminWalletPage() {
               </div>
             ) : (
               <div className="divide-y divide-gray-50">
-                {transactions.map((tx: any, idx: number) => (
+                {transactions.map((tx: Transaction, idx: number) => (
                   <div key={idx} className="p-6 flex items-center justify-between hover:bg-gray-50/50 transition-colors">
                     <div className="flex items-center gap-4">
                       <div className={`p-3.5 rounded-2xl ${tx.type === "CREDIT" ? "bg-emerald-50 text-emerald-600" : "bg-rose-50 text-rose-600"}`}>

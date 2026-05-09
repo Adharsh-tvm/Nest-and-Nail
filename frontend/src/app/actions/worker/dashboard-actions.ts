@@ -1,6 +1,7 @@
 "use server";
 
 import { fetchWorkerDashboardData } from "@/sources/api/worker/dashboard.api";
+import axios from "axios";
 
 export async function getWorkerDashboardDataAction(months?: number) {
   try {
@@ -17,10 +18,11 @@ export async function getWorkerDashboardDataAction(months?: number) {
         message: data.message || "Failed to fetch dashboard data",
       };
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = axios.isAxiosError(error) ? error.response?.data?.message : (error instanceof Error ? error.message : undefined);
     return {
       success: false,
-      message: error?.response?.data?.message || "Failed to fetch dashboard data",
+      message: message || "Failed to fetch dashboard data",
     };
   }
 }

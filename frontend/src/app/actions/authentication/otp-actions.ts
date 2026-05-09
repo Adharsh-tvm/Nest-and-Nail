@@ -1,7 +1,7 @@
 "use server";
 
 import authApi from "@/sources/api/user/auth.api";
-import { AxiosError } from "axios";
+import axios, { AxiosError } from "axios";
 
 type OtpResponse = {
   success: boolean;
@@ -92,11 +92,13 @@ export async function forgotPasswordAction(email_address: string) {
       message: res.data.message || "OTP sent successfully",
     };
 
-  } catch (error: any) {
-    const rawMessage: string =
-      error.response?.data?.message ||
-      error.response?.data?.error ||
-      "Something went wrong while sending OTP";
+  } catch (error: unknown) {
+    let rawMessage = "Something went wrong while sending OTP";
+    if (axios.isAxiosError(error)) {
+      rawMessage = error.response?.data?.message || error.response?.data?.error || rawMessage;
+    } else if (error instanceof Error) {
+      rawMessage = error.message;
+    }
 
     // Map internal messages to user-friendly ones
     const userMessage =
@@ -130,10 +132,11 @@ export async function verifyResetOtpAction(
 
     return { success: true };
 
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = axios.isAxiosError(error) ? error.response?.data?.message : (error instanceof Error ? error.message : undefined);
     return {
       error:
-        error.response?.data?.message ||
+        message ||
         "Unable to verify OTP. Please try again.",
     };
   }
@@ -154,10 +157,11 @@ export async function resetPasswordAction(
     return {
       success: response.data.message || "Password reset successful",
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = axios.isAxiosError(error) ? error.response?.data?.message : (error instanceof Error ? error.message : undefined);
     return {
       error:
-        error.response?.data?.message ||
+        message ||
         "Failed to reset password",
     };
   }

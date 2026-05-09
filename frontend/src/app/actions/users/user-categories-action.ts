@@ -10,9 +10,9 @@ export async function updateUserCategoriesAction(
 ): Promise<ApiResponse<User>> {
     try {
         return await userApi.updateCategories(userId, categories);
-    } catch (error: any) {
+    } catch (error: unknown) {
         throw new Error(
-            error?.normalizedMessage || "Failed to update categories"
+            (error && typeof error === "object" && "normalizedMessage" in error ? (error as { normalizedMessage: string }).normalizedMessage : undefined) || "Failed to update categories"
         );
     }
 }
@@ -22,7 +22,7 @@ export async function fetchCategoriesAction() {
         const { fetchAllCategories } = await import("@/sources/api/category/category.api");
         const res = await fetchAllCategories();
         return res.categories;
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Fetch categories error:", error);
         return [];
     }

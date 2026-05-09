@@ -13,8 +13,8 @@ export async function addReviewAction(
       return { success: false, error: res.message };
     }
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("addReviewAction error:", error);
-    return { success: false, error: error.message || "Failed to submit review" };
+    return { success: false, error: (error instanceof Error ? error.message : undefined) || "Failed to submit review" };
   }
 }

@@ -7,9 +7,9 @@ export async function getAdminMeetingsAction(): Promise<{ success: boolean; data
     try {
         const response = await fetchAllAdminMeetings();
         return { success: true, data: response };
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Failed to fetch admin meetings", error);
-        return { success: false, error: error.message || "Failed to fetch admin meetings" };
+        return { success: false, error: (error instanceof Error ? error.message : undefined) || "Failed to fetch admin meetings" };
     }
 }
 
@@ -17,8 +17,8 @@ export async function getAdminMeetingDetailsAction(serviceId: string): Promise<{
     try {
         const response = await fetchAdminMeetingDetails(serviceId);
         return { success: true, data: response };
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Failed to fetch admin meeting details", error);
-        return { success: false, error: error.message || "Failed to fetch admin meeting details" };
+        return { success: false, error: (error instanceof Error ? error.message : undefined) || "Failed to fetch admin meeting details" };
     }
 }

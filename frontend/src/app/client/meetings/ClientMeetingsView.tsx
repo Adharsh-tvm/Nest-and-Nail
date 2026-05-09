@@ -13,7 +13,7 @@ const HISTORY_PAGE_SIZE = 6;
 interface Props {
     scheduled: ServiceResponseDTO[];
     history: ServiceResponseDTO[];
-    workerMap: Record<string, User>;
+    workerMap: Record<string, Partial<User>>;
 }
 
 export default function ClientMeetingsView({ scheduled, history, workerMap }: Props) {

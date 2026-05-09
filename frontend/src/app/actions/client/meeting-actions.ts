@@ -10,8 +10,8 @@ export async function getClientScheduledMeetingsAction(): Promise<{ success: boo
             return { success: false, error: response.message };
         }
         return { success: true, data: response.payload };
-    } catch (error: any) {
-        return { success: false, error: error.message || "Failed to fetch scheduled meetings" };
+    } catch (error: unknown) {
+        return { success: false, error: (error instanceof Error ? error.message : undefined) || "Failed to fetch scheduled meetings" };
     }
 }
 
@@ -22,8 +22,8 @@ export async function getClientMeetingsHistoryAction(): Promise<{ success: boole
             return { success: false, error: response.message };
         }
         return { success: true, data: response.payload };
-    } catch (error: any) {
-        return { success: false, error: error.message || "Failed to fetch meeting history" };
+    } catch (error: unknown) {
+        return { success: false, error: (error instanceof Error ? error.message : undefined) || "Failed to fetch meeting history" };
     }
 }
 
@@ -34,8 +34,8 @@ export async function getClientMeetingByIdAction(serviceId: string): Promise<{ s
             return { success: false, error: response.message };
         }
         return { success: true, data: response.payload };
-    } catch (error: any) {
-        return { success: false, error: error.message || "Failed to fetch meeting details" };
+    } catch (error: unknown) {
+        return { success: false, error: (error instanceof Error ? error.message : undefined) || "Failed to fetch meeting details" };
     }
 }
 
@@ -46,8 +46,8 @@ export async function joinMeetingAction(serviceId: string): Promise<{ success: b
             return { success: false, error: response.message };
         }
         return { success: true, data: response.payload };
-    } catch (error: any) {
-        return { success: false, error: error.message || "Failed to join meeting" };
+    } catch (error: unknown) {
+        return { success: false, error: (error instanceof Error ? error.message : undefined) || "Failed to join meeting" };
     }
 }
 
@@ -58,8 +58,8 @@ export async function leaveMeetingAction(serviceId: string): Promise<{ success: 
             return { success: false, error: response.message };
         }
         return { success: true, message: response.message };
-    } catch (error: any) {
-        return { success: false, error: error.message || "Failed to leave meeting" };
+    } catch (error: unknown) {
+        return { success: false, error: (error instanceof Error ? error.message : undefined) || "Failed to leave meeting" };
     }
 }
 
@@ -70,7 +70,7 @@ export async function endMeetingAction(serviceId: string): Promise<{ success: bo
             return { success: false, error: response.message };
         }
         return { success: true, message: response.message };
-    } catch (error: any) {
-        return { success: false, error: error.message || "Failed to end meeting" };
+    } catch (error: unknown) {
+        return { success: false, error: (error instanceof Error ? error.message : undefined) || "Failed to end meeting" };
     }
 }

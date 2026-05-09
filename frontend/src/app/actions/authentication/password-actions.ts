@@ -1,7 +1,7 @@
 "use server";
 
 import authApi from "@/sources/api/user/auth.api";
-import { AxiosError } from "axios";
+import axios from "axios";
 
 export async function changePasswordAction(payload: {
     currentPassword: string;
@@ -14,12 +14,12 @@ export async function changePasswordAction(payload: {
             success: true,
             message: response.data.message || "Password changed successfully",
         };
-    } catch (error: any) {
-        if (error instanceof AxiosError) {
+    } catch (error: unknown) {
+        if (axios.isAxiosError(error)) {
             return {
                 success: false,
                 error: error.response?.data?.message || "Failed to change password"
-            }
+            };
         }
         return {
             success: false,

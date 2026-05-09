@@ -94,7 +94,18 @@ export function MeetingBookingSection({ worker }: MeetingBookingSectionProps) {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleRazorpayPayment = async (bookingData: any) => {
+  interface RazorpayResponse {
+    razorpay_payment_id: string;
+    razorpay_order_id: string;
+    razorpay_signature: string;
+  }
+
+  interface BookingData {
+    id: string;
+    serviceId?: string;
+  }
+
+  const handleRazorpayPayment = async (bookingData: BookingData) => {
     setIsProcessingPayment(true);
 
     const res = await loadRazorpay();
@@ -111,7 +122,7 @@ export function MeetingBookingSection({ worker }: MeetingBookingSectionProps) {
       return;
     }
 
-    const orderData = orderRes.data;
+    const orderData = orderRes.data as { orderId?: string; amount?: number; currency?: string };
     if (!orderData || orderData.amount == null || !orderData.currency || !orderData.orderId) {
       toast.error("Invalid payment order response. Please try again.");
       setIsProcessingPayment(false);
@@ -127,7 +138,7 @@ export function MeetingBookingSection({ worker }: MeetingBookingSectionProps) {
       name: "Nest & Nail",
       description: "Video Consultation – Full Payment",
       order_id: order_id,
-      handler: async function (response: any) {
+      handler: async function (response: RazorpayResponse) {
         try {
           setIsProcessingPayment(true);
           const verifyRes = await verifyPaymentAction({
@@ -162,15 +173,15 @@ export function MeetingBookingSection({ worker }: MeetingBookingSectionProps) {
       },
     };
 
-    const paymentObject = new (window as any).Razorpay(options);
-    paymentObject.on("payment.failed", function (response: any) {
+    const paymentObject = new (window as { Razorpay?: new (options: unknown) => { on: (event: string, callback: (errResponse: { error?: { description?: string } }) => void) => void; open: () => void } }).Razorpay!(options);
+    paymentObject.on("payment.failed", function (response: { error?: { description?: string } }) {
       toast.error(response.error?.description || "Payment failed");
       setIsProcessingPayment(false);
     });
     paymentObject.open();
   };
 
-  const handleWalletPayment = async (bookingData: any) => {
+  const handleWalletPayment = async (bookingData: BookingData) => {
     setIsProcessingPayment(true);
     try {
       const res = await processWalletPaymentAction(bookingData.serviceId || bookingData.id);
@@ -180,14 +191,14 @@ export function MeetingBookingSection({ worker }: MeetingBookingSectionProps) {
       } else {
         toast.error(res.error || "Wallet payment failed.");
       }
-    } catch (err: any) {
-      toast.error(err.message || "Wallet payment failed.");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Wallet payment failed.");
     } finally {
       setIsProcessingPayment(false);
     }
   };
 
-  const handlePayment = (bookingData: any) => {
+  const handlePayment = (bookingData: BookingData) => {
     if (paymentMethod === "wallet") {
       handleWalletPayment(bookingData);
     } else {
@@ -281,7 +292,7 @@ export function MeetingBookingSection({ worker }: MeetingBookingSectionProps) {
           </div>
         ) : (
           <button
-            onClick={() => handlePayment(bookingState.data)}
+            onClick={() => handlePayment(bookingState.data as BookingData)}
             disabled={paymentMethod === "wallet" && !walletSufficient}
             className="w-full inline-flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-xl transition-all shadow-sm hover:shadow-md active:scale-[0.98]"
           >

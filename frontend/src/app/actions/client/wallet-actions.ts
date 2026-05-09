@@ -14,9 +14,9 @@ export async function getWalletBalanceAction(): Promise<{
             return { success: false, error: "Failed to fetch wallet balance" };
         }
         return { success: true, data: res };
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("getWalletBalanceAction error:", error);
-        return { success: false, error: error.message || "Failed to fetch wallet balance" };
+        return { success: false, error: (error instanceof Error ? error.message : undefined) || "Failed to fetch wallet balance" };
     }
 }
 
@@ -25,8 +25,8 @@ export async function getTransactionsAction(page: number = 1, limit: number = 10
         const { getTransactionsApi } = require("@/sources/api/user/wallet.api");
         const res = await getTransactionsApi(page, limit);
         return { success: true, data: res };
-    } catch (error: any) {
-        return { success: false, error: error.message || "Failed to fetch transactions" };
+    } catch (error: unknown) {
+        return { success: false, error: (error instanceof Error ? error.message : undefined) || "Failed to fetch transactions" };
     }
 }
 
@@ -35,8 +35,8 @@ export async function createRechargeOrderAction(amount: number) {
         const { createRechargeOrderApi } = require("@/sources/api/user/wallet.api");
         const res = await createRechargeOrderApi(amount);
         return { success: true, data: res };
-    } catch (error: any) {
-        return { success: false, error: error.message || "Failed to create order" };
+    } catch (error: unknown) {
+        return { success: false, error: (error instanceof Error ? error.message : undefined) || "Failed to create order" };
     }
 }
 
@@ -50,7 +50,7 @@ export async function verifyRechargePaymentAction(data: {
         const { verifyRechargePaymentApi } = require("@/sources/api/user/wallet.api");
         const res = await verifyRechargePaymentApi(data);
         return { success: true, data: res };
-    } catch (error: any) {
-        return { success: false, error: error.message || "Failed to verify payment" };
+    } catch (error: unknown) {
+        return { success: false, error: (error instanceof Error ? error.message : undefined) || "Failed to verify payment" };
     }
 }

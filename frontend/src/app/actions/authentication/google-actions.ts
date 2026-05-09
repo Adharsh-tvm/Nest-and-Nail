@@ -1,8 +1,9 @@
 "use server";
 
-import authApi from "@/sources/api/user/auth.api";
+import authApi, { AuthPayload } from "@/sources/api/user/auth.api";
 import { OAuth2Client } from "google-auth-library";
 import { cookies } from "next/headers";
+import axios from "axios";
 
 const googleClient = new OAuth2Client(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID);
 
@@ -10,7 +11,7 @@ type GoogleAuthState =
   | {
     success: boolean;
     message: string;
-    user?: any;
+    user?: AuthPayload["user"];
   }
   | undefined;
 
@@ -96,11 +97,12 @@ export async function handleGoogleSignIn(
       throw new Error("User payload not recieved")
     }
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Google Sign-In Error:", error);
+    const message = axios.isAxiosError(error) ? error.response?.data?.message : (error instanceof Error ? error.message : undefined);
     return {
       success: false,
-      message: error.response?.data?.message || "An unknown error occurred.",
+      message: message || "An unknown error occurred.",
     };
   }
 }

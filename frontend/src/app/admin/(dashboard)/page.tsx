@@ -35,7 +35,7 @@ interface StatCardProps {
   value: string;
   change?: string;
   isPositive?: boolean;
-  icon?: React.ComponentType<any>;
+  icon?: React.ComponentType<{ size?: number; className?: string }>;
   theme: "green" | "white";
 }
 
@@ -131,14 +131,56 @@ const WorkerRow = ({
   </div>
 );
 
+interface MonthlyChartData {
+  name: string;
+  revenue: number;
+  sales: number;
+}
+
+interface ServiceStatusChartData {
+  name: string;
+  value: number;
+  color: string;
+}
+
+interface CategoryChartData {
+  name: string;
+  value: number;
+  fill: string;
+}
+
+interface TopWorkerData {
+  id: string;
+  name: string;
+  rating: number;
+  totalRatings: number;
+}
+
+interface DashboardData {
+  stats: {
+    totalServices: number;
+    completedServices: number;
+    activeJobs: number;
+    pendingJobs: number;
+    totalRevenue: number;
+    totalRefunds: number;
+  };
+  charts: {
+    monthlyData: MonthlyChartData[];
+    servicesByStatus: ServiceStatusChartData[];
+    topCategories: CategoryChartData[];
+  };
+  topWorkers: TopWorkerData[];
+}
+
 export default function DashboardPage() {
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     getAdminDashboardDataAction().then((res) => {
       if (res.success) {
-        setData(res.payload);
+        setData(res.payload as DashboardData || null);
       }
       setLoading(false);
     });
@@ -284,7 +326,7 @@ export default function DashboardPage() {
                   dataKey="value"
                   stroke="none"
                 >
-                  {(data?.charts?.servicesByStatus || []).map((entry: any, index: number) => (
+                  {(data?.charts?.servicesByStatus || []).map((entry: ServiceStatusChartData, index: number) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
@@ -316,7 +358,7 @@ export default function DashboardPage() {
                   formatter={(value: any) => [value, 'Services']}
                 />
                 <Bar dataKey="value" radius={[0, 6, 6, 0]} barSize={24}>
-                  {(data?.charts?.topCategories || []).map((entry: any, index: number) => (
+                  {(data?.charts?.topCategories || []).map((entry: CategoryChartData, index: number) => (
                     <Cell key={`cell-${index}`} fill={entry.fill} />
                   ))}
                 </Bar>
@@ -342,7 +384,7 @@ export default function DashboardPage() {
             </div>
           </div>
           <div className="flex-1 overflow-y-auto pr-2 space-y-3 custom-scrollbar">
-            {(data?.topWorkers || []).map((worker: any) => (
+            {(data?.topWorkers || []).map((worker: TopWorkerData) => (
               <WorkerRow
                 key={worker.id}
                 name={worker.name}

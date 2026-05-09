@@ -16,7 +16,7 @@ interface Props {
     ongoing: ServiceResponseDTO[];
     history: ServiceResponseDTO[];
     cancelled: ServiceResponseDTO[];
-    workerMap: Record<string, User>;
+    workerMap: Record<string, Partial<User>>;
 }
 
 type TabId = 'active' | 'history' | 'cancelled';

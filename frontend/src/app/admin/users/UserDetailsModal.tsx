@@ -84,7 +84,23 @@ const UserDetailsModal = ({ isOpen, onClose, user }: UserDetailsModalProps) => {
 
     if (!mounted || !isOpen || !user) return null;
 
-    const TabButton = ({ id, label, icon: Icon }: { id: TabType, label: string, icon: any }) => (
+    interface DocObj {
+        name?: string;
+        type?: string;
+        url?: string;
+    }
+    interface CertObj {
+        name?: string;
+        organization?: string;
+        issuer?: string;
+        date?: string;
+        url?: string;
+    }
+    interface PhotoObj {
+        url?: string;
+    }
+
+    const TabButton = ({ id, label, icon: Icon }: { id: TabType, label: string, icon: React.ComponentType<{ size?: number; className?: string }> }) => (
         <button
             onClick={() => setActiveTab(id)}
             className={`flex items-center gap-2 px-4 py-3 text-sm font-bold border-b-2 transition-all ${activeTab === id
@@ -98,28 +114,31 @@ const UserDetailsModal = ({ isOpen, onClose, user }: UserDetailsModalProps) => {
     );
 
     // Helper to determine if an item is an object or string and extract name/url safely
-    const safeRender = (item: any, type: 'doc' | 'cert' | 'photo') => {
+    const safeRender = (item: unknown, type: 'doc' | 'cert' | 'photo') => {
         const isString = typeof item === 'string';
 
         if (type === 'doc') {
+            const doc = !isString && item && typeof item === 'object' ? (item as DocObj) : {};
             return {
-                name: isString ? 'Document' : item.name || item.type || 'Document',
-                type: isString ? 'FILE' : item.type || 'FILE',
-                url: isString ? item : item.url,
+                name: isString ? 'Document' : doc.name || doc.type || 'Document',
+                type: isString ? 'FILE' : doc.type || 'FILE',
+                url: isString ? (item as string) : doc.url,
                 raw: item
             }
         }
         if (type === 'cert') {
+            const cert = !isString && item && typeof item === 'object' ? (item as CertObj) : {};
             return {
-                name: isString ? item : item.name || 'Certificate',
-                org: isString ? 'Unknown Organization' : item.organization || item.issuer || '',
-                date: isString ? null : item.date,
-                url: isString ? null : item.url
+                name: isString ? (item as string) : cert.name || 'Certificate',
+                org: isString ? 'Unknown Organization' : cert.organization || cert.issuer || '',
+                date: isString ? null : cert.date,
+                url: isString ? null : cert.url
             }
         }
         if (type === 'photo') {
+            const photo = !isString && item && typeof item === 'object' ? (item as PhotoObj) : {};
             return {
-                url: isString ? item : item.url
+                url: isString ? (item as string) : photo.url
             }
         }
         return { name: 'Unknown', url: '' };
@@ -247,7 +266,7 @@ const UserDetailsModal = ({ isOpen, onClose, user }: UserDetailsModalProps) => {
                                             <MapPin size={18} className="text-[#1B4332]" /> Locations
                                         </h4>
                                         <div className="space-y-3">
-                                            {user.address.map((addr: any, idx: number) => (
+                                            {(user.address as { label?: string; isDefault?: boolean; street?: string; city?: string; zip?: string }[]).map((addr, idx) => (
                                                 <div key={idx} className="p-4 bg-gray-50 rounded-2xl border border-gray-100 group hover:border-[#1B4332]/20 transition-colors">
                                                     <div className="flex items-center justify-between mb-2">
                                                         <div className="flex items-center gap-2">
@@ -311,7 +330,7 @@ const UserDetailsModal = ({ isOpen, onClose, user }: UserDetailsModalProps) => {
                                 </h4>
                                 {user.skills && user.skills.length > 0 ? (
                                     <div className="flex flex-wrap gap-2">
-                                        {user.skills.map((skill: any, idx: number) => (
+                                        {(user.skills as (string | { name: string })[]).map((skill, idx) => (
                                             <span key={idx} className="px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-lg text-sm font-bold border border-emerald-100">
                                                 {typeof skill === 'string' ? skill : skill.name}
                                             </span>
@@ -332,7 +351,7 @@ const UserDetailsModal = ({ isOpen, onClose, user }: UserDetailsModalProps) => {
                                 </h4>
                                 {user.certificates && user.certificates.length > 0 ? (
                                     <div className="grid grid-cols-1 gap-4">
-                                        {user.certificates.map((cert: any, idx: number) => {
+                                        {user.certificates.map((cert: unknown, idx: number) => {
                                             const data = safeRender(cert, 'cert');
                                             return (
                                                 <div key={idx} className="flex items-start gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100">
@@ -366,7 +385,7 @@ const UserDetailsModal = ({ isOpen, onClose, user }: UserDetailsModalProps) => {
                                 </h4>
                                 {user.documents && user.documents.length > 0 ? (
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        {user.documents.map((doc: any, idx: number) => {
+                                        {user.documents.map((doc: unknown, idx: number) => {
                                             const data = safeRender(doc, 'doc');
                                             return (
                                                 <div key={idx} className="group relative p-4 bg-gray-50 rounded-2xl border border-gray-100 hover:border-emerald-200 hover:shadow-md transition-all flex items-start gap-3">
@@ -413,12 +432,12 @@ const UserDetailsModal = ({ isOpen, onClose, user }: UserDetailsModalProps) => {
                                 </h4>
                                 {user.workPhotos && user.workPhotos.length > 0 ? (
                                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                                        {user.workPhotos.map((photo: any, idx: number) => {
+                                        {user.workPhotos.map((photo: unknown, idx: number) => {
                                             const data = safeRender(photo, 'photo');
                                             return (
                                                 <div key={idx} className="aspect-square rounded-xl overflow-hidden relative group cursor-pointer border border-gray-100 bg-gray-50">
                                                     <img
-                                                        src={data.url}
+                                                        src={data.url || ""}
                                                         alt={`Work ${idx + 1}`}
                                                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                                     />

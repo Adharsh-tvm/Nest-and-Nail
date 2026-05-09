@@ -1,49 +1,51 @@
 "use server";
 
-import { createPaymentOrderApi, verifyPaymentApi, processWalletPaymentApi } from "@/sources/api/user/payment.api";
+import { createPaymentOrderApi, verifyPaymentApi, processWalletPaymentApi, IVerifyPaymentData } from "@/sources/api/user/payment.api";
 
 export async function createPaymentOrderAction(
   serviceId: string
-): Promise<{ success: boolean; data?: any; error?: string }> {
+): Promise<{ success: boolean; data?: unknown; error?: string }> {
   try {
     const res = await createPaymentOrderApi(serviceId);
     if (!res.success) {
       return { success: false, error: res.message };
     }
-    // res.payload is the raw HTTP response body: { success, message, payload: actualData }
-    return { success: true, data: (res.payload as any)?.payload ?? res.payload };
-  } catch (error: any) {
+    const payloadObj = res.payload as Record<string, unknown> | null | undefined;
+    return { success: true, data: payloadObj?.payload ?? res.payload };
+  } catch (error: unknown) {
     console.error("createPaymentOrderAction error:", error);
-    return { success: false, error: error.message || "Failed to create payment order" };
+    return { success: false, error: (error instanceof Error ? error.message : undefined) || "Failed to create payment order" };
   }
 }
 
 export async function verifyPaymentAction(
-  paymentData: any
-): Promise<{ success: boolean; data?: any; error?: string }> {
+  paymentData: IVerifyPaymentData
+): Promise<{ success: boolean; data?: unknown; error?: string }> {
   try {
     const res = await verifyPaymentApi(paymentData);
     if (!res.success) {
       return { success: false, error: res.message };
     }
-    return { success: true, data: (res.payload as any)?.payload ?? res.payload };
-  } catch (error: any) {
+    const payloadObj = res.payload as Record<string, unknown> | null | undefined;
+    return { success: true, data: payloadObj?.payload ?? res.payload };
+  } catch (error: unknown) {
     console.error("verifyPaymentAction error:", error);
-    return { success: false, error: error.message || "Failed to verify payment" };
+    return { success: false, error: (error instanceof Error ? error.message : undefined) || "Failed to verify payment" };
   }
 }
 
 export async function processWalletPaymentAction(
   serviceId: string
-): Promise<{ success: boolean; data?: any; error?: string }> {
+): Promise<{ success: boolean; data?: unknown; error?: string }> {
   try {
     const res = await processWalletPaymentApi(serviceId);
     if (!res.success) {
       return { success: false, error: res.message };
     }
-    return { success: true, data: (res.payload as any)?.payload ?? res.payload };
-  } catch (error: any) {
+    const payloadObj = res.payload as Record<string, unknown> | null | undefined;
+    return { success: true, data: payloadObj?.payload ?? res.payload };
+  } catch (error: unknown) {
     console.error("processWalletPaymentAction error:", error);
-    return { success: false, error: error.message || "Failed to process wallet payment" };
+    return { success: false, error: (error instanceof Error ? error.message : undefined) || "Failed to process wallet payment" };
   }
 }

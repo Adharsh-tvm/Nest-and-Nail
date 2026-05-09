@@ -305,7 +305,7 @@ const WorkerVerificationFlow: React.FC<WorkerVerificationFlowProps> = ({
         certUrls.push(url);
       }
 
-      const updatePayload: any = {};
+      const updatePayload: { documents?: string[]; certificates?: string[] } = {};
       if (docUrls.length > 0) updatePayload.documents = docUrls;
       if (certUrls.length > 0) updatePayload.certificates = certUrls;
 

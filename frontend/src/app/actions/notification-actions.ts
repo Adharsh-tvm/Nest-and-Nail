@@ -13,7 +13,7 @@ export async function getNotificationsAction(): Promise<{
       return { success: false, error: res.error };
     }
     return { success: true, data: res.data };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("getNotificationsAction error:", error);
     return { success: false, error: "Failed to fetch notifications" };
   }
@@ -29,7 +29,7 @@ export async function markNotificationReadAction(notificationId: string): Promis
       return { success: false, error: res.error };
     }
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("markNotificationReadAction error:", error);
     return { success: false, error: "Failed to mark notification as read" };
   }

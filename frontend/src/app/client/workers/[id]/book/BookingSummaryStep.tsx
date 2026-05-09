@@ -2,6 +2,14 @@ import React from "react";
 import { CheckCircle2, RotateCcw } from "lucide-react";
 import { SlotType, SLOT_LABELS, SLOT_PRICES } from "@/shared/types/serviceTypes";
 
+interface Address {
+  label: string;
+  street: string;
+  city: string;
+  state?: string;
+  zip: string;
+}
+
 interface BookingSummaryStepProps {
   title: string;
   description: string;
@@ -12,7 +20,7 @@ interface BookingSummaryStepProps {
   slotType: SlotType | null;
   workerName: string;
   category: string;
-  address?: any;
+  address?: Address;
   isBooking: boolean;
   onConfirm: () => void;
   onBackReq?: () => void;

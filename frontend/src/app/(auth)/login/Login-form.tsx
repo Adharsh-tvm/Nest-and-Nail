@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { login } from "../../actions/authentication/login-actions";
 import { useActionState } from "react";
-import { GoogleLogin } from "@react-oauth/google";
+import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
 import { handleGoogleSignIn } from "@/app/actions/authentication/google-actions";
 import { redirect, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
@@ -434,12 +434,13 @@ export const LoginForm = () => {
     "bg-[#0f291e] text-white hover:bg-[#1B4332] shadow-lg shadow-green-900/20";
   const linkClass = "text-gray-500 hover:text-[#DC2626]";
 
-  async function onGoogleSuccess(credentialResponse: any) {
+  async function onGoogleSuccess(credentialResponse: CredentialResponse) {
     const token = credentialResponse.credential;
+    if (!token) return;
     const result = await handleGoogleSignIn(token, "client");
 
     if (result?.success) {
-      const redirectPath = result.user.user_role;
+      const redirectPath = result.user?.user_role || "client";
       toast.success(result?.message)
       redirect(redirectPath);
     } else {

@@ -30,14 +30,14 @@ import { VerificationStatus } from "@/shared/enums/authEnums";
  * HELPER: ACTION MENU COMPONENT
  * ----------------------------------------------------------------------------
  */
-const ActionMenu = ({
+const ActionMenu = <RowType extends { isBlocked: boolean }>({
   row,
   onBlockToggle,
   onViewDetails,
 }: {
-  row: any;
-  onBlockToggle: (row: any) => void;
-  onViewDetails: (row: any) => void;
+  row: RowType;
+  onBlockToggle: (row: RowType) => void;
+  onViewDetails: (row: RowType) => void;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
@@ -158,11 +158,11 @@ const UsersView = () => {
     sortOrder: "desc",
   });
 
-  const [localUsers, setLocalUsers] = useState<any[]>([]);
-  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [localUsers, setLocalUsers] = useState<ClientRow[]>([]);
+  const [selectedUser, setSelectedUser] = useState<ClientRow | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [blockConfirmOpen, setBlockConfirmOpen] = useState(false);
-  const [userToBlock, setUserToBlock] = useState<any>(null);
+  const [userToBlock, setUserToBlock] = useState<ClientRow | null>(null);
 
   // Helper to update URL params
   const updateUrl = (key: string, value: string | null) => {
@@ -193,7 +193,7 @@ const UsersView = () => {
     if (users) setLocalUsers(users);
   }, [users]);
 
-  const handleBlockToggle = (row: any) => {
+  const handleBlockToggle = (row: ClientRow) => {
     setUserToBlock(row);
     setBlockConfirmOpen(true);
   };
@@ -224,7 +224,7 @@ const UsersView = () => {
     }
   };
 
-  const handleViewDetails = (row: any) => {
+  const handleViewDetails = (row: ClientRow) => {
     setSelectedUser(row);
     setIsModalOpen(true);
   };
@@ -351,7 +351,7 @@ const UsersView = () => {
           <ShieldAlert size={24} />
         </div>
         <h3 className="font-bold text-lg">Failed to load</h3>
-        <p className="text-sm opacity-80">{error as any}</p>
+        <p className="text-sm opacity-80">{String(error)}</p>
       </div>
     );
   }
@@ -363,7 +363,14 @@ const UsersView = () => {
     color,
     iconColor,
     trend,
-  }: any) => (
+  }: {
+    title: string;
+    value: React.ReactNode;
+    icon: React.ComponentType<{ size?: number; className?: string }>;
+    color: string;
+    iconColor: string;
+    trend?: string;
+  }) => (
     <div
       className={`p-6 rounded-2xl shadow-sm flex items-center justify-between group hover:shadow-md transition-all ${color}`}
     >

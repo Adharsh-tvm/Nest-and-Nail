@@ -10,7 +10,7 @@ export type BookingState =
   | { status: "success"; data: BookingResult }
   | { status: "error"; message: string };
 
-export function useBookWorker(refetchAvailability: () => Promise<any>) {
+export function useBookWorker(refetchAvailability: () => Promise<SlotAvailability | null>) {
   const [bookingState, setBookingState] = useState<BookingState>({
     status: "idle",
   });
@@ -39,7 +39,14 @@ export function useBookWorker(refetchAvailability: () => Promise<any>) {
       pricePerWorker?: number;
       title?: string;
       description?: string;
-      address?: any;
+      address?: {
+        street?: string;
+        city?: string;
+        state?: string;
+        country?: string;
+        zip?: string;
+        label?: string;
+      };
     }) => {
       setBookingState({ status: "loading" });
 

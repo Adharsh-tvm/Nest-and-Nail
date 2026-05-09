@@ -109,7 +109,7 @@ export function BookingSection({ worker }: BookingSectionProps) {
       pricePerWorker: SLOT_PRICES[finalSlot],
       title,
       description,
-      address: selectedAddress,
+      address: selectedAddress || undefined,
     });
   };
 
@@ -128,9 +128,9 @@ export function BookingSection({ worker }: BookingSectionProps) {
       setUser(response.payload || oldUser);
       toast.success("Address added successfully");
       setIsAddAddressOpen(false);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setUser(oldUser);
-      toast.error(err.message || "Failed to save address");
+      toast.error(err instanceof Error ? err.message : "Failed to save address");
     }
   };
 
@@ -143,7 +143,18 @@ export function BookingSection({ worker }: BookingSectionProps) {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleRazorpayPayment = async (bookingData: any) => {
+  interface RazorpayResponse {
+    razorpay_payment_id: string;
+    razorpay_order_id: string;
+    razorpay_signature: string;
+  }
+
+  interface BookingData {
+    id: string;
+    serviceId?: string;
+  }
+
+  const handleRazorpayPayment = async (bookingData: BookingData) => {
     setIsProcessingPayment(true);
     
     const res = await loadRazorpay();
@@ -160,7 +171,7 @@ export function BookingSection({ worker }: BookingSectionProps) {
         return;
     }
 
-    const { orderId: order_id, amount, currency } = orderRes.data;
+    const { orderId: order_id, amount, currency } = orderRes.data as { orderId: string; amount: number; currency: string };
 
     const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY || "rzp_test_YourKeyHere",
@@ -169,7 +180,7 @@ export function BookingSection({ worker }: BookingSectionProps) {
         name: "Nest & Nail",
         description: "Service Booking – Full Payment",
         order_id: order_id,
-        handler: async function (response: any) {
+        handler: async function (response: RazorpayResponse) {
             try {
                 setIsProcessingPayment(true);
                 const verifyRes = await verifyPaymentAction({
@@ -204,15 +215,15 @@ export function BookingSection({ worker }: BookingSectionProps) {
         }
     };
 
-    const paymentObject = new (window as any).Razorpay(options);
-    paymentObject.on("payment.failed", function (response: any) {
+    const paymentObject = new (window as { Razorpay?: new (options: unknown) => { on: (event: string, callback: (errResponse: { error?: { description?: string } }) => void) => void; open: () => void } }).Razorpay!(options);
+    paymentObject.on("payment.failed", function (response: { error?: { description?: string } }) {
         toast.error(response.error?.description || "Payment failed");
         setIsProcessingPayment(false);
     });
     paymentObject.open();
   };
 
-  const handleWalletPayment = async (bookingData: any) => {
+  const handleWalletPayment = async (bookingData: BookingData) => {
     setIsProcessingPayment(true);
     try {
       const res = await processWalletPaymentAction(bookingData.serviceId || bookingData.id);
@@ -222,14 +233,14 @@ export function BookingSection({ worker }: BookingSectionProps) {
       } else {
         toast.error(res.error || "Wallet payment failed.");
       }
-    } catch (err: any) {
-      toast.error(err.message || "Wallet payment failed.");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Wallet payment failed.");
     } finally {
       setIsProcessingPayment(false);
     }
   };
 
-  const handlePayment = (bookingData: any) => {
+  const handlePayment = (bookingData: BookingData) => {
     if (paymentMethod === "wallet") {
       setIsWalletConfirmOpen(true);
     } else {
@@ -325,7 +336,7 @@ export function BookingSection({ worker }: BookingSectionProps) {
               </div>
             ) : (
               <button
-                onClick={() => handlePayment(bookingState.data)}
+                onClick={() => handlePayment(bookingState.data as BookingData)}
                 disabled={paymentMethod === "wallet" && !walletSufficient}
                 className="w-full inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-xl transition-all shadow-sm hover:shadow-md active:scale-[0.98]"
               >
@@ -370,7 +381,7 @@ export function BookingSection({ worker }: BookingSectionProps) {
                   <button
                     onClick={() => {
                       setIsWalletConfirmOpen(false);
-                      handleWalletPayment(bookingState.data);
+                      handleWalletPayment(bookingState.data as BookingData);
                     }}
                     className="flex-1 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl transition-colors shadow-sm"
                   >
@@ -518,7 +529,7 @@ export function BookingSection({ worker }: BookingSectionProps) {
             slotType={Object.keys(selectedSlots).length > 0 ? Object.values(selectedSlots)[0] : null}
             workerName={worker.name}
             category={selectedCategory}
-            address={selectedAddress}
+            address={selectedAddress || undefined}
             isBooking={bookingState.status === "loading"}
             onConfirm={handleConfirm}
           />

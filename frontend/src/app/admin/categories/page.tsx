@@ -86,8 +86,8 @@ const CategoriesPage = () => {
       setTotalCount(res.payload.total);
       setActiveCount(res.payload.activeCount);
       setInactiveCount(res.payload.inactiveCount);
-    } catch (error: any) {
-      toast.error(error.message || "Failed to load categories");
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : "Failed to load categories");
     } finally {
       setLoading(false);
     }
@@ -142,8 +142,8 @@ const CategoriesPage = () => {
         `Category ${res.payload!.isActive ? "activated" : "blocked"} successfully`,
       );
       fetchCategories();
-    } catch (error: any) {
-      toast.error(error.message || "Failed to update category status");
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : "Failed to update category status");
     }
   };
 
@@ -270,7 +270,15 @@ const CategoriesPage = () => {
     },
   ];
 
-  const StatCard = ({ title, value, icon: Icon, color, iconColor }: any) => (
+  interface StatCardProps {
+    title: string;
+    value: number | string;
+    icon: React.ComponentType<{ size?: number; className?: string }>;
+    color?: string;
+    iconColor?: string;
+  }
+
+  const StatCard = ({ title, value, icon: Icon, color, iconColor }: StatCardProps) => (
     <div
       className={`p-6 rounded-2xl shadow-sm flex items-center justify-between border border-gray-100 bg-white`}
     >

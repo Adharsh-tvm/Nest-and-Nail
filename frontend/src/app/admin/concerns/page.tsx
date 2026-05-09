@@ -82,8 +82,8 @@ export default function AdminConcernsPage() {
       } else {
         toast.error(res.error || "Failed to fetch concerns");
       }
-    } catch (error: any) {
-      toast.error(error.message || "Failed to fetch concerns");
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : "Failed to fetch concerns");
     } finally {
       setLoading(false);
     }

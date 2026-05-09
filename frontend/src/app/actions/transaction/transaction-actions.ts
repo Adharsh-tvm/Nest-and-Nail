@@ -9,8 +9,8 @@ export async function getClientTransactionsAction(page: number = 1, limit: numbe
             return { success: false, error: response?.message || "Failed to fetch transactions" };
         }
         return { success: true, data: response.payload };
-    } catch (error: any) {
-        return { success: false, error: error.message || "Failed to fetch transactions" };
+    } catch (error: unknown) {
+        return { success: false, error: (error instanceof Error ? error.message : undefined) || "Failed to fetch transactions" };
     }
 }
 
@@ -21,8 +21,8 @@ export async function getWorkerTransactionsAction(page: number = 1, limit: numbe
             return { success: false, error: response?.message || "Failed to fetch transactions" };
         }
         return { success: true, data: response.payload };
-    } catch (error: any) {
-        return { success: false, error: error.message || "Failed to fetch transactions" };
+    } catch (error: unknown) {
+        return { success: false, error: (error instanceof Error ? error.message : undefined) || "Failed to fetch transactions" };
     }
 }
 
@@ -33,7 +33,7 @@ export async function getAdminTransactionsAction(page: number = 1, limit: number
             return { success: false, error: response?.message || "Failed to fetch transactions" };
         }
         return { success: true, data: response.payload };
-    } catch (error: any) {
-        return { success: false, error: error.message || "Failed to fetch transactions" };
+    } catch (error: unknown) {
+        return { success: false, error: (error instanceof Error ? error.message : undefined) || "Failed to fetch transactions" };
     }
 }

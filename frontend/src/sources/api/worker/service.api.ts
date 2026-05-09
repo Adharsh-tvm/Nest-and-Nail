@@ -79,12 +79,12 @@ export async function startWorkerServiceApi(
       { withCredentials: true }
     );
 
-    const resData = response.data as any;
+    const resData = response.data as { success: boolean; message: string; data?: ServiceResponseDTO; payload?: ServiceResponseDTO; error?: any };
     if (resData.success) {
       return {
         success: true,
         message: resData.message,
-        payload: resData.data || resData.payload || null,
+        payload: (resData.data || resData.payload) as ServiceResponseDTO,
       };
     } else {
       return {
@@ -119,12 +119,12 @@ export async function getWorkerServiceDetailsApi(serviceId: string): Promise<Api
       withCredentials: true,
     });
 
-    const resData = response.data as any;
+    const resData = response.data as { success: boolean; message: string; data?: ServiceResponseDTO; payload?: ServiceResponseDTO; error?: any };
     if (resData.success) {
       return {
         success: true,
         message: resData.message,
-        payload: resData.data || resData.payload || null,
+        payload: (resData.data || resData.payload) as ServiceResponseDTO,
       };
     } else {
       return {
@@ -161,12 +161,12 @@ export async function completeWorkerServiceApi(serviceId: string): Promise<ApiRe
       { withCredentials: true }
     );
 
-    const resData = response.data as any;
+    const resData = response.data as { success: boolean; message: string; data?: ServiceResponseDTO; payload?: ServiceResponseDTO; error?: any };
     if (resData.success) {
       return {
         success: true,
         message: resData.message,
-        payload: resData.data || resData.payload || null,
+        payload: (resData.data || resData.payload) as ServiceResponseDTO,
       };
     } else {
       return {

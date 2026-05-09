@@ -49,7 +49,7 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen
       } else {
         toast.error(res.error || "Failed to change password");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error("Something went wrong");
     } finally {
       setIsLoading(false);

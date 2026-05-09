@@ -46,8 +46,8 @@ const AdminServicesPage = () => {
 
       const servicesOnly = (res.data || []).filter(s => s.category !== "VIDEO_CALL");
       setServices(servicesOnly);
-    } catch (error: any) {
-      toast.error(error.message || "Failed to load services");
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : "Failed to load services");
     } finally {
       setLoading(false);
     }
@@ -250,7 +250,15 @@ const AdminServicesPage = () => {
     },
   ];
 
-  const StatCard = ({ title, value, icon: Icon, color, iconColor }: any) => (
+  interface StatCardProps {
+    title: string;
+    value: number | string;
+    icon: React.ComponentType<{ size?: number; className?: string }>;
+    color?: string;
+    iconColor?: string;
+  }
+
+  const StatCard = ({ title, value, icon: Icon, color, iconColor }: StatCardProps) => (
     <div
       className={`p-6 rounded-2xl shadow-sm flex items-center justify-between border border-gray-100 bg-white hover:shadow-md transition-shadow`}
     >

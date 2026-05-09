@@ -10,9 +10,9 @@ export async function updateUserSkillsAction(
 ): Promise<ApiResponse<User>> {
     try {
         return await userApi.updateSkills(userId, skills);
-    } catch (error: any) {
+    } catch (error: unknown) {
         throw new Error(
-            error?.normalizedMessage || "Failed to update skills"
+            (error && typeof error === "object" && "normalizedMessage" in error ? (error as { normalizedMessage: string }).normalizedMessage : undefined) || "Failed to update skills"
         );
     }
 }

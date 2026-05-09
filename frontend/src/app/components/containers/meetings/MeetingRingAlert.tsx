@@ -40,7 +40,7 @@ export default function MeetingRingAlert({
       // Create or reuse AudioContext
       if (!audioCtxRef.current || audioCtxRef.current.state === "closed") {
         audioCtxRef.current = new (window.AudioContext ||
-          (window as any).webkitAudioContext)();
+          (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext)();
       }
       const ctx = audioCtxRef.current;
 
@@ -124,7 +124,7 @@ export default function MeetingRingAlert({
       console.log("[MeetingRingAlert] socket connected, registered userId:", user.id);
     });
 
-    socket.on("notification", (notification: { type: string; data?: any }) => {
+    socket.on("notification", (notification: { type: string; data?: { serviceId?: string } }) => {
       console.log("[MeetingRingAlert] notification received:", notification);
       if (
         notification.type === "MEETING_JOINED" &&

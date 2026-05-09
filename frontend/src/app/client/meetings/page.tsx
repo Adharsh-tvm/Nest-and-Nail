@@ -3,6 +3,8 @@ import { getClientScheduledMeetingsAction, getClientMeetingsHistoryAction } from
 import { getWorkerDetailAction } from "@/app/actions/client/view-worker-actions";
 import ClientMeetingsView from "./ClientMeetingsView";
 
+import { User } from "@/shared/types/userTypes";
+
 export const metadata = {
   title: "My Meetings | Client",
 };
@@ -30,7 +32,7 @@ export default async function ClientMeetingsPage() {
   const workerResponses = await Promise.all(workerDetailsPromises);
 
   // Map worker ID to worker data
-  const workerMap: Record<string, any> = {};
+  const workerMap: Record<string, Partial<User>> = {};
   workerResponses.forEach((res) => {
     if (res.success && res.data) {
       workerMap[res.data.id || res.data.userId || ""] = res.data;

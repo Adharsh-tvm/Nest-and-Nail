@@ -16,9 +16,9 @@ export async function getActiveWorkerServiceAction(): Promise<{ success: boolean
             return { success: false, error: response.message };
         }
         return { success: true, data: response.payload };
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Failed to fetch active worker service", error);
-        return { success: false, error: error.message || "Failed to fetch active worker service" };
+        return { success: false, error: (error instanceof Error ? error.message : undefined) || "Failed to fetch active worker service" };
     }
 }
 
@@ -29,9 +29,9 @@ export async function getWorkerServicesAction(status?: string): Promise<{ succes
             return { success: false, error: response.message };
         }
         return { success: true, data: response.payload };
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Failed to fetch worker services", error);
-        return { success: false, error: error.message || "Failed to fetch worker services" };
+        return { success: false, error: (error instanceof Error ? error.message : undefined) || "Failed to fetch worker services" };
     }
 }
 
@@ -42,9 +42,9 @@ export async function getWorkerServiceDetailsAction(serviceId: string): Promise<
             return { success: false, error: response.message };
         }
         return { success: true, data: response.payload };
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Failed to fetch worker service details", error);
-        return { success: false, error: error.message || "Failed to fetch worker service details" };
+        return { success: false, error: (error instanceof Error ? error.message : undefined) || "Failed to fetch worker service details" };
     }
 }
 
@@ -59,9 +59,9 @@ export async function startWorkerServiceAction(
             return { success: false, error: response.message };
         }
         return { success: true, data: response.payload };
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Failed to start worker service", error);
-        return { success: false, error: error.message || "Failed to start service" };
+        return { success: false, error: (error instanceof Error ? error.message : undefined) || "Failed to start service" };
     }
 }
 
@@ -74,8 +74,8 @@ export async function completeWorkerServiceAction(
             return { success: false, error: response.message };
         }
         return { success: true, data: response.payload };
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Failed to complete worker service", error);
-        return { success: false, error: error.message || "Failed to complete service" };
+        return { success: false, error: (error instanceof Error ? error.message : undefined) || "Failed to complete service" };
     }
 }

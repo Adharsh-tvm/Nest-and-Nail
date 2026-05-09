@@ -2,9 +2,17 @@
 "use server";
 
 import { cookies } from "next/headers";
-import authApi from "@/sources/api/user/auth.api";
+import authApi, { AuthPayload } from "@/sources/api/user/auth.api";
 import axios from "axios";
 import { ApiResponse } from "@/shared/types/responseTypes";
+
+interface CustomAxiosError {
+  normalizedMessage?: string;
+  serverData?: {
+    message?: string;
+    error?: string;
+  };
+}
 
 export type LoginState = {
   error?: string | null;
@@ -52,7 +60,8 @@ export async function login(
   } catch (e: unknown) {
     // Prefer axios.isAxiosError (works across bundlers) and normalizedMessage from interceptor
     if (axios.isAxiosError(e)) {
-      const normalized = (e as any).normalizedMessage || (e as any).serverData?.message || (e as any).serverData?.error;
+      const customErr = e as unknown as CustomAxiosError;
+      const normalized = customErr.normalizedMessage || customErr.serverData?.message || customErr.serverData?.error;
       return {
         error: normalized || (e as Error).message || "Failed to call auth service",
         fields,
@@ -69,7 +78,7 @@ export async function login(
     };
   }
   const data = response.data as ApiResponse<{
-    user: any;
+    user: AuthPayload["user"];
     accessToken: string;
     refreshToken: string;
   }>;

@@ -46,14 +46,13 @@ const StatCard = ({ title, value, icon: Icon, color = "indigo" }: StatCardProps)
   );
 };
 
-interface Review {
-  id: string;
-  clientName: string;
-  clientImage?: string;
-  rating: number;
-  review?: string;
-  createdAt: string;
-}
+import {
+  Review,
+  DashboardStats,
+  UpcomingService,
+  ScheduleItem,
+  WorkerDashboardData
+} from "@/sources/api/worker/dashboard.api";
 
 const ReviewRow = ({ review }: { review: Review }) => (
   <div className="flex items-start gap-4 p-5 bg-white rounded-2xl border border-gray-100 hover:border-indigo-200 hover:shadow-lg hover:shadow-indigo-500/5 transition-all duration-300 group">
@@ -80,42 +79,6 @@ const ReviewRow = ({ review }: { review: Review }) => (
   </div>
 );
 
-interface DashboardStats {
-  walletBalance: number;
-  totalEarnings: number;
-  totalJobs: number;
-  ongoingJobs: number;
-  pendingJobs: number;
-  cancelledJobs?: number;
-  totalRatings: number;
-  rating: number;
-}
-
-interface UpcomingService {
-  title: string;
-  clientName: string;
-  clientImage?: string;
-  date: string;
-  location: string;
-}
-
-interface ScheduleItem {
-  title: string;
-  date: string;
-  status: string;
-}
-
-interface WorkerDashboardData {
-  stats: DashboardStats;
-  upcomingService?: UpcomingService | null;
-  schedules?: ScheduleItem[];
-  recentReviews?: Review[];
-  charts?: {
-    monthlyEarnings?: { name: string; earnings: number }[];
-    jobsByStatus?: { name: string; value: number; color?: string }[];
-  };
-}
-
 export default function WorkerDashboardPage() {
   const [data, setData] = useState<WorkerDashboardData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -129,7 +92,7 @@ export default function WorkerDashboardPage() {
     setLoading(true);
     const res = await getWorkerDashboardDataAction(months);
     if (res.success) {
-      setData(res.payload);
+      setData(res.payload || null);
     } else {
       toast.error(res.message || "Failed to load dashboard data");
     }

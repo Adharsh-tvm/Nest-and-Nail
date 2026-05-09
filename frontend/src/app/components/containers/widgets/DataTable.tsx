@@ -9,7 +9,7 @@ import {
   ArrowUpDown,
 } from "lucide-react";
 
-export type Column<T = any> = {
+export type Column<T = unknown> = {
   header: React.ReactNode;
   accessorKey?: string;
   className?: string;
@@ -18,7 +18,7 @@ export type Column<T = any> = {
   sortKey?: string;
 };
 
-export interface DataTableProps<T = any> {
+export interface DataTableProps<T = unknown> {
   columns: Column<T>[];
   data: T[];
   onRowClick?: (row: T) => void;
@@ -224,9 +224,9 @@ const DataTable = <T,>({
               ))
             ) : data && data.length > 0 ? (
               // Data Rows
-              data.map((row: any, rowIndex: number) => (
+              data.map((row: T, rowIndex: number) => (
                 <tr
-                  key={row.id || row.user_id || rowIndex}
+                  key={(row as { id?: string | number }).id || (row as { user_id?: string | number }).user_id || rowIndex}
                   onClick={(e) => {
                     // Prevent row click if clicking on action menu or interactive elements
                     if (
@@ -247,7 +247,7 @@ const DataTable = <T,>({
                   {columns.map((col, colIndex) => {
                     const value =
                       col.accessorKey !== undefined
-                        ? row[col.accessorKey]
+                        ? (row as Record<string, unknown>)[col.accessorKey]
                         : undefined;
 
                     return (
@@ -256,7 +256,7 @@ const DataTable = <T,>({
                         className={`px-6 py-5 text-sm text-gray-600 first:pl-2 first:rounded-l-2xl last:rounded-r-2xl ${col.className || ""
                           }`}
                       >
-                        {col.cell ? col.cell(row) : value ?? "—"}
+                        {col.cell ? col.cell(row) : (value as any) ?? "—"}
                       </td>
                     );
                   })}

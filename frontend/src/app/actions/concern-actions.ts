@@ -15,8 +15,8 @@ export async function raiseConcernAction(
       return { success: false, error: res.error || "Failed to raise concern" };
     }
     return { success: true, data: res.data };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("raiseConcernAction error:", error);
-    return { success: false, error: error.message || "Failed to raise concern" };
+    return { success: false, error: (error instanceof Error ? error.message : undefined) || "Failed to raise concern" };
   }
 }

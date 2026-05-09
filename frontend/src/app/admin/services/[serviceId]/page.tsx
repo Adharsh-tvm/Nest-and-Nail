@@ -37,8 +37,8 @@ const AdminServiceDetailsPage = () => {
           throw new Error(res.error || "Failed to load service details");
         }
         setService(res.data);
-      } catch (error: any) {
-        toast.error(error.message);
+      } catch (error: unknown) {
+        toast.error(error instanceof Error ? error.message : "Failed to load service details");
         router.push("/admin/services");
       } finally {
         setLoading(false);
@@ -234,11 +234,11 @@ const AdminServiceDetailsPage = () => {
                     ? service.client.address 
                     : service.client.address && typeof service.client.address === 'object'
                       ? [
-                          (service.client.address as any).street,
-                          (service.client.address as any).city,
-                          (service.client.address as any).state,
-                          (service.client.address as any).country,
-                          (service.client.address as any).zip
+                          (service.client.address as { street?: string }).street,
+                          (service.client.address as { city?: string }).city,
+                          (service.client.address as { state?: string }).state,
+                          (service.client.address as { country?: string }).country,
+                          (service.client.address as { zip?: string }).zip
                         ].filter(Boolean).join(', ')
                       : "No address on file"}
                 </p>

@@ -1,7 +1,7 @@
 import React from "react";
 import { notFound } from "next/navigation";
 import { getClientMeetingByIdAction, endMeetingAction } from "@/app/actions/client/meeting-actions";
-import { PaymentStatus, SLOT_LABELS } from "@/shared/types/serviceTypes";
+import { PaymentStatus, SLOT_LABELS, ServiceResponseDTO } from "@/shared/types/serviceTypes";
 import Link from "next/link";
 import { 
   CalendarDays, Clock, Video, CreditCard, ArrowLeft,
@@ -26,8 +26,8 @@ export default async function ClientMeetingDetailPage({ params }: { params: Prom
   }
 
   const meeting = res.data;
-  const worker = (meeting as any).worker;
-  const client = (meeting as any).client;
+  const worker = (meeting as ServiceResponseDTO & { worker?: { name: string; email?: string } }).worker;
+  const client = (meeting as ServiceResponseDTO & { client?: { name: string; email?: string } }).client;
 
   const formatDate = (d: string | Date) =>
     new Date(d).toLocaleDateString("en-US", {

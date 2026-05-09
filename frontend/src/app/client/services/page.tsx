@@ -3,6 +3,8 @@ import { getClientServiceHistoryAction } from "@/app/actions/client/service-acti
 import { getWorkerDetailAction } from "@/app/actions/client/view-worker-actions";
 import ClientServicesView from "./ClientServicesView";
 
+import { User } from "@/shared/types/userTypes";
+
 export const metadata = {
   title: "My Services | Client",
 };
@@ -47,7 +49,7 @@ export default async function ClientServicesPage() {
   const workerResponses = await Promise.all(workerDetailsPromises);
 
   // Map worker ID to worker data
-  const workerMap: Record<string, any> = {};
+  const workerMap: Record<string, Partial<User>> = {};
   workerResponses.forEach((res) => {
     if (res.success && res.data) {
       workerMap[res.data.id || res.data.userId || ""] = res.data;

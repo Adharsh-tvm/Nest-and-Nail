@@ -15,8 +15,8 @@ export async function getMediaUploadUrlAction(
 > {
     try {
         return await getMediaUploadUrlApi(fileName, contentType);
-    } catch (error: any) {
-        const errorMessage = error.response?.data?.message || error.message || "Failed to get upload URL";
+    } catch (error: unknown) {
+        const errorMessage = (error instanceof Error ? error.message : undefined) || "Failed to get upload URL";
         return {
             success: false,
             message: String(errorMessage),

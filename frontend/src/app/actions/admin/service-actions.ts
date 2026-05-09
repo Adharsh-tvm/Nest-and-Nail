@@ -8,9 +8,9 @@ export async function getAdminServicesAction(): Promise<{ success: boolean; data
     try {
         const response = await fetchAllAdminServices();
         return { success: true, data: response };
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Failed to fetch admin services", error);
-        return { success: false, error: error.message || "Failed to fetch admin services" };
+        return { success: false, error: (error instanceof Error ? error.message : undefined) || "Failed to fetch admin services" };
     }
 }
 
@@ -18,8 +18,8 @@ export async function getAdminServiceDetailsAction(serviceId: string): Promise<{
     try {
         const response = await fetchAdminServiceDetails(serviceId);
         return { success: true, data: response };
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Failed to fetch admin service details", error);
-        return { success: false, error: error.message || "Failed to fetch admin service details" };
+        return { success: false, error: (error instanceof Error ? error.message : undefined) || "Failed to fetch admin service details" };
     }
 }
