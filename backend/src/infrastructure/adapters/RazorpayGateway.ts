@@ -26,7 +26,11 @@ export class RazorpayGateway implements IPaymentGateway {
     };
   }
 
-  verifyPayment({ orderId, paymentId, signature }: any): boolean {
+  verifyPayment({ orderId, paymentId, signature }: {
+    orderId: string;
+    paymentId: string;
+    signature: string;
+  }): boolean {
     const body = orderId + "|" + paymentId;
 
     const expected = crypto

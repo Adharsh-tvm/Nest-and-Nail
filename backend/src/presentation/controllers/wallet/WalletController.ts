@@ -104,8 +104,9 @@ export class WalletController {
     try {
       const order = await this._createRechargeOrderUseCase.execute(amount, userId);
       res.status(HttpStatusCode.OK).json(ResponseHandler.success(order, "Recharge order created"));
-    } catch (error: any) {
-      res.status(HttpStatusCode.INTERNAL_SERVER).json(ResponseHandler.error(error.message));
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Failed to create recharge order";
+      res.status(HttpStatusCode.INTERNAL_SERVER).json(ResponseHandler.error(message));
     }
   };
 
@@ -128,8 +129,9 @@ export class WalletController {
       });
 
       res.status(HttpStatusCode.OK).json(ResponseHandler.success(result, "Recharge successful"));
-    } catch (error: any) {
-      res.status(HttpStatusCode.BAD_REQUEST).json(ResponseHandler.error(error.message || "Payment verification failed"));
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Payment verification failed";
+      res.status(HttpStatusCode.BAD_REQUEST).json(ResponseHandler.error(message));
     }
   };
 }

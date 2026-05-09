@@ -44,7 +44,7 @@ export class ClientServiceController {
             const scheduledDate = new Date(date);
 
             const parsedSelectedSlots = selectedSlots
-                ? selectedSlots.map((s: any) => ({
+                ? selectedSlots.map((s: { date: string | Date; slotType: string }) => ({
                     date: new Date(s.date),
                     slotType: s.slotType,
                 }))
@@ -167,8 +167,9 @@ export class ClientServiceController {
             await this._cancelServiceUseCase.execute(serviceId, userId, reason);
 
             res.status(HttpStatusCode.OK).json(ResponseHandler.success(null, "Service cancelled successfully"));
-        } catch (error: any) {
-            res.status(HttpStatusCode.BAD_REQUEST).json(ResponseHandler.error(error.message, error));
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : "Failed to cancel service";
+            res.status(HttpStatusCode.BAD_REQUEST).json(ResponseHandler.error(message, error));
         }
     }
 }

@@ -22,9 +22,10 @@ export class NotificationController {
       return res.status(HttpStatusCode.OK).json(
         ResponseHandler.success(notifications, "Notifications fetched")
       );
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Internal Server Error";
       return res.status(HttpStatusCode.INTERNAL_SERVER).json(
-        ResponseHandler.error(error.message)
+        ResponseHandler.error(message)
       );
     }
   };
@@ -36,9 +37,10 @@ export class NotificationController {
       return res.status(HttpStatusCode.OK).json(
         ResponseHandler.success(null, "Notification marked as read")
       );
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Internal Server Error";
       return res.status(HttpStatusCode.INTERNAL_SERVER).json(
-        ResponseHandler.error(error.message)
+        ResponseHandler.error(message)
       );
     }
   };

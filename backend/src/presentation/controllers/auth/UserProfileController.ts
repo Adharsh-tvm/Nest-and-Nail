@@ -26,7 +26,7 @@ export class UserProfileController implements IUserProfileController {
             const profilePictureFilePath = req.file?.path;
             const mimetype = req.file?.mimetype;
 
-            const updates: any = {
+            const updates: Record<string, unknown> = {
                 ...req.body,
             };
 

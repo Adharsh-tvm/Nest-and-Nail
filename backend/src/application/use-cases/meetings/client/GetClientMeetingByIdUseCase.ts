@@ -2,12 +2,21 @@ import { IServiceRepository } from "../../../../domain/repositories/IServiceRepo
 import { IGetClientMeetingByIdUseCase } from "../../../interfaces/meetings/client/IGetClientMeetingByIdUseCase";
 import { ServiceMapper } from "../../../mappers/ServiceMapper";
 import { ServiceStatus } from "../../../../shared/enums/serviceEnums";
+import { Service } from "../../../../domain/entities/Service";
 
-interface IDetailedService {
-  clientId: string;
-  category: string;
-  status: ServiceStatus;
-  [key: string]: unknown;
+interface IDetailedService extends Service {
+  client?: {
+    name: string;
+    email: string;
+    phone?: number;
+    profilePictureUrl?: string;
+  };
+  worker?: {
+    name: string;
+    email?: string;
+    rating?: number;
+    profilePictureUrl?: string;
+  };
 }
 
 export class GetClientMeetingByIdUseCase implements IGetClientMeetingByIdUseCase {

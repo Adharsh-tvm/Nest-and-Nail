@@ -86,7 +86,7 @@ export interface ServiceResponseDTO {
       startTime: Date;
       endTime: Date;
       meetingLink?: string;
-      startedAt?: Date;
+      startedAt?: Date | null;
       endedAt?: Date;
       duration?: string;
     };
@@ -127,7 +127,7 @@ export interface AdminServiceResponseDTO {
     startTime: Date;
     endTime: Date;
     meetingLink?: string;
-    startedAt?: Date;
+    startedAt?: Date | null;
     endedAt?: Date;
     duration?: string;
   };

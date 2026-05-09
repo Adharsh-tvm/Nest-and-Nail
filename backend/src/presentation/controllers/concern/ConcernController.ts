@@ -21,7 +21,7 @@ export class ConcernController {
       const { serviceId, message } = req.body;
       const role = req.user?.role?.toUpperCase() as concernBy;
 
-      const files = req.files as any[] | undefined;
+      const files = req.files as Express.Multer.File[] | undefined;
 
       const result = await this._createConcernUseCase.execute(
         serviceId,
@@ -35,9 +35,10 @@ export class ConcernController {
         ResponseHandler.success(result, "Concern raised successfully")
       );
 
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Failed to raise concern";
       res.status(HttpStatusCode.BAD_REQUEST).json(
-        ResponseHandler.error(error.message)
+        ResponseHandler.error(message)
       );
     }
   };

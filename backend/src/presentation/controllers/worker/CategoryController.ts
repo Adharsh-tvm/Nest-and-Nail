@@ -24,10 +24,11 @@ export class CategoryController implements ICategoryController {
             const { name } = req.body;
             const category = await this._createCategoryUseCase.execute(name);
             res.status(HttpStatusCode.CREATED).json(ResponseHandler.success(category, RESPONSE_MESSAGES.UPDATED));
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("[CategoryController.create]", error);
+            const message = error instanceof Error ? error.message : "Failed to create category";
             res.status(HttpStatusCode.BAD_REQUEST).json(
-                ResponseHandler.error(error.message || "Failed to create category")
+                ResponseHandler.error(message)
             );
         }
     };
@@ -50,10 +51,11 @@ export class CategoryController implements ICategoryController {
                 activeCount,
                 inactiveCount
             }, RESPONSE_MESSAGES.UPDATED));
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("[CategoryController.getAll]", error);
+            const message = error instanceof Error ? error.message : "Failed to fetch categories";
             res.status(HttpStatusCode.INTERNAL_SERVER).json(
-                ResponseHandler.error(error.message || "Failed to fetch categories")
+                ResponseHandler.error(message)
             );
         }
     };
@@ -71,12 +73,13 @@ export class CategoryController implements ICategoryController {
             res.status(HttpStatusCode.OK).json(
                 ResponseHandler.success(category, RESPONSE_MESSAGES.UPDATED)
             );
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("[CategoryController.update]", error);
+            const message = error instanceof Error ? error.message : "Failed to update category";
 
             res.status(HttpStatusCode.BAD_REQUEST).json(
                 ResponseHandler.error(
-                    error.message || "Failed to update category"
+                    message
                 )
             );
         }
@@ -92,10 +95,11 @@ export class CategoryController implements ICategoryController {
             res.status(HttpStatusCode.OK).json(
                 ResponseHandler.success(updatedCategory, RESPONSE_MESSAGES.UPDATED)
             );
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("[CategoryController.updateStatus]", error);
+            const message = error instanceof Error ? error.message : "Failed to update category status";
             res.status(HttpStatusCode.BAD_REQUEST).json(
-                ResponseHandler.error(error.message || "Failed to update category status")
+                ResponseHandler.error(message)
             );
         }
     };
@@ -123,10 +127,11 @@ export class CategoryController implements ICategoryController {
                     RESPONSE_MESSAGES.UPDATED
                 )
             );
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("[CategoryController.updateUserCategories]", error);
+            const message = error instanceof Error ? error.message : "Failed to update user categories";
             res.status(HttpStatusCode.BAD_REQUEST).json(
-                ResponseHandler.error(error.message || "Failed to update user categories")
+                ResponseHandler.error(message)
             );
         }
     }

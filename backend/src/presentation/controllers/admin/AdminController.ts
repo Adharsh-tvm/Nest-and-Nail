@@ -31,11 +31,11 @@ export class AdminController implements IAdminController {
                         ? req.query.isBlocked === "true"
                         : undefined,
 
-                isVerified: req.query.isVerified as any,
+                isVerified: req.query.isVerified as VerificationStatus,
                 search: req.query.search as string,
 
-                sortBy: req.query.sortBy as any,
-                sortOrder: req.query.sortOrder as any,
+                sortBy: req.query.sortBy as "createdAt" | "name" | "email" | undefined,
+                sortOrder: req.query.sortOrder as "asc" | "desc" | undefined,
 
                 page: req.query.page ? Number(req.query.page) : 1,
                 limit: req.query.limit ? Number(req.query.limit) : 20,
@@ -95,9 +95,10 @@ export class AdminController implements IAdminController {
 
             res.status(HttpStatusCode.OK).json(ResponseHandler.success(result, RESPONSE_MESSAGES.SUCCESS));
 
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error(error);
-            res.status(HttpStatusCode.INTERNAL_SERVER).json(ResponseHandler.error(RESPONSE_MESSAGES.BAD_REQUEST, error));
+            const message = error instanceof Error ? error.message : String(error);
+            res.status(HttpStatusCode.INTERNAL_SERVER).json(ResponseHandler.error(RESPONSE_MESSAGES.BAD_REQUEST, message));
         }
     };
 
@@ -121,9 +122,10 @@ export class AdminController implements IAdminController {
 
             res.status(HttpStatusCode.OK).json(ResponseHandler.success(result, RESPONSE_MESSAGES.SUCCESS));
 
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error(error);
-            res.status(HttpStatusCode.INTERNAL_SERVER).json(ResponseHandler.error(RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR, error));
+            const message = error instanceof Error ? error.message : String(error);
+            res.status(HttpStatusCode.INTERNAL_SERVER).json(ResponseHandler.error(RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR, message));
         }
     };
 
@@ -136,9 +138,10 @@ export class AdminController implements IAdminController {
 
             res.status(HttpStatusCode.OK).json(ResponseHandler.success(result, RESPONSE_MESSAGES.UPDATED));
 
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error(error);
-            res.status(HttpStatusCode.INTERNAL_SERVER).json(ResponseHandler.error(RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR, error));
+            const message = error instanceof Error ? error.message : String(error);
+            res.status(HttpStatusCode.INTERNAL_SERVER).json(ResponseHandler.error(RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR, message));
         }
     }
 
@@ -146,9 +149,10 @@ export class AdminController implements IAdminController {
         try {
             const data = await this._getAdminDashboardDataUseCase.execute();
             res.status(HttpStatusCode.OK).json(ResponseHandler.success(data, "Dashboard data fetched successfully"));
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error(error);
-            res.status(HttpStatusCode.INTERNAL_SERVER).json(ResponseHandler.error(RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR, error));
+            const message = error instanceof Error ? error.message : String(error);
+            res.status(HttpStatusCode.INTERNAL_SERVER).json(ResponseHandler.error(RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR, message));
         }
     }
 }

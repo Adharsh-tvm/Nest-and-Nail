@@ -1,12 +1,14 @@
 import axiosInstance from "@/lib/axiosInstance";
 import { CHAT_ROUTES } from "@/sources/constant-api";
+import axios from "axios";
 
 export const getMessagesApi = async (chatId: string) => {
   try {
     const res = await axiosInstance.get(CHAT_ROUTES.GET_MESSAGES(chatId));
     return { success: true, data: res.data };
-  } catch (error: any) {
-    return { success: false, message: error.response?.data?.message || "Failed to get messages" };
+  } catch (error: unknown) {
+    const message = axios.isAxiosError(error) ? error.response?.data?.message : undefined;
+    return { success: false, message: message || "Failed to get messages" };
   }
 };
 
@@ -14,7 +16,8 @@ export const sendMessageApi = async (data: { chatId: string; receiverId: string;
   try {
     const res = await axiosInstance.post(CHAT_ROUTES.SEND, data);
     return { success: true, data: res.data };
-  } catch (error: any) {
-    return { success: false, message: error.response?.data?.message || "Failed to send message" };
+  } catch (error: unknown) {
+    const message = axios.isAxiosError(error) ? error.response?.data?.message : undefined;
+    return { success: false, message: message || "Failed to send message" };
   }
 };

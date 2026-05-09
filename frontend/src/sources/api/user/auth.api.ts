@@ -39,7 +39,7 @@ export const authApi = {
       payload
     ),
 
-  signup: (payload: any) =>
+  signup: (payload: Record<string, unknown>) =>
     axiosInstance.post<ApiResponse<AuthPayload>>(
       AUTH_ROUTES.REGISTER,
       payload
@@ -100,7 +100,7 @@ export const authApi = {
     newPassword: string;
     confirmPassword: string;
   }) =>
-    axiosInstance.patch<ApiResponse<any>>(
+    axiosInstance.patch<ApiResponse<null>>(
       AUTH_ROUTES.CHANGE_PASSWORD,
       payload
     ),

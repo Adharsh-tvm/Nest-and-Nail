@@ -8,7 +8,7 @@ export interface NotificationDocument extends Document {
   message: string;
   type: string;
 
-  data?: Record<string, any>;
+  data?: Record<string, unknown>;
 
   isRead: boolean;
   createdAt: Date;

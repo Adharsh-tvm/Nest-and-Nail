@@ -74,9 +74,10 @@ export class WorkerController {
       res.status(HttpStatusCode.OK).json(
         ResponseHandler.success(data, "Dashboard data fetched successfully")
       );
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Internal Server Error";
       res.status(HttpStatusCode.INTERNAL_SERVER).json(
-        ResponseHandler.error(RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR, error.message)
+        ResponseHandler.error(RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR, message)
       );
     }
   };

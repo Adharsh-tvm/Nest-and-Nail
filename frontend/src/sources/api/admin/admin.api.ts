@@ -1,6 +1,7 @@
 
 
 import axiosInstance from "@/lib/axiosInstance";
+import axios from "axios";
 import { VerificationStatus } from "@/shared/enums/authEnums";
 import { mapUserFromApi } from "@/shared/mappers/user.mapper";
 import { ApiResponse } from "@/shared/types/responseTypes";
@@ -41,7 +42,7 @@ export type Worker = {
 
 /* ---------------- HELPERS ---------------- */
 
-function normalizeVerification(value: any): VerificationStatus {
+function normalizeVerification(value: unknown): VerificationStatus {
   if (
     value === true ||
     value === 1 ||
@@ -62,7 +63,7 @@ function normalizeVerification(value: any): VerificationStatus {
 
 export async function fetchAllClients(): Promise<Client[]> {
   try {
-    const res = await axiosInstance.get<ApiResponse<any[]>>(
+    const res = await axiosInstance.get<ApiResponse<Record<string, unknown>[]>>(
       ADMIN_ROUTES.CLIENTS
     );
 
@@ -75,15 +76,16 @@ export async function fetchAllClients(): Promise<Client[]> {
       isVerified: normalizeVerification(
         u.isVerified ?? u.is_verified ?? u.verified
       ),
-    }));
-  } catch (error: any) {
-    throw new Error(error.normalizedMessage || "Failed to fetch clients");
+    })) as unknown as Client[];
+  } catch (error: unknown) {
+    const msg = (error as { normalizedMessage?: string })?.normalizedMessage || (error instanceof Error ? error.message : "Failed to fetch clients");
+    throw new Error(msg);
   }
 }
 
 export async function fetchAllWorkers(): Promise<Worker[]> {
   try {
-    const res = await axiosInstance.get<ApiResponse<any[]>>(
+    const res = await axiosInstance.get<ApiResponse<Record<string, unknown>[]>>(
       ADMIN_ROUTES.WORKERS
     );
 
@@ -96,9 +98,10 @@ export async function fetchAllWorkers(): Promise<Worker[]> {
       isVerified: normalizeVerification(
         u.isVerified ?? u.is_verified ?? u.verified
       ),
-    }));
-  } catch (error: any) {
-    throw new Error(error.normalizedMessage || "Failed to fetch workers");
+    })) as unknown as Worker[];
+  } catch (error: unknown) {
+    const msg = (error as { normalizedMessage?: string })?.normalizedMessage || (error instanceof Error ? error.message : "Failed to fetch workers");
+    throw new Error(msg);
   }
 }
 
@@ -137,7 +140,7 @@ export async function fetchAllUsers(
   const queryString = buildQueryString(params);
   const url = `/api/admin/users/all${queryString ? `?${queryString}` : ""}`;
 
-  const res = await axiosInstance.get<ApiResponse<any>>(url);
+  const res = await axiosInstance.get<ApiResponse<unknown>>(url);
 
   if (!res.data.success) {
     throw new Error(res.data.message || "Failed to fetch users");
@@ -146,15 +149,17 @@ export async function fetchAllUsers(
   // Handle both array response (legacy) and paginated response
   if (Array.isArray(res.data.payload)) {
     return {
-      users: res.data.payload.map(mapUserFromApi),
+      users: res.data.payload.map((raw) => mapUserFromApi(raw as Record<string, unknown>)),
       total: res.data.payload.length,
       totalPages: 1,
     };
   } else {
+    const payload = res.data.payload as { users?: unknown[]; total?: number; totalPages?: number } | undefined;
+    const usersArray = payload?.users || [];
     return {
-      users: (res.data.payload.users || []).map(mapUserFromApi),
-      total: res.data.payload.total || 0,
-      totalPages: res.data.payload.totalPages || 1,
+      users: usersArray.map((raw) => mapUserFromApi(raw as Record<string, unknown>)),
+      total: payload?.total || 0,
+      totalPages: payload?.totalPages || 1,
     };
   }
 }
@@ -184,14 +189,14 @@ export async function rejectVerification(
 }
 
 export async function toggleUserAccess(userId: string): Promise<User> {
-  const res = await axiosInstance.patch<ApiResponse<null>>(
+  const res = await axiosInstance.patch<ApiResponse<unknown>>(
     ADMIN_ROUTES.ACCESS(userId)
   );
 
   if (!res.data.success) {
     throw new Error(res.data.message || "Failed to toggle user access");
   }
-  return mapUserFromApi(res.data.payload);
+  return mapUserFromApi(res.data.payload as Record<string, unknown>);
 }
 
 export async function fetchAllAdminServices(): Promise<AdminServiceResponseDTO[]> {
@@ -201,8 +206,9 @@ export async function fetchAllAdminServices(): Promise<AdminServiceResponseDTO[]
       throw new Error(res.data.message || "Failed to fetch admin services");
     }
     return res.data.payload;
-  } catch (error: any) {
-    throw new Error(error.response?.data?.message || error.message || "Failed to fetch admin services");
+  } catch (error: unknown) {
+    const message = axios.isAxiosError(error) ? error.response?.data?.message : (error instanceof Error ? error.message : undefined);
+    throw new Error(message || "Failed to fetch admin services");
   }
 }
 
@@ -213,8 +219,9 @@ export async function fetchAdminServiceDetails(serviceId: string): Promise<Admin
       throw new Error(res.data.message || "Failed to fetch admin service details");
     }
     return res.data.payload;
-  } catch (error: any) {
-    throw new Error(error.response?.data?.message || error.message || "Failed to fetch admin service details");
+  } catch (error: unknown) {
+    const message = axios.isAxiosError(error) ? error.response?.data?.message : (error instanceof Error ? error.message : undefined);
+    throw new Error(message || "Failed to fetch admin service details");
   }
 }
 
@@ -225,8 +232,9 @@ export async function fetchAllAdminMeetings(): Promise<AdminServiceResponseDTO[]
       throw new Error(res.data.message || "Failed to fetch admin meetings");
     }
     return res.data.payload;
-  } catch (error: any) {
-    throw new Error(error.response?.data?.message || error.message || "Failed to fetch admin meetings");
+  } catch (error: unknown) {
+    const message = axios.isAxiosError(error) ? error.response?.data?.message : (error instanceof Error ? error.message : undefined);
+    throw new Error(message || "Failed to fetch admin meetings");
   }
 }
 
@@ -237,8 +245,9 @@ export async function fetchAdminMeetingDetails(serviceId: string): Promise<Admin
       throw new Error(res.data.message || "Failed to fetch admin meeting details");
     }
     return res.data.payload;
-  } catch (error: any) {
-    throw new Error(error.response?.data?.message || error.message || "Failed to fetch admin meeting details");
+  } catch (error: unknown) {
+    const message = axios.isAxiosError(error) ? error.response?.data?.message : (error instanceof Error ? error.message : undefined);
+    throw new Error(message || "Failed to fetch admin meeting details");
   }
 }
 
@@ -290,21 +299,21 @@ export async function fetchAllAdminConcerns(params?: {
       throw new Error(res.data.message || "Failed to fetch concerns");
     }
     return res.data.payload;
-  } catch (error: any) {
-    throw new Error(
-      error.response?.data?.message || error.message || "Failed to fetch concerns"
-    );
+  } catch (error: unknown) {
+    const message = axios.isAxiosError(error) ? error.response?.data?.message : (error instanceof Error ? error.message : undefined);
+    throw new Error(message || "Failed to fetch concerns");
   }
 }
 
-export async function fetchAdminDashboardData(): Promise<any> {
+export async function fetchAdminDashboardData(): Promise<unknown> {
   try {
-    const res = await axiosInstance.get<ApiResponse<any>>(ADMIN_ROUTES.DASHBOARD);
+    const res = await axiosInstance.get<ApiResponse<unknown>>(ADMIN_ROUTES.DASHBOARD);
     if (!res.data.success) {
       throw new Error(res.data.message || "Failed to fetch dashboard data");
     }
     return res.data.payload;
-  } catch (error: any) {
-    throw new Error(error.response?.data?.message || error.message || "Failed to fetch dashboard data");
+  } catch (error: unknown) {
+    const message = axios.isAxiosError(error) ? error.response?.data?.message : (error instanceof Error ? error.message : undefined);
+    throw new Error(message || "Failed to fetch dashboard data");
   }
 }

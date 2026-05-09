@@ -20,10 +20,11 @@ export class MediaController {
         success: true,
         payload: result,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Failed to get upload URL";
       return res.status(HttpStatusCode.INTERNAL_SERVER).json({
         success: false,
-        message: error.message,
+        message,
       });
     }
   };

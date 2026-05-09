@@ -1,4 +1,4 @@
-export type SuccessResponse<T = any> = {
+export type SuccessResponse<T = unknown> = {
     success: true,
     message: string,
     payload: T,

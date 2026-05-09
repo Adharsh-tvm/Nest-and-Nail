@@ -1318,7 +1318,7 @@ const SlotView: React.FC<ViewProps> = ({ user, setUser }) => {
     try {
       const response = await getWorkerBlockedDatesAction();
       if (response.success && response.payload) {
-        const payloadData: Array<{ date: string | Date; slotType: string; isBooked: boolean; isAvailable: boolean }> = response.payload;
+        const payloadData = response.payload as Array<{ date: string | Date; slotType: string; isBooked: boolean; isAvailable: boolean }>;
         
         const formattedData: Record<string, SlotAvailability> = {};
         

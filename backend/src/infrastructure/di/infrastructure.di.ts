@@ -1,5 +1,6 @@
 import { ILogger } from "../logger/ILogger";
 import { IEmailService } from "../../application/contracts/IEmailService";
+import { User } from "../../domain/entities/User";
 import { IGenerateUserID } from "../../application/contracts/IGenerateUserID";
 import { IOtpService } from "../../application/contracts/IOtpService";
 import { IPasswordHasher } from "../../application/contracts/IPasswordHasher";
@@ -55,7 +56,7 @@ export class InfrastructureDI {
   private _workerRepository?: IWorkerRepository;
   private _otpRepository?: IOtpRepository;
   private _adminRepository?: IAdminRepository;
-  private _userRepository?: IBaseRepository<any>;
+  private _userRepository?: IBaseRepository<User>;
   private _workerScheduleRepo?: IWorkerScheduleRepository;
   private _serviceRepository?: IServiceRepository;
   private _paymentRepository?: IPaymentRepository;
@@ -95,7 +96,7 @@ export class InfrastructureDI {
     return this._userRepositoryFactory;
   }
 
-  get userRepository(): IBaseRepository<any> {
+  get userRepository(): IBaseRepository<User> {
     if (!this._userRepository) {
       this._userRepository = new UserRepository();
     }

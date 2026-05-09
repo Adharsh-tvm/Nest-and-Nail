@@ -63,7 +63,20 @@ export class ServiceMapper {
     };
   }
 
-  static toResponse(service: any): ServiceResponseDTO {
+  static toResponse(service: Service & {
+    client?: {
+      name: string;
+      email: string;
+      phone?: number;
+      profilePictureUrl?: string;
+    };
+    worker?: {
+      name: string;
+      email?: string;
+      rating?: number;
+      profilePictureUrl?: string;
+    };
+  }): ServiceResponseDTO {
     return {
       serviceId: service.serviceId,
       clientId: service.clientId,

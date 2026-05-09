@@ -37,9 +37,10 @@ export class VideoCallController {
       res.status(HttpStatusCode.OK).json(
         ResponseHandler.success(result, "Joined video call successfully")
       );
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Internal Server Error";
       res.status(HttpStatusCode.INTERNAL_SERVER).json(
-        ResponseHandler.error(RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR, error.message)
+        ResponseHandler.error(RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR, message)
       );
     }
   };
@@ -68,9 +69,10 @@ export class VideoCallController {
       res.status(HttpStatusCode.OK).json(
         ResponseHandler.success(result, "Call ended successfully")
       );
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Internal Server Error";
       res.status(HttpStatusCode.INTERNAL_SERVER).json(
-        ResponseHandler.error(RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR, error.message)
+        ResponseHandler.error(RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR, message)
       );
     }
   };
@@ -99,9 +101,10 @@ export class VideoCallController {
       res.status(HttpStatusCode.OK).json(
         ResponseHandler.success(result, "Left video call successfully")
       );
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Internal Server Error";
       res.status(HttpStatusCode.INTERNAL_SERVER).json(
-        ResponseHandler.error(RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR, error.message)
+        ResponseHandler.error(RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR, message)
       );
     }
   };

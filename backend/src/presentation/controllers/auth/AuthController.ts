@@ -328,8 +328,9 @@ export class AuthController implements IAuthController {
         ResponseHandler.success(null, "Password changed successfully")
       );
 
-    } catch (error: any) {
-      res.status(HttpStatusCode.BAD_REQUEST).json(ResponseHandler.error(error.message));
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Failed to change password";
+      res.status(HttpStatusCode.BAD_REQUEST).json(ResponseHandler.error(message));
     }
   }
 }

@@ -31,9 +31,10 @@ export class ClientReviewController {
         ResponseHandler.success(null, "Review submitted")
       );
 
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Failed to submit review";
       res.status(HttpStatusCode.BAD_REQUEST).json(
-        ResponseHandler.error(error.message)
+        ResponseHandler.error(message)
       );
     }
   };

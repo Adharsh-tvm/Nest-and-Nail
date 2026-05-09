@@ -28,7 +28,14 @@ export interface BookingPayload {
   pricePerWorker?: number;
   title?: string;
   description?: string;
-  address?: any;
+  address?: {
+    street?: string;
+    city?: string;
+    state?: string;
+    country?: string;
+    zip?: string;
+    label?: string;
+  };
 }
 
 export interface BookingResult {
@@ -192,7 +199,10 @@ export interface AdminServiceResponseDTO {
       state?: string;
       country?: string;
       zip?: string;
-      location?: any;
+      location?: {
+        type: string;
+        coordinates: number[];
+      };
       isDefault?: boolean;
     } | string;
   };

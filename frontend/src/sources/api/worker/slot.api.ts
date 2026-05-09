@@ -3,7 +3,15 @@ import { ApiResponse } from "@/shared/types/responseTypes";
 import { WORKER_ROUTES } from "@/sources/constant-api";
 import axios from "axios";
 
-export async function blockWorkerDatesApi(dates: string[], slotTypes: string[]): Promise<ApiResponse<any>> {
+interface IApiResponseData {
+  success: boolean;
+  message?: string;
+  data?: unknown;
+  payload?: unknown;
+  error?: string | null;
+}
+
+export async function blockWorkerDatesApi(dates: string[], slotTypes: string[]): Promise<ApiResponse<unknown>> {
   try {
     const response = await axiosInstance.post(
       WORKER_ROUTES.BLOCK_DATES,
@@ -11,11 +19,11 @@ export async function blockWorkerDatesApi(dates: string[], slotTypes: string[]):
       { withCredentials: true }
     );
 
-    const resData = response.data as any;
+    const resData = response.data as IApiResponseData;
     if (resData.success) {
       return {
         success: true,
-        message: resData.message,
+        message: resData.message || "Dates blocked successfully",
         payload: resData.data || resData.payload || null,
       };
     } else {
@@ -41,14 +49,14 @@ export async function blockWorkerDatesApi(dates: string[], slotTypes: string[]):
   }
 }
 
-export async function getWorkerBlockedDatesApi(): Promise<ApiResponse<any>> {
+export async function getWorkerBlockedDatesApi(): Promise<ApiResponse<unknown>> {
   try {
     const response = await axiosInstance.get(
       WORKER_ROUTES.BLOCKED_DATES,
       { withCredentials: true }
     );
 
-    const resData = response.data as any;
+    const resData = response.data as IApiResponseData;
     if (resData.success) {
       return {
         success: true,

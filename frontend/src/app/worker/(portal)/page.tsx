@@ -11,7 +11,14 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 
-const StatCard = ({ title, value, icon: Icon, color = "indigo" }: any) => {
+interface StatCardProps {
+  title: string;
+  value: string;
+  icon: React.ComponentType<{ size?: number; strokeWidth?: number }>;
+  color?: string;
+}
+
+const StatCard = ({ title, value, icon: Icon, color = "indigo" }: StatCardProps) => {
   const colorMap: Record<string, string> = {
     indigo: "from-indigo-500/10 to-indigo-500/5 text-indigo-600 border-indigo-100",
     violet: "from-violet-500/10 to-violet-500/5 text-violet-600 border-violet-100",
@@ -39,7 +46,16 @@ const StatCard = ({ title, value, icon: Icon, color = "indigo" }: any) => {
   );
 };
 
-const ReviewRow = ({ review }: { review: any }) => (
+interface Review {
+  id: string;
+  clientName: string;
+  clientImage?: string;
+  rating: number;
+  review?: string;
+  createdAt: string;
+}
+
+const ReviewRow = ({ review }: { review: Review }) => (
   <div className="flex items-start gap-4 p-5 bg-white rounded-2xl border border-gray-100 hover:border-indigo-200 hover:shadow-lg hover:shadow-indigo-500/5 transition-all duration-300 group">
     <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-100 to-violet-100 border-2 border-white shadow-sm overflow-hidden flex-shrink-0">
       <img
@@ -64,8 +80,44 @@ const ReviewRow = ({ review }: { review: any }) => (
   </div>
 );
 
+interface DashboardStats {
+  walletBalance: number;
+  totalEarnings: number;
+  totalJobs: number;
+  ongoingJobs: number;
+  pendingJobs: number;
+  cancelledJobs?: number;
+  totalRatings: number;
+  rating: number;
+}
+
+interface UpcomingService {
+  title: string;
+  clientName: string;
+  clientImage?: string;
+  date: string;
+  location: string;
+}
+
+interface ScheduleItem {
+  title: string;
+  date: string;
+  status: string;
+}
+
+interface WorkerDashboardData {
+  stats: DashboardStats;
+  upcomingService?: UpcomingService | null;
+  schedules?: ScheduleItem[];
+  recentReviews?: Review[];
+  charts?: {
+    monthlyEarnings?: { name: string; earnings: number }[];
+    jobsByStatus?: { name: string; value: number; color?: string }[];
+  };
+}
+
 export default function WorkerDashboardPage() {
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<WorkerDashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState<number>(6);
 
@@ -109,7 +161,7 @@ export default function WorkerDashboardPage() {
     'Cancelled': '#f43f5e', // rose-500
   };
 
-  const enhancedPieData = (data?.charts?.jobsByStatus || []).map((item: any) => ({
+  const enhancedPieData = (data?.charts?.jobsByStatus || []).map((item) => ({
     ...item,
     color: STATUS_COLORS[item.name] || item.color
   }));
@@ -213,7 +265,7 @@ export default function WorkerDashboardPage() {
                   cursor={{stroke: '#e0e7ff', strokeWidth: 2, strokeDasharray: '4 4'}}
                   contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)' }}
                   itemStyle={{ color: '#4f46e5', fontWeight: 'bold' }}
-                  formatter={(value: any) => [`₹${value.toLocaleString()}`, 'Earnings']}
+                  formatter={(value: unknown) => [`₹${Number(value).toLocaleString()}`, 'Earnings']}
                 />
                 <Line 
                   type="monotone" 
@@ -258,14 +310,14 @@ export default function WorkerDashboardPage() {
                   dataKey="value"
                   stroke="none"
                 >
-                  {enhancedPieData.map((entry: any, index: number) => (
+                  {enhancedPieData.map((entry, index: number) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
                 <Tooltip 
                   contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)' }}
                   itemStyle={{ fontWeight: 'bold' }}
-                  formatter={(value: any) => [value, 'Jobs']}
+                  formatter={(value: unknown) => [Number(value), 'Jobs']}
                 />
                 <Legend 
                   verticalAlign="bottom" 
@@ -347,32 +399,35 @@ export default function WorkerDashboardPage() {
           </div>
           
           <div className="relative z-10 flex-1 overflow-y-auto pr-2 space-y-4 custom-scrollbar">
-            {(data?.schedules || []).length > 0 ? (
-              (data.schedules).slice(0, 10).map((schedule: any, idx: number) => {
-                const isToday = new Date().toDateString() === new Date(schedule.date).toDateString();
-                return (
-                  <div key={idx} className="flex gap-4 items-start group">
-                    <div className="flex flex-col items-center mt-1">
-                      <div className={`w-3 h-3 rounded-full ${isToday ? 'bg-indigo-500 ring-4 ring-indigo-100' : 'bg-gray-300'}`} />
-                      {idx !== (data.schedules.length - 1) && <div className="w-0.5 h-12 bg-gray-100 my-1" />}
+            {(() => {
+              const schedules = data?.schedules || [];
+              return schedules.length > 0 ? (
+                schedules.slice(0, 10).map((schedule, idx: number) => {
+                  const isToday = new Date().toDateString() === new Date(schedule.date).toDateString();
+                  return (
+                    <div key={idx} className="flex gap-4 items-start group">
+                      <div className="flex flex-col items-center mt-1">
+                        <div className={`w-3 h-3 rounded-full ${isToday ? 'bg-indigo-500 ring-4 ring-indigo-100' : 'bg-gray-300'}`} />
+                        {idx !== (schedules.length - 1) && <div className="w-0.5 h-12 bg-gray-100 my-1" />}
+                      </div>
+                      <div className={`flex-1 p-3 rounded-xl border transition-all ${isToday ? 'bg-indigo-50 border-indigo-100' : 'bg-white border-gray-100 group-hover:border-indigo-100 group-hover:shadow-sm'}`}>
+                        <h4 className="font-bold text-sm text-gray-900">{schedule.title}</h4>
+                        <p className="text-xs font-medium text-gray-500 mt-0.5">
+                          {new Date(schedule.date).toLocaleDateString()} at {new Date(schedule.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                        <span className={`inline-block mt-2 px-2 py-0.5 text-[10px] font-bold uppercase rounded-full ${schedule.status === 'IN_PROGRESS' ? 'bg-violet-100 text-violet-700' : 'bg-blue-100 text-blue-700'}`}>
+                          {schedule.status}
+                        </span>
+                      </div>
                     </div>
-                    <div className={`flex-1 p-3 rounded-xl border transition-all ${isToday ? 'bg-indigo-50 border-indigo-100' : 'bg-white border-gray-100 group-hover:border-indigo-100 group-hover:shadow-sm'}`}>
-                      <h4 className="font-bold text-sm text-gray-900">{schedule.title}</h4>
-                      <p className="text-xs font-medium text-gray-500 mt-0.5">
-                        {new Date(schedule.date).toLocaleDateString()} at {new Date(schedule.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </p>
-                      <span className={`inline-block mt-2 px-2 py-0.5 text-[10px] font-bold uppercase rounded-full ${schedule.status === 'IN_PROGRESS' ? 'bg-violet-100 text-violet-700' : 'bg-blue-100 text-blue-700'}`}>
-                        {schedule.status}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })
-            ) : (
-              <div className="h-full flex items-center justify-center text-center text-gray-500">
-                No schedules available.
-              </div>
-            )}
+                  );
+                })
+              ) : (
+                <div className="h-full flex items-center justify-center text-center text-gray-500">
+                  No schedules available.
+                </div>
+              );
+            })()}
           </div>
         </div>
       </div>
@@ -390,7 +445,7 @@ export default function WorkerDashboardPage() {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
-          {(data?.recentReviews || []).map((review: any) => (
+          {(data?.recentReviews || []).map((review) => (
             <ReviewRow key={review.id} review={review} />
           ))}
         </div>
