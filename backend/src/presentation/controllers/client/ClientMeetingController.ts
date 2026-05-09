@@ -19,7 +19,7 @@ export class ClientMeetingsController {
         next: NextFunction
     ) => {
         try {
-            const clientId = (req as any).user?.id;
+            const clientId = req.user?.id;
 
             if (!clientId) {
                 return res
@@ -43,7 +43,7 @@ export class ClientMeetingsController {
         next: NextFunction
     ) => {
         try {
-            const clientId = (req as any).user?.id;
+            const clientId = req.user?.id;
 
             if (!clientId) {
                 return res
@@ -63,7 +63,13 @@ export class ClientMeetingsController {
 
     getMeetingById = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const clientId = req.user.id;
+            const clientId = req.user?.id;
+
+            if (!clientId) {
+                return res
+                    .status(HttpStatusCode.UNAUTHORIZED)
+                    .json(ResponseHandler.error("Unauthorized"));
+            }
             const { serviceId } = req.params;
 
             const result = await this._getMeetingByIdUseCase.execute(

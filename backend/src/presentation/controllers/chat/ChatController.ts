@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { HttpStatusCode } from "../../../shared/enums/httpCodes";
 import { ISendMessageUseCase } from "../../../application/interfaces/chat/ISendMessageUseCase";
 import { IGetMessagesUseCase } from "../../../application/interfaces/chat/IGetMessagesUseCase";
 
@@ -11,7 +12,10 @@ export class ChatController {
 
     sendMessage = async (req: Request, res: Response) => {
         const { chatId, receiverId, message } = req.body;
-        const senderId = req.user.id;
+        const senderId = req.user?.id;
+        if (!senderId) {
+            return res.status(HttpStatusCode.UNAUTHORIZED).json({ success: false, message: "Unauthorized" });
+        }
 
         await this._sendMessageUseCase.execute({
             chatId,

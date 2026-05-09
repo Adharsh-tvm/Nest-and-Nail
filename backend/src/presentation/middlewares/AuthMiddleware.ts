@@ -4,13 +4,7 @@ import { ITokenService } from "../../application/contracts/ITokenService";
 import { HttpStatusCode } from "../../shared/enums/httpCodes";
 import { Role } from "../../shared/enums/authEnums";
 
-declare global {
-  namespace Express {
-    interface Request {
-      user?: any;
-    }
-  }
-}
+
 
 export class AuthMiddleware {
   constructor(private readonly _tokenService: ITokenService) { }

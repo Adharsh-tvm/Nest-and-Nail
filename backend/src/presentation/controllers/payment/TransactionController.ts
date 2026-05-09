@@ -15,6 +15,12 @@ export class TransactionController {
   async getClientTransactions(req: Request, res: Response): Promise<void> {
     try {
       const userId = req.user?.id;
+      if (!userId) {
+        res.status(HttpStatusCode.UNAUTHORIZED).json(
+          ResponseHandler.error("Unauthorized")
+        );
+        return;
+      }
 
       const page = req.query.page ? Number(req.query.page) : 1;
       const limit = req.query.limit ? Number(req.query.limit) : 10;
@@ -38,6 +44,12 @@ export class TransactionController {
   async getWorkerTransactions(req: Request, res: Response): Promise<void> {
     try {
       const workerId = req.user?.id;
+      if (!workerId) {
+        res.status(HttpStatusCode.UNAUTHORIZED).json(
+          ResponseHandler.error("Unauthorized")
+        );
+        return;
+      }
 
       const page = req.query.page ? Number(req.query.page) : 1;
       const limit = req.query.limit ? Number(req.query.limit) : 10;

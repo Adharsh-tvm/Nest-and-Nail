@@ -19,7 +19,7 @@ export class WorkerMeetingsController {
         next: NextFunction
     ) => {
         try {
-            const workerId = (req as any).user?.id;
+            const workerId = req.user?.id;
 
             if (!workerId) {
                 return res
@@ -43,7 +43,7 @@ export class WorkerMeetingsController {
         next: NextFunction
     ) => {
         try {
-            const workerId = (req as any).user?.id;
+            const workerId = req.user?.id;
 
             if (!workerId) {
                 return res
@@ -63,7 +63,13 @@ export class WorkerMeetingsController {
 
     getMeetingById = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const workerId = req.user.id;
+            const workerId = req.user?.id;
+
+            if (!workerId) {
+                return res
+                    .status(HttpStatusCode.UNAUTHORIZED)
+                    .json(ResponseHandler.error("Unauthorized"));
+            }
             const { serviceId } = req.params;
 
             const result = await this._getMeetingByIdUseCase.execute(

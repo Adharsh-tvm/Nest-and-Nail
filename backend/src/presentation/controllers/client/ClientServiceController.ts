@@ -33,7 +33,7 @@ export class ClientServiceController {
                 pricePerWorker,
             } = req.body;
 
-            const clientId = (req as any).user?.id || (req as any).user?._id;
+            const clientId = req.user?.id;
 
             if (!clientId) {
                 return res
@@ -93,7 +93,13 @@ export class ClientServiceController {
 
     getServiceHistory = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const clientId = (req as any).user.id;
+            const clientId = req.user?.id;
+
+            if (!clientId) {
+                return res
+                    .status(HttpStatusCode.UNAUTHORIZED)
+                    .json(ResponseHandler.error("Unauthorized"));
+            }
 
             const result = await this._getHistoryUseCase.execute(clientId);
 
@@ -107,7 +113,13 @@ export class ClientServiceController {
 
     getServiceByClientId = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const clientId = (req as any).user.id;
+            const clientId = req.user?.id;
+
+            if (!clientId) {
+                return res
+                    .status(HttpStatusCode.UNAUTHORIZED)
+                    .json(ResponseHandler.error("Unauthorized"));
+            }
             const { serviceId } = req.params;
 
             const result = await this._getByIdUseCase.execute(serviceId, clientId);
@@ -122,7 +134,13 @@ export class ClientServiceController {
 
     getOngoingServices = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const clientId = (req as any).user.id;
+            const clientId = req.user?.id;
+
+            if (!clientId) {
+                return res
+                    .status(HttpStatusCode.UNAUTHORIZED)
+                    .json(ResponseHandler.error("Unauthorized"));
+            }
 
             const result = await this._getOngoingUseCase.execute(clientId);
 
@@ -136,7 +154,13 @@ export class ClientServiceController {
 
     async cancelService(req: Request, res: Response): Promise<void> {
         try {
-            const userId = req.user.id;
+            const userId = req.user?.id;
+            if (!userId) {
+                res.status(HttpStatusCode.UNAUTHORIZED).json(
+                    ResponseHandler.error("Unauthorized")
+                );
+                return;
+            }
             const { serviceId } = req.params;
             const { reason } = req.body;
 

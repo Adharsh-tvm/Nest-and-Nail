@@ -23,7 +23,12 @@ export class UserController implements IUserController {
 
     changeRole = async (req: Request, res: Response): Promise<Response> => {
         try {
-            const userId = req.user.id;
+            const userId = req.user?.id;
+            if (!userId) {
+                return res.status(HttpStatusCode.UNAUTHORIZED).json(
+                    ResponseHandler.error(RESPONSE_MESSAGES.UNAUTHORIZED)
+                );
+            }
             const { role } = req.body;
 
             const result = await this._changeUserRoleUseCase.execute(userId, role);

@@ -14,13 +14,12 @@ export class ConcernController {
   createConcern = async (req: Request, res: Response) => {
     try {
       const userId = req.user?.id;
-      const { serviceId, message } = req.body;
-      const role = req.user.role?.toUpperCase() as concernBy;
-
       if (!userId) {
         return res.status(HttpStatusCode.UNAUTHORIZED)
           .json(ResponseHandler.error("Unauthorized"));
       }
+      const { serviceId, message } = req.body;
+      const role = req.user?.role?.toUpperCase() as concernBy;
 
       const files = req.files as any[] | undefined;
 
@@ -45,6 +44,10 @@ export class ConcernController {
 
   getMyConcerns = async (req: Request, res: Response) => {
     const userId = req.user?.id;
+    if (!userId) {
+      return res.status(HttpStatusCode.UNAUTHORIZED)
+        .json(ResponseHandler.error("Unauthorized"));
+    }
 
     const result = await this._getUserConcernsUseCase.execute(userId);
 
