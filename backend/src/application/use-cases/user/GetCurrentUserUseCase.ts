@@ -31,7 +31,7 @@ export class GetCurrentUserUseCase implements IGetCurrentUserUseCase {
             if (user) {
                 this._logger.info(`[GetCurrentUserUseCase] User found as CLIENT`);
             }
-        } catch (error) {
+        } catch {
             // Continue to next repository
         }
 
@@ -42,7 +42,7 @@ export class GetCurrentUserUseCase implements IGetCurrentUserUseCase {
                 if (user) {
                     this._logger.info(`[GetCurrentUserUseCase] User found as WORKER`);
                 }
-            } catch (error) {
+            } catch {
                 // Continue
             }
         }
@@ -54,7 +54,7 @@ export class GetCurrentUserUseCase implements IGetCurrentUserUseCase {
                 if (user) {
                     this._logger.info(`[GetCurrentUserUseCase] User found as ADMIN`);
                 }
-            } catch (error) {
+            } catch {
                 // Continue
             }
         }

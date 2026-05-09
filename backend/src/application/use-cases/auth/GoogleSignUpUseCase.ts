@@ -27,10 +27,8 @@ export class GoogleSignUpUseCase implements IGoogleSignUpUseCase {
             const clientRepository = this._userRepositoryFactory.getRepository(Role.CLIENT)
             const workerRepository = this._userRepositoryFactory.getRepository(Role.WORKER)
 
-            user = await clientRepository.findByEmail(email)
-            if (!user) {
-                user = await workerRepository.findByEmail(email)
-            }
+            user = await clientRepository.findByEmail(email);
+            user ??= await workerRepository.findByEmail(email);
 
             if (!user) {
                 //register a new user based on role.

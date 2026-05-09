@@ -21,6 +21,6 @@ export class GetWorkerServicesUseCase implements IGetWorkerServicesUseCase {
       services = services.filter(s => s.status === status);
     }
 
-    return services.map(ServiceMapper.toResponse);
+    return services.map(s => ServiceMapper.toResponse(s));
   }
 }

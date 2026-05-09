@@ -1,6 +1,7 @@
 import Razorpay from "razorpay";
 import crypto from "crypto";
 import { IPaymentGateway } from "../../domain/gateways/IPaymentGateway";
+import { env } from "../../config/env";
 
 export class RazorpayGateway implements IPaymentGateway {
 
@@ -8,8 +9,8 @@ export class RazorpayGateway implements IPaymentGateway {
 
   constructor() {
     this.razorpay = new Razorpay({
-      key_id: process.env.RAZORPAY_KEY!,
-      key_secret: process.env.RAZORPAY_SECRET!
+      key_id: env.RAZORPAY_KEY,
+      key_secret: env.RAZORPAY_SECRET
     });
   }
 
@@ -34,7 +35,7 @@ export class RazorpayGateway implements IPaymentGateway {
     const body = orderId + "|" + paymentId;
 
     const expected = crypto
-      .createHmac("sha256", process.env.RAZORPAY_SECRET!)
+      .createHmac("sha256", env.RAZORPAY_SECRET)
       .update(body)
       .digest("hex");
 

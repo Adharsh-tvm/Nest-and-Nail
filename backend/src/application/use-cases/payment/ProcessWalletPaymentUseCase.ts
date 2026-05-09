@@ -39,15 +39,12 @@ export class ProcessWalletPaymentUseCase implements IProcessWalletPaymentUseCase
     const amount = service.totalAmount;
 
     let wallet = await this._walletRepo.findByUserId(clientId);
-
-    if (!wallet) {
-      wallet = await this._walletRepo.create({
-        walletId: uuidv4(),
-        userId: clientId,
-        balance: 0,
-        currency: "INR",
-      });
-    }
+    wallet ??= await this._walletRepo.create({
+      walletId: uuidv4(),
+      userId: clientId,
+      balance: 0,
+      currency: "INR",
+    });
 
     const updatedWallet = await this._walletRepo.debitBalance(clientId, amount);
 
@@ -66,18 +63,16 @@ export class ProcessWalletPaymentUseCase implements IProcessWalletPaymentUseCase
     // Credit full amount to Admin wallet initially
     const adminRepo = this._userRepoFactory.getRepository(Role.ADMIN);
     const admins = await adminRepo.findAll();
-    const admin = admins[0];
+    const admin = admins[0] as typeof admins[number] | undefined;
 
     if (admin) {
         let adminWallet = await this._walletRepo.findByUserId(admin.userId);
-        if (!adminWallet) {
-            adminWallet = await this._walletRepo.create({
-                walletId: uuidv4(),
-                userId: admin.userId,
-                balance: 0,
-                currency: "INR"
-            });
-        }
+        adminWallet ??= await this._walletRepo.create({
+            walletId: uuidv4(),
+            userId: admin.userId,
+            balance: 0,
+            currency: "INR"
+        });
 
         const updatedAdminWallet = await this._walletRepo.creditBalance(admin.userId, amount);
 
@@ -112,7 +107,7 @@ export class ProcessWalletPaymentUseCase implements IProcessWalletPaymentUseCase
     });
 
     // Mark worker schedule slots as booked now that payment is confirmed
-    for (const slot of service.selectedSlots || []) {
+    for (const slot of service.selectedSlots) {
       await this._scheduleRepo.markAsBooked(
         service.workerId,
         slot.date,

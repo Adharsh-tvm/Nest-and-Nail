@@ -14,9 +14,9 @@ function formatDuration(totalSeconds: number): string {
   const hours = Math.floor(totalSeconds / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
   const seconds = totalSeconds % 60;
-  if (hours > 0) return `${hours}h ${minutes}m ${seconds}s`;
-  if (minutes > 0) return `${minutes}m ${seconds}s`;
-  return `${seconds}s`;
+  if (hours > 0) return `${String(hours)}h ${String(minutes)}m ${String(seconds)}s`;
+  if (minutes > 0) return `${String(minutes)}m ${String(seconds)}s`;
+  return `${String(seconds)}s`;
 }
 
 export class EndVideoCallUseCase implements IEndVideoCallUseCase {
@@ -67,6 +67,7 @@ export class EndVideoCallUseCase implements IEndVideoCallUseCase {
     };
 
     const updated = await this.serviceRepository.updateVideoCall(serviceId, updatedVideoCall);
+    void updated;
 
     await this.serviceRepository.updateStatus(serviceId, {
       status: ServiceStatus.COMPLETED,
@@ -81,14 +82,12 @@ export class EndVideoCallUseCase implements IEndVideoCallUseCase {
         // Credit Worker
         const workerId = service.workerId;
         let workerWallet = await this._walletRepo.findByUserId(workerId);
-        if (!workerWallet) {
-          workerWallet = await this._walletRepo.create({
-            walletId: uuidv4(),
-            userId: workerId,
-            balance: 0,
-            currency: "INR"
-          });
-        }
+        workerWallet ??= await this._walletRepo.create({
+          walletId: uuidv4(),
+          userId: workerId,
+          balance: 0,
+          currency: "INR"
+        });
 
         const updatedWorkerWallet = await this._walletRepo.creditBalance(workerId, workerShare);
         await this._transactionRepo.create({
@@ -106,7 +105,7 @@ export class EndVideoCallUseCase implements IEndVideoCallUseCase {
         // Debit admin wallet
         const adminRepo = this._userRepoFactory.getRepository(Role.ADMIN);
         const admins = await adminRepo.findAll();
-        const admin = admins[0];
+        const admin = admins[0] as typeof admins[number] | undefined;
 
         if (admin) {
           const adminWallet = await this._walletRepo.findByUserId(admin.userId);

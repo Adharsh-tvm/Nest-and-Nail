@@ -4,8 +4,17 @@ import { TransactionModel } from "../../../infrastructure/database/models/Transa
 import { WorkerModel } from "../../../infrastructure/database/models/WorkerModel";
 import { CategoryModel } from "../../../infrastructure/database/models/CategoryModel";
 import { ServiceStatus } from "../../../shared/enums/serviceEnums";
-import { transactionType, transactionSource, transactionStatus } from "../../../shared/enums/transactionEnums";
+import { transactionSource, transactionStatus } from "../../../shared/enums/transactionEnums";
 import { AdminDashboardResponseDTO } from "../../dtos/admin/AdminDashboardDTO";
+
+interface MonthlyDataAgg {
+    _id: {
+        year: number;
+        month: number;
+    };
+    revenue: number;
+    sales: number;
+}
 
 export class GetAdminDashboardDataUseCase implements IGetAdminDashboardDataUseCase {
     async execute(): Promise<AdminDashboardResponseDTO> {
@@ -17,7 +26,7 @@ export class GetAdminDashboardDataUseCase implements IGetAdminDashboardDataUseCa
 
         // Total Revenue
         const completedServicesData = await ServiceModel.find({ status: ServiceStatus.COMPLETED });
-        const totalRevenue = completedServicesData.reduce((acc, service) => acc + (service.totalAmount || 0), 0);
+        const totalRevenue = completedServicesData.reduce((acc, service) => acc + (service.totalAmount ?? 0), 0);
 
         // Total Refunds
         const refundedTransactions = await TransactionModel.find({
@@ -37,7 +46,7 @@ export class GetAdminDashboardDataUseCase implements IGetAdminDashboardDataUseCa
         const categories = await CategoryModel.find().lean();
         const categoryGraphData = await Promise.all(
             categories.map(async (cat) => {
-                const count = await ServiceModel.countDocuments({ category: cat._id.toString() });
+                const count = await ServiceModel.countDocuments({ category: (cat._id as { toString(): string }).toString() });
                 const countByName = await ServiceModel.countDocuments({ category: cat.name });
                 return {
                     name: cat.name,
@@ -54,7 +63,7 @@ export class GetAdminDashboardDataUseCase implements IGetAdminDashboardDataUseCa
         sixMonthsAgo.setDate(1);
         sixMonthsAgo.setHours(0, 0, 0, 0);
 
-        const monthlyData = await ServiceModel.aggregate([
+        const monthlyData = (await ServiceModel.aggregate([
             { $match: { createdAt: { $gte: sixMonthsAgo } } },
             {
                 $group: {
@@ -71,7 +80,7 @@ export class GetAdminDashboardDataUseCase implements IGetAdminDashboardDataUseCa
                 }
             },
             { $sort: { "_id.year": 1, "_id.month": 1 } }
-        ]);
+        ])) as unknown as MonthlyDataAgg[];
 
         const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
@@ -114,7 +123,7 @@ export class GetAdminDashboardDataUseCase implements IGetAdminDashboardDataUseCa
                 servicesByStatus: servicesByStatus
             },
             topWorkers: topWorkers.map(w => ({
-                id: w._id.toString(),
+                id: (w._id as { toString(): string }).toString(),
                 name: w.name,
                 role: 'Worker',
                 rating: w.rating,

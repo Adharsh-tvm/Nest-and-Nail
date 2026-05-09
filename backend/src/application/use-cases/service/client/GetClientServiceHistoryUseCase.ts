@@ -15,6 +15,6 @@ export class GetClientServiceHistoryUseCase implements IGetClientServiceHistoryU
       s => s.category !== "VIDEO_CALL" && s.status !== ServiceStatus.PENDING
     );
 
-    return filtered.map(ServiceMapper.toResponse);
+    return filtered.map(s => ServiceMapper.toResponse(s));
   }
 }

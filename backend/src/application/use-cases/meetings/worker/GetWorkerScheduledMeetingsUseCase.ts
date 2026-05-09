@@ -12,7 +12,7 @@ export class GetWorkerScheduledMeetingsUseCase implements IGetWorkerScheduledMee
 
         const filtered = services
             .filter(s => ["CONFIRMED", "IN_PROGRESS"].includes(s.status))
-            .map(ServiceMapper.toResponse);
+            .map(s => ServiceMapper.toResponse(s));
         
         return filtered
     }

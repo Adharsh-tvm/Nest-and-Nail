@@ -20,6 +20,6 @@ export class GetClientOngoingServicesUseCase implements IGetClientOngoingService
         )
     );
 
-    return ongoing.map(ServiceMapper.toResponse);
+    return ongoing.map(s => ServiceMapper.toResponse(s));
   }
 }

@@ -7,6 +7,7 @@ export class RefreshTokenUseCase implements IRefreshTokenUseCase {
   ) { }
 
   async execute(refreshToken: string) {
+    await Promise.resolve();
     // 1. Verify refresh token
     const payload = this._tokenService.verifyRefreshToken(refreshToken);
 

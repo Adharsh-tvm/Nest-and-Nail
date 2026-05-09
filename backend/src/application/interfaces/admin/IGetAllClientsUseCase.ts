@@ -1,7 +1,5 @@
-export interface IGetAllClientsUseCase {
-    execute(
+import { UserResponseDTO } from "../../dtos/UserDTO";
 
-    ):Promise<{
-        
-    }>
+export interface IGetAllClientsUseCase {
+    execute(): Promise<UserResponseDTO[]>;
 }

@@ -30,8 +30,8 @@ export class UpdateWorkerCategoriesUseCase implements IUpdateWorkerCategoriesUse
             throw new Error("One or more categories are invalid or inactive");
         }
 
-        const workerRepo = await this._userRepo.getRepository<User>(Role.WORKER);
-        const clientRepo = await this._userRepo.getRepository<User>(Role.CLIENT);
+        const workerRepo = this._userRepo.getRepository<User>(Role.WORKER);
+        const clientRepo = this._userRepo.getRepository<User>(Role.CLIENT);
 
         let worker = await workerRepo.findById(workerId);
         let repo = workerRepo;

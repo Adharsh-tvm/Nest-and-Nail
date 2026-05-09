@@ -56,7 +56,7 @@ export class GetWorkerAvailabilityUseCase implements IGetWorkerAvailabilityUseCa
         end.setHours(0, 0, 0, 0);
 
         while (cur <= end) {
-            const dateKey = `${cur.getFullYear()}-${String(cur.getMonth() + 1).padStart(2, '0')}-${String(cur.getDate()).padStart(2, '0')}`;
+            const dateKey = `${String(cur.getFullYear())}-${String(cur.getMonth() + 1).padStart(2, '0')}-${String(cur.getDate()).padStart(2, '0')}`;
             result[dateKey] = { morningAvailable: true, eveningAvailable: true, fullDayAvailable: true, isBooked: false, isUnavailable: false, bookedSlots: [] };
             cur.setDate(cur.getDate() + 1);
         }
@@ -65,25 +65,26 @@ export class GetWorkerAvailabilityUseCase implements IGetWorkerAvailabilityUseCa
         for (const s of schedules) {
             if (s.isAvailable && !s.isBooked) continue;
             const dt = new Date(s.date);
-            const dateStr = `${dt.getUTCFullYear()}-${String(dt.getUTCMonth() + 1).padStart(2, '0')}-${String(dt.getUTCDate()).padStart(2, '0')}`;
-            if (result[dateStr]) {
+            const dateStr = `${String(dt.getUTCFullYear())}-${String(dt.getUTCMonth() + 1).padStart(2, '0')}-${String(dt.getUTCDate()).padStart(2, '0')}`;
+            const entry = result[dateStr] as typeof result[string] | undefined;
+            if (entry) {
                 if (s.isBooked) {
-                     result[dateStr].isBooked = true;
-                     result[dateStr].bookedSlots = result[dateStr].bookedSlots || [];
-                     result[dateStr].bookedSlots.push(s.slotType);
+                     entry.isBooked = true;
+                     entry.bookedSlots = entry.bookedSlots ?? [];
+                     entry.bookedSlots.push(s.slotType);
                 }
-                if (!s.isAvailable) result[dateStr].isUnavailable = true;
+                if (!s.isAvailable) entry.isUnavailable = true;
 
                 if (s.slotType === SlotType.MORNING_HALF) {
-                    result[dateStr].morningAvailable = false;
-                    result[dateStr].fullDayAvailable = false;
+                    entry.morningAvailable = false;
+                    entry.fullDayAvailable = false;
                 } else if (s.slotType === SlotType.EVENING_HALF) {
-                    result[dateStr].eveningAvailable = false;
-                    result[dateStr].fullDayAvailable = false;
+                    entry.eveningAvailable = false;
+                    entry.fullDayAvailable = false;
                 } else if (s.slotType === SlotType.FULL_DAY) {
-                    result[dateStr].morningAvailable = false;
-                    result[dateStr].eveningAvailable = false;
-                    result[dateStr].fullDayAvailable = false;
+                    entry.morningAvailable = false;
+                    entry.eveningAvailable = false;
+                    entry.fullDayAvailable = false;
                 }
             }
         }

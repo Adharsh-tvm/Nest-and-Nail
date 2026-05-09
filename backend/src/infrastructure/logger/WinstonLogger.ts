@@ -6,7 +6,7 @@ export class WinstonLogger implements ILogger {
     loggerInstance.info(message);
   }
   error(message: string, error?: unknown): void {
-    loggerInstance.error(`${message} - ${error instanceof Error ? error.stack : error}`);
+    loggerInstance.error(`${message} - ${error instanceof Error ? String(error.stack) : String(error)}`);
   }
   warn(message: string): void {
     loggerInstance.warn(message);
@@ -15,6 +15,6 @@ export class WinstonLogger implements ILogger {
     loggerInstance.debug(message);
   }
   http(message: string): void {
-    loggerInstance.http?.(message);
+    loggerInstance.http(message);
   }
 }

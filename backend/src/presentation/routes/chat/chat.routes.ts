@@ -8,8 +8,8 @@ export const chatRoutes = (
 ) => {
     const router = Router();
 
-    router.post("/send", authMiddleware.verify.bind(authMiddleware), chatController.sendMessage);
-    router.get("/:chatId", authMiddleware.verify.bind(authMiddleware), chatController.getMessages);
+    router.post("/send", authMiddleware.verify.bind(authMiddleware), (req, res) => { void chatController.sendMessage(req, res); });
+    router.get("/:chatId", authMiddleware.verify.bind(authMiddleware), (req, res) => { void chatController.getMessages(req, res); });
 
     return router;
 };

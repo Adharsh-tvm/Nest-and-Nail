@@ -9,8 +9,8 @@ export function createAdminMeetingRoutes(
     authMiddleware: AuthMiddleware
 ) {
 
-    router.get("/meetings", authMiddleware.adminOnly.bind(authMiddleware), (req, res) => adminMeetingController.getAllMeetings(req, res));
-    router.get("/meetings/:serviceId", authMiddleware.adminOnly.bind(authMiddleware), (req, res) => adminMeetingController.getMeetingById(req, res));
+    router.get("/meetings", authMiddleware.adminOnly.bind(authMiddleware), (req, res) => { void adminMeetingController.getAllMeetings(req, res); });
+    router.get("/meetings/:serviceId", authMiddleware.adminOnly.bind(authMiddleware), (req, res) => { void adminMeetingController.getMeetingById(req, res); });
 
     return router;
 }

@@ -6,7 +6,7 @@ const { combine, timestamp, printf, colorize, errors } = winston.format;
 
 // Custom format for logs
 const logFormat = printf(({ level, message, timestamp, stack }) => {
-  return `[${timestamp}] ${level}: ${stack || message}`;
+  return `[${String(timestamp)}] ${level}: ${String(stack ?? message)}`;
 });
 
 // Daily rotate transport
@@ -16,7 +16,7 @@ const dailyRotateTransport = new DailyRotateFile({
   zippedArchive: true,
   maxSize: env.LOG_MAX_SIZE,
   maxFiles: env.LOG_RETENTION_DAYS
-    ? `${env.LOG_RETENTION_DAYS}d`
+    ? `${String(env.LOG_RETENTION_DAYS)}d`
     : "30d",
 });
 
@@ -28,7 +28,7 @@ const errorRotateTransport = new DailyRotateFile({
   zippedArchive: true,
   maxSize: env.ERROR_LOG_MAX_SIZE,
   maxFiles: env.LOG_RETENTION_DAYS
-    ? `${env.LOG_RETENTION_DAYS}d`
+    ? `${String(env.LOG_RETENTION_DAYS)}d`
     : "30d",
 });
 

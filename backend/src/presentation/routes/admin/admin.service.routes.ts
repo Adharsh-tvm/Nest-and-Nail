@@ -12,13 +12,13 @@ export function createAdminServiceRoutes(
     router.get(
         "/",
         authMiddleware.adminOnly.bind(authMiddleware),
-        (req, res) => adminServiceController.getAllServices(req, res)
+        (req, res) => { void adminServiceController.getAllServices(req, res); }
     );
 
     router.get(
         "/:serviceId",
         authMiddleware.adminOnly.bind(authMiddleware),
-        (req, res) => adminServiceController.getServiceDetails(req, res)
+        (req, res) => { void adminServiceController.getServiceDetails(req, res); }
     );
 
     return router;

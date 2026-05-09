@@ -39,6 +39,7 @@ export class StartServiceUseCase implements IStartServiceUseCase {
         const scheduled = new Date(service.scheduledDate);
 
         const diffInMinutes = (now.getTime() - scheduled.getTime()) / (1000 * 60);
+        void diffInMinutes;
 
         // if (diffInMinutes < -30) {
         //     throw new Error("Too early to start service");
@@ -52,6 +53,7 @@ export class StartServiceUseCase implements IStartServiceUseCase {
             serviceLat,
             serviceLng
         );
+        void distance;
 
         // if (distance > 150) {
         //     throw new Error("You are not near the service location");

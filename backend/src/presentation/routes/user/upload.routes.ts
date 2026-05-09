@@ -15,7 +15,7 @@ export function createUploadRoutes(
     "/worker/:workerId/profile",
     authMiddleware.verify.bind(authMiddleware),
     upload.single("file"),
-    (req, res) => uploadController.uploadProfile(req, res)
+    (req, res) => { void uploadController.uploadProfile(req, res); }
   );
 
 
@@ -24,7 +24,7 @@ export function createUploadRoutes(
     "/worker/:workerId/document",
     authMiddleware.verify.bind(authMiddleware),
     upload.single("file"),
-    (req, res) => uploadController.uploadDocument(req, res)
+    (req, res) => { void uploadController.uploadDocument(req, res); }
   );
 
   return router;

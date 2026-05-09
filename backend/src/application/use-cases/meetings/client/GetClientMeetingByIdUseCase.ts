@@ -25,7 +25,7 @@ export class GetClientMeetingByIdUseCase implements IGetClientMeetingByIdUseCase
 
   async execute(serviceId: string, clientId: string) {
 
-    const service = await this.serviceRepo.findDetailedByServiceId(serviceId) as unknown as IDetailedService;
+    const service = await this.serviceRepo.findDetailedByServiceId(serviceId) as IDetailedService | null;
 
     if (!service) {
       throw new Error("Meeting not found");

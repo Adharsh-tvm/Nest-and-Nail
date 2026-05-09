@@ -44,7 +44,7 @@ export class ResetPasswordUseCase implements IResetPasswordUseCase {
 
         await this._otpRepo.delete(email);
 
-        this._logger?.info(`Password reset successful for ${email}`);
+        this._logger.info(`Password reset successful for ${email}`);
     }
 }
     

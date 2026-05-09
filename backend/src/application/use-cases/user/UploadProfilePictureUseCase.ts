@@ -27,7 +27,7 @@ export class UploadProfilePictureUseCase implements IUploadProfilePictureUseCase
 
         if (!user) throw new Error("User not found");
 
-        const key = `users/profile/${userId}-${Date.now()}`;
+        const key = `users/profile/${userId}-${String(Date.now())}`;
         await this._s3Service.uploadFile(filePath, key, mimetype);
 
         // Store the KEY in the database, not the full URL

@@ -10,12 +10,10 @@ export class GetClientMeetingsHistoryUseCase implements IGetClientScheduledMeeti
 
     const services = await this.serviceRepo.getMeetingsByClient(clientId);
 
-    const now = new Date();
-
     const history = services.filter(s =>
       !["OPEN", "PENDING", "CONFIRMED", "IN_PROGRESS"].includes(s.status)
     );
 
-    return history.map(ServiceMapper.toResponse);
+    return history.map(s => ServiceMapper.toResponse(s));
   }
 }

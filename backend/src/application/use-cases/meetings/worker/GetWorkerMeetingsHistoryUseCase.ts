@@ -12,6 +12,6 @@ export class GetWorkerMeetingsHistoryUseCase implements IGetWorkerScheduledMeeti
 
     return services
       .filter(s => !["OPEN", "PENDING", "CONFIRMED", "IN_PROGRESS"].includes(s.status))
-      .map(ServiceMapper.toResponse);
+      .map(s => ServiceMapper.toResponse(s));
   }
 }

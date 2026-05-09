@@ -26,10 +26,12 @@ const envSchema = z.object({
   GOOGLE_CLIENT_SECRET: z.string().min(1),
 
   // Email
+  // eslint-disable-next-line @typescript-eslint/no-deprecated
   EMAIL_USER: z.string().email(),
   EMAIL_PASS: z.string().min(1),
 
   // Frontend
+  // eslint-disable-next-line @typescript-eslint/no-deprecated
   FRONTEND_URL: z.string().url(),
 
   // Cloudinary
@@ -52,6 +54,7 @@ const parsed = envSchema.safeParse(process.env);
 
 if (!parsed.success) {
   console.error(" Invalid environment variables:");
+  // eslint-disable-next-line @typescript-eslint/no-deprecated
   console.error(parsed.error.format());
   process.exit(1);
 }

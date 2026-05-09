@@ -11,13 +11,13 @@ export const notificationRoutes = (
   router.get(
     "/",
     authMiddleware.verify.bind(authMiddleware),
-    controller.getMyNotifications
+    (req, res) => { void controller.getMyNotifications(req, res); }
   );
 
   router.patch(
     "/:notificationId/read",
     authMiddleware.verify.bind(authMiddleware),
-    controller.markAsRead
+    (req, res) => { void controller.markAsRead(req, res); }
   );
 
   return router;

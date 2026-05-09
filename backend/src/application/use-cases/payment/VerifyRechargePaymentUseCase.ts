@@ -37,14 +37,12 @@ export class VerifyRechargePaymentUseCase implements IVerifyRechargePaymentUseCa
         if (!isValid) throw new Error("Invalid payment signature");
 
         let wallet = await this._walletRepo.findByUserId(data.userId);
-        if (!wallet) {
-            wallet = await this._walletRepo.create({
-                walletId: uuidv4(),
-                userId: data.userId,
-                balance: 0,
-                currency: "INR",
-            });
-        }
+        wallet ??= await this._walletRepo.create({
+            walletId: uuidv4(),
+            userId: data.userId,
+            balance: 0,
+            currency: "INR",
+        });
 
         const updatedWallet = await this._walletRepo.creditBalance(data.userId, data.amount);
 

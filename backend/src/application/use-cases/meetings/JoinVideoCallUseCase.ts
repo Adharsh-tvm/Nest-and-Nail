@@ -24,12 +24,15 @@ export class JoinVideoCallUseCase implements IJoinVideoCallUseCase {
             throw new Error("Unauthorized");
         }
 
-        const now = new Date();
-        const start = new Date(service.videoCall.startTime);
-        const end = new Date(service.videoCall.endTime);
+        // const now = new Date();
+        // const start = new Date(service.videoCall.startTime);
+        // const end = new Date(service.videoCall.endTime);
 
         // Relaxed time restriction for better UX/testing
         /*
+        const now = new Date();
+        const start = new Date(service.videoCall.startTime);
+        const end = new Date(service.videoCall.endTime);
         const earlyJoin = new Date(start.getTime() - 15 * 60 * 1000); // 15 mins early
         const lateJoin = new Date(end.getTime() + 60 * 60 * 1000); // 1 hour late
  
@@ -38,7 +41,7 @@ export class JoinVideoCallUseCase implements IJoinVideoCallUseCase {
         }
         */
 
-        const joinedUsers = service.videoCall.joinedUsers || [];
+        const joinedUsers = service.videoCall.joinedUsers ?? [];
         if (!joinedUsers.includes(userId)) {
             joinedUsers.push(userId);
         }

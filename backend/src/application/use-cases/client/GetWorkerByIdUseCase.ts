@@ -39,9 +39,7 @@ export class GetWorkerByIdUseCase implements IGetWorkerByIdUseCase {
         const clientRepo = this._userRepoFactory.getRepository(Role.CLIENT);
         const workerRepo = this._userRepoFactory.getRepository(Role.WORKER);
         let client = await clientRepo.findById(review.clientId);
-        if (!client) {
-          client = await workerRepo.findById(review.clientId)
-        }
+        client ??= await workerRepo.findById(review.clientId);
 
         return {
           reviewId: review.reviewId,
@@ -51,7 +49,7 @@ export class GetWorkerByIdUseCase implements IGetWorkerByIdUseCase {
           rating: review.rating,
           review: review.review,
           createdAt: review.createdAt,
-          clientName: client?.name || "Anonymous Client"
+          clientName: client?.name ?? "Anonymous Client"
         };
       } catch (error) {
         console.error(`[GetWorkerById] Error fetching client for review:`, error);

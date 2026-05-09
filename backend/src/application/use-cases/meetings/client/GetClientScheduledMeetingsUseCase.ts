@@ -10,12 +10,10 @@ export class GetClientScheduledMeetingsUseCase implements IGetClientScheduledMee
 
     const services = await this.serviceRepo.getMeetingsByClient(clientId);
 
-    const now = new Date();
-
     const scheduled = services.filter(s =>
       ["CONFIRMED", "IN_PROGRESS"].includes(s.status)
     );
 
-    return scheduled.map(ServiceMapper.toResponse);
+    return scheduled.map(s => ServiceMapper.toResponse(s));
   }
 }

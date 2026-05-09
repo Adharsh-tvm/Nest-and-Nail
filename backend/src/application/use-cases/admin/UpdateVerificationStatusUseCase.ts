@@ -23,7 +23,7 @@ export class UpdateVerificationStatusUseCase implements IUpdateVerificationStatu
         const workerRepo = this._repoFactory.getRepository(Role.WORKER);
 
         let user = await clientRepo.findById(userId);
-        if (!user) user = await workerRepo.findById(userId);
+        user ??= await workerRepo.findById(userId);
 
         if (!user) throw new Error("User not found");
 

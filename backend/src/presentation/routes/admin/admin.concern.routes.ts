@@ -4,7 +4,7 @@ import { AdminConcernController } from "../../controllers/admin/AdminConcernCont
 export const adminConcernRoutes = (controller: AdminConcernController) => {
   const router = express.Router();
 
-  router.get("/", controller.getAllConcerns);
+  router.get("/", (req, res) => { void controller.getAllConcerns(req, res); });
 
   return router;
 };

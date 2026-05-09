@@ -12,19 +12,19 @@ export function createPaymentRoutes(
     router.post(
         "/payment/create-order",
         authMiddleware.verify.bind(authMiddleware),
-        paymentController.createOrder
+        (req, res) => { void paymentController.createOrder(req, res); }
     );
 
     router.post(
         "/payment/verify",
         authMiddleware.verify.bind(authMiddleware),
-        paymentController.verify
+        (req, res) => { void paymentController.verify(req, res); }
     );
 
     router.post(
         "/payment/wallet",
         authMiddleware.verify.bind(authMiddleware),
-        paymentController.processWalletPayment
+        (req, res) => { void paymentController.processWalletPayment(req, res); }
     );
 
     return router;

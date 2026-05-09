@@ -1,4 +1,3 @@
-import { Role } from "../../../shared/enums/authEnums";
 import { LoginResponseDTO } from "../../dtos/UserDTO";
 
 export interface IGoogleSignUpUseCase {

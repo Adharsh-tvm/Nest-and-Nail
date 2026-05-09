@@ -58,14 +58,12 @@ export class CompleteServiceUseCase implements ICompleteServiceUseCase {
                 // Credit Worker
                 const workerId = service.workerId;
                 let workerWallet = await this._walletRepo.findByUserId(workerId);
-                if (!workerWallet) {
-                    workerWallet = await this._walletRepo.create({
-                        walletId: uuidv4(),
-                        userId: workerId,
-                        balance: 0,
-                        currency: "INR"
-                    });
-                }
+                workerWallet ??= await this._walletRepo.create({
+                    walletId: uuidv4(),
+                    userId: workerId,
+                    balance: 0,
+                    currency: "INR"
+                });
                 
                 const updatedWorkerWallet = await this._walletRepo.creditBalance(workerId, workerShare);
                 await this._transactionRepo.create({
@@ -83,7 +81,7 @@ export class CompleteServiceUseCase implements ICompleteServiceUseCase {
                 // Debit admin wallet
                 const adminRepo = this._userRepoFactory.getRepository(Role.ADMIN);
                 const admins = await adminRepo.findAll();
-                const admin = admins[0];
+                const admin = admins[0] as typeof admins[number] | undefined;
 
                 if (admin) {
                     const adminWallet = await this._walletRepo.findByUserId(admin.userId);

@@ -82,7 +82,7 @@ export class CreateWorkerScheduleUseCase implements ICreateWorkerScheduleUseCase
 
     try {
       const createdSchedules = await this.workerScheduleRepository.createBulk(schedulesToCreate);
-      return createdSchedules.map(WorkerScheduleMapper.toDTO);
+      return createdSchedules.map(s => WorkerScheduleMapper.toDTO(s));
     } catch (error: unknown) {
       if (typeof error === 'object' && error !== null && 'code' in error && (error as { code: number }).code === 11000) {
         throw new Error("Some schedules in this date range already exist for the worker.");

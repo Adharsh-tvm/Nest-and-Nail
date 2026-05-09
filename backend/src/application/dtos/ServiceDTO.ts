@@ -65,7 +65,7 @@ export interface ServiceResponseDTO {
     profilePictureUrl?: string;
   };
   location?: {
-    type: "Point" | string;
+    type: "Point";
     coordinates: number[];
   };
   address?: {

@@ -34,7 +34,7 @@ export class CreateConcernUseCase implements ICreateConcernUseCase {
     if (files && files.length > 0) {
       for (const file of files) {
         const fileExtension = file.originalname.split(".").pop();
-        const key = `concerns/${serviceId}/${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExtension}`;
+        const key = `concerns/${serviceId}/${String(Date.now())}-${Math.random().toString(36).substring(2, 9)}.${fileExtension ?? ""}`;
         await this._s3Service.uploadFile(file.path, key, file.mimetype);
         uploadedKeys.push(key);
       }

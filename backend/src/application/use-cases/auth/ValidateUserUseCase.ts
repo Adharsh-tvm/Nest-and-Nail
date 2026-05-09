@@ -22,14 +22,18 @@ export class ValidateUserUseCase implements IValidateUserUseCase {
             const clientRepo = this._userRepositoryFactory.getRepository(Role.CLIENT);
             user = await clientRepo.findById(userId);
             if (user) userRole = Role.CLIENT;
-        } catch { }
+        } catch {
+            // clientRepo lookup failed, proceed to workerRepo
+        }
 
         if (!user) {
             try {
                 const workerRepo = this._userRepositoryFactory.getRepository(Role.WORKER);
                 user = await workerRepo.findById(userId);
                 if (user) userRole = Role.WORKER;
-            } catch { }
+            } catch {
+                // workerRepo lookup failed, proceed to adminRepo
+            }
         }
 
         if (!user) {
@@ -37,7 +41,9 @@ export class ValidateUserUseCase implements IValidateUserUseCase {
                 const adminRepo = this._userRepositoryFactory.getRepository(Role.ADMIN);
                 user = await adminRepo.findById(userId);
                 if (user) userRole = Role.ADMIN;
-            } catch { }
+            } catch {
+                // adminRepo lookup failed, user not found
+            }
         }
 
         if (!user || !userRole) {

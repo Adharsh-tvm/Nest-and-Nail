@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { AuthMiddleware } from "../../middlewares/AuthMiddleware";
-import { ClientServiceController } from "../../controllers/client/ClientServiceController";
 import { VideoCallController } from "../../controllers/common/videoCallController";
 
 
@@ -11,11 +10,11 @@ export function createUsersVideoCallRoutes(
     videoCallController : VideoCallController
 ) {
 
-    router.post("/join/:serviceId", authMiddleware.verify.bind(authMiddleware), videoCallController.joinCall);
+    router.post("/join/:serviceId", authMiddleware.verify.bind(authMiddleware), (req, res) => { void videoCallController.joinCall(req, res); });
 
-    router.post("/end/:serviceId", authMiddleware.verify.bind(authMiddleware), videoCallController.endCall);
+    router.post("/end/:serviceId", authMiddleware.verify.bind(authMiddleware), (req, res) => { void videoCallController.endCall(req, res); });
 
-    router.post("/leave/:serviceId", authMiddleware.verify.bind(authMiddleware), videoCallController.leaveCall);
+    router.post("/leave/:serviceId", authMiddleware.verify.bind(authMiddleware), (req, res) => { void videoCallController.leaveCall(req, res); });
 
     return router;
 }

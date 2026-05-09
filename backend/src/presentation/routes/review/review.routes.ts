@@ -11,7 +11,7 @@ export const clientReviewRoutes = (
     router.post(
         "/:serviceId",
         authMiddleware.verify.bind(authMiddleware),
-        controller.addReview
+        (req, res) => { void controller.addReview(req, res); }
     );
 
     return router;

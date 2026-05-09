@@ -66,11 +66,11 @@ async function bootstrap() {
   // Start server
   const PORT = env.PORT;
   server.listen(PORT, () => {
-    container.infra.logger.info(`Server running on http://localhost:${PORT}`);
+    container.infra.logger.info(`Server running on http://localhost:${String(PORT)}`);
   });
 }
 
-bootstrap().catch((error) => {
+bootstrap().catch((error: unknown) => {
   console.error("Failed to start server:", error);
   process.exit(1);
 });                           

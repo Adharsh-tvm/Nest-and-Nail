@@ -1,7 +1,7 @@
 import { Schema } from "mongoose";
 import { IUserDocument, UserModel } from "./UserModel";
 
-export interface IClientDocument extends IUserDocument {}
+export type IClientDocument = IUserDocument;
 
 const clientSchema = new Schema<IClientDocument>(
   {},

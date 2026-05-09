@@ -1,7 +1,7 @@
 import { Schema } from "mongoose";
 import { IUserDocument, UserModel } from "./UserModel";
 
-export interface IWorkerDocument extends IUserDocument { }
+export type IWorkerDocument = IUserDocument;
 
 const workerSchema = new Schema<IWorkerDocument>(
   {},

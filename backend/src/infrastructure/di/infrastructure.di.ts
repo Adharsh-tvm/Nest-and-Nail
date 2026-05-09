@@ -85,165 +85,100 @@ export class InfrastructureDI {
 
 
   get userRepositoryFactory(): IUserRepositoryFactory {
-    if (!this._userRepositoryFactory) {
-      this._userRepositoryFactory = new UserRepositoryFactory(
+    return (this._userRepositoryFactory ??= new UserRepositoryFactory(
         this.clientRepository,
         this.workerRepository,
         this.adminRepository,
         this.userRepository
-      );
-    }
-    return this._userRepositoryFactory;
+      ));
   }
 
   get userRepository(): IBaseRepository<User> {
-    if (!this._userRepository) {
-      this._userRepository = new UserRepository();
-    }
-    return this._userRepository;
+    return (this._userRepository ??= new UserRepository());
   }
 
   get clientRepository(): IClientRepository {
-    if (!this._clientRepository) {
-      this._clientRepository = new ClientRepository();
-    }
-    return this._clientRepository;
+    return (this._clientRepository ??= new ClientRepository());
   }
 
   get workerRepository(): IWorkerRepository {
-    if (!this._workerRepository) {
-      this._workerRepository = new WorkerRepository();
-    }
-    return this._workerRepository;
+    return (this._workerRepository ??= new WorkerRepository());
   }
 
   get workerScheduleRepo(): IWorkerScheduleRepository {
-    if (!this._workerScheduleRepo) {
-      this._workerScheduleRepo = new WorkerScheduleRepository();
-    }
-    return this._workerScheduleRepo
+    return (this._workerScheduleRepo ??= new WorkerScheduleRepository());
   }
 
   get adminRepository(): IAdminRepository {
-    if (!this._adminRepository) {
-      this._adminRepository = new AdminRepository();
-    }
-    return this._adminRepository
+    return (this._adminRepository ??= new AdminRepository());
   }
 
   get otpRepository(): IOtpRepository {
-    if (!this._otpRepository) {
-      this._otpRepository = new OtpRepository();
-    }
-    return this._otpRepository;
+    return (this._otpRepository ??= new OtpRepository());
   }
 
   get categoryRepository(): ICategoryRepository {
-    if (!this._categoryRepository) {
-      this._categoryRepository = new CategoryRepository();
-    }
-    return this._categoryRepository;
+    return (this._categoryRepository ??= new CategoryRepository());
   }
 
   get serviceRepository(): IServiceRepository {
-    if (!this._serviceRepository) {
-      this._serviceRepository = new ServiceRepository();
-    }
-    return this._serviceRepository;
+    return (this._serviceRepository ??= new ServiceRepository());
   }
 
   get passwordHasher(): IPasswordHasher {
-    if (!this._passwordHasher) {
-      this._passwordHasher = new BcryptPasswordHasher();
-    }
-    return this._passwordHasher;
+    return (this._passwordHasher ??= new BcryptPasswordHasher());
   }
 
   get idGenerator(): IGenerateUserID {
-    if (!this._idGenerator) {
-      this._idGenerator = new UUIDGenerator();
-    }
-    return this._idGenerator;
+    return (this._idGenerator ??= new UUIDGenerator());
   }
 
   get tokenService(): ITokenService {
-    if (!this._tokenService) {
-
-      this._tokenService = new JwtTokenService(
+    return (this._tokenService ??= new JwtTokenService(
         env.ACCESS_TOKEN_SECRET,
         env.REFRESH_TOKEN_SECRET
-      );
-
-    }
-    return this._tokenService;
+      ));
   }
 
   get logger(): ILogger {
-    if (!this._logger) this._logger = loggerInstance;
+    this._logger ??= loggerInstance;
     return this._logger;
   }
 
   get otpService(): IOtpService {
-    if (!this._otpService) {
-      this._otpService = new OtpService();
-    }
-    return this._otpService;
+    return (this._otpService ??= new OtpService());
   }
 
   get emailService(): IEmailService {
-    if (!this._emailService) {
-      this._emailService = new NodemailerEmailService();
-    }
-    return this._emailService;
+    return (this._emailService ??= new NodemailerEmailService());
   }
 
   get s3Service(): S3Service {
-    if (!this._s3Service) {
-      this._s3Service = new S3Service();
-    }
-    return this._s3Service;
+    return (this._s3Service ??= new S3Service());
   }
 
   get paymentRepository(): IPaymentRepository {
-    if (!this._paymentRepository) {
-      this._paymentRepository = new PaymentRepository(PaymentModel)
-    }
-    return this._paymentRepository;
+    return (this._paymentRepository ??= new PaymentRepository(PaymentModel));
   }
 
   get paymentGateway(): IPaymentGateway {
-    if (!this._paymentGateway) {
-      this._paymentGateway = new RazorpayGateway();
-    }
-    return this._paymentGateway
+    return (this._paymentGateway ??= new RazorpayGateway());
   }
 
   get walletRepository(): IWalletRepository {
-    if (!this._walletRepository) {
-      this._walletRepository = new WalletRepository();
-    }
-    return this._walletRepository;
+    return (this._walletRepository ??= new WalletRepository());
   }
 
   get transactionRepository(): ITransactionRepository {
-    if (!this._transactionRepository) {
-      this._transactionRepository = new TransactionRepository();
-    }
-    return this._transactionRepository;
+    return (this._transactionRepository ??= new TransactionRepository());
   }
 
   get concernRepository(): IConcernRepository {
-    if (!this._concernRepository) {
-      this._concernRepository = new ConcernRepository();
-    }
-    return this._concernRepository;
+    return (this._concernRepository ??= new ConcernRepository());
   }
 
   get reviewRepository(): IReviewRepository {
-    if (!this._reviewRepository) {
-      this._reviewRepository = new ReviewRepository();
-    }
-    return this._reviewRepository
+    return (this._reviewRepository ??= new ReviewRepository());
   }
 
   setRealtimeService(service: IRealtimeService) {
@@ -258,16 +193,10 @@ export class InfrastructureDI {
   }
 
   get notificationRepository(): INotificationRepository {
-    if (!this._notificationRepository) {
-      this._notificationRepository = new NotificationRepository();
-    }
-    return this._notificationRepository;
+    return (this._notificationRepository ??= new NotificationRepository());
   }
 
   get chatRepository(): IChatRepository {
-    if (!this._chatRepository) {
-      this._chatRepository = new ChatRepository()
-    }
-    return this._chatRepository;
+    return (this._chatRepository ??= new ChatRepository());
   }
 }

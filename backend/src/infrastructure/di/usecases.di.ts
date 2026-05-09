@@ -257,584 +257,409 @@ export class UseCaseDI {
 
 
   get registerUserUseCase(): IRegisterUserUseCase {
-    if (!this._registerUserUseCase) {
-      this._registerUserUseCase = new RegisterUserUseCase(
+    return (this._registerUserUseCase ??= new RegisterUserUseCase(
         this.infra.userRepositoryFactory,
         this.infra.passwordHasher,
         this.infra.idGenerator,
         this.infra.tokenService,
         this.infra.logger
-      );
-    }
-    return this._registerUserUseCase;
+      ));
   }
 
   get loginUserUseCase(): ILoginUserUseCase {
-    if (!this._loginUserUseCase) {
-      this._loginUserUseCase = new LoginUserUseCase(
+    return (this._loginUserUseCase ??= new LoginUserUseCase(
         this.infra.userRepositoryFactory,
         this.infra.passwordHasher,
         this.infra.tokenService,
         this.infra.logger
-      );
-    }
-    return this._loginUserUseCase;
+      ));
   }
 
   get getAllClientsUseCase(): IGetAllClientsUseCase {
-    if (!this._getAllClientsUseCase) {
-      this._getAllClientsUseCase = new GetAllClientsUseCase(this.infra.clientRepository);
-    }
-    return this._getAllClientsUseCase;
+    return (this._getAllClientsUseCase ??= new GetAllClientsUseCase(this.infra.clientRepository));
   }
 
   get getAdminDashboardDataUseCase(): IGetAdminDashboardDataUseCase {
-    if (!this._getAdminDashboardDataUseCase) {
-      this._getAdminDashboardDataUseCase = new GetAdminDashboardDataUseCase();
-    }
-    return this._getAdminDashboardDataUseCase;
+    return (this._getAdminDashboardDataUseCase ??= new GetAdminDashboardDataUseCase());
   }
 
   get getWorkerDashboardDataUseCase(): IGetWorkerDashboardDataUseCase {
-    if (!this._getWorkerDashboardDataUseCase) {
-      this._getWorkerDashboardDataUseCase = new GetWorkerDashboardDataUseCase();
-    }
-    return this._getWorkerDashboardDataUseCase;
+    return (this._getWorkerDashboardDataUseCase ??= new GetWorkerDashboardDataUseCase());
   }
 
   get getAllWorkersUseCase(): IGetAllWorkersUseCase {
-    if (!this._getAllWorkersUseCase) {
-      this._getAllWorkersUseCase = new GetAllWorkersUseCase(
+    return (this._getAllWorkersUseCase ??= new GetAllWorkersUseCase(
         this.infra.workerRepository,
         this.infra.s3Service
-      );
-    }
-    return this._getAllWorkersUseCase;
+      ));
   }
 
   get googleLoginUseCase(): IGoogleSignUpUseCase {
-    if (!this._googleLoginUseCase) {
-      this._googleLoginUseCase = new GoogleSignUpUseCase(
+    return (this._googleLoginUseCase ??= new GoogleSignUpUseCase(
         this.infra.userRepositoryFactory,
         this.infra.passwordHasher,
         this.infra.tokenService,
         this.infra.idGenerator
-      );
-    }
-    return this._googleLoginUseCase;
+      ));
   }
 
   get sendOtpUseCase(): ISendOtpUseCase {
-    if (!this._sendOtpUseCase) {
-      this._sendOtpUseCase = new SendOtpUseCase(
+    return (this._sendOtpUseCase ??= new SendOtpUseCase(
         this.infra.emailService,
         this.infra.otpService,
         this.infra.otpRepository,
         this.infra.userRepositoryFactory,
         this.infra.logger
-      );
-    }
-    return this._sendOtpUseCase;
+      ));
   }
 
   get verifyOtpUseCase(): IVerifyOtpUseCase {
-    if (!this._verifyOtpUseCase) {
-      this._verifyOtpUseCase = new VerifyOtpUseCase(
+    return (this._verifyOtpUseCase ??= new VerifyOtpUseCase(
         this.infra.otpService,
         this.infra.otpRepository,
-        this.infra.logger);
-    }
-    return this._verifyOtpUseCase;
+        this.infra.logger));
   }
 
   get validateUserUseCase(): IValidateUserUseCase {
-    if (!this._validateUserUseCase) {
-      this._validateUserUseCase = new ValidateUserUseCase(
+    return (this._validateUserUseCase ??= new ValidateUserUseCase(
         this.infra.userRepositoryFactory
-      );
-    }
-    return this._validateUserUseCase;
+      ));
   }
 
 
   get refreshTokenUseCase(): IRefreshTokenUseCase {
-    if (!this._refreshTokenUseCase) {
-      this._refreshTokenUseCase = new RefreshTokenUseCase(
-        this.infra.tokenService);
-    }
-    return this._refreshTokenUseCase
+    return (this._refreshTokenUseCase ??= new RefreshTokenUseCase(
+        this.infra.tokenService));
   }
 
   get forgotPasswordUseCase(): IForgotPasswordUseCase {
-    if (!this._forgotpasswordUseCase) {
-      this._forgotpasswordUseCase = new ForgotPasswordUseCase(
+    return (this._forgotpasswordUseCase ??= new ForgotPasswordUseCase(
         this.infra.emailService,
         this.infra.otpService,
         this.infra.otpRepository,
-        this.infra.userRepositoryFactory);
-    }
-    return this._forgotpasswordUseCase;
+        this.infra.userRepositoryFactory));
   }
 
   get resetPasswordUseCase(): IResetPasswordUseCase {
-    if (!this._resetPasswordUseCase) {
-      this._resetPasswordUseCase = new ResetPasswordUseCase(
+    return (this._resetPasswordUseCase ??= new ResetPasswordUseCase(
         this.infra.userRepositoryFactory,
         this.infra.passwordHasher,
         this.infra.otpRepository,
-        this.infra.logger);
-    }
-    return this._resetPasswordUseCase;
+        this.infra.logger));
   }
 
   get changePasswordUseCase(): IChangePasswordUseCase {
-    if (!this._changePasswordUseCase) {
-      this._changePasswordUseCase = new ChangePasswordUseCase(
+    return (this._changePasswordUseCase ??= new ChangePasswordUseCase(
         this.infra.userRepositoryFactory,
         this.infra.passwordHasher,
         this.infra.logger
-      )
-    }
-    return this._changePasswordUseCase;
+      ));
   }
 
   get changeUserRoleUseCase(): IChangeUserRoleUseCase {
-    if (!this._changeUserRoleuseCase) {
-      this._changeUserRoleuseCase = new ChangeUserRoleUseCase(
+    return (this._changeUserRoleuseCase ??= new ChangeUserRoleUseCase(
         this.infra.userRepositoryFactory,
         this.infra.logger,
         this.infra.tokenService
-      )
-    }
-    return this._changeUserRoleuseCase
+      ));
   }
 
   get getCurrentUserUseCase(): IGetCurrentUserUseCase {
-    if (!this._getCurrentUserUseCase) {
-      this._getCurrentUserUseCase = new GetCurrentUserUseCase(
+    return (this._getCurrentUserUseCase ??= new GetCurrentUserUseCase(
         this.infra.userRepositoryFactory,
         this.infra.logger,
         this.infra.s3Service
-      );
-    }
-    return this._getCurrentUserUseCase;
+      ));
   }
 
   get uploadProfilePictureUseCase(): IUploadProfilePictureUseCase {
-    if (!this._uploadProfilePictureUseCase) {
-      this._uploadProfilePictureUseCase = new UploadProfilePictureUseCase(
+    return (this._uploadProfilePictureUseCase ??= new UploadProfilePictureUseCase(
         this.infra.userRepositoryFactory,
         this.infra.logger,
         this.infra.s3Service
-      );
-    }
-    return this._uploadProfilePictureUseCase;
+      ));
   }
 
   get uploadWorkerDocumentUseCase(): IUploadWorkerDocumentUseCase {
-    if (!this._uploadWorkerDocumentUseCase) {
-      this._uploadWorkerDocumentUseCase = new UploadWorkerDocumentUseCase(
+    return (this._uploadWorkerDocumentUseCase ??= new UploadWorkerDocumentUseCase(
         this.infra.userRepositoryFactory,
         this.infra.logger,
         this.infra.s3Service
-      );
-    }
-    return this._uploadWorkerDocumentUseCase;
+      ));
   }
 
   get updateUserProfileUseCase(): IUpdateUserProfileUseCase {
-    if (!this._updateUserProfileUseCase) {
-      this._updateUserProfileUseCase = new UpdateUserProfileUseCase(
+    return (this._updateUserProfileUseCase ??= new UpdateUserProfileUseCase(
         this.infra.userRepositoryFactory,
         this.infra.logger,
         this.uploadProfilePictureUseCase
-      );
-    }
-    return this._updateUserProfileUseCase
+      ));
   }
 
   get getAllUsersUseCase(): IGetAllUsersUseCase {
-    if (!this._getAllUsersUseCase) {
-      this._getAllUsersUseCase = new GetAllUsersUseCase(
+    return (this._getAllUsersUseCase ??= new GetAllUsersUseCase(
         this.infra.userRepositoryFactory,
         this.infra.logger,
         this.infra.s3Service
-      )
-    }
-    return this._getAllUsersUseCase;
+      ));
   }
 
   get updateVerificationStatusUseCase(): IUpdateVerificationStatusUseCase {
-    if (!this._updateVerificationStatusUseCase) {
-      this._updateVerificationStatusUseCase = new UpdateVerificationStatusUseCase(
+    return (this._updateVerificationStatusUseCase ??= new UpdateVerificationStatusUseCase(
         this.infra.userRepositoryFactory,
         this.infra.emailService,
         this.infra.logger,
         this.sendNotificationUseCase
-      );
-    }
-    return this._updateVerificationStatusUseCase;
+      ));
   }
 
   get updateUserAccessUseCase(): IUpdateUserAccessUseCase {
-    if (!this._updateUserAccessUseCase) {
-      this._updateUserAccessUseCase = new UpdateUserAccessUseCase(
+    return (this._updateUserAccessUseCase ??= new UpdateUserAccessUseCase(
         this.infra.userRepositoryFactory,
         this.infra.logger
-      );
-    }
-    return this._updateUserAccessUseCase
+      ));
   }
 
   get updateUserSkillsUseCase(): IUpdateUserSkillsUseCase {
-    if (!this._updateUserSkillUseCase) {
-      this._updateUserSkillUseCase = new UpdateUserSkillsUseCase(
+    return (this._updateUserSkillUseCase ??= new UpdateUserSkillsUseCase(
         this.infra.userRepositoryFactory
-      );
-    }
-    return this._updateUserSkillUseCase;
+      ));
   }
 
   get addUserAddressUseCase(): IAddUserAddressUseCase {
-    if (!this._addUserAddressUseCase) {
-      this._addUserAddressUseCase = new AddUserAddressUseCase(
+    return (this._addUserAddressUseCase ??= new AddUserAddressUseCase(
         this.infra.userRepositoryFactory
-      )
-    }
-    return this._addUserAddressUseCase;
+      ));
   }
 
   get editUserAddressUseCase(): IEditUserAddressUseCase {
-    if (!this._editUserAddressUseCase) {
-      this._editUserAddressUseCase = new EditUserAddressUseCase(
+    return (this._editUserAddressUseCase ??= new EditUserAddressUseCase(
         this.infra.userRepositoryFactory
-      )
-    }
-    return this._editUserAddressUseCase;
+      ));
   }
 
   get deleteUserAddressUseCase(): IDeleteUserAddressUseCase {
-    if (!this._deleteUserAddressUseCase) {
-      this._deleteUserAddressUseCase = new DeleteUserAddressUseCase(
+    return (this._deleteUserAddressUseCase ??= new DeleteUserAddressUseCase(
         this.infra.userRepositoryFactory
-      )
-    }
-    return this._deleteUserAddressUseCase;
+      ));
   }
 
   get createCategoryUseCase(): ICreateCategoryUseCase {
-    if (!this._createCategoryUseCase) {
-      this._createCategoryUseCase = new CreateCategoryUseCase(
+    return (this._createCategoryUseCase ??= new CreateCategoryUseCase(
         this.infra.categoryRepository
-      )
-    }
-    return this._createCategoryUseCase
+      ));
   }
 
   get getAllCategoriesUseCase(): IGetAllCategoriesUseCase {
-    if (!this._getAllCategoriesUseCase) {
-      this._getAllCategoriesUseCase = new GetAllCategoriesUseCase(
+    return (this._getAllCategoriesUseCase ??= new GetAllCategoriesUseCase(
         this.infra.categoryRepository
-      )
-    }
-    return this._getAllCategoriesUseCase
+      ));
   }
 
   get updateCategoryUseCase(): IUpdateCategoryUseCase {
-    if (!this._updateCategoryUseCase) {
-      this._updateCategoryUseCase = new UpdateCategoryUseCase(
+    return (this._updateCategoryUseCase ??= new UpdateCategoryUseCase(
         this.infra.categoryRepository
-      )
-    }
-    return this._updateCategoryUseCase
+      ));
   }
 
   get updateCategoryStatusUseCase(): IUpdateCategoryStatusUseCase {
-    if (!this._updateCategoryStatusUseCase) {
-      this._updateCategoryStatusUseCase = new UpdateCategoryStatusUseCase(
+    return (this._updateCategoryStatusUseCase ??= new UpdateCategoryStatusUseCase(
         this.infra.categoryRepository
-      )
-    }
-    return this._updateCategoryStatusUseCase
+      ));
   }
 
   get updateWorkerCategoriesUseCase(): IUpdateWorkerCategoriesUseCase {
-    if (!this._updateWorkerCategoriesUseCase) {
-      this._updateWorkerCategoriesUseCase = new UpdateWorkerCategoriesUseCase(
+    return (this._updateWorkerCategoriesUseCase ??= new UpdateWorkerCategoriesUseCase(
         this.infra.userRepositoryFactory,
         this.infra.categoryRepository
-      )
-    }
-    return this._updateWorkerCategoriesUseCase
+      ));
   }
 
   get getS3UploadUrlUseCase(): IGetS3UploadUrlUseCase {
-    if (!this._getS3UploadUrlUseCase) {
-      this._getS3UploadUrlUseCase = new GetS3UploadUrlUseCase(
+    return (this._getS3UploadUrlUseCase ??= new GetS3UploadUrlUseCase(
         this.infra.s3Service
-      );
-    }
-    return this._getS3UploadUrlUseCase;
+      ));
   }
 
   get getAvailableWorkersUseCase(): IGetAvailableWorkersUseCase {
-    if (!this._getAvailableWorkersUseCase) {
-      this._getAvailableWorkersUseCase = new GetAvailableWorkersUseCase(
+    return (this._getAvailableWorkersUseCase ??= new GetAvailableWorkersUseCase(
         this.infra.workerRepository,
         this.infra.s3Service
-      );
-    }
-    return this._getAvailableWorkersUseCase;
+      ));
   }
 
   get getWorkerByIdUseCase(): IGetWorkerByIdUseCase {
-    if (!this._getWorkerByIdUseCase) {
-      this._getWorkerByIdUseCase = new GetWorkerByIdUseCase(
+    return (this._getWorkerByIdUseCase ??= new GetWorkerByIdUseCase(
         this.infra.workerRepository,
         this.infra.categoryRepository,
         this.infra.reviewRepository,
         this.infra.userRepositoryFactory,
         this.infra.s3Service
-      );
-    }
-    return this._getWorkerByIdUseCase;
+      ));
   }
 
   get getWorkerAvailabilityUseCase(): IGetWorkerAvailabilityUseCase {
-    if (!this._getWorkerAvailabilityUseCase) {
-      this._getWorkerAvailabilityUseCase = new GetWorkerAvailabilityUseCase(
+    return (this._getWorkerAvailabilityUseCase ??= new GetWorkerAvailabilityUseCase(
         this.infra.workerScheduleRepo
-      )
-    }
-    return this._getWorkerAvailabilityUseCase;
+      ));
   }
 
   get bookWorkerUseCase(): IBookWorkerUseCase {
-    if (!this._bookWorkerUseCase) {
-      this._bookWorkerUseCase = new BookWorkerUseCase(
+    return (this._bookWorkerUseCase ??= new BookWorkerUseCase(
         this.infra.serviceRepository,
         this.infra.workerRepository,
         this.infra.workerScheduleRepo
-      )
-    }
-    return this._bookWorkerUseCase;
+      ));
   }
 
   get getClientServiceHistoryUseCase(): IGetClientServiceHistoryUseCase {
-    if (!this._getClientServiceHistoryUseCase) {
-      this._getClientServiceHistoryUseCase = new GetClientServiceHistoryUseCase(
+    return (this._getClientServiceHistoryUseCase ??= new GetClientServiceHistoryUseCase(
         this.infra.serviceRepository
-      )
-    }
-    return this._getClientServiceHistoryUseCase
+      ));
   }
 
   get getClientServiceByIdUseCase(): IGetClientServiceByIdUseCase {
-    if (!this._getClientServiceByIdUseCase) {
-      this._getClientServiceByIdUseCase = new GetClientServiceByIdUseCase(
+    return (this._getClientServiceByIdUseCase ??= new GetClientServiceByIdUseCase(
         this.infra.serviceRepository
-      )
-    }
-    return this._getClientServiceByIdUseCase
+      ));
   }
 
   get getClientOngoingServicesUseCase(): IGetClientOngoingServicesUseCase {
-    if (!this._getClientOngoingServicesUseCase) {
-      this._getClientOngoingServicesUseCase = new GetClientOngoingServicesUseCase(
+    return (this._getClientOngoingServicesUseCase ??= new GetClientOngoingServicesUseCase(
         this.infra.serviceRepository
-      )
-    }
-    return this._getClientOngoingServicesUseCase
+      ));
   }
 
   get getWorkerServicesUseCase(): IGetWorkerServicesUseCase {
-    if (!this._getWorkerServicesUseCase) {
-      this._getWorkerServicesUseCase = new GetWorkerServicesUseCase(
+    return (this._getWorkerServicesUseCase ??= new GetWorkerServicesUseCase(
         this.infra.serviceRepository
-      )
-    }
-    return this._getWorkerServicesUseCase
+      ));
   }
 
   get getWorkerServiceDetailsUseCase(): IGetWorkerServiceDetailsUseCase {
-    if (!this._getWorkerServiceDetailsUseCase) {
-      this._getWorkerServiceDetailsUseCase = new GetWorkerServiceDetailsUseCase(
+    return (this._getWorkerServiceDetailsUseCase ??= new GetWorkerServiceDetailsUseCase(
         this.infra.serviceRepository,
         this.infra.userRepositoryFactory,
         this.infra.s3Service
-      )
-    }
-    return this._getWorkerServiceDetailsUseCase
+      ));
   }
 
   get getActiveWorkerServiceUseCase(): IGetActiveWorkerServiceUseCase {
-    if (!this._getActiveWorkerServiceUseCase) {
-      this._getActiveWorkerServiceUseCase = new GetActiveWorkerServiceUseCase(
+    return (this._getActiveWorkerServiceUseCase ??= new GetActiveWorkerServiceUseCase(
         this.infra.serviceRepository
-      )
-    }
-    return this._getActiveWorkerServiceUseCase;
+      ));
   }
 
   get getAllServicesUseCase(): IGetAllServicesUseCase {
-    if (!this._getAllServicesUseCase) {
-      this._getAllServicesUseCase = new GetAllServicesUseCase(
+    return (this._getAllServicesUseCase ??= new GetAllServicesUseCase(
         this.infra.serviceRepository
-      )
-    }
-    return this._getAllServicesUseCase
+      ));
   }
 
   get getServiceDetailsForAdminUseCase(): IGetServiceDetailsForAdminUseCase {
-    if (!this._getServiceDetailsForAdminUseCase) {
-      this._getServiceDetailsForAdminUseCase = new GetServiceDetailsForAdminUseCase(
+    return (this._getServiceDetailsForAdminUseCase ??= new GetServiceDetailsForAdminUseCase(
         this.infra.serviceRepository
-      )
-    }
-    return this._getServiceDetailsForAdminUseCase
+      ));
   }
 
   get startServiceUseCase(): IStartServiceUseCase {
-    if (!this._startServiceUseCase) {
-      this._startServiceUseCase = new StartServiceUseCase(
+    return (this._startServiceUseCase ??= new StartServiceUseCase(
         this.infra.serviceRepository,
         this.sendNotificationUseCase
-      )
-    }
-    return this._startServiceUseCase
+      ));
   }
 
   get completeServiceUseCase(): ICompleteServiceUseCase {
-    if (!this._completeServiceUseCase) {
-      this._completeServiceUseCase = new CompleteServiceUseCase(
+    return (this._completeServiceUseCase ??= new CompleteServiceUseCase(
         this.infra.serviceRepository,
         this.infra.walletRepository,
         this.infra.transactionRepository,
         this.infra.userRepositoryFactory,
         this.sendNotificationUseCase
-      )
-    }
-    return this._completeServiceUseCase
+      ));
   }
 
   get blockWorkerDatesUsecase(): IBlockWorkerDatesUseCase {
-    if (!this._blockWorkerDatesUsecase) {
-      this._blockWorkerDatesUsecase = new BlockWorkerDatesUseCase(
+    return (this._blockWorkerDatesUsecase ??= new BlockWorkerDatesUseCase(
         this.infra.workerScheduleRepo
-      )
-    }
-    return this._blockWorkerDatesUsecase
+      ));
   }
 
   get getWorkerBlockedDatesUseCase(): IGetWorkerBlockedDatesUseCase {
-    if (!this._getWorkerBlockedDatesUseCase) {
-      this._getWorkerBlockedDatesUseCase = new GetWorkerBlockedDatesUseCase(
+    return (this._getWorkerBlockedDatesUseCase ??= new GetWorkerBlockedDatesUseCase(
         this.infra.workerScheduleRepo
-      )
-    }
-    return this._getWorkerBlockedDatesUseCase;
+      ));
   }
 
   get getClientScheduledMeetingsUseCase(): IGetClientScheduledMeetingsUseCase {
-    if (!this._getClientScheduledMeetingsUseCase) {
-      this._getClientScheduledMeetingsUseCase = new GetClientScheduledMeetingsUseCase(
+    return (this._getClientScheduledMeetingsUseCase ??= new GetClientScheduledMeetingsUseCase(
         this.infra.serviceRepository
-      )
-    }
-    return this._getClientScheduledMeetingsUseCase
+      ));
   }
 
   get getClientMeetingsHistoryUseCase(): IGetClientMeetingsHistoryUseCase {
-    if (!this._getClientMeetingsHistoryUseCase) {
-      this._getClientMeetingsHistoryUseCase = new GetClientMeetingsHistoryUseCase(
+    return (this._getClientMeetingsHistoryUseCase ??= new GetClientMeetingsHistoryUseCase(
         this.infra.serviceRepository
-      )
-    }
-    return this._getClientMeetingsHistoryUseCase
+      ));
   }
 
   get getWorkerScheduledMeetingsUseCase(): IGetWorkerScheduledMeetingsUseCase {
-    if (!this._getWorkerScheduledMeetingsUseCase) {
-      this._getWorkerScheduledMeetingsUseCase = new GetWorkerScheduledMeetingsUseCase(
+    return (this._getWorkerScheduledMeetingsUseCase ??= new GetWorkerScheduledMeetingsUseCase(
         this.infra.serviceRepository
-      )
-    }
-    return this._getWorkerScheduledMeetingsUseCase
+      ));
   }
 
   get getWorkerMeetingsHistoryUseCase(): IGetWorkerMeetingsHistoryUseCase {
-    if (!this._getWorkerMeetingsHistoryUseCase) {
-      this._getWorkerMeetingsHistoryUseCase = new GetWorkerMeetingsHistoryUseCase(
+    return (this._getWorkerMeetingsHistoryUseCase ??= new GetWorkerMeetingsHistoryUseCase(
         this.infra.serviceRepository
-      )
-    }
-    return this._getWorkerMeetingsHistoryUseCase
+      ));
   }
 
   get getClientMeetingByIdUseCase(): IGetClientMeetingByIdUseCase {
-    if (!this._getClientMeetingByIdUseCase) {
-      this._getClientMeetingByIdUseCase = new GetClientMeetingByIdUseCase(
+    return (this._getClientMeetingByIdUseCase ??= new GetClientMeetingByIdUseCase(
         this.infra.serviceRepository
-      )
-    }
-    return this._getClientMeetingByIdUseCase
+      ));
   }
 
   get getWorkerMeetingByIdUseCase(): IGetWorkerMeetingByIdUseCase {
-    if (!this._getWorkerMeetingByIdUseCase) {
-      this._getWorkerMeetingByIdUseCase = new GetWorkerMeetingByIdUseCase(
+    return (this._getWorkerMeetingByIdUseCase ??= new GetWorkerMeetingByIdUseCase(
         this.infra.serviceRepository
-      )
-    }
-    return this._getWorkerMeetingByIdUseCase
+      ));
   }
 
 
   get joinVideoCallUseCase(): IJoinVideoCallUseCase {
-    if (!this._joinVideoCallUseCase) {
-      this._joinVideoCallUseCase = new JoinVideoCallUseCase(
+    return (this._joinVideoCallUseCase ??= new JoinVideoCallUseCase(
         this.infra.serviceRepository,
         this.sendNotificationUseCase
-      );
-    }
-    return this._joinVideoCallUseCase;
+      ));
   }
 
   get endVideoCallUseCase(): IEndVideoCallUseCase {
-    if (!this._endVideoCallUseCase) {
-      this._endVideoCallUseCase = new EndVideoCallUseCase(
+    return (this._endVideoCallUseCase ??= new EndVideoCallUseCase(
         this.infra.serviceRepository,
         this.infra.walletRepository,
         this.infra.transactionRepository,
         this.infra.userRepositoryFactory
-      );
-    }
-    return this._endVideoCallUseCase;
+      ));
   }
 
   get leaveVideoCallUseCase(): ILeaveVideoCallUseCase {
-    if (!this._leaveVideoCallUseCase) {
-      this._leaveVideoCallUseCase = new LeaveVideoCallUseCase(
+    return (this._leaveVideoCallUseCase ??= new LeaveVideoCallUseCase(
         this.infra.serviceRepository
-      );
-    }
-    return this._leaveVideoCallUseCase;
+      ));
   }
 
   get createPaymentUseCase(): ICreatePaymentUseCase {
-    if (!this._createPaymentUseCase) {
-      this._createPaymentUseCase = new CreatePaymentUseCase(
+    return (this._createPaymentUseCase ??= new CreatePaymentUseCase(
         this.infra.paymentRepository,
         this.infra.paymentGateway,
         this.infra.serviceRepository
-      )
-    }
-    return this._createPaymentUseCase
+      ));
   }
 
   get verifyPaymentUseCase(): IVerifyPaymentUseCase {
-    if (!this._verifyPaymentUseCase) {
-      this._verifyPaymentUseCase = new VerifyPaymentUseCase(
+    return (this._verifyPaymentUseCase ??= new VerifyPaymentUseCase(
         this.infra.paymentRepository,
         this.infra.paymentGateway,
         this.infra.serviceRepository,
@@ -843,14 +668,11 @@ export class UseCaseDI {
         this.infra.workerScheduleRepo,
         this.infra.userRepositoryFactory,
         this.sendNotificationUseCase
-      )
-    }
-    return this._verifyPaymentUseCase;
+      ));
   }
 
   get processWalletPaymentUseCase(): ProcessWalletPaymentUseCase {
-    if (!this._processWalletPaymentUseCase) {
-      this._processWalletPaymentUseCase = new ProcessWalletPaymentUseCase(
+    return (this._processWalletPaymentUseCase ??= new ProcessWalletPaymentUseCase(
         this.infra.paymentRepository,
         this.infra.serviceRepository,
         this.infra.walletRepository,
@@ -858,178 +680,125 @@ export class UseCaseDI {
         this.infra.workerScheduleRepo,
         this.infra.userRepositoryFactory,
         this.sendNotificationUseCase
-      );
-    }
-    return this._processWalletPaymentUseCase;
+      ));
   }
 
   get getWalletBalanceUseCase(): IGetWalletBalanceUseCase {
-    if (!this._getWalletBalanceUseCase) {
-      this._getWalletBalanceUseCase = new GetWalletBalanceUseCase(
+    return (this._getWalletBalanceUseCase ??= new GetWalletBalanceUseCase(
         this.infra.walletRepository
-      );
-    }
-    return this._getWalletBalanceUseCase;
+      ));
   }
 
   get createRechargeOrderUseCase(): ICreateRechargeOrderUseCase {
-    if (!this._createRechargeOrderUseCase) {
-      this._createRechargeOrderUseCase = new CreateRechargeOrderUseCase(
+    return (this._createRechargeOrderUseCase ??= new CreateRechargeOrderUseCase(
         this.infra.paymentGateway
-      );
-    }
-    return this._createRechargeOrderUseCase;
+      ));
   }
 
   get verifyRechargePaymentUseCase(): IVerifyRechargePaymentUseCase {
-    if (!this._verifyRechargePaymentUseCase) {
-      this._verifyRechargePaymentUseCase = new VerifyRechargePaymentUseCase(
+    return (this._verifyRechargePaymentUseCase ??= new VerifyRechargePaymentUseCase(
         this.infra.paymentGateway,
         this.infra.walletRepository,
         this.infra.transactionRepository
-      );
-    }
-    return this._verifyRechargePaymentUseCase;
+      ));
   }
 
   get getMeetingByIdForAdminUseCase(): IGetMeetingByIdForAdminUseCase {
-    if (!this._getMeetingByIdForAdminUseCase) {
-      this._getMeetingByIdForAdminUseCase = new GetMeetingByIdForAdminUseCase(
+    return (this._getMeetingByIdForAdminUseCase ??= new GetMeetingByIdForAdminUseCase(
         this.infra.serviceRepository
-      )
-    }
-    return this._getMeetingByIdForAdminUseCase
+      ));
   }
 
   get getAllMeetingsForAdminUseCase(): IGetAllMeetingsForAdminUseCase {
-    if (!this._getAllMeetingsForAdminUseCase) {
-      this._getAllMeetingsForAdminUseCase = new GetAllMeetingsForAdminUseCase(
+    return (this._getAllMeetingsForAdminUseCase ??= new GetAllMeetingsForAdminUseCase(
         this.infra.serviceRepository
-      )
-    }
-    return this._getAllMeetingsForAdminUseCase
+      ));
   }
 
   get cancelServiceUseCase(): ICancelServiceUseCase {
-    if (!this._cancelServiceUseCase) {
-      this._cancelServiceUseCase = new CancelServiceUseCase(
+    return (this._cancelServiceUseCase ??= new CancelServiceUseCase(
         this.infra.serviceRepository,
         this.infra.workerScheduleRepo,
         this.infra.walletRepository,
         this.infra.transactionRepository,
         this.infra.userRepositoryFactory,
         this.sendNotificationUseCase
-      )
-    }
-    return this._cancelServiceUseCase
+      ));
   }
 
   get getTransactionsUseCase(): IGetTransactionsUseCase {
-    if (!this._getTransactionsUseCase) {
-      this._getTransactionsUseCase = new GetTransactionsUseCase(
+    return (this._getTransactionsUseCase ??= new GetTransactionsUseCase(
         this.infra.transactionRepository
-      )
-    }
-    return this._getTransactionsUseCase
+      ));
   }
 
   get getClientTransactionsUseCase(): IGetClientTransactionsUseCase {
-    if (!this._getClientTransactionsUseCase) {
-      this._getClientTransactionsUseCase = new GetClientTransactionsUseCase(
+    return (this._getClientTransactionsUseCase ??= new GetClientTransactionsUseCase(
         this.infra.transactionRepository
-      );
-    }
-    return this._getClientTransactionsUseCase;
+      ));
   }
 
   get getWorkerTransactionsUseCase(): IGetWorkerTransactionsUseCase {
-    if (!this._getWorkerTransactionsUseCase) {
-      this._getWorkerTransactionsUseCase = new GetWorkerTransactionsUseCase(
+    return (this._getWorkerTransactionsUseCase ??= new GetWorkerTransactionsUseCase(
         this.infra.transactionRepository
-      );
-    }
-    return this._getWorkerTransactionsUseCase;
+      ));
   }
 
   get getAllTransactionsUseCase(): IGetAllTransactionsUseCase {
-    if (!this._getAllTransactionsUseCase) {
-      this._getAllTransactionsUseCase = new GetAllTransactionsUseCase(
+    return (this._getAllTransactionsUseCase ??= new GetAllTransactionsUseCase(
         this.infra.transactionRepository
-      );
-    }
-    return this._getAllTransactionsUseCase;
+      ));
   }
 
   get createConcernUseCase(): ICreateConcernUseCase {
-    if (!this._createConcernUseCase) {
-      this._createConcernUseCase = new CreateConcernUseCase(
+    return (this._createConcernUseCase ??= new CreateConcernUseCase(
         this.infra.concernRepository,
         this.infra.serviceRepository,
         this.infra.s3Service
-      );
-    }
-    return this._createConcernUseCase;
+      ));
   }
 
   get getAllConcernsUseCase(): IGetAllConcernsUseCase {
-    if (!this._getAllConcernsUseCase) {
-      this._getAllConcernsUseCase = new GetAllConcernsUseCase(
+    return (this._getAllConcernsUseCase ??= new GetAllConcernsUseCase(
         this.infra.concernRepository,
         this.infra.serviceRepository,
         this.infra.userRepositoryFactory,
         this.infra.s3Service
-      );
-    }
-    return this._getAllConcernsUseCase;
+      ));
   }
 
   get getUserConcernsUseCase(): IGetUserConcernsUseCase {
-    if (!this._getUserConcernsUseCase) {
-      this._getUserConcernsUseCase = new GetUserConcernsUseCase(
+    return (this._getUserConcernsUseCase ??= new GetUserConcernsUseCase(
         this.infra.concernRepository
-      );
-    }
-    return this._getUserConcernsUseCase;
+      ));
   }
 
   get addReviewUseCase(): IAddReviewUseCase {
-    if (!this._addReviewUseCase) {
-      this._addReviewUseCase = new AddReviewUseCase(
+    return (this._addReviewUseCase ??= new AddReviewUseCase(
         this.infra.reviewRepository,
         this.infra.serviceRepository,
         this.infra.workerRepository
-      )
-    }
-    return this._addReviewUseCase;
+      ));
   }
 
   get sendNotificationUseCase(): ISendNotificationUseCase {
-    if (!this._sendNotificationUseCase) {
-      this._sendNotificationUseCase = new SendNotificationUseCase(
+    return (this._sendNotificationUseCase ??= new SendNotificationUseCase(
         this.infra.realtimeService,
         this.infra.notificationRepository
-      )
-    }
-    return this._sendNotificationUseCase
+      ));
   }
 
   get sendMessageUseCase(): ISendMessageUseCase {
-    if (!this._sendMessageUseCase) {
-      this._sendMessageUseCase = new SendMessageUseCase(
+    return (this._sendMessageUseCase ??= new SendMessageUseCase(
         this.infra.chatRepository,
         this.infra.realtimeService
-      )
-    }
-    return this._sendMessageUseCase;
+      ));
   }
 
   get getMessagesUseCase(): IGetMessagesUseCase {
-    if (!this._getMessagesUseCase) {
-      this._getMessagesUseCase = new GetMessagesUseCase(
+    return (this._getMessagesUseCase ??= new GetMessagesUseCase(
         this.infra.chatRepository,
-      )
-    }
-    return this._getMessagesUseCase;
+      ));
   }
 
 }

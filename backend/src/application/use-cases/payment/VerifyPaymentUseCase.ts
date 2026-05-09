@@ -60,7 +60,7 @@ export class VerifyPaymentUseCase implements IVerifyPaymentUseCase {
         const service = await this._serviceRepo.findById(payment.serviceId);
         if (service) {
             // Mark worker schedule slots as booked now that payment is confirmed
-            for (const slot of service.selectedSlots || []) {
+            for (const slot of service.selectedSlots) {
                 await this._scheduleRepo.markAsBooked(
                     service.workerId,
                     slot.date,
@@ -72,18 +72,16 @@ export class VerifyPaymentUseCase implements IVerifyPaymentUseCase {
             // Credit full amount to Admin wallet initially
             const adminRepo = this._userRepoFactory.getRepository(Role.ADMIN);
             const admins = await adminRepo.findAll();
-            const admin = admins[0];
+            const admin = admins[0] as typeof admins[number] | undefined;
 
             if (admin) {
                 let adminWallet = await this._walletRepo.findByUserId(admin.userId);
-                if (!adminWallet) {
-                    adminWallet = await this._walletRepo.create({
-                        walletId: uuidv4(),
-                        userId: admin.userId,
-                        balance: 0,
-                        currency: "INR"
-                    });
-                }
+                adminWallet ??= await this._walletRepo.create({
+                    walletId: uuidv4(),
+                    userId: admin.userId,
+                    balance: 0,
+                    currency: "INR"
+                });
 
                 const updatedAdminWallet = await this._walletRepo.creditBalance(admin.userId, payment.amount);
 
@@ -102,14 +100,12 @@ export class VerifyPaymentUseCase implements IVerifyPaymentUseCase {
 
             // Ensure client has a wallet to record the transaction
             let clientWallet = await this._walletRepo.findByUserId(payment.clientId);
-            if (!clientWallet) {
-                clientWallet = await this._walletRepo.create({
-                    walletId: uuidv4(),
-                    userId: payment.clientId,
-                    balance: 0,
-                    currency: "INR"
-                });
-            }
+            clientWallet ??= await this._walletRepo.create({
+                walletId: uuidv4(),
+                userId: payment.clientId,
+                balance: 0,
+                currency: "INR"
+            });
 
             // Record the transaction for the client
             await this._transactionRepo.create({

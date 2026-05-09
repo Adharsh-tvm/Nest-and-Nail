@@ -11,7 +11,7 @@ export interface AddressDTO {
   isDefault?: boolean;
 }
 
-export interface UpdateAddressDTO extends Partial<AddressDTO> { }
+export type UpdateAddressDTO = Partial<AddressDTO>;
 
-export interface AddAddressDTO extends Omit<AddressDTO, "addressId"> { }
+export type AddAddressDTO = Omit<AddressDTO, "addressId">;
 

@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { AuthMiddleware } from "../../middlewares/AuthMiddleware";
-import { PaymentController } from "../../controllers/payment/PaymentController";
 import { TransactionController } from "../../controllers/payment/TransactionController";
 
 export function createTransactionRoutes(
@@ -10,11 +9,11 @@ export function createTransactionRoutes(
 
     const router = Router();
 
-    router.get("/client", authMiddleware.verify.bind(authMiddleware), transactionController.getClientTransactions.bind(transactionController));
+    router.get("/client", authMiddleware.verify.bind(authMiddleware), (req, res) => { void transactionController.getClientTransactions(req, res); });
 
-    router.get("/worker", authMiddleware.verify.bind(authMiddleware), transactionController.getWorkerTransactions.bind(transactionController));
+    router.get("/worker", authMiddleware.verify.bind(authMiddleware), (req, res) => { void transactionController.getWorkerTransactions(req, res); });
 
-    router.get("/admin", authMiddleware.verify.bind(authMiddleware), transactionController.getAllTransactions.bind(transactionController));
+    router.get("/admin", authMiddleware.verify.bind(authMiddleware), (req, res) => { void transactionController.getAllTransactions(req, res); });
 
     return router;
 }

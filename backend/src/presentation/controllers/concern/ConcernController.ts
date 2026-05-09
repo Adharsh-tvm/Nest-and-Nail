@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { ICreateConcernUseCase } from "../../../application/interfaces/concern/ICreateConcernUseCase";
 import { IGetUserConcernsUseCase } from "../../../application/interfaces/concern/IGetUserConcernsUseCase";
 import { HttpStatusCode } from "../../../shared/enums/httpCodes";

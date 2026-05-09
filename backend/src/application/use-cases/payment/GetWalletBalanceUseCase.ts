@@ -9,14 +9,12 @@ export class GetWalletBalanceUseCase implements IGetWalletBalanceUseCase {
     async execute(userId: string): Promise<Wallet> {
         let wallet = await this.walletRepo.findByUserId(userId);
 
-        if (!wallet) {
-            wallet = await this.walletRepo.create({
-                walletId: uuidv4(),
-                userId,
-                balance: 0,
-                currency: "INR",
-            });
-        }
+        wallet ??= await this.walletRepo.create({
+            walletId: uuidv4(),
+            userId,
+            balance: 0,
+            currency: "INR",
+        });
 
         return wallet;
     }

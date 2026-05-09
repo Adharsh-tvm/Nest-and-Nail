@@ -41,6 +41,7 @@ export class CancelServiceUseCase implements ICancelServiceUseCase {
     ) { }
 
     async execute(serviceId: string, userId: string, reason?: string): Promise<ServiceResponseDTO> {
+        void reason;
 
         const service = await this._serviceRepo.findById(serviceId);
 
@@ -101,7 +102,7 @@ export class CancelServiceUseCase implements ICancelServiceUseCase {
 
                     // Add transaction record
                     await this._transactionRepo.create({
-                        transactionId: `txn_refund_${serviceId}_${Date.now()}`,
+                        transactionId: `txn_refund_${serviceId}_${String(Date.now())}`,
                         walletId: wallet ? wallet.walletId : `wallet_${service.clientId}`,
                         userId: service.clientId,
                         type: transactionType.CREDIT,
@@ -115,7 +116,7 @@ export class CancelServiceUseCase implements ICancelServiceUseCase {
                     // Debit admin wallet
                     const adminRepo = this._userRepoFactory.getRepository(Role.ADMIN);
                     const admins = await adminRepo.findAll();
-                    const admin = admins[0];
+                    const admin = admins[0] as typeof admins[number] | undefined;
 
                     if (admin) {
                         const adminWallet = await this._walletRepo.findByUserId(admin.userId);
@@ -124,7 +125,7 @@ export class CancelServiceUseCase implements ICancelServiceUseCase {
                                 const updatedAdminWallet = await this._walletRepo.debitBalance(admin.userId, refundAmount);
                                 
                                 await this._transactionRepo.create({
-                                    transactionId: `txn_refund_debit_${serviceId}_${Date.now()}`,
+                                    transactionId: `txn_refund_debit_${serviceId}_${String(Date.now())}`,
                                     walletId: updatedAdminWallet.walletId,
                                     userId: admin.userId,
                                     type: transactionType.DEBIT,

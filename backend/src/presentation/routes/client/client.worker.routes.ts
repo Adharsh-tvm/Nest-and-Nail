@@ -9,11 +9,11 @@ export function createClientRoutes(
     authMiddleware: AuthMiddleware
 ) {
 
-    router.get("/", (req, res, next) => { authMiddleware.verify(req, res, next); }, (req, res, next) => clientController.getAvailableWorkers(req, res, next))
+    router.get("/", authMiddleware.verify.bind(authMiddleware), (req, res) => { void clientController.getAvailableWorkers(req, res); })
 
-    router.get("/:id", (req, res, next) => { authMiddleware.verify(req, res, next); }, (req, res, next) => clientController.getWorkerById(req, res, next))
+    router.get("/:id", authMiddleware.verify.bind(authMiddleware), (req, res) => { void clientController.getWorkerById(req, res); })
 
-    router.get("/:id/availability", (req, res, next) => { authMiddleware.verify(req, res, next); }, (req, res, next) => clientController.getWorkerAvailability(req, res, next));
+    router.get("/:id/availability", authMiddleware.verify.bind(authMiddleware), (req, res) => { void clientController.getWorkerAvailability(req, res); });
 
     return router;
 }

@@ -20,8 +20,8 @@ export class GetAllConcernsUseCase implements IGetAllConcernsUseCase {
     page?: number;
     limit?: number;
   }) {
-    const page = query.page || 1;
-    const limit = query.limit || 10;
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 10;
 
     const { concerns, total, totalPages } = await this._concernRepo.findAll({
       status: query.status,
@@ -87,11 +87,9 @@ export class GetAllConcernsUseCase implements IGetAllConcernsUseCase {
             .getRepository(Role.CLIENT)
             .findById(concern.userId);
 
-          if (!raisedByUser) {
-            raisedByUser = await this._userRepositoryFactory
-              .getRepository(Role.WORKER)
-              .findById(concern.userId);
-          }
+          raisedByUser ??= await this._userRepositoryFactory
+            .getRepository(Role.WORKER)
+            .findById(concern.userId);
 
           if (raisedByUser) {
             raisedByName = raisedByUser.name;

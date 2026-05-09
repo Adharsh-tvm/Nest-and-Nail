@@ -9,7 +9,7 @@ export class ServiceMapper {
 
   static toEntity(dto: CreateServiceDTO): Service {
     const basePlatformFee = dto.category === "VIDEO_CALL" ? 10 : 50;
-    const totalAmount = dto.pricePerWorker * dto.numberOfWorkers * (dto.numberOfDays || 1) + basePlatformFee;
+    const totalAmount = dto.pricePerWorker * dto.numberOfWorkers * (dto.numberOfDays ?? 1) + basePlatformFee;
 
     let videoCall;
 
@@ -38,8 +38,8 @@ export class ServiceMapper {
 
       category: dto.category,
 
-      title: dto.title || "Service Booking",
-      description: dto.description || "Service booked by client",
+      title: dto.title ?? "Service Booking",
+      description: dto.description ?? "Service booked by client",
 
       location: dto.location,
       address: dto.address,
@@ -47,7 +47,7 @@ export class ServiceMapper {
       scheduledDate: dto.scheduledDate,
       selectedSlots: dto.selectedSlots,
 
-      numberOfDays: dto.numberOfDays || 1,
+      numberOfDays: dto.numberOfDays ?? 1,
       numberOfWorkers: dto.numberOfWorkers,
 
       pricePerWorker: dto.pricePerWorker,
@@ -91,10 +91,10 @@ export class ServiceMapper {
       createdAt: service.createdAt,
       client: service.client,
       worker: service.worker,
-      location: service.location ? {
+      location: {
         type: service.location.type,
         coordinates: service.location.coordinates
-      } : undefined,
+      },
       address: service.address,
       videoCall: service.videoCall,
     };

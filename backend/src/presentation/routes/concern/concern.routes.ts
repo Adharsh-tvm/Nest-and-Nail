@@ -10,9 +10,9 @@ export const concernRoutes = (authMiddleware: AuthMiddleware, controller: Concer
     "/",
     authMiddleware.verify.bind(authMiddleware),
     upload.array("images", 5),
-    controller.createConcern
+    (req, res) => { void controller.createConcern(req, res); }
   );
-  router.get("/", authMiddleware.verify.bind(authMiddleware), controller.getMyConcerns);
+  router.get("/", authMiddleware.verify.bind(authMiddleware), (req, res) => { void controller.getMyConcerns(req, res); });
 
   return router;
 };

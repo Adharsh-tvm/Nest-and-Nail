@@ -5,7 +5,7 @@ export class GetS3UploadUrlUseCase implements IGetS3UploadUrlUseCase {
   constructor(private s3Service: S3Service) { }
 
   async execute(fileName: string, contentType: string) {
-    const key = `uploads/${Date.now()}-${fileName}`;
+    const key = `uploads/${String(Date.now())}-${fileName}`;
 
     const uploadUrl = await this.s3Service.generatePresignedUploadUrl(
       key,

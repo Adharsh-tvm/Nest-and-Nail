@@ -52,11 +52,11 @@ export class BookWorkerUseCase implements IBookWorkerUseCase {
       const slotDate = new Date(slot.date);
       let startHour = 9;
       let startMinute = 0;
-      if (slot.slotType === "EVENING_HALF") {
+      if ((slot.slotType as string) === "EVENING_HALF") {
         startHour = 14; // 2 PM
-      } else if (slot.slotType.toString().startsWith("VIDEO_")) {
+      } else if ((slot.slotType as string).startsWith("VIDEO_")) {
         // e.g. VIDEO_8_00_8_15
-        const parts = slot.slotType.toString().split("_");
+        const parts = (slot.slotType as string).split("_");
         if (parts.length >= 3) {
           startHour = parseInt(parts[1], 10);
           startMinute = parseInt(parts[2], 10);

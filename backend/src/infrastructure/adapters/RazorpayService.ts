@@ -1,12 +1,14 @@
 import Razorpay from "razorpay";
+import crypto from "crypto";
+import { env } from "../../config/env";
 
 export class RazorpayService {
   private razorpay;
 
   constructor() {
     this.razorpay = new Razorpay({
-      key_id: process.env.RAZORPAY_KEY!,
-      key_secret: process.env.RAZORPAY_SECRET!
+      key_id: env.RAZORPAY_KEY,
+      key_secret: env.RAZORPAY_SECRET
     });
   }
 
@@ -14,18 +16,16 @@ export class RazorpayService {
     return this.razorpay.orders.create({
       amount: amount * 100,
       currency: "INR",
-      receipt: "receipt_" + Date.now()
+      receipt: `receipt_${String(Date.now())}`
     });
   }
 
   verifySignature(orderId: string, paymentId: string, signature: string) {
-    const crypto = require("crypto");
-
-    const body = orderId + "|" + paymentId;
+    const body = `${orderId}|${paymentId}`;
 
     const expected = crypto
-      .createHmac("sha256", process.env.RAZORPAY_SECRET!)
-      .update(body.toString())
+      .createHmac("sha256", env.RAZORPAY_SECRET)
+      .update(body)
       .digest("hex");
 
     return expected === signature;

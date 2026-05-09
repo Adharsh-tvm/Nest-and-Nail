@@ -12,19 +12,19 @@ export function createWorkerRoutes(
     router.post(
         "/slot/block-dates",
         authMiddleware.verify.bind(authMiddleware),
-        workerController.blockDates
+        (req, res) => { void workerController.blockDates(req, res); }
     );
 
     router.get(
         "/slot/blocked-dates",
         authMiddleware.verify.bind(authMiddleware),
-        workerController.getBlockedDates
+        (req, res) => { void workerController.getBlockedDates(req, res); }
     );
 
     router.get(
         "/dashboard",
         authMiddleware.verify.bind(authMiddleware),
-        workerController.getDashboardData
+        (req, res) => { void workerController.getDashboardData(req, res); }
     );
 
     return router;

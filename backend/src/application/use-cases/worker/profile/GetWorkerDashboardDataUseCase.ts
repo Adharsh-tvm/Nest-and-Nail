@@ -7,7 +7,15 @@ import { ReviewModel } from "../../../../infrastructure/database/models/ReviewMo
 import { ClientModel } from "../../../../infrastructure/database/models/ClientModel";
 import { WalletModel } from "../../../../infrastructure/database/models/WalletModel";
 import { ServiceStatus } from "../../../../shared/enums/serviceEnums";
-import { transactionType, transactionStatus, transactionSource } from "../../../../shared/enums/transactionEnums";
+import { transactionType, transactionStatus } from "../../../../shared/enums/transactionEnums";
+
+interface MonthlyEarningsAgg {
+    _id: {
+        year: number;
+        month: number;
+    };
+    earnings: number;
+}
 
 export class GetWorkerDashboardDataUseCase implements IGetWorkerDashboardDataUseCase {
     async execute(workerId: string, months = 6): Promise<WorkerDashboardResponseDTO> {
@@ -44,7 +52,7 @@ export class GetWorkerDashboardDataUseCase implements IGetWorkerDashboardDataUse
         const walletBalance = wallet ? wallet.balance : 0;
 
         // Earnings by month (last `months` months)
-        const monthlyData = await TransactionModel.aggregate([
+        const monthlyData = (await TransactionModel.aggregate([
             { 
                 $match: { 
                     userId: workerId, 
@@ -63,7 +71,7 @@ export class GetWorkerDashboardDataUseCase implements IGetWorkerDashboardDataUse
                 }
             },
             { $sort: { "_id.year": 1, "_id.month": 1 } }
-        ]);
+        ])) as unknown as MonthlyEarningsAgg[];
 
         const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
         const formattedMonthlyData = [];
@@ -99,9 +107,9 @@ export class GetWorkerDashboardDataUseCase implements IGetWorkerDashboardDataUse
             recentReviews.map(async (review) => {
                 const client = await ClientModel.findOne({ userId: review.clientId }).select('name profilePictureUrl').lean();
                 return {
-                    id: review._id.toString(),
+                    id: (review._id as { toString(): string }).toString(),
                     rating: review.rating,
-                    review: review.review || "",
+                    review: review.review ?? "",
                     createdAt: review.createdAt,
                     clientName: client ? client.name : 'Unknown Client',
                     clientImage: client ? client.profilePictureUrl : ''
@@ -124,9 +132,9 @@ export class GetWorkerDashboardDataUseCase implements IGetWorkerDashboardDataUse
             formattedUpcomingService = {
                 title: upcomingService.title,
                 date: upcomingService.scheduledDate,
-                location: upcomingService.address?.city || "Remote",
-                clientName: client?.name || "Unknown",
-                clientImage: client?.profilePictureUrl || "",
+                location: upcomingService.address?.city ?? "Remote",
+                clientName: client?.name ?? "Unknown",
+                clientImage: client?.profilePictureUrl ?? "",
                 status: upcomingService.status
             };
         }
@@ -145,8 +153,8 @@ export class GetWorkerDashboardDataUseCase implements IGetWorkerDashboardDataUse
                 cancelledJobs,
                 totalEarnings,
                 walletBalance,
-                rating: worker.rating || 0,
-                totalRatings: worker.totalRatings || 0
+                rating: worker.rating,
+                totalRatings: worker.totalRatings
             },
             schedules: schedules.map(s => ({ title: s.title, date: s.scheduledDate, status: s.status })),
             upcomingService: formattedUpcomingService,

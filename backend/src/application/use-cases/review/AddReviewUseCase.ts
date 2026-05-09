@@ -50,10 +50,10 @@ export class AddReviewUseCase implements IAddReviewUseCase {
     const worker = await this._workerRepo.findById(service.workerId);
     if (!worker) throw new Error("Worker not found");
 
-    const totalRatings = (worker.totalRatings || 0) + 1;
+    const totalRatings = (worker.totalRatings ?? 0) + 1;
 
     const newRating =
-      ((worker.rating || 0) * (totalRatings - 1) + rating) / totalRatings;
+      ((worker.rating ?? 0) * (totalRatings - 1) + rating) / totalRatings;
 
     await this._workerRepo.updateById(worker.userId, {
       rating: newRating,

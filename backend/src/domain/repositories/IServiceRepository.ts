@@ -12,7 +12,7 @@ export interface IServiceRepository {
     findActiveByWorkerId(workerId: string): Promise<Service | null>;
 
     findAllWithDetails(): Promise<unknown[]>;
-    findDetailedByServiceId(serviceId: string): Promise<unknown | null>;
+    findDetailedByServiceId(serviceId: string): Promise<unknown>;
 
     getMeetingsByClient(clientId: string): Promise<Service[]>;
     getMeetingsByWorker(workerId: string): Promise<Service[]>;
