@@ -1,6 +1,5 @@
 import { IServiceRepository } from "../../../../domain/repositories/IServiceRepository";
 import { GetAllMeetingsQuery } from "../../../../shared/queries/GetAllMeetingsQuery";
-import { AdminServiceResponseDTO } from "../../../dtos/ServiceDTO";
 import { IGetAllMeetingsForAdminUseCase } from "../../../interfaces/meetings/admin/IGetAllMeetingsForAdminUseCase";
 
 export class GetAllMeetingsForAdminUseCase
@@ -12,7 +11,7 @@ export class GetAllMeetingsForAdminUseCase
 
     async execute(
         query: GetAllMeetingsQuery
-    ): Promise<AdminServiceResponseDTO[]> {
+    ): Promise<unknown> {
 
         const formattedQuery = {
             page: query.page ?? 1,

@@ -2,6 +2,7 @@ import { Worker } from "../../domain/entities/Worker";
 import { IWorkerRepository } from "../../domain/repositories/IWorkerRepository";
 import { WorkerModel, IWorkerDocument } from "../database/models/WorkerModel";
 import { BaseRepository } from "./BaseRepository";
+import { PipelineStage } from "mongoose";
 
 export class WorkerRepository extends BaseRepository<Worker, IWorkerDocument> implements IWorkerRepository {
     constructor() {
@@ -44,7 +45,7 @@ export class WorkerRepository extends BaseRepository<Worker, IWorkerDocument> im
         sortBy?: string
     ): Promise<{ workers: Worker[]; total: number }> {
 
-        const pipeline: any[] = [];
+        const pipeline: unknown[] = [];
 
         // ── 1. Geo-near must be the first stage when lat/lng are provided ──
         if (lat && lng) {
@@ -59,7 +60,7 @@ export class WorkerRepository extends BaseRepository<Worker, IWorkerDocument> im
         }
 
         // ── 2. Base match (non-category) so we skip blocked/unverified early ──
-        const baseMatch: any = {
+        const baseMatch: Record<string, unknown> = {
             role: "worker",
             isBlocked: false,
             isVerified: "VERIFIED",
@@ -93,7 +94,7 @@ export class WorkerRepository extends BaseRepository<Worker, IWorkerDocument> im
         }
 
         // ── 5. Determine Sort Stage ──
-        const sortStage: any = { $sort: {} };
+        const sortStage: { $sort: Record<string, 1 | -1> } = { $sort: {} };
         if (sortBy === 'rating_desc') {
             sortStage.$sort.rating = -1;
         } else if (sortBy === 'distance_asc' && lat && lng) {
@@ -103,7 +104,7 @@ export class WorkerRepository extends BaseRepository<Worker, IWorkerDocument> im
         }
 
         // ── 6. Facet for count and data ──
-        const dataPipeline: any[] = [sortStage];
+        const dataPipeline: Record<string, unknown>[] = [sortStage as unknown as Record<string, unknown>];
         if (page && limit) {
             dataPipeline.push({ $skip: (page - 1) * limit });
             dataPipeline.push({ $limit: limit });
@@ -116,18 +117,19 @@ export class WorkerRepository extends BaseRepository<Worker, IWorkerDocument> im
             }
         });
 
-        const result = await WorkerModel.aggregate(pipeline);
-        const workersRaw = result[0].data || [];
-        const total = result[0].total[0]?.count || 0;
+        const result = await WorkerModel.aggregate(pipeline as unknown as PipelineStage[]);
+        const workersRaw = (result[0]?.data || []) as Record<string, unknown>[];
+        const total = (result[0]?.total?.[0]?.count || 0) as number;
 
-        const workers = workersRaw.map((doc: any) => {
+        const workers = workersRaw.map((doc) => {
             const { _id, __v, categories, categoryDocs, ...rest } = doc;
+            const docId = _id as { toString(): string };
             return {
                 ...rest,
-                userId: rest.userId || _id.toString(),
-                categories: categoryDocs?.map((cat: any) => cat.name) || [],
-                distance: rest.distance,
-            } as Worker;
+                userId: (rest.userId as string) || docId.toString(),
+                categories: (categoryDocs as { name: string }[] | undefined)?.map((cat) => cat.name) || [],
+                distance: rest.distance as number | undefined,
+            } as unknown as Worker;
         });
 
         return { workers, total };

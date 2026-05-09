@@ -4,5 +4,5 @@ import { GetAllMeetingsQuery } from "../../../../shared/queries/GetAllMeetingsQu
 export interface IGetAllMeetingsForAdminUseCase {
     execute(
         query: GetAllMeetingsQuery
-    ): Promise<AdminServiceResponseDTO[]>;
+    ): Promise<unknown>;
 }

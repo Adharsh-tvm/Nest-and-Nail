@@ -135,7 +135,7 @@ export class EndVideoCallUseCase implements IEndVideoCallUseCase {
 
     return {
       message: "Meeting ended successfully",
-      videoCall: updated.videoCall,
+      videoCall: updatedVideoCall,
     };
   }
 }

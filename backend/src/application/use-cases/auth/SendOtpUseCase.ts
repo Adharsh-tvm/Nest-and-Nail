@@ -1,16 +1,16 @@
 import { ISendOtpUseCase } from "../../interfaces/auth/ISendOtpUseCase";
 import { IEmailService } from "../../contracts/IEmailService";
 import { IOtpService } from "../../contracts/IOtpService";
-import { OtpRepository } from "../../../infrastructure/repo/OtpRepository";
 import { ILogger } from "../../../infrastructure/logger/ILogger";
 import { Role } from "../../../shared/enums/authEnums";
 import { IUserRepositoryFactory } from "../../../domain/repositories/IUserRepositoryFactory";
+import { IOtpRepository } from "../../../domain/repositories/IOtpRepository";
 
 export class SendOtpUseCase implements ISendOtpUseCase {
     constructor(
         private readonly _emailService: IEmailService,
         private readonly _otpService: IOtpService,
-        private readonly _otpRepo: OtpRepository,
+        private readonly _otpRepo: IOtpRepository,
         private readonly _userRepositoryFactory: IUserRepositoryFactory,
         private readonly _logger?: ILogger
     ) { }

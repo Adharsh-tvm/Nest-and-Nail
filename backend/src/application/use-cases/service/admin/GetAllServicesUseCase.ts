@@ -13,6 +13,6 @@ export class GetAllServicesUseCase implements IGetAllServicesUseCase {
 
         const services = await this._serviceRepo.findAllWithDetails();
 
-        return services;
+        return services as unknown as AdminServiceResponseDTO[];
     }
 }

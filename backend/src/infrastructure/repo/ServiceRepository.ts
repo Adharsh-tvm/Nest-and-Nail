@@ -2,6 +2,8 @@ import { Service } from "../../domain/entities/Service";
 import { IServiceRepository } from "../../domain/repositories/IServiceRepository";
 import { ServiceStatus } from "../../shared/enums/serviceEnums";
 import { ServiceModel } from "../database/models/ServiceModel";
+import { UpdateVideoCallDTO } from "../../application/dtos/videoCallDTO";
+import { FilterQuery } from "mongoose";
 
 export class ServiceRepository implements IServiceRepository {
 
@@ -62,7 +64,7 @@ export class ServiceRepository implements IServiceRepository {
         return service as Service;
     }
 
-    async findAllWithDetails(): Promise<any[]> {
+    async findAllWithDetails(): Promise<unknown[]> {
         return await ServiceModel.aggregate([
             {
                 $lookup: {
@@ -119,7 +121,7 @@ export class ServiceRepository implements IServiceRepository {
         ]);
     }
 
-    async findDetailedByServiceId(serviceId: string): Promise<any | null> {
+    async findDetailedByServiceId(serviceId: string): Promise<unknown | null> {
 
         const result = await ServiceModel.aggregate([
             {
@@ -213,7 +215,7 @@ export class ServiceRepository implements IServiceRepository {
         return docs as Service[];
     }
 
-    async updateVideoCall(serviceId: string, videoCall: any): Promise<any> {
+    async updateVideoCall(serviceId: string, videoCall: UpdateVideoCallDTO): Promise<unknown> {
         return await ServiceModel.findOneAndUpdate(
             { serviceId },
             { $set: { videoCall } },
@@ -231,10 +233,15 @@ export class ServiceRepository implements IServiceRepository {
         );
     }
 
-    async getAllMeetingsForAdmin(query: any) {
+    async getAllMeetingsForAdmin(query: {
+        page: number;
+        limit: number;
+        search?: string;
+        status?: string;
+    }): Promise<unknown> {
         const { page, limit, search, status } = query;
 
-        const filter: any = {
+        const filter: FilterQuery<typeof ServiceModel> = {
             meeting: { $exists: true }
         };
 
@@ -267,7 +274,7 @@ export class ServiceRepository implements IServiceRepository {
         };
     }
 
-    async getMeetingByIdForAdmin(serviceId: string) {
+    async getMeetingByIdForAdmin(serviceId: string): Promise<unknown> {
         return await ServiceModel
             .findById(serviceId)
             .populate("clientId workerId");

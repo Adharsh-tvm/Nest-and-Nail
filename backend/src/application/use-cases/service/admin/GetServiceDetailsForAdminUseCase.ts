@@ -1,6 +1,6 @@
 import { IServiceRepository } from "../../../../domain/repositories/IServiceRepository";
 import { IGetServiceDetailsForAdminUseCase } from "../../../interfaces/service/admin/IGetServiceDetailsForAdminUseCase";
-
+import { AdminServiceResponseDTO } from "../../../dtos/ServiceDTO";
 
 export class GetServiceDetailsForAdminUseCase implements IGetServiceDetailsForAdminUseCase {
 
@@ -8,7 +8,7 @@ export class GetServiceDetailsForAdminUseCase implements IGetServiceDetailsForAd
         private readonly _serviceRepo: IServiceRepository
     ) {}
 
-    async execute(serviceId: string) {
+    async execute(serviceId: string): Promise<AdminServiceResponseDTO> {
 
         const service = await this._serviceRepo.findDetailedByServiceId(serviceId);
 
@@ -16,6 +16,6 @@ export class GetServiceDetailsForAdminUseCase implements IGetServiceDetailsForAd
             throw new Error("Service not found");
         }
 
-        return service;
+        return service as unknown as AdminServiceResponseDTO;
     }
 }

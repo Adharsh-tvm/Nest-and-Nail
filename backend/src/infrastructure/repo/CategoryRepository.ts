@@ -1,6 +1,7 @@
 import { Category } from "../../domain/entities/Category";
 import { ICategoryRepository } from "../../domain/repositories/ICategoryRepository";
 import { CategoryModel } from "../database/models/CategoryModel";
+import { FilterQuery } from "mongoose";
 
 export class CategoryRepository implements ICategoryRepository {
     async create(category: Category): Promise<Category> {
@@ -32,7 +33,7 @@ export class CategoryRepository implements ICategoryRepository {
         activeCount: number;
         inactiveCount: number;
     }> {
-        const query: any = {};
+        const query: FilterQuery<typeof CategoryModel> = {};
 
         if (options?.search) {
             query.$or = [
@@ -42,12 +43,12 @@ export class CategoryRepository implements ICategoryRepository {
         }
 
         const total = await CategoryModel.countDocuments(query);
-        const activeCount = await CategoryModel.countDocuments({ ...query, isActive: true });
+        const activeCount = await CategoryModel.countDocuments({ ...query, isActive: true } as FilterQuery<typeof CategoryModel>);
         const inactiveCount = total - activeCount;
 
         const sortField = options?.sortBy || "name";
         const sortOrder = options?.sortOrder === "desc" ? -1 : 1;
-        const sortOptions: any = { [sortField]: sortOrder };
+        const sortOptions: Record<string, 1 | -1> = { [sortField]: sortOrder };
 
         let mongoQuery = CategoryModel.find(query).sort(sortOptions);
 

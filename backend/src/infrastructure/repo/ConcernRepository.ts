@@ -1,6 +1,7 @@
 import { Concern } from "../../domain/entities/Concern";
 import { IConcernRepository } from "../../domain/repositories/IConcernRepository";
 import { ConcernModel } from "../database/models/ConcernModel";
+import { FilterQuery } from "mongoose";
 
 export class ConcernRepository implements IConcernRepository {
 
@@ -24,7 +25,7 @@ export class ConcernRepository implements IConcernRepository {
     }) {
         const { status, search, page, limit } = query;
 
-        const filter: any = {};
+        const filter: FilterQuery<typeof ConcernModel> = {};
 
         if (status) {
             filter.status = status;

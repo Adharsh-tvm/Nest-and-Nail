@@ -11,19 +11,19 @@ export interface IServiceRepository {
     findByWorkerId(workerId: string): Promise<Service[]>;
     findActiveByWorkerId(workerId: string): Promise<Service | null>;
 
-    findAllWithDetails(): Promise<any[]>;
-    findDetailedByServiceId(serviceId: string): Promise<any | null>;
+    findAllWithDetails(): Promise<unknown[]>;
+    findDetailedByServiceId(serviceId: string): Promise<unknown | null>;
 
     getMeetingsByClient(clientId: string): Promise<Service[]>;
     getMeetingsByWorker(workerId: string): Promise<Service[]>;
-    updateVideoCall(serviceId: string, videoCall: UpdateVideoCallDTO): Promise<any>;
+    updateVideoCall(serviceId: string, videoCall: UpdateVideoCallDTO): Promise<unknown>;
     getAllMeetingsForAdmin(query: {
         page: number;
         limit: number;
         search?: string;
         status?: string;
-    }): Promise<any>;
-    getMeetingByIdForAdmin(serviceId: string): Promise<any>;
+    }): Promise<unknown>;
+    getMeetingByIdForAdmin(serviceId: string): Promise<unknown>;
 
     updatePaymentStatus(serviceId: string, paymentStatus: string): Promise<void>;
 

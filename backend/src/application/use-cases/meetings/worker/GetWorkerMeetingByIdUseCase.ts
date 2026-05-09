@@ -3,13 +3,20 @@ import { IGetWorkerMeetingByIdUseCase } from "../../../interfaces/meetings/worke
 import { ServiceMapper } from "../../../mappers/ServiceMapper";
 import { ServiceStatus } from "../../../../shared/enums/serviceEnums";
 
+interface IDetailedService {
+  workerId: string;
+  category: string;
+  status: ServiceStatus;
+  [key: string]: unknown;
+}
+
 export class GetWorkerMeetingByIdUseCase implements IGetWorkerMeetingByIdUseCase {
 
   constructor(private serviceRepo: IServiceRepository) {}
 
   async execute(serviceId: string, workerId: string) {
 
-    const service = await this.serviceRepo.findDetailedByServiceId(serviceId);
+    const service = await this.serviceRepo.findDetailedByServiceId(serviceId) as unknown as IDetailedService;
 
     if (!service) {
       throw new Error("Meeting not found");
