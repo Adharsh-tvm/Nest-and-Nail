@@ -52,7 +52,7 @@ export function AddressSelectionStep({
         ) : (
           <div className="grid sm:grid-cols-2 gap-4">
             {addresses.map((addr, index) => {
-              const addressId = addr.addressId || (addr as any)._id || index.toString();
+              const addressId = addr.addressId || (addr as unknown as { _id?: string })._id || index.toString();
               const isSelected = selectedAddress?.addressId === addressId || 
                                  (!selectedAddress?.addressId && selectedAddress?.street === addr.street);
 

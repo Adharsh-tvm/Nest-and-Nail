@@ -19,12 +19,14 @@ axiosInstance.interceptors.request.use(
         const accessToken = cookieStore.get("accessToken")?.value;
         if (accessToken) {
           config.headers = config.headers || {};
-          (config.headers as any).Authorization = `Bearer ${accessToken}`;
+          const headers = config.headers as unknown as Record<string, string>;
+          headers["Authorization"] = `Bearer ${accessToken}`;
         }
         const allCookies = cookieStore.getAll();
         if (allCookies.length > 0) {
           const cookieString = allCookies.map((c) => `${c.name}=${c.value}`).join("; ");
-          (config.headers as any).Cookie = cookieString;
+          const headers = config.headers as unknown as Record<string, string>;
+          headers["Cookie"] = cookieString;
         }
       } catch (err) {
         console.error("Error reading cookies in request interceptor:", err);
@@ -43,8 +45,13 @@ axiosInstance.interceptors.response.use(
     const serverMsg = serverData?.message || serverData?.error || null;
 
     try {
-      (error as any).normalizedMessage = serverMsg || error.message || `Request failed with status ${status}`;
-      (error as any).serverData = serverData || null;
+      interface CustomError {
+        normalizedMessage?: string;
+        serverData?: unknown;
+      }
+      const customError = error as unknown as CustomError;
+      customError.normalizedMessage = serverMsg || error.message || `Request failed with status ${status}`;
+      customError.serverData = serverData || null;
     } catch (attachErr) {
     }
 

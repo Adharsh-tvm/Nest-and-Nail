@@ -79,7 +79,7 @@ export async function startWorkerServiceApi(
       { withCredentials: true }
     );
 
-    const resData = response.data as { success: boolean; message: string; data?: ServiceResponseDTO; payload?: ServiceResponseDTO; error?: any };
+    const resData = response.data as { success: boolean; message: string; data?: ServiceResponseDTO; payload?: ServiceResponseDTO; error?: unknown };
     if (resData.success) {
       return {
         success: true,
@@ -90,7 +90,7 @@ export async function startWorkerServiceApi(
       return {
         success: false,
         message: resData.message || "Failed to start service",
-        error: resData.error || null,
+        error: (resData.error as string | null) || null,
       };
     }
   } catch (error: unknown) {
@@ -119,7 +119,7 @@ export async function getWorkerServiceDetailsApi(serviceId: string): Promise<Api
       withCredentials: true,
     });
 
-    const resData = response.data as { success: boolean; message: string; data?: ServiceResponseDTO; payload?: ServiceResponseDTO; error?: any };
+    const resData = response.data as { success: boolean; message: string; data?: ServiceResponseDTO; payload?: ServiceResponseDTO; error?: unknown };
     if (resData.success) {
       return {
         success: true,
@@ -130,7 +130,7 @@ export async function getWorkerServiceDetailsApi(serviceId: string): Promise<Api
       return {
         success: false,
         message: resData.message || "Failed to fetch service details",
-        error: resData.error || null,
+        error: (resData.error as string | null) || null,
       };
     }
   } catch (error: unknown) {
@@ -161,7 +161,7 @@ export async function completeWorkerServiceApi(serviceId: string): Promise<ApiRe
       { withCredentials: true }
     );
 
-    const resData = response.data as { success: boolean; message: string; data?: ServiceResponseDTO; payload?: ServiceResponseDTO; error?: any };
+    const resData = response.data as { success: boolean; message: string; data?: ServiceResponseDTO; payload?: ServiceResponseDTO; error?: unknown };
     if (resData.success) {
       return {
         success: true,
@@ -172,7 +172,7 @@ export async function completeWorkerServiceApi(serviceId: string): Promise<ApiRe
       return {
         success: false,
         message: resData.message || "Failed to complete service",
-        error: resData.error || null,
+        error: (resData.error as string | null) || null,
       };
     }
   } catch (error: unknown) {

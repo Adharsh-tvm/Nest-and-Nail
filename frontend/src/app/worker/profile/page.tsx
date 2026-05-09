@@ -216,7 +216,7 @@ const ConfirmationModal = ({
 
 interface ViewProps {
   user: User;
-  setUser: (user: User) => void; // Updated to match store setter signature
+  setUser: (user: User | null) => void;
 }
 
 const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
@@ -1720,29 +1720,29 @@ const UserProfile = () => {
           {activeTab === "profile" && (
             <ProfileView
               user={safeUser}
-              setUser={(updatedUser) => setUser(updatedUser as any)}
+              setUser={setUser}
             />
           )}
           {activeTab === "addresses" && (
             <AddressesView
               user={safeUser}
-              setUser={(updatedUser) => setUser(updatedUser as any)}
+              setUser={setUser}
             />
           )}
           {activeTab === "slot" && (
             <SlotView
               user={safeUser}
-              setUser={(updatedUser) => setUser(updatedUser as any)}
+              setUser={setUser}
             />
           )}
           {activeTab === "wallet" && (
             <WalletView
               user={safeUser}
-              setUser={(updatedUser) => setUser(updatedUser as any)}
+              setUser={setUser}
             />
           )}
           {activeTab === "settings" && (
-            <SettingsView user={safeUser} setUser={(u) => setUser(u as any)} />
+            <SettingsView user={safeUser} setUser={setUser} />
           )}
         </div>
       </div>

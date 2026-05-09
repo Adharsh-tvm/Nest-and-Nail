@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { User } from "@/shared/types/userTypes";
-import { SlotType, SLOT_PRICES } from "@/shared/types/serviceTypes";
+import { SlotType, SLOT_PRICES, DateAvailabilitySummary } from "@/shared/types/serviceTypes";
 import { useWorkerAvailability } from "@/hooks/useWorkerAvailability";
 import { useBookWorker } from "@/hooks/useBookWorker";
 import { CalendarSelector } from "./CalendarSelector";
@@ -452,7 +452,7 @@ export function BookingSection({ worker }: BookingSectionProps) {
               onSlotChange={(newSlots) => {
                 setSelectedSlots(newSlots);
               }}
-              availabilityData={Object.fromEntries(calendarHighlights.entries()) as any}
+              availabilityData={Object.fromEntries(calendarHighlights.entries()) as Record<string, DateAvailabilitySummary>}
               isLoadingDate={isLoadingDate}
               numberOfDays={numberOfDays || 1}
               viewYear={viewYear}

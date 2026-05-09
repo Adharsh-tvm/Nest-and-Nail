@@ -175,10 +175,10 @@ export default function ClientServiceDetailsPage() {
                         <span className="text-gray-600 break-all">{worker.email}</span>
                       </div>
                     )}
-                    {((worker as any).phone || worker?.phone_number) && (
+                    {(worker?.phone_number || (worker as unknown as { phone?: string })?.phone) && (
                       <div className="flex items-center space-x-3 text-sm">
                         <Phone className="w-4 h-4 text-gray-400" />
-                        <span className="text-gray-600">{(worker as any).phone || worker?.phone_number}</span>
+                        <span className="text-gray-600">{worker?.phone_number || (worker as unknown as { phone?: string })?.phone}</span>
                       </div>
                     )}
                   </div>

@@ -12,7 +12,7 @@ interface NotificationDTO {
   title: string;
   message: string;
   type: string;
-  data?: Record<string, any>;
+  data?: Record<string, unknown>;
   isRead: boolean;
   createdAt: string;
 }
@@ -63,7 +63,7 @@ export default function NotificationBell() {
       // Play a ring sound for meeting join notifications
       if (notification.type === "MEETING_JOINED") {
         try {
-          const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+          const ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext)();
           const playTone = (freq: number, startTime: number, duration: number) => {
             const osc = ctx.createOscillator();
             const gain = ctx.createGain();

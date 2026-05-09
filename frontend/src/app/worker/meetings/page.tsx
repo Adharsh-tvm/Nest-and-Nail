@@ -155,7 +155,7 @@ export default function WorkerMeetingsPage() {
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => setActiveTab(tab.id as "ALL" | ServiceStatus)}
                 className={`pb-4 px-1 text-sm font-medium transition-colors relative flex items-center gap-1.5 ${
                   activeTab === tab.id ? "text-emerald-600" : "text-slate-500 hover:text-slate-800"
                 }`}

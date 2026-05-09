@@ -18,8 +18,8 @@ export default function VideoCall({
   role: string; 
   workerName?: string; 
   clientName?: string;
-  onJoin?: (roomId: string) => Promise<any>;
-  onLeave?: (roomId: string) => Promise<any>;
+  onJoin?: (roomId: string) => Promise<unknown>;
+  onLeave?: (roomId: string) => Promise<unknown>;
 }) {
   const myName = role === "WORKER" ? (workerName || "Worker") : (clientName || "Client");
   const otherName = role === "WORKER" ? (clientName || "Client") : (workerName || "Worker");

@@ -256,7 +256,7 @@ const DataTable = <T,>({
                         className={`px-6 py-5 text-sm text-gray-600 first:pl-2 first:rounded-l-2xl last:rounded-r-2xl ${col.className || ""
                           }`}
                       >
-                        {col.cell ? col.cell(row) : (value as any) ?? "—"}
+                        {col.cell ? col.cell(row) : (value as React.ReactNode) ?? "—"}
                       </td>
                     );
                   })}

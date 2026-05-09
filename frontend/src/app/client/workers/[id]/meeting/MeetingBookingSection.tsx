@@ -337,7 +337,7 @@ export function MeetingBookingSection({ worker }: MeetingBookingSectionProps) {
             <MeetingCalendarSelector
               selectedSlots={selectedSlots}
               onSlotChange={setSelectedSlots}
-              availabilityData={Object.fromEntries(calendarHighlights.entries()) as any}
+              availabilityData={Object.fromEntries(calendarHighlights.entries()) as Record<string, { isBooked?: boolean; bookedSlots?: string[] }>}
               isLoadingDate={isLoadingDate}
               viewYear={viewYear}
               viewMonth={viewMonth}
