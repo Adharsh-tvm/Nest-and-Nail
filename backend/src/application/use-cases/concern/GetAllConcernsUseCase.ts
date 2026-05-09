@@ -1,4 +1,5 @@
 import { IConcernRepository } from "../../../domain/repositories/IConcernRepository";
+import { Concern } from "../../../domain/entities/Concern";
 import { IServiceRepository } from "../../../domain/repositories/IServiceRepository";
 import { IUserRepositoryFactory } from "../../../domain/repositories/IUserRepositoryFactory";
 import { IGetAllConcernsUseCase } from "../../interfaces/concern/IGetAllConcernsUseCase";
@@ -30,8 +31,8 @@ export class GetAllConcernsUseCase implements IGetAllConcernsUseCase {
     });
 
     const populatedConcerns = await Promise.all(
-      concerns.map(async (concern: any) => {
-        const concernObj = concern.toObject ? concern.toObject() : { ...concern };
+      concerns.map(async (concern) => {
+        const concernObj = ((concern as unknown as { toObject?: () => object }).toObject ? (concern as unknown as { toObject: () => object }).toObject() : { ...concern }) as Concern;
 
         // Fetch Service details
         const service = await this._serviceRepo.findById(concern.serviceId);

@@ -28,7 +28,7 @@ export class GetAllUsersUseCase implements IGetAllUsersUseCase {
             limit = 20,
         } = query;
 
-        const userRepo = this._repoFactory.getRepository("USER" as any);
+        const userRepo = this._repoFactory.getRepository("USER");
 
         const filter = {
             isBlocked,

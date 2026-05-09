@@ -4,6 +4,7 @@ import { ServiceMapper } from "../../../mappers/ServiceMapper";
 import { IUserRepositoryFactory } from "../../../../domain/repositories/IUserRepositoryFactory";
 import { S3Service } from "../../../../infrastructure/adapters/S3service";
 import { ServiceStatus } from "../../../../shared/enums/serviceEnums";
+import { Role } from "../../../../shared/enums/authEnums";
 
 export class GetWorkerServiceDetailsUseCase implements IGetWorkerServiceDetailsUseCase {
 
@@ -30,7 +31,7 @@ export class GetWorkerServiceDetailsUseCase implements IGetWorkerServiceDetailsU
             throw new Error("Service not found");
         }
 
-        const userRepo = this._userRepoFactory.getRepository("USER" as any);
+        const userRepo = this._userRepoFactory.getRepository(Role.CLIENT);
         const client = await userRepo.findById(service.clientId);
 
         const responseDTO = ServiceMapper.toResponse(service);

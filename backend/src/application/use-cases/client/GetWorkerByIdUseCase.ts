@@ -34,7 +34,7 @@ export class GetWorkerByIdUseCase implements IGetWorkerByIdUseCase {
     const reviews = await this._reviewRepository.findByWorkerId(id);
 
     // Fetch client names for reviews
-    const reviewsWithClientNames = await Promise.all(reviews.map(async (review: any) => {
+    const reviewsWithClientNames = await Promise.all(reviews.map(async (review) => {
       try {
         const clientRepo = this._userRepoFactory.getRepository(Role.CLIENT);
         const workerRepo = this._userRepoFactory.getRepository(Role.WORKER);

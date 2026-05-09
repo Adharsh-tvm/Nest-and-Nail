@@ -1,6 +1,7 @@
 import { UserAlreadyExistsError } from "../../../domain/errors/DomainError";
 import { LoginMethod } from "../../../shared/enums/authEnums";
 import { UserRequestDTO, UserResponseDTO } from "../../dtos/UserDTO";
+import { User } from "../../../domain/entities/User";
 import { ILogger } from "../../../infrastructure/logger/ILogger";
 import { IRegisterUserUseCase } from "../../interfaces/auth/IRegisterUserUseCase";
 import { UserMapper } from "../../mappers/UserMapper";
@@ -56,7 +57,8 @@ export class RegisterUserUseCase implements IRegisterUserUseCase {
       createdAt: new Date(),
       updatedAt: new Date(),
       lastLoginAt: new Date(),
-    } as any);
+      isOnline: false,
+    } as User);
 
     this._logger.info(`[RegisterUserUseCase] User created successfully`);
 

@@ -1,4 +1,5 @@
 import { IGetWorkerDashboardDataUseCase } from "../../../interfaces/worker/profile/IGetWorkerDashboardDataUseCase";
+import { WorkerDashboardResponseDTO } from "../../../dtos/worker/WorkerDashboardDTO";
 import { ServiceModel } from "../../../../infrastructure/database/models/ServiceModel";
 import { TransactionModel } from "../../../../infrastructure/database/models/TransactionModel";
 import { WorkerModel } from "../../../../infrastructure/database/models/WorkerModel";
@@ -9,7 +10,7 @@ import { ServiceStatus } from "../../../../shared/enums/serviceEnums";
 import { transactionType, transactionStatus, transactionSource } from "../../../../shared/enums/transactionEnums";
 
 export class GetWorkerDashboardDataUseCase implements IGetWorkerDashboardDataUseCase {
-    async execute(workerId: string, months = 6): Promise<any> {
+    async execute(workerId: string, months = 6): Promise<WorkerDashboardResponseDTO> {
         // Fetch worker stats
         const worker = await WorkerModel.findOne({ userId: workerId }).lean();
         if (!worker) {
@@ -98,9 +99,9 @@ export class GetWorkerDashboardDataUseCase implements IGetWorkerDashboardDataUse
             recentReviews.map(async (review) => {
                 const client = await ClientModel.findOne({ userId: review.clientId }).select('name profilePictureUrl').lean();
                 return {
-                    id: review._id,
+                    id: review._id.toString(),
                     rating: review.rating,
-                    review: review.review,
+                    review: review.review || "",
                     createdAt: review.createdAt,
                     clientName: client ? client.name : 'Unknown Client',
                     clientImage: client ? client.profilePictureUrl : ''

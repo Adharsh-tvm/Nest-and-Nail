@@ -38,7 +38,7 @@ export class UpdateUserProfileUseCase implements IUpdateUserProfileUseCase {
 
         if (!user) throw new Error("User not found");
 
-        const updatedUser: any = { ...user, ...updates };
+        const updatedUser: Partial<User> = { ...user, ...updates };
 
         let signedUrl: string | undefined;
 

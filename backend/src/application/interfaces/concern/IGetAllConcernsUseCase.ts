@@ -1,4 +1,4 @@
-import { Concern } from "../../../domain/entities/Concern";
+import { ConcernResponseDTO } from "../../dtos/concern/ConcernDTO";
 
 export interface IGetAllConcernsUseCase {
   execute(query: {
@@ -7,7 +7,7 @@ export interface IGetAllConcernsUseCase {
     page?: number;
     limit?: number;
   }): Promise<{
-    concerns: Concern[];
+    concerns: ConcernResponseDTO[];
     total: number;
     totalPages: number;
   }>;
