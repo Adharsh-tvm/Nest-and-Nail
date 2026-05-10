@@ -141,7 +141,7 @@ function StartServiceModal({
                 </div>
                 <h2 className="text-xl font-bold text-white">Start Service</h2>
                 <p className="text-sm text-indigo-100 mt-1">
-                  We need your current location to verify you're at the service
+                  {"We need your current location to verify you're at the service"}
                   site.
                 </p>
               </div>
@@ -455,7 +455,7 @@ export default function WorkerServiceDetailsPage() {
             Service Not Found
           </h2>
           <p className="text-gray-500 mb-6">
-            We couldn't locate the details for this service assignment.
+            {"We couldn't locate the details for this service assignment."}
           </p>
           <button
             onClick={() => router.back()}

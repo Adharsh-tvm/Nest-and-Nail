@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import {
-  Search,
   CheckCircle2,
   XCircle,
   Eye,
@@ -11,7 +10,6 @@ import {
   Briefcase,
   X,
   UserCheck,
-  Shield,
   TrendingUp,
   Clock,
   Mail,
@@ -25,6 +23,7 @@ import {
 } from "@/app/actions/admin/admin-actions";
 import { VerificationStatus } from "@/shared/enums/authEnums";
 import toast from "react-hot-toast";
+import Image from "next/image";
 
 /* ---------------------------------------------------------------------------
  * TABLE TYPES
@@ -37,11 +36,7 @@ type Column<T> = {
   cell?: (row: T) => React.ReactNode;
 };
 
-type WithId = {
-  id?: string | number;
-  _id?: string | number;
-  userId?: string | number;
-};
+
 
 /* ---------------------------------------------------------------------------
  * VERIFICATION DETAILS MODAL
@@ -119,11 +114,13 @@ const VerificationModal: React.FC<VerificationModalProps> = ({
             {/* LEFT: Profile */}
             <div className="md:col-span-1 space-y-6">
               <div className="text-center bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-                <div className="w-24 h-24 mx-auto rounded-2xl bg-gradient-to-br from-emerald-50 to-emerald-100 mb-4 overflow-hidden border border-emerald-100 shadow-inner flex items-center justify-center">
+                <div className="w-24 h-24 mx-auto rounded-2xl bg-gradient-to-br from-emerald-50 to-emerald-100 mb-4 overflow-hidden border border-emerald-100 shadow-inner flex items-center justify-center relative">
                   {request.profilePictureUrl ? (
-                    <img
+                    <Image
                       src={request.profilePictureUrl}
                       alt={request.name}
+                      fill
+                      unoptimized
                       className="w-full h-full object-cover"
                     />
                   ) : (
@@ -182,9 +179,11 @@ const VerificationModal: React.FC<VerificationModalProps> = ({
                   <div className="grid sm:grid-cols-2 gap-4">
                     {idFront && (
                       <div className="group relative aspect-video bg-gray-200 rounded-2xl overflow-hidden border border-gray-200 cursor-pointer shadow-sm">
-                        <img
+                        <Image
                           src={idFront}
                           alt="ID Front"
+                          fill
+                          unoptimized
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                         />
                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
@@ -200,9 +199,11 @@ const VerificationModal: React.FC<VerificationModalProps> = ({
                     )}
                     {idBack && (
                       <div className="group relative aspect-video bg-gray-200 rounded-2xl overflow-hidden border border-gray-200 cursor-pointer shadow-sm">
-                        <img
+                        <Image
                           src={idBack}
                           alt="ID Back"
+                          fill
+                          unoptimized
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                         />
                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
@@ -369,7 +370,7 @@ const VerificationsPendingView: React.FC = () => {
   const [selectedRequest, setSelectedRequest] =
     useState<PendingVerificationUser | null>(null);
 
-  const { users, loading, error } = useUsers();
+  const { users, loading } = useUsers();
 
   const [pendingRequests, setPendingRequests] = useState<
     PendingVerificationUser[]
@@ -451,11 +452,13 @@ const VerificationsPendingView: React.FC = () => {
       className: "min-w-[240px]",
       cell: (row) => (
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-gray-50 overflow-hidden border border-gray-100 flex items-center justify-center shadow-sm">
+          <div className="w-12 h-12 rounded-2xl bg-gray-50 overflow-hidden border border-gray-100 flex items-center justify-center shadow-sm relative">
             {row.profilePictureUrl ? (
-              <img
+              <Image
                 src={row.profilePictureUrl}
                 alt={row.name}
+                fill
+                unoptimized
                 className="w-full h-full object-cover"
               />
             ) : (

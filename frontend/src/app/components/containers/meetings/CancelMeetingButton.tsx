@@ -302,7 +302,7 @@ export default function CancelMeetingButton({
                         <p className="text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-wider">
                           Your reason:
                         </p>
-                        <p className="text-sm text-slate-700 italic font-medium">"{reason}"</p>
+                        <p className="text-sm text-slate-700 italic font-medium">&quot;{reason}&quot;</p>
                       </div>
 
                       {error && (

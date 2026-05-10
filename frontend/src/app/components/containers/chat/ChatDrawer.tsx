@@ -79,7 +79,6 @@ export default function ChatDrawer({ chatId, receiverId, receiverName }: ChatDra
       socket.disconnect();
       socketRef.current = null;
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chatId]);
 
   // Clear unread count when opening

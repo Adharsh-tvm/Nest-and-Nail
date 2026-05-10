@@ -2,9 +2,10 @@
 
 import React, { useState } from 'react';
 import { ServiceResponseDTO, ServiceStatus } from '@/shared/types/serviceTypes';
-import { Calendar, Clock, ChevronRight, X, Briefcase, IndianRupee, AlertTriangle, XCircle, RotateCcw, CheckCircle2, Ban } from 'lucide-react';
+import { Calendar, Clock, ChevronRight, X, Briefcase, AlertTriangle, XCircle, RotateCcw, CheckCircle2, Ban } from 'lucide-react';
 import { User } from '@/shared/types/userTypes';
 import Pagination from '@/app/components/ui/Pagination';
+import Image from 'next/image';
 import { cancelServiceAction } from '@/app/actions/client/service-actions';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
@@ -32,7 +33,7 @@ interface CancelModalState {
 
 export default function ClientServicesView({ ongoing, history, cancelled, workerMap }: Props) {
     const [activeTab, setActiveTab] = useState<TabId>('active');
-    const [selectedService, setSelectedService] = useState<ServiceResponseDTO | null>(null);
+
     const [activePage, setActivePage] = useState(1);
     const [historyPage, setHistoryPage] = useState(1);
     const [cancelledPage, setCancelledPage] = useState(1);
@@ -111,14 +112,7 @@ export default function ClientServicesView({ ongoing, history, cancelled, worker
         });
     };
 
-    const isCancellable = (service: ServiceResponseDTO) => {
-        const cancellableStatuses: string[] = [
-            ServiceStatus.PENDING,
-            ServiceStatus.CONFIRMED,
-            'PENDING',
-        ];
-        return cancellableStatuses.includes(service.status);
-    };
+
 
     const renderServiceCard = (service: ServiceResponseDTO, isActive: boolean) => {
         const worker = workerMap[service.workerId];
@@ -131,16 +125,18 @@ export default function ClientServicesView({ ongoing, history, cancelled, worker
             >
                 <div className="p-5">
                     <div className="flex justify-between items-start mb-4">
-                        <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100 border-2 border-white shadow-sm flex items-center justify-center shrink-0">
+                        <div className="flex items-center gap-3">                             <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100 border-2 border-white shadow-sm flex items-center justify-center shrink-0 relative">
                                 {worker && (worker.profileImageUrl || worker.profilePictureUrl) ? (
-                                    <img
+                                    <Image
                                         src={
                                             ((worker.profileImageUrl || worker.profilePictureUrl) as string)?.startsWith('http')
                                             ? ((worker.profileImageUrl || worker.profilePictureUrl) as string)
                                             : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/${((worker.profileImageUrl || worker.profilePictureUrl) as string || '').replace(/^\//, '')}`
                                         }
-                                        alt={worker.name} className="w-full h-full object-cover"
+                                        alt={worker.name || "Worker"}
+                                        fill
+                                        unoptimized
+                                        className="w-full h-full object-cover"
                                     />
                                 ) : (
                                     <span className="font-bold text-gray-400 text-lg">{worker?.name?.substring(0, 2).toUpperCase() || 'W'}</span>
@@ -246,7 +242,7 @@ export default function ClientServicesView({ ongoing, history, cancelled, worker
                                 <Briefcase className="w-8 h-8" />
                             </div>
                             <h3 className="text-xl font-bold text-gray-900 mb-2">No Active Services</h3>
-                            <p className="text-gray-500">You don't have any ongoing services at the moment.</p>
+                            <p className="text-gray-500">{"You don't have any ongoing services at the moment."}</p>
                         </div>
                     )}
                 </>
@@ -315,7 +311,7 @@ export default function ClientServicesView({ ongoing, history, cancelled, worker
                                 <Ban className="w-8 h-8" />
                             </div>
                             <h3 className="text-xl font-bold text-gray-900 mb-2">No Cancelled Services</h3>
-                            <p className="text-gray-500">You haven't cancelled any services.</p>
+                            <p className="text-gray-500">{"You haven't cancelled any services."}</p>
                         </div>
                     )}
                 </section>
@@ -394,7 +390,7 @@ export default function ClientServicesView({ ongoing, history, cancelled, worker
                                     </div>
                                     <div className="bg-gray-50 rounded-xl p-3 border border-gray-100">
                                         <p className="text-xs font-semibold text-gray-500 mb-1">Your reason:</p>
-                                        <p className="text-sm text-gray-700 italic">"{cancelModal.reason}"</p>
+                                        <p className="text-sm text-gray-700 italic">&quot;{cancelModal.reason}&quot;</p>
                                     </div>
                                     <div className="flex gap-3 pt-1">
                                         <button

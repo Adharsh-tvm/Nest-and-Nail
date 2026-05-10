@@ -147,7 +147,7 @@ const OtpVerificationForm: React.FC<OtpVerificationFormProps> = ({
 
         <div className="mt-6 text-center text-sm text-gray-600">
           <p>
-            Didn't receive the code?{" "}
+            {"Didn't receive the code?"}{" "}
             <button
               type="button"
               onClick={handleResendClick}

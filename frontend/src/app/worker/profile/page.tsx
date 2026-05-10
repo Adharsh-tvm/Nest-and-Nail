@@ -1357,7 +1357,6 @@ const SlotView: React.FC<ViewProps> = ({ user, setUser }) => {
 
   useEffect(() => {
     loadAvailability();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewYear, viewMonth, user.id]);
 
   const handleDateClick = (day: number) => {

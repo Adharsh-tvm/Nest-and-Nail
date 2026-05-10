@@ -2,10 +2,11 @@
 
 import React from 'react';
 import { ServiceResponseDTO, ServiceStatus, SLOT_LABELS } from '@/shared/types/serviceTypes';
-import { Calendar, Clock, ChevronRight, Video, Timer } from 'lucide-react';
+import { Calendar, Clock, ChevronRight, Video } from 'lucide-react';
 import { User } from '@/shared/types/userTypes';
 import Pagination from '@/app/components/ui/Pagination';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const ACTIVE_PAGE_SIZE = 6;
 const HISTORY_PAGE_SIZE = 6;
@@ -65,15 +66,18 @@ export default function ClientMeetingsView({ scheduled, history, workerMap }: Pr
                 <div className="p-5">
                     <div className="flex justify-between items-start mb-4">
                         <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100 border-2 border-white shadow-sm flex items-center justify-center shrink-0">
+                            <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100 border-2 border-white shadow-sm flex items-center justify-center shrink-0 relative">
                                 {worker && (worker.profileImageUrl || worker.profilePictureUrl) ? (
-                                    <img
+                                    <Image
                                         src={
                                             ((worker.profileImageUrl || worker.profilePictureUrl) as string)?.startsWith('http')
                                             ? ((worker.profileImageUrl || worker.profilePictureUrl) as string)
                                             : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/${((worker.profileImageUrl || worker.profilePictureUrl) as string || '').replace(/^\//, '')}`
                                         }
-                                        alt={worker.name} className="w-full h-full object-cover"
+                                        alt={worker.name || "Worker"}
+                                        fill
+                                        unoptimized
+                                        className="w-full h-full object-cover"
                                     />
                                 ) : (
                                     <span className="font-bold text-gray-400 text-lg">{worker?.name?.substring(0, 2).toUpperCase() || 'W'}</span>
@@ -148,7 +152,7 @@ export default function ClientMeetingsView({ scheduled, history, workerMap }: Pr
                             <Video className="w-8 h-8" />
                         </div>
                         <h3 className="text-xl font-bold text-gray-900 mb-2">No Scheduled Meetings</h3>
-                        <p className="text-gray-500">You don't have any upcoming video consultations.</p>
+                        <p className="text-gray-500">{"You don't have any upcoming video consultations."}</p>
                     </div>
                 )}
             </section>

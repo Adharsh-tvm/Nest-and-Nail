@@ -4,15 +4,12 @@ import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { 
   ArrowLeft, 
-  MapPin, 
   Calendar, 
   Clock, 
   User, 
   Briefcase, 
   CreditCard,
-  FileText,
   AlignLeft,
-  Home,
   Video
 } from "lucide-react";
 import toast from "react-hot-toast";

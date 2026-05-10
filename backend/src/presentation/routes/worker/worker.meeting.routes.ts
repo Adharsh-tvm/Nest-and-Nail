@@ -5,7 +5,6 @@ import { WorkerMeetingsController } from "../../controllers/worker/WorkerMeeting
 const router = Router();
 
 export function createWorkerMeetingsRoutes(
-
     authMiddleware: AuthMiddleware,
     workerMeetingsController: WorkerMeetingsController
 ) {
@@ -13,19 +12,19 @@ export function createWorkerMeetingsRoutes(
     router.get(
         "/scheduled",
         authMiddleware.verify.bind(authMiddleware),
-        (req, res) => { void workerMeetingsController.getScheduledMeetings(req, res); }
+        workerMeetingsController.getScheduledMeetings
     );
 
     router.get(
         "/history",
         authMiddleware.verify.bind(authMiddleware),
-        (req, res) => { void workerMeetingsController.getMeetingsHistory(req, res); }
+        workerMeetingsController.getMeetingsHistory
     );
 
     router.get(
         "/:serviceId",
         authMiddleware.verify.bind(authMiddleware),
-        (req, res) => { void workerMeetingsController.getMeetingById(req, res); }
+        workerMeetingsController.getMeetingById
     );
 
     return router;

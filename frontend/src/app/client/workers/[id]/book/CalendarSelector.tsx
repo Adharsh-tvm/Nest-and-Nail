@@ -266,7 +266,7 @@ export function CalendarSelector({
                     }
                     
                     const needed = numberOfDays - Object.keys(newSlots).length;
-                    let current = new Date(dateObj);
+                    const current = new Date(dateObj);
                     
                     for (let i = 0; i < needed; i++) {
                        const cKey = toDateKey(current.getFullYear(), current.getMonth(), current.getDate());

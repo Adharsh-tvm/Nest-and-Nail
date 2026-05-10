@@ -1,18 +1,14 @@
 "use client";
 import { useRouter } from "next/navigation";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   User as UserIcon,
-  Mail,
-  Phone,
   MapPin,
   Edit2,
-  Calendar,
   ShieldCheck,
   Briefcase,
   FileText,
-  Image as ImageIcon,
   CheckCircle2,
   Clock,
   Eye,
@@ -23,16 +19,13 @@ import {
   CreditCard,
   Settings,
   LogOut,
-  MoreVertical,
   Wallet as WalletIcon,
   Bell,
   ChevronRight,
   LayoutDashboard,
   ExternalLink,
   Camera,
-  Upload,
   Trash2,
-  Calendar1,
 } from "lucide-react";
 import { useUserStore } from "@/store/userStore";
 import { updateUserProfileAction } from "@/app/actions/users/user-profile-actions";
@@ -50,6 +43,7 @@ import { getWalletBalanceAction, getTransactionsAction } from "@/app/actions/cli
 import Pagination from "@/app/components/ui/Pagination";
 import { User } from "@/shared/types/userTypes";
 import { Address } from "@/shared/types/addressType";
+import Image from "next/image";
 
 // --- Types ---
 
@@ -124,7 +118,7 @@ const DocumentViewerModal = ({
           </button>
         </div>
 
-        <div className="flex-1 bg-gray-50 p-4 overflow-auto flex items-center justify-center">
+        <div className="flex-1 bg-gray-50 p-4 overflow-auto flex items-center justify-center relative w-full h-full">
           {isPdf ? (
             <iframe
               src={src}
@@ -132,9 +126,11 @@ const DocumentViewerModal = ({
               title="Document Viewer"
             />
           ) : (
-            <img
+            <Image
               src={src}
               alt="Document"
+              fill
+              unoptimized
               className="max-w-full max-h-full object-contain rounded-lg shadow-sm"
             />
           )}
@@ -387,9 +383,11 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
                     }`}
                   >
                     {profilePicPreview ? (
-                      <img
+                      <Image
                         src={profilePicPreview}
                         alt="Profile"
+                        fill
+                        unoptimized
                         className="w-full h-full object-cover"
                         onError={() => setProfilePicPreview(null)}
                       />
@@ -808,7 +806,7 @@ const WalletView: React.FC<ViewProps> = ({ user }) => {
   const [totalPages, setTotalPages] = useState(1);
   const [limit] = useState(4); // Show 5 transactions per page
 
-  const fetchWallet = async (page: number = 1) => {
+  const fetchWallet = useCallback(async (page: number = 1) => {
     setIsLoading(true);
     const balanceRes = await getWalletBalanceAction();
     if (balanceRes.success && balanceRes.data) {
@@ -821,11 +819,11 @@ const WalletView: React.FC<ViewProps> = ({ user }) => {
       setTotalPages(txRes.data.totalPages || 1);
     }
     setIsLoading(false);
-  };
+  }, [limit]);
 
   useEffect(() => {
     fetchWallet(currentPage);
-  }, [currentPage]);
+  }, [currentPage, fetchWallet]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -886,7 +884,7 @@ const WalletView: React.FC<ViewProps> = ({ user }) => {
             } else {
               toast.error("Payment verification failed.");
             }
-          } catch (error) {
+          } catch {
             toast.error("An error occurred during verification.");
           } finally {
             setIsRecharging(false);
@@ -1167,9 +1165,11 @@ const UserProfile = () => {
                 className="w-20 h-20 rounded-full border-4 border-white shadow-lg overflow-hidden bg-gray-200 cursor-pointer relative"
               >
                 {safeUser.profileImageUrl ? (
-                  <img
+                  <Image
                     src={safeUser.profileImageUrl}
                     alt="Profile"
+                    fill
+                    unoptimized
                     className="w-full h-full object-cover group-hover/avatar:opacity-75 transition-opacity"
                   />
                 ) : (

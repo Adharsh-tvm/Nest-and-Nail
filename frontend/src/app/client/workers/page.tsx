@@ -49,7 +49,7 @@ export default async function WorkersPage({
         ? (categoriesResult.payload.categories || []).filter((c: Category) => c.isActive)
         : [];
 
-    let workers = [...(allWorkers ?? [])];
+    const workers = [...(allWorkers ?? [])];
 
     // Sorting is still handled on client for now as the action doesn't support it yet, 
     // but typically it should also move to backend. 

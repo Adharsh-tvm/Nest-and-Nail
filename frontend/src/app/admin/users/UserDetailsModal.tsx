@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import NextImage from "next/image";
 import {
     X,
     Mail,
@@ -194,7 +195,7 @@ const UserDetailsModal = ({ isOpen, onClose, user }: UserDetailsModalProps) => {
                             <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-8 items-start">
                                 <div className="w-32 h-32 shrink-0 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 border-4 border-white shadow-xl flex items-center justify-center overflow-hidden relative">
                                     {user.profileImageUrl ? (
-                                        <img src={user.profileImageUrl} alt={user.name} className="w-full h-full object-cover" />
+                                        <NextImage src={user.profileImageUrl} alt={user.name} fill unoptimized className="w-full h-full object-cover" />
                                     ) : (
                                         <span className="text-4xl font-bold text-gray-300">{user.name?.charAt(0)}</span>
                                     )}
@@ -417,13 +418,13 @@ const UserDetailsModal = ({ isOpen, onClose, user }: UserDetailsModalProps) => {
                                     <div className="text-center py-12 bg-gray-50 rounded-xl border border-dashed border-gray-200">
                                         <FileText size={48} className="mx-auto text-gray-200 mb-3" />
                                         <p className="text-gray-400 font-medium">No documents uploaded</p>
-                                        <p className="text-xs text-gray-300 mt-1">User hasn't submitted verification documents yet.</p>
+                                        <p className="text-xs text-gray-300 mt-1">{"User hasn't submitted verification documents yet."}</p>
                                     </div>
                                 )}
                             </div>
                         </div>
                     )}
-
+ 
                     {activeTab === 'gallery' && (
                         <div className="space-y-6 animate-in slide-in-from-bottom-2 duration-300">
                             <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
@@ -436,9 +437,11 @@ const UserDetailsModal = ({ isOpen, onClose, user }: UserDetailsModalProps) => {
                                             const data = safeRender(photo, 'photo');
                                             return (
                                                 <div key={idx} className="aspect-square rounded-xl overflow-hidden relative group cursor-pointer border border-gray-100 bg-gray-50">
-                                                    <img
+                                                    <NextImage
                                                         src={data.url || ""}
                                                         alt={`Work ${idx + 1}`}
+                                                        fill
+                                                        unoptimized
                                                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                                     />
                                                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -454,7 +457,7 @@ const UserDetailsModal = ({ isOpen, onClose, user }: UserDetailsModalProps) => {
                                     <div className="text-center py-12 bg-gray-50 rounded-xl border border-dashed border-gray-200">
                                         <ImageIcon size={48} className="mx-auto text-gray-200 mb-3" />
                                         <p className="text-gray-400 font-medium">No work photos added</p>
-                                        <p className="text-xs text-gray-300 mt-1">User hasn't uploaded any portfolio images.</p>
+                                        <p className="text-xs text-gray-300 mt-1">{"User hasn't uploaded any portfolio images."}</p>
                                     </div>
                                 )}
                             </div>

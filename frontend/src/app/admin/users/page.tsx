@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import Image from "next/image";
 import {
   Mail,
   Phone,
@@ -132,10 +133,25 @@ const UsersView = () => {
 
   useEffect(() => {
     const urlSearch = searchParams.get("search") || "";
-    if (urlSearch !== searchTerm) {
-      setSearchTerm(urlSearch);
-    }
+    setSearchTerm(urlSearch);
   }, [searchParams]);
+
+  // Helper to update URL params
+  const updateUrl = useCallback((key: string, value: string | null) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (value === null) {
+      params.delete(key);
+    } else {
+      params.set(key, value);
+    }
+
+    // When filtering or searching, reset to page 1
+    if (key !== "page") {
+      params.set("page", "1");
+    }
+
+    router.replace(`${pathname}?${params.toString()}`);
+  }, [searchParams, router, pathname]);
 
   // Debounce URL update
   useEffect(() => {
@@ -146,7 +162,7 @@ const UsersView = () => {
       }
     }, 500);
     return () => clearTimeout(timer);
-  }, [searchTerm]);
+  }, [searchTerm, searchParams, updateUrl]);
 
   const { users, loading, error, total, totalPages } = useUsers({
     page,
@@ -164,22 +180,7 @@ const UsersView = () => {
   const [blockConfirmOpen, setBlockConfirmOpen] = useState(false);
   const [userToBlock, setUserToBlock] = useState<ClientRow | null>(null);
 
-  // Helper to update URL params
-  const updateUrl = (key: string, value: string | null) => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (value === null) {
-      params.delete(key);
-    } else {
-      params.set(key, value);
-    }
 
-    // When filtering or searching, reset to page 1
-    if (key !== "page") {
-      params.set("page", "1");
-    }
-
-    router.replace(`${pathname}?${params.toString()}`);
-  };
 
   const handleSearchChange = (value: string) => {
     setSearchTerm(value);
@@ -242,9 +243,11 @@ const UsersView = () => {
           <div className="relative">
             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-50 to-emerald-100 flex items-center justify-center text-[#1B4332] font-bold text-lg shadow-sm border border-emerald-100/50 overflow-hidden">
               {row.profileImageUrl ? (
-                <img
+                <Image
                   src={row.profileImageUrl}
                   alt={row.name}
+                  fill
+                  unoptimized
                   className="w-full h-full object-cover"
                 />
               ) : (

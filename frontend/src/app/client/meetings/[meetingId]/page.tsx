@@ -5,7 +5,7 @@ import { PaymentStatus, SLOT_LABELS, ServiceResponseDTO } from "@/shared/types/s
 import Link from "next/link";
 import { 
   CalendarDays, Clock, Video, CreditCard, ArrowLeft,
-  CheckCircle2, AlertCircle, Timer, XCircle, User
+  CheckCircle2, AlertCircle, Timer, XCircle
 } from "lucide-react";
 import EndMeetingButton from "@/app/components/containers/meetings/EndMeetingButton";
 import CancelMeetingButton from "@/app/components/containers/meetings/CancelMeetingButton";
@@ -13,7 +13,7 @@ import { cancelServiceAction } from "@/app/actions/client/service-actions";
 import ChatDrawer from "@/app/components/containers/chat/ChatDrawer";
 import MeetingRingAlert from "@/app/components/containers/meetings/MeetingRingAlert";
 
-export async function generateMetadata({ params }: { params: Promise<{ meetingId: string }> }) {
+export async function generateMetadata() {
   return { title: `Meeting Details | Client` };
 }
 
@@ -47,7 +47,7 @@ export default async function ClientMeetingDetailPage({ params }: { params: Prom
     CANCELLED_BY_WORKER: { label: "Cancelled by Worker", color: "text-rose-700", bg: "bg-rose-50 border-rose-200", icon: <XCircle className="w-4 h-4" /> },
   };
 
-  const isCancellable = ["PENDING", "CONFIRMED"].includes(meeting.status);
+
 
   const statusInfo = statusConfig[meeting.status] ?? { label: meeting.status, color: "text-slate-700", bg: "bg-slate-50 border-slate-200", icon: null };
 

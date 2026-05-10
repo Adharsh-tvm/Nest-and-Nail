@@ -1,7 +1,13 @@
 "use server";
-
-import { getWalletBalanceApi, WalletData } from "@/sources/api/user/wallet.api";
-
+ 
+import {
+    getWalletBalanceApi,
+    WalletData,
+    getTransactionsApi,
+    createRechargeOrderApi,
+    verifyRechargePaymentApi
+} from "@/sources/api/user/wallet.api";
+ 
 export async function getWalletBalanceAction(): Promise<{
     success: boolean;
     data?: WalletData;
@@ -19,27 +25,25 @@ export async function getWalletBalanceAction(): Promise<{
         return { success: false, error: (error instanceof Error ? error.message : undefined) || "Failed to fetch wallet balance" };
     }
 }
-
+ 
 export async function getTransactionsAction(page: number = 1, limit: number = 10) {
     try {
-        const { getTransactionsApi } = require("@/sources/api/user/wallet.api");
         const res = await getTransactionsApi(page, limit);
         return { success: true, data: res };
     } catch (error: unknown) {
         return { success: false, error: (error instanceof Error ? error.message : undefined) || "Failed to fetch transactions" };
     }
 }
-
+ 
 export async function createRechargeOrderAction(amount: number) {
     try {
-        const { createRechargeOrderApi } = require("@/sources/api/user/wallet.api");
         const res = await createRechargeOrderApi(amount);
         return { success: true, data: res };
     } catch (error: unknown) {
         return { success: false, error: (error instanceof Error ? error.message : undefined) || "Failed to create order" };
     }
 }
-
+ 
 export async function verifyRechargePaymentAction(data: {
     razorpay_order_id: string;
     razorpay_payment_id: string;
@@ -47,7 +51,6 @@ export async function verifyRechargePaymentAction(data: {
     amount: number;
 }) {
     try {
-        const { verifyRechargePaymentApi } = require("@/sources/api/user/wallet.api");
         const res = await verifyRechargePaymentApi(data);
         return { success: true, data: res };
     } catch (error: unknown) {

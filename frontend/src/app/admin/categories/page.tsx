@@ -1,22 +1,19 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Search,
   Plus,
   Edit2,
   Trash2,
-  MoreHorizontal,
   CheckCircle,
   XCircle,
-  Tag,
   Hash,
   List,
   Activity,
   Calendar,
 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import Pagination from "@/app/components/ui/Pagination";
 
 import DataTable, {
   Column,
@@ -24,7 +21,6 @@ import DataTable, {
 import { Category, CategoryInput } from "@/shared/types/categoryTypes";
 import {
   getAllCategoriesAction,
-  createCategoryAction,
   updateCategoryAction,
   toggleCategoryStatusAction,
 } from "@/app/actions/admin/category-actions";
@@ -54,7 +50,7 @@ const CategoriesPage = () => {
   const [activeCount, setActiveCount] = useState(0);
   const [inactiveCount, setInactiveCount] = useState(0);
 
-  const updateParams = (updates: Record<string, string | null>) => {
+  const updateParams = useCallback((updates: Record<string, string | null>) => {
     const params = new URLSearchParams(searchParams.toString());
     Object.entries(updates).forEach(([key, value]) => {
       if (value === null) {
@@ -64,9 +60,9 @@ const CategoriesPage = () => {
       }
     });
     router.push(`?${params.toString()}`);
-  };
+  }, [searchParams, router]);
 
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -91,11 +87,11 @@ const CategoriesPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [searchQuery, currentPage, itemsPerPage, sortBy, sortOrder]);
 
   useEffect(() => {
     fetchCategories();
-  }, [searchQuery, currentPage, sortBy, sortOrder]);
+  }, [fetchCategories]);
 
   const handleCreate = () => {
     setSelectedCategory(null);
@@ -164,7 +160,7 @@ const CategoriesPage = () => {
       }
     }, 400);
     return () => clearTimeout(timer);
-  }, [localSearch]);
+  }, [localSearch, searchQuery, updateParams]);
 
   // Stats
   const totalCategories = totalCount;
@@ -274,11 +270,10 @@ const CategoriesPage = () => {
     title: string;
     value: number | string;
     icon: React.ComponentType<{ size?: number; className?: string }>;
-    color?: string;
     iconColor?: string;
   }
 
-  const StatCard = ({ title, value, icon: Icon, color, iconColor }: StatCardProps) => (
+  const StatCard = ({ title, value, icon: Icon, iconColor }: StatCardProps) => (
     <div
       className={`p-6 rounded-2xl shadow-sm flex items-center justify-between border border-gray-100 bg-white`}
     >

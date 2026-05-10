@@ -10,7 +10,6 @@ import {
   XCircle,
   CreditCard,
   User,
-  Wrench,
   Activity,
   CheckSquare,
   Video
@@ -260,11 +259,10 @@ const AdminMeetingsPage = () => {
     title: string;
     value: number | string;
     icon: React.ComponentType<{ size?: number; className?: string }>;
-    color?: string;
     iconColor?: string;
   }
 
-  const StatCard = ({ title, value, icon: Icon, color, iconColor }: StatCardProps) => (
+  const StatCard = ({ title, value, icon: Icon, iconColor }: StatCardProps) => (
     <div
       className={`p-6 rounded-2xl shadow-sm flex items-center justify-between border border-gray-100 bg-white hover:shadow-md transition-shadow`}
     >
@@ -321,6 +319,8 @@ const AdminMeetingsPage = () => {
           data={filteredMeetings}
           isLoading={loading}
           searchPlaceholder="Search meetings by category, client, worker, or status..."
+          searchValue={searchQuery}
+          onSearchChange={setSearchQuery}
         />
       </div>
     </div>

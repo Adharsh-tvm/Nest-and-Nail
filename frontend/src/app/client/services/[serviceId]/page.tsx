@@ -5,8 +5,9 @@ import { useParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft, Calendar, Clock, MapPin, Phone, Mail, FileText, CreditCard,
-  CheckCircle2, Briefcase, User, Loader2, AlertTriangle, XCircle
+  CheckCircle2, Briefcase, User as UserIcon, Loader2, AlertTriangle, XCircle, MessageCircle
 } from "lucide-react";
+import Image from "next/image";
 import { ServiceResponseDTO, ServiceStatus, PaymentStatus } from "@/shared/types/serviceTypes";
 import { getClientServiceByIdAction, cancelServiceAction } from "@/app/actions/client/service-actions";
 import { getWorkerDetailAction } from "@/app/actions/client/view-worker-actions";
@@ -15,7 +16,6 @@ import toast from "react-hot-toast";
 import RaiseConcernButton from "@/app/components/containers/services/RaiseConcernButton";
 import AddReviewButton from "@/app/components/containers/services/AddReviewButton";
 import ChatDrawer from "@/app/components/containers/chat/ChatDrawer";
-import { MessageCircle } from "lucide-react";
 
 // ── Refund tier helper (mirrors backend) ──────────────────────────────────────
 function getRefundInfo(createdAt: Date | string) {
@@ -120,7 +120,7 @@ export default function ClientServiceDetailsPage() {
         <div className="bg-white p-8 rounded-2xl shadow-sm text-center max-w-md w-full border border-gray-100">
           <Briefcase className="w-12 h-12 text-gray-400 mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-gray-900 mb-2">Service Not Found</h2>
-          <p className="text-gray-500 mb-6">We couldn't locate the details for this service.</p>
+          <p className="text-gray-500 mb-6">{"We couldn't locate the details for this service."}</p>
           <button
             onClick={() => router.back()}
             className="w-full inline-flex justify-center items-center py-2.5 bg-gray-900 text-white rounded-xl font-medium hover:bg-gray-800 transition-colors"
@@ -132,7 +132,7 @@ export default function ClientServiceDetailsPage() {
     );
   }
 
-  const isCancellable = ["PENDING", "CONFIRMED"].includes(service.status);
+
 
   return (
     <>
@@ -154,16 +154,24 @@ export default function ClientServiceDetailsPage() {
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                 <div className="bg-gradient-to-r from-blue-500 to-indigo-600 h-16" />
                 <div className="p-5 flex flex-col items-center relative">
-                  <div className="w-20 h-20 bg-white rounded-full border-4 border-white shadow-md flex items-center justify-center -mt-14 mb-3 overflow-hidden">
+                  <div className="w-20 h-20 bg-white rounded-full border-4 border-white shadow-md flex items-center justify-center -mt-14 mb-3 overflow-hidden relative">
                     {(() => {
                       const imgPath = worker?.profileImageUrl || worker?.profilePictureUrl;
                       if (imgPath) {
                         const srcUrl = imgPath.startsWith("http")
                           ? imgPath
                           : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}/${imgPath.replace(/^\//, "")}`;
-                        return <img src={srcUrl} alt={worker?.name || "Worker"} className="w-full h-full object-cover" />;
+                        return (
+                          <Image
+                            src={srcUrl}
+                            alt={worker?.name || "Worker"}
+                            fill
+                            unoptimized
+                            className="w-full h-full object-cover"
+                          />
+                        );
                       }
-                      return <User className="w-8 h-8 text-gray-400" />;
+                      return <UserIcon className="w-8 h-8 text-gray-400" />;
                     })()}
                   </div>
                   <h3 className="text-lg font-bold text-gray-900 text-center">{worker?.name || "Loading worker..."}</h3>

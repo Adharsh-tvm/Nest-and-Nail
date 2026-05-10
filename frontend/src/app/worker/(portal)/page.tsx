@@ -71,7 +71,7 @@ const ReviewRow = ({ review }: { review: Review }) => (
           <span className="text-xs font-bold text-amber-700">{review.rating.toFixed(1)}</span>
         </div>
       </div>
-      <p className="text-sm text-gray-600 line-clamp-2 mt-1 font-medium">"{review.review || "No written review"}"</p>
+      <p className="text-sm text-gray-600 line-clamp-2 mt-1 font-medium">&quot;{review.review || "No written review"}&quot;</p>
       <p className="text-xs text-gray-400 mt-2 font-medium">
         {new Date(review.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
       </p>
@@ -344,7 +344,7 @@ export default function WorkerDashboardPage() {
             ) : (
               <div className="text-center py-10 bg-gray-50 rounded-2xl border border-dashed border-gray-200 text-gray-500">
                 <CalendarDays className="w-12 h-12 mx-auto text-gray-300 mb-3" />
-                You don't have any upcoming services scheduled right now.
+                {"You don't have any upcoming services scheduled right now."}
               </div>
             )}
           </div>

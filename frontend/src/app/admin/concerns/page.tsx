@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Search,
   MessageSquareWarning,
@@ -15,14 +15,13 @@ import {
   ChevronUp,
   ZoomIn,
   X,
-  FileText,
   Briefcase,
-  ShieldAlert,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { AdminConcern } from "@/sources/api/admin/admin.api";
 import { getAllConcernsAction } from "@/app/actions/admin/admin-actions";
 import Pagination from "@/app/components/ui/Pagination";
+import Image from "next/image";
 
 export default function AdminConcernsPage() {
   const [concerns, setConcerns] = useState<AdminConcern[]>([]);
@@ -38,10 +37,7 @@ export default function AdminConcernsPage() {
   const [expandedConcernId, setExpandedConcernId] = useState<string | null>(null);
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
 
-  // Metrics state
-  const [totalConcerns, setTotalConcerns] = useState(0);
-  const [pendingCount, setPendingCount] = useState(0);
-  const [resolvedCount, setResolvedCount] = useState(0);
+
 
   const ITEMS_PER_PAGE = 4;
 
@@ -54,7 +50,7 @@ export default function AdminConcernsPage() {
     return () => clearTimeout(timer);
   }, [localSearch]);
 
-  const loadConcerns = async () => {
+  const loadConcerns = useCallback(async () => {
     try {
       setLoading(true);
       const filterStatus = statusFilter === "ALL" ? undefined : statusFilter;
@@ -70,15 +66,6 @@ export default function AdminConcernsPage() {
         setConcerns(res.payload.concerns);
         setTotalCount(res.payload.total);
         setTotalPages(res.payload.totalPages);
-
-        // Also calculate metrics (if not provided from separate endpoint, derive locally based on simple query)
-        if (statusFilter === "ALL" && !searchQuery) {
-          setTotalConcerns(res.payload.total);
-          const pending = res.payload.concerns.filter((c) => c.status.toUpperCase() === "PENDING").length;
-          const resolved = res.payload.concerns.filter((c) => c.status.toUpperCase() === "RESOLVED").length;
-          setPendingCount(pending);
-          setResolvedCount(resolved);
-        }
       } else {
         toast.error(res.error || "Failed to fetch concerns");
       }
@@ -87,12 +74,12 @@ export default function AdminConcernsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [statusFilter, searchQuery, currentPage]);
 
   // Trigger loading on changes
   useEffect(() => {
     loadConcerns();
-  }, [searchQuery, statusFilter, currentPage]);
+  }, [loadConcerns]);
 
   const toggleExpand = (id: string) => {
     setExpandedConcernId((prev) => (prev === id ? null : id));
@@ -353,9 +340,11 @@ export default function AdminConcernsPage() {
                             onClick={() => setLightboxImage(imgUrl)}
                             className="group relative w-16 h-16 sm:w-20 sm:h-20 bg-slate-50 rounded-xl border border-slate-200 overflow-hidden cursor-zoom-in hover:scale-105 active:scale-95 shadow-sm transition-all duration-300 shrink-0"
                           >
-                            <img
+                            <Image
                               src={imgUrl}
                               alt={`Concern attachment ${i + 1}`}
+                              fill
+                              unoptimized
                               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                             />
                             <div className="absolute inset-0 bg-slate-900/0 group-hover:bg-slate-900/40 flex items-center justify-center transition-colors">
@@ -457,9 +446,12 @@ export default function AdminConcernsPage() {
             <X className="w-6 h-6" />
           </button>
           <div className="relative max-w-5xl max-h-[85vh] overflow-hidden rounded-3xl border border-white/10 shadow-2xl animate-in zoom-in-95 duration-200">
-            <img
+            <Image
               src={lightboxImage}
               alt="Attachment full-size preview"
+              width={1200}
+              height={800}
+              unoptimized
               className="w-auto h-auto max-w-full max-h-[85vh] object-contain"
             />
           </div>

@@ -6,13 +6,14 @@ import { ServiceResponseDTO, SlotType, PaymentStatus } from "@/shared/types/serv
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Calendar, Clock, CreditCard, Tag, AlertCircle, Loader2,
-  User, Mail, Phone, MapPin, FileText, Briefcase, Hash,
+  Mail, Phone, MapPin, FileText, Briefcase, Hash,
   CheckCircle2, Zap, ExternalLink, Sun, Sunset, AlarmClock,
   CheckCheck, X
 } from "lucide-react";
 import toast from "react-hot-toast";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 /* ────────────────────────────────────────────────────── */
 /*  Helper: slot label + icon                            */
@@ -166,7 +167,7 @@ export default function OngoingServicePage() {
           </div>
           <h3 style={{ fontSize: "20px", fontWeight: 800, color: "#0f172a", marginBottom: "10px" }}>No Active Assignment</h3>
           <p style={{ fontSize: "14px", color: "#64748b", lineHeight: 1.7, marginBottom: "28px" }}>
-            You don't have any ongoing service right now.<br />
+            {"You don't have any ongoing service right now."}<br />
             Head to your services list to pick up an assignment.
           </p>
           <Link href="/worker/services" style={{
@@ -294,9 +295,10 @@ export default function OngoingServicePage() {
                   display: "flex", alignItems: "center", justifyContent: "center",
                   margin: "-36px auto 12px",
                   fontSize: "26px", fontWeight: 800, color: "#4f46e5",
+                  position: "relative",
                 }}>
                   {service.client?.profilePictureUrl ? (
-                    <img src={service.client.profilePictureUrl} alt={service.client.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    <Image src={service.client.profilePictureUrl} alt={service.client.name || "Client"} fill unoptimized style={{ objectFit: "cover" }} />
                   ) : clientInitial}
                 </div>
                 <p style={{ fontSize: "11px", fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>Client</p>

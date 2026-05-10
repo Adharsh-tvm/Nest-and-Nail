@@ -3,7 +3,7 @@ import React from "react";
 import Image from "next/image";
 import { GalleryVerticalEnd, Sparkles, ShieldCheck, Clock } from "lucide-react";
 
-type Props = {};
+type Props = Record<string, never>;
 
 async function ClientSignup({ }: Props) {
   return (

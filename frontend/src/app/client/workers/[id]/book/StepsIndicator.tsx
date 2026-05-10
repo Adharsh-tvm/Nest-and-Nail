@@ -1,7 +1,7 @@
 import { Calendar, CheckCircle2, ChevronRight, Contact2, MapPin } from "lucide-react";
 
 export function StepsIndicator({ currentStep, numberOfDays }: { currentStep: number, numberOfDays: number }) {
-  let steps = [
+  const steps = [
     { num: 1, label: "Days", icon: Calendar },
     { num: 2, label: "Dates", icon: Calendar },
     { num: 3, label: "Location", icon: MapPin },
