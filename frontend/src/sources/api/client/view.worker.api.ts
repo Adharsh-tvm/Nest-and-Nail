@@ -1,6 +1,6 @@
 import axiosInstance from "@/lib/axiosInstance";
 import { ApiResponse } from "@/shared/types/responseTypes";
-import { User, UserQueryParams } from "@/shared/types/userTypes";
+import { User } from "@/shared/types/userTypes";
 import { CLIENT_ROUTES } from "@/sources/constant-api";
 import axios from 'axios';
 

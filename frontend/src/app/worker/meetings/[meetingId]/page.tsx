@@ -5,13 +5,13 @@ import { PaymentStatus, SLOT_LABELS, ServiceResponseDTO } from "@/shared/types/s
 import Link from "next/link";
 import { 
   CalendarDays, Clock, Video, CreditCard, ArrowLeft, 
-  MapPin, User, CheckCircle2, AlertCircle, Timer, XCircle
+  CheckCircle2, AlertCircle, Timer, XCircle
 } from "lucide-react";
 import EndMeetingButton from "@/app/components/containers/meetings/EndMeetingButton";
 import ChatDrawer from "@/app/components/containers/chat/ChatDrawer";
 import MeetingRingAlert from "@/app/components/containers/meetings/MeetingRingAlert";
 
-export async function generateMetadata({ params }: { params: Promise<{ meetingId: string }> }) {
+export async function generateMetadata() {
   return { title: `Meeting Details | Worker` };
 }
 

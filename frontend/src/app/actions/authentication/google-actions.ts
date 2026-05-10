@@ -31,7 +31,7 @@ export async function handleGoogleSignIn(
       return { success: false, message: "Invalid Google token." };
     }
 
-    const { email, name, picture } = payload;
+    const { email, name } = payload;
 
 
     const response = await authApi.googleAuth({

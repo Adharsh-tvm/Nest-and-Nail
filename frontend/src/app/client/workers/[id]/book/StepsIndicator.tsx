@@ -1,6 +1,6 @@
-import { Calendar, CheckCircle2, ChevronRight, Contact2, MapPin } from "lucide-react";
+import { CheckCircle2, Calendar, MapPin, Contact2 } from "lucide-react";
 
-export function StepsIndicator({ currentStep, numberOfDays }: { currentStep: number, numberOfDays: number }) {
+export function StepsIndicator({ currentStep }: { currentStep: number }) {
   const steps = [
     { num: 1, label: "Days", icon: Calendar },
     { num: 2, label: "Dates", icon: Calendar },
@@ -32,7 +32,6 @@ export function StepsIndicator({ currentStep, numberOfDays }: { currentStep: num
         {steps.map((step, idx) => {
           const isActive = idx === currentIndex;
           const isCompleted = idx < currentIndex;
-          const Icon = step.icon;
 
           return (
             <div key={step.num} className="relative z-10 flex flex-col items-center gap-2">

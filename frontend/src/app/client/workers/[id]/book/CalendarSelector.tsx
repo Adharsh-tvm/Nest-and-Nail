@@ -27,17 +27,7 @@ const MONTH_NAMES = [
 
 const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-const HIGHLIGHT_CLASSES: Record<string, string> = {
-  green: "bg-emerald-500 text-white",
-  yellow: "bg-amber-400 text-white",
-  red: "bg-red-400 text-white",
-};
 
-const HIGHLIGHT_DOT: Record<string, string> = {
-  green: "bg-emerald-400",
-  yellow: "bg-amber-400",
-  red: "bg-red-400",
-};
 
 const isSlotWithin12Hours = (dateKey: string, slotType: SlotType): boolean => {
   const slotDate = new Date(dateKey);
@@ -53,7 +43,6 @@ export function CalendarSelector({
   selectedSlots,
   onSlotChange,
   availabilityData,
-  isLoadingDate,
   numberOfDays,
   onMonthChange,
   viewYear,
@@ -62,7 +51,6 @@ export function CalendarSelector({
 }: CalendarSelectorProps) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const todayKey = toDateKey(today.getFullYear(), today.getMonth(), today.getDate());
 
   const firstDayOfMonth = new Date(viewYear, viewMonth, 1).getDay();
   const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();

@@ -7,9 +7,7 @@ import {
   GalleryVerticalEnd,
   User,
   LogOut,
-  Settings,
   ChevronDown,
-  Briefcase,
   Hammer,
 } from "lucide-react";
 import { logoutAction } from "@/app/actions/authentication/logout-actions";
@@ -29,7 +27,6 @@ const ClientHeader: React.FC = () => {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isTogglingRole, setIsTogglingRole] = useState(false);
   const [isSwitchRoleModalOpen, setIsSwitchRoleModalOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [imageError, setImageError] = useState(false);
 
   const router = useRouter();
@@ -51,9 +48,7 @@ const ClientHeader: React.FC = () => {
   const profileHref =
     userMode === "worker" ? "/worker/profile" : "/client/profile";
 
-  useEffect(() => {
-    setIsLoggedIn(Boolean(currentUser && Object.keys(currentUser).length));
-  }, [currentUser]);
+
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -73,7 +68,6 @@ const ClientHeader: React.FC = () => {
       toast.loading("Logging out...", { id: "logout" });
       await logoutAction();
       toast.success("Logged out successfully", { id: "logout" });
-      setIsLoggedIn(false);
       setIsUserMenuOpen(false);
       window.location.replace("/login");
     } catch (error) {
@@ -318,6 +312,7 @@ const ClientHeader: React.FC = () => {
                   >
                     <div className="w-8 h-8 rounded-full bg-[#1B4332] text-white flex items-center justify-center shadow-sm overflow-hidden">
                       {currentUser?.profileImageUrl && !imageError ? (
+                        // eslint-disable-next-line @next/next/no-img-element
                         <img
                           src={currentUser.profileImageUrl}
                           alt={currentUser.name || "User"}

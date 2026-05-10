@@ -153,7 +153,7 @@ export function MeetingBookingSection({ worker }: MeetingBookingSectionProps) {
           } else {
             toast.error("Payment verification failed. Please contact support.");
           }
-        } catch (error) {
+        } catch {
           toast.error("An error occurred during verification.");
         } finally {
           setIsProcessingPayment(false);

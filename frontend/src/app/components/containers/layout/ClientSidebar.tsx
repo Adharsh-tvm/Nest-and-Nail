@@ -12,7 +12,6 @@ import {
   Clock,
   Menu,
   X,
-  LogOut,
 } from "lucide-react";
 import { VerificationStatus } from "@/shared/enums/authEnums";
 import { User } from "@/shared/types/userTypes";
@@ -74,6 +73,7 @@ const Sidebar: React.FC<SidebarProps> = ({ children }) => {
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-full bg-gray-200 overflow-hidden">
             {user.profileImageUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={user.profileImageUrl}
                 alt="Profile"
@@ -121,6 +121,7 @@ const Sidebar: React.FC<SidebarProps> = ({ children }) => {
         <div className="p-8 border-b border-gray-100 flex flex-col items-center text-center">
           <div className="w-24 h-24 rounded-full bg-gray-100 mb-4 overflow-hidden border-4 border-white shadow-lg relative">
             {user.profileImageUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={user.profileImageUrl}
                 alt="Profile"

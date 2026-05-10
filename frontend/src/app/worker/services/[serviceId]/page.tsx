@@ -8,7 +8,6 @@ import {
   Calendar,
   Clock,
   MapPin,
-  User,
   Phone,
   Mail,
   FileText,
@@ -34,7 +33,6 @@ import clsx from "clsx";
 import toast from "react-hot-toast";
 import RaiseConcernButton from "@/app/components/containers/services/RaiseConcernButton";
 import ChatDrawer from "@/app/components/containers/chat/ChatDrawer";
-import { MessageCircle } from "lucide-react";
 import dynamic from "next/dynamic";
 
 const ServiceRouteMap = dynamic(
@@ -55,24 +53,7 @@ const ServiceRouteMap = dynamic(
   },
 );
 
-function getHaversineDistance(
-  lat1: number,
-  lon1: number,
-  lat2: number,
-  lon2: number,
-): number {
-  const R = 6371; // km
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLon = ((lon2 - lon1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c; // Distance in km
-}
+
 
 /* ─────────────────────────────────────────────────────────────── */
 /*  Types                                                          */
@@ -602,6 +583,7 @@ export default function WorkerServiceDetailsPage() {
                 <div className="p-5 flex flex-col items-center relative">
                   <div className="w-20 h-20 bg-white rounded-full border-4 border-white shadow-md flex items-center justify-center -mt-14 mb-3 overflow-hidden">
                     {service.client?.profilePictureUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={service.client.profilePictureUrl}
                         alt={service.client.name}

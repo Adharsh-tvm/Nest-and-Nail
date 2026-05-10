@@ -2,10 +2,10 @@
 
 import React, { useEffect, useState } from "react";
 import { getWorkerScheduledMeetingsAction, getWorkerMeetingsHistoryAction } from "@/app/actions/worker/meeting-actions";
-import { ServiceResponseDTO, SlotType, ServiceStatus, SLOT_LABELS } from "@/shared/types/serviceTypes";
+import { ServiceResponseDTO, ServiceStatus, SLOT_LABELS } from "@/shared/types/serviceTypes";
 import Link from "next/link";
-import { motion, AnimatePresence, Variants } from "framer-motion";
-import { Calendar as CalendarIcon, Clock, CreditCard, Tag, MoreHorizontal, Filter, Loader2, Search, Video } from "lucide-react";
+import { motion, Variants } from "framer-motion";
+import { Calendar as CalendarIcon, Clock, CreditCard, MoreHorizontal, Filter, Loader2, Search, Video } from "lucide-react";
 import toast from "react-hot-toast";
 import Pagination from "@/app/components/ui/Pagination";
 

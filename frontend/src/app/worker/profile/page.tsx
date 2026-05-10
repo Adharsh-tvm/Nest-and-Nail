@@ -1,18 +1,14 @@
 "use client";
 import { useRouter } from "next/navigation";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   User as UserIcon,
-  Mail,
-  Phone,
   MapPin,
   Edit2,
-  Calendar,
   ShieldCheck,
   Briefcase,
   FileText,
-  Image as ImageIcon,
   CheckCircle2,
   Clock,
   Eye,
@@ -23,7 +19,6 @@ import {
   CreditCard,
   Settings,
   LogOut,
-  MoreVertical,
   Wallet as WalletIcon,
   Bell,
   ChevronLeft,
@@ -31,9 +26,7 @@ import {
   LayoutDashboard,
   ExternalLink,
   Camera,
-  Upload,
   Trash2,
-  SailboatIcon,
   Calendar1,
 } from "lucide-react";
 import { useUserStore } from "@/store/userStore";
@@ -142,6 +135,7 @@ const DocumentViewerModal = ({
               title="Document Viewer"
             />
           ) : (
+            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={src}
               alt="Document"
@@ -457,6 +451,7 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
                       }`}
                   >
                     {profilePicPreview ? (
+                      // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={profilePicPreview}
                         alt="Profile"
@@ -968,7 +963,7 @@ const WalletView: React.FC<ViewProps> = ({ user }) => {
   const [totalPages, setTotalPages] = useState(1);
   const [limit] = useState(5); // Show 5 transactions per page
 
-  const fetchWallet = async (page: number = 1) => {
+  const fetchWallet = useCallback(async (page: number = 1) => {
     setIsLoading(true);
     const balanceRes = await getWalletBalanceAction();
     if (balanceRes.success && balanceRes.data) {
@@ -982,11 +977,11 @@ const WalletView: React.FC<ViewProps> = ({ user }) => {
       setTotalPages(txRes.data.totalPages || 1);
     }
     setIsLoading(false);
-  };
+  }, [limit]);
 
   useEffect(() => {
     fetchWallet(currentPage);
-  }, [currentPage]);
+  }, [currentPage, fetchWallet]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -1047,7 +1042,7 @@ const WalletView: React.FC<ViewProps> = ({ user }) => {
             } else {
               toast.error("Payment verification failed.");
             }
-          } catch (error) {
+          } catch {
             toast.error("An error occurred during verification.");
           } finally {
             setIsRecharging(false);
@@ -1298,12 +1293,11 @@ const SettingsView: React.FC<ViewProps> = ({ user, setUser }) => {
   );
 };
 
-const SlotView: React.FC<ViewProps> = ({ user, setUser }) => {
+const SlotView: React.FC<ViewProps> = ({ user }) => {
   const [selectedDates, setSelectedDates] = useState<Record<string, SlotType>>({});
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [availabilityData, setAvailabilityData] = useState<Record<string, SlotAvailability>>({});
-  const [isLoadingDates, setIsLoadingDates] = useState(false);
   const [isBlockConfirmOpen, setIsBlockConfirmOpen] = useState(false);
 
   const today = new Date();
@@ -1324,9 +1318,8 @@ const SlotView: React.FC<ViewProps> = ({ user, setUser }) => {
   for (let d = 1; d <= daysInMonth; d++) cells.push(d);
   while (cells.length % 7 !== 0) cells.push(null);
 
-  const loadAvailability = async () => {
+  const loadAvailability = useCallback(async () => {
     if (!user.id) return;
-    setIsLoadingDates(true);
     try {
       const response = await getWorkerBlockedDatesAction();
       if (response.success && response.payload) {
@@ -1350,14 +1343,12 @@ const SlotView: React.FC<ViewProps> = ({ user, setUser }) => {
       }
     } catch (e) {
       console.error(e);
-    } finally {
-      setIsLoadingDates(false);
     }
-  };
+  }, [user.id]);
 
   useEffect(() => {
     loadAvailability();
-  }, [viewYear, viewMonth, user.id]);
+  }, [viewYear, viewMonth, loadAvailability]);
 
   const handleDateClick = (day: number) => {
     const key = toDateKey(viewYear, viewMonth, day);
@@ -1612,6 +1603,7 @@ const UserProfile = () => {
                 className="w-20 h-20 rounded-full border-4 border-white shadow-lg overflow-hidden bg-gray-200 cursor-pointer relative"
               >
                 {safeUser.profileImageUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={safeUser.profileImageUrl}
                     alt="Profile"

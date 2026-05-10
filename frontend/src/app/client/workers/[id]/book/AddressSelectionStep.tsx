@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { Address } from "@/shared/types/addressType";
 import { User } from "@/shared/types/userTypes";
 import { MapPin, Plus, CheckCircle2 } from "lucide-react";

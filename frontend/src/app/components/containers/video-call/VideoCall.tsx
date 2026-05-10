@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
 import io, { Socket } from "socket.io-client";
 import { createPortal } from "react-dom";
 import { Mic, MicOff, Video as VideoIcon, VideoOff, LogOut, Loader2, Users, AlertCircle } from "lucide-react";
@@ -32,7 +31,11 @@ export default function VideoCall({
   // Buffer ICE candidates that arrive before remoteDescription is set
   const pendingCandidates = useRef<RTCIceCandidateInit[]>([]);
 
-  const router = useRouter();
+  const onJoinRef = useRef(onJoin);
+  useEffect(() => {
+    onJoinRef.current = onJoin;
+  }, [onJoin]);
+
   const [mounted, setMounted] = useState(false);
   const [isMicOn, setIsMicOn] = useState(true);
   const [isVideoOn, setIsVideoOn] = useState(true);
@@ -118,8 +121,8 @@ export default function VideoCall({
     const socket = io(apiUrl, { transports: ["websocket", "polling"] });
     socketRef.current = socket;
 
-    if (onJoin) {
-      onJoin(roomId).catch(err => console.error("Error calling join API:", err));
+    if (onJoinRef.current) {
+      onJoinRef.current(roomId).catch(err => console.error("Error calling join API:", err));
     }
 
     const start = async () => {
@@ -237,7 +240,7 @@ export default function VideoCall({
       socket.emit("leave-room", { roomId, userId: role });
       socket.disconnect();
     };
-  }, [roomId, role, createPeerConnection]);
+  }, [roomId, role, createPeerConnection, onJoinRef]);
 
   const onBeforeUnload = useCallback((e: BeforeUnloadEvent) => {
     e.preventDefault();

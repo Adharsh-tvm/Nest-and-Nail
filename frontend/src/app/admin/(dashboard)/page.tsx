@@ -2,13 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import {
-  Briefcase,
-  Clock,
-  CheckCircle2,
-  AlertCircle,
-  MoreHorizontal,
   ArrowUpRight,
-  Plus,
   TrendingUp,
   Users,
   BriefcaseBusiness
@@ -34,8 +28,6 @@ interface StatCardProps {
   title: string;
   value: string;
   change?: string;
-  isPositive?: boolean;
-  icon?: React.ComponentType<{ size?: number; className?: string }>;
   theme: "green" | "white";
 }
 
@@ -43,8 +35,6 @@ const StatCard: React.FC<StatCardProps> = ({
   title,
   value,
   change,
-  isPositive,
-  icon: Icon,
   theme,
 }) => (
   <div
@@ -197,8 +187,6 @@ export default function DashboardPage() {
   if (!data) {
     return <div>Failed to load dashboard data.</div>;
   }
-
-
 
   return (
     <div className="space-y-6 pb-10">

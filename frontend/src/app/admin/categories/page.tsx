@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, Suspense } from "react";
 import {
-  Search,
   Plus,
   Edit2,
   Trash2,
@@ -353,4 +352,17 @@ const CategoriesPage = () => {
   );
 };
 
-export default CategoriesPage;
+const CategoriesPageWithSuspense = () => {
+  return (
+    <Suspense fallback={
+      <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-4">
+        <div className="w-12 h-12 border-4 border-[#1B4332] border-t-transparent rounded-full animate-spin shadow-md" />
+        <p className="text-gray-500 font-medium">Loading...</p>
+      </div>
+    }>
+      <CategoriesPage />
+    </Suspense>
+  );
+};
+
+export default CategoriesPageWithSuspense;

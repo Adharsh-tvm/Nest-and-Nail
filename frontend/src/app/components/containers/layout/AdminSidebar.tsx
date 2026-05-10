@@ -13,7 +13,6 @@ import {
   LogOut,
   Settings,
   HelpCircle,
-  Menu,
   Calendar,
 } from "lucide-react";
 import Link from "next/link";

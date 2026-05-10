@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { SlotType, SLOT_LABELS, SLOT_DURATION_LABEL } from "@/shared/types/serviceTypes";
 
@@ -53,7 +53,6 @@ const meetingSlots = [
 export function MeetingCalendarSelector({
   selectedSlots,
   onSlotChange,
-  isLoadingDate,
   onMonthChange,
   viewYear,
   viewMonth,

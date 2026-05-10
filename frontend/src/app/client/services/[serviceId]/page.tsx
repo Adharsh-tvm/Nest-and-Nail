@@ -2,10 +2,10 @@
 
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   ArrowLeft, Calendar, Clock, MapPin, Phone, Mail, FileText, CreditCard,
-  CheckCircle2, Briefcase, User as UserIcon, Loader2, AlertTriangle, XCircle, MessageCircle
+  CheckCircle2, Briefcase, User as UserIcon, Loader2, AlertTriangle, XCircle
 } from "lucide-react";
 import Image from "next/image";
 import { ServiceResponseDTO, ServiceStatus, PaymentStatus } from "@/shared/types/serviceTypes";
@@ -132,7 +132,7 @@ export default function ClientServiceDetailsPage() {
     );
   }
 
-
+  const isCancellable = ["PENDING", "CONFIRMED"].includes(service.status);
 
   return (
     <>

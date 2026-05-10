@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { getWorkerDashboardDataAction } from "@/app/actions/worker/dashboard-actions";
 import { 
-  BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend
 } from 'recharts';
 import { 
@@ -48,15 +48,13 @@ const StatCard = ({ title, value, icon: Icon, color = "indigo" }: StatCardProps)
 
 import {
   Review,
-  DashboardStats,
-  UpcomingService,
-  ScheduleItem,
   WorkerDashboardData
 } from "@/sources/api/worker/dashboard.api";
 
 const ReviewRow = ({ review }: { review: Review }) => (
   <div className="flex items-start gap-4 p-5 bg-white rounded-2xl border border-gray-100 hover:border-indigo-200 hover:shadow-lg hover:shadow-indigo-500/5 transition-all duration-300 group">
     <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-100 to-violet-100 border-2 border-white shadow-sm overflow-hidden flex-shrink-0">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={review.clientImage || `https://api.dicebear.com/7.x/avataaars/svg?seed=${review.clientName}`}
         alt={review.clientName}
@@ -318,6 +316,7 @@ export default function WorkerDashboardPage() {
               <div className="bg-blue-50/50 p-6 rounded-2xl border border-blue-100/50">
                 <div className="flex items-center gap-4 mb-4">
                   <div className="w-12 h-12 rounded-full overflow-hidden bg-white shadow-sm border border-blue-100 flex-shrink-0">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={data.upcomingService.clientImage || `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.upcomingService.clientName}`} alt="client" className="w-full h-full object-cover" />
                   </div>
                   <div>

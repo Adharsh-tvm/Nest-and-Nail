@@ -3,7 +3,7 @@ import { X, MapPin, Loader2, Save, Map as MapIcon } from "lucide-react";
 import { Address } from "@/shared/types/addressType";
 import toast from "react-hot-toast";
 import { useUserStore } from "@/store/userStore";
-import { addUSerAddressAction } from "@/app/actions/users/user-profile-actions";
+
 import dynamic from "next/dynamic";
 
 const LocationPicker = dynamic(
@@ -172,7 +172,7 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
     setIsLoadingLocation(false);
   };
 
-  const { user, setUser } = useUserStore();
+  const { user } = useUserStore();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

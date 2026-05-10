@@ -18,7 +18,6 @@ import { ServiceDetailsStep } from "./ServiceDetailsStep";
 import { BookingSummaryStep } from "./BookingSummaryStep";
 import { StepsIndicator } from "./StepsIndicator";
 import { CheckCircle2, ChevronRight, ChevronLeft, CreditCard, Wallet, RotateCcw } from "lucide-react";
-import Link from "next/link";
 import { loadRazorpay } from "@/utils/loadRazorpay";
 import { createPaymentOrderAction, verifyPaymentAction, processWalletPaymentAction } from "@/app/actions/client/payment-actions";
 import { getWalletBalanceAction } from "@/app/actions/client/wallet-actions";
@@ -54,12 +53,8 @@ export function BookingSection({ worker }: BookingSectionProps) {
   const [isWalletConfirmOpen, setIsWalletConfirmOpen] = useState(false);
 
   const {
-    selectedDate,
-    currentAvailability,
     isLoadingDate,
-    dateError,
     calendarHighlights,
-    selectDate,
     prefetchDays,
     refetchCurrentDate,
   } = useWorkerAvailability(worker.userId || worker.id);
@@ -195,7 +190,7 @@ export function BookingSection({ worker }: BookingSectionProps) {
                 } else {
                     toast.error("Payment verification failed. Please contact support.");
                 }
-            } catch (error) {
+            } catch {
                 toast.error("An error occurred during verification.");
             } finally {
                 setIsProcessingPayment(false);
@@ -401,7 +396,7 @@ export function BookingSection({ worker }: BookingSectionProps) {
   // ---------------------------------------------------------------------------
   return (
     <div className="w-full">
-      <StepsIndicator currentStep={currentStep} numberOfDays={numberOfDays} />
+      <StepsIndicator currentStep={currentStep} />
 
       <div className="relative mt-8">
         {/* Back Button (Only visible if step > 1 and not loading API) */}

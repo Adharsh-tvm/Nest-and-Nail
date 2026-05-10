@@ -52,7 +52,7 @@ axiosInstance.interceptors.response.use(
       const customError = error as unknown as CustomError;
       customError.normalizedMessage = serverMsg || error.message || `Request failed with status ${status}`;
       customError.serverData = serverData || null;
-    } catch (attachErr) {
+    } catch {
     }
 
     console.error("🚨 API Error:", {

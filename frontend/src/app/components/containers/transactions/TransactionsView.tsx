@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { Transaction } from "@/shared/types/transactionTypes";
 import { ArrowUpRight, ArrowDownRight, CreditCard, CheckCircle2, Clock, XCircle } from "lucide-react";
 
@@ -12,7 +12,7 @@ interface Props {
 }
 
 export default function TransactionsView({ transactions, total, totalPages, role }: Props) {
-  const [currentPage, setCurrentPage] = useState(1);
+  const currentPage = 1;
   // Optional: implement client-side or server-side pagination. For now we will just display what's passed in.
 
   const getStatusIcon = (status: string) => {

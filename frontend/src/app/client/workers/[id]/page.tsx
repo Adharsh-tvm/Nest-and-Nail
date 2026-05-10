@@ -209,6 +209,7 @@ export default async function WorkerDetailPage({
                                     border: '3px solid white',
                                 }}>
                                     {profileImageSrc ? (
+                                        // eslint-disable-next-line @next/next/no-img-element
                                         <img src={profileImageSrc} alt={worker.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                     ) : (
                                         <span style={{ fontSize: '36px', fontWeight: 800, color: '#94a3b8', letterSpacing: '-1px' }}>{initials}</span>
@@ -520,6 +521,7 @@ export default async function WorkerDetailPage({
                                                     border: '1px solid #e2e8f0',
                                                     position: 'relative',
                                                 }}>
+                                                    {/* eslint-disable-next-line @next/next/no-img-element */}
                                                     <img
                                                         src={src}
                                                         alt={`Work example ${idx + 1}`}

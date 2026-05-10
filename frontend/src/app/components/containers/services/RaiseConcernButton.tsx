@@ -10,7 +10,6 @@ import {
   Send,
   UploadCloud,
   Trash2,
-  Image as ImageIcon,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { raiseConcernAction } from "@/app/actions/concern-actions";
@@ -264,6 +263,7 @@ export default function RaiseConcernButton({ serviceId }: RaiseConcernButtonProp
                             key={img.id}
                             className="relative group aspect-square rounded-2xl border border-slate-100 overflow-hidden bg-slate-50"
                           >
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
                               src={img.previewUrl}
                               alt="Concern attachment"

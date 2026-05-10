@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, Suspense } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import {
@@ -487,4 +487,17 @@ const UsersView = () => {
   );
 };
 
-export default UsersView;
+const UsersViewWithSuspense = () => {
+  return (
+    <Suspense fallback={
+      <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-4">
+        <div className="w-12 h-12 border-4 border-[#1B4332] border-t-transparent rounded-full animate-spin shadow-md" />
+        <p className="text-gray-500 font-medium">Loading...</p>
+      </div>
+    }>
+      <UsersView />
+    </Suspense>
+  );
+};
+
+export default UsersViewWithSuspense;

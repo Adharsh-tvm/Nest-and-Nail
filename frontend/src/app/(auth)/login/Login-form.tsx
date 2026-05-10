@@ -453,7 +453,7 @@ export const LoginForm = () => {
     if (state?.error) {
       toast.error(state.error);
     }
-  }, [state?.errorId]);
+  }, [state?.errorId, state?.error]);
 
   useEffect(() => {
     if (state?.success) {
@@ -466,7 +466,7 @@ export const LoginForm = () => {
         else router.replace("/client");
       }, 500);
     }
-  }, [state?.success]);
+  }, [state?.success, state?.userRole, router]);
 
   return (
     <>

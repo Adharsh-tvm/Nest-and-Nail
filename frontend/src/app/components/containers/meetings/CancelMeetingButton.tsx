@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { XCircle, AlertTriangle, X, Loader2, CheckCircle2, RotateCcw, Info } from "lucide-react";
+import { XCircle, AlertTriangle, X, CheckCircle2, RotateCcw, Info } from "lucide-react";
 import toast from "react-hot-toast";
 
 interface CancelMeetingButtonProps {

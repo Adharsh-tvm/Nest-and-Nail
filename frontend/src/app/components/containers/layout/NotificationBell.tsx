@@ -80,7 +80,7 @@ export default function NotificationBell() {
           playTone(1100, ctx.currentTime + 0.18, 0.15);
           playTone(880, ctx.currentTime + 0.38, 0.15);
           playTone(1100, ctx.currentTime + 0.56, 0.2);
-        } catch (_) { /* AudioContext not available */ }
+        } catch { /* AudioContext not available */ }
       }
     });
 

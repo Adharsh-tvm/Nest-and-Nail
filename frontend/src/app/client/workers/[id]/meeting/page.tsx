@@ -56,6 +56,7 @@ export default async function ScheduleMeetingPage({
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100 border-2 border-emerald-100">
                {(worker.profileImageUrl || worker.profilePictureUrl) ? (
+                 // eslint-disable-next-line @next/next/no-img-element
                  <img 
                    src={worker.profileImageUrl || worker.profilePictureUrl || ""}
                    alt={worker.name}

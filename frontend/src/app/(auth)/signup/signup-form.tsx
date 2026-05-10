@@ -22,7 +22,7 @@ import OtpVerificationForm from "../otp/page";
 import { redirect, useRouter } from "next/navigation";
 import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
 import { handleGoogleSignIn } from "@/app/actions/authentication/google-actions";
-import { Toaster, toast } from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import { motion } from "framer-motion";
 
 const roleConfig = {
@@ -104,7 +104,7 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
     if (state.errorId && state.error) {
       toast.error(state.error);
     }
-  }, [state.errorId]);
+  }, [state.errorId, state.error]);
 
   useEffect(() => {
     if (state.otpSent) {
@@ -228,6 +228,7 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
       }
     } catch (err) {
       setOtpError("Failed to resend OTP");
+      console.log(err)
     }
   };
 

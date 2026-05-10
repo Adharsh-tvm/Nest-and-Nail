@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { X, Send, MessageCircle } from "lucide-react";
 import io, { Socket } from "socket.io-client";
 import { getMessagesAction, sendMessageAction } from "@/app/actions/chat-actions";
@@ -32,6 +32,11 @@ export default function ChatDrawer({ chatId, receiverId, receiverName }: ChatDra
   const socketRef = useRef<Socket | null>(null);
   // Ref to track isOpen without stale closures inside socket callbacks
   const isOpenRef = useRef(false);
+
+  const userIdRef = useRef(user?.id);
+  useEffect(() => {
+    userIdRef.current = user?.id;
+  }, [user?.id]);
 
   // Initial fetch
   useEffect(() => {
@@ -70,7 +75,7 @@ export default function ChatDrawer({ chatId, receiverId, receiverName }: ChatDra
       setMessages((prev) => [...prev, message]);
 
       // Use ref so we always read the current isOpen value, not a stale closure
-      if (message.senderId !== user?.id && !isOpenRef.current) {
+      if (message.senderId !== userIdRef.current && !isOpenRef.current) {
         setUnreadCount((prev) => prev + 1);
       }
     });
@@ -79,7 +84,7 @@ export default function ChatDrawer({ chatId, receiverId, receiverName }: ChatDra
       socket.disconnect();
       socketRef.current = null;
     };
-  }, [chatId]);
+  }, [chatId, userIdRef]);
 
   // Clear unread count when opening
   useEffect(() => {

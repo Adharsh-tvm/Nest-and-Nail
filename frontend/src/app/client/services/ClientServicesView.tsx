@@ -49,10 +49,7 @@ export default function ClientServicesView({ ongoing, history, cancelled, worker
     const pagedHistory = history.slice((historyPage - 1) * HISTORY_PAGE_SIZE, historyPage * HISTORY_PAGE_SIZE);
     const pagedCancelled = cancelled.slice((cancelledPage - 1) * HISTORY_PAGE_SIZE, cancelledPage * HISTORY_PAGE_SIZE);
 
-    const openCancelModal = (e: React.MouseEvent, service: ServiceResponseDTO) => {
-        e.stopPropagation();
-        setCancelModal({ service, step: 'reason', reason: '', isSubmitting: false });
-    };
+
 
     const closeCancelModal = () => {
         if (cancelModal?.isSubmitting) return;

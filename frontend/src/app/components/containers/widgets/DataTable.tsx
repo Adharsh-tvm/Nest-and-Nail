@@ -237,7 +237,9 @@ const DataTable = <T,>({
                       (e.target as HTMLElement).closest("a")
                     )
                       return;
-                    onRowClick && onRowClick(row);
+                    if (onRowClick) {
+                      onRowClick(row);
+                    }
                   }}
                   className={`group transition-all duration-200 hover:bg-emerald-50/30 ${onRowClick
                       ? "cursor-pointer hover:transform hover:scale-[1.01]"
