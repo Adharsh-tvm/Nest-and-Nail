@@ -3,8 +3,6 @@ import { IWorkerScheduleRepository } from "../../domain/repositories/IWorkerSche
 import { WorkerScheduleModel } from "../database/models/WorkerScheduleModel";
 
 export class WorkerScheduleRepository implements IWorkerScheduleRepository {
-  constructor() {
-  }
 
   async createBulk(schedules: WorkerSchedule[]): Promise<WorkerSchedule[]> {
     const created = await WorkerScheduleModel.insertMany(schedules, { ordered: false });

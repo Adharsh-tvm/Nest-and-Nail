@@ -26,7 +26,7 @@ export class UserRepositoryFactory implements IUserRepositoryFactory {
       case 'USER': // Special case for all users
         return this._userRepository as IBaseRepository<T>;
       default:
-        throw new Error(`Unknown role: ${role}`);
+        throw new Error(`Unknown role: ${role as string}`);
     }
   }
 }

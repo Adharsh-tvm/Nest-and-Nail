@@ -27,10 +27,10 @@ export class WorkerRepository extends BaseRepository<Worker, IWorkerDocument> im
             role: worker.role,
             skills: worker.skills,
             loginMethod: worker.loginMethod,
-            documents: worker.documents || [],
-            certificates: worker.certificates || [],
-            categories: worker.categories || [],
-            workPhotos: worker.workPhotos || []
+            documents: worker.documents ?? [],
+            certificates: worker.certificates ?? [],
+            categories: worker.categories ?? [],
+            workPhotos: worker.workPhotos ?? []
         }));
     }
 
@@ -118,16 +118,23 @@ export class WorkerRepository extends BaseRepository<Worker, IWorkerDocument> im
         });
 
         const result = await WorkerModel.aggregate(pipeline as unknown as PipelineStage[]);
-        const workersRaw = (result[0]?.data || []) as Record<string, unknown>[];
-        const total = (result[0]?.total?.[0]?.count || 0) as number;
+        const firstResult = result[0] as { data?: Record<string, unknown>[]; total?: { count: number }[] } | undefined;
+        const workersRaw = firstResult?.data ?? [];
+        const total = firstResult?.total?.[0]?.count ?? 0;
 
         const workers = workersRaw.map((doc) => {
-            const { _id, __v, categories, categoryDocs, ...rest } = doc;
-            const docId = _id as { toString(): string };
+            const rest = { ...doc };
+            const docId = doc._id as { toString(): string };
+            const categoryDocs = doc.categoryDocs as { name: string }[] | undefined;
+            delete (rest as Record<string, unknown>)._id;
+            delete (rest as Record<string, unknown>).__v;
+            delete (rest as Record<string, unknown>).categories;
+            delete (rest as Record<string, unknown>).categoryDocs;
+
             return {
                 ...rest,
-                userId: (rest.userId as string) || docId.toString(),
-                categories: (categoryDocs as { name: string }[] | undefined)?.map((cat) => cat.name) || [],
+                userId: (rest.userId as string | undefined) ?? docId.toString(),
+                categories: categoryDocs?.map((cat) => cat.name) ?? [],
                 distance: rest.distance as number | undefined,
             } as unknown as Worker;
         });

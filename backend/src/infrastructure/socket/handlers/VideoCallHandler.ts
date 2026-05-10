@@ -9,7 +9,7 @@ export class VideoHandler {
     constructor(private _io: Server) { }
 
     handle(socket: Socket) {
-        socket.on("join-room", ({ roomId, userId, role }: { roomId: string; userId: string; role: string }) => {
+        socket.on("join-room", ({ roomId, role }: { roomId: string; userId: string; role: string }) => {
             const participants = roomParticipants.get(roomId) ?? new Set<string>();
 
             // Detect duplicate join: reject if room already has 2 participants
@@ -27,7 +27,7 @@ export class VideoHandler {
             roomParticipants.set(roomId, participants);
             socketRooms.set(socket.id, roomId);
 
-            socket.join(roomId);
+            void socket.join(roomId);
 
             if (participants.size === 1) {
                 // First participant: wait for the other
@@ -47,7 +47,7 @@ export class VideoHandler {
                 // Room is full (3+ people)
                 socket.emit("duplicate-tab");
                 participants.delete(socket.id);
-                socket.leave(roomId);
+                void socket.leave(roomId);
             }
         });
 
@@ -87,6 +87,6 @@ export class VideoHandler {
             }
         }
         socketRooms.delete(socket.id);
-        socket.leave(roomId);
+        void socket.leave(roomId);
     }
 }

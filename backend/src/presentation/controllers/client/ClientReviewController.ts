@@ -13,18 +13,28 @@ export class ClientReviewController {
     try {
       const clientId = req.user?.id;
       const { serviceId } = req.params;
-      const { rating, review } = req.body;
+      const { rating, review } = req.body as { rating?: number; review?: string };
 
       if (!clientId) {
         return res.status(HttpStatusCode.UNAUTHORIZED)
           .json(ResponseHandler.error("Unauthorized"));
       }
 
+      if (!serviceId) {
+        return res.status(HttpStatusCode.BAD_REQUEST)
+          .json(ResponseHandler.error("Service ID is required"));
+      }
+
+      if (rating === undefined) {
+        return res.status(HttpStatusCode.BAD_REQUEST)
+          .json(ResponseHandler.error("Rating is required"));
+      }
+
       await this._addReviewUseCase.execute(
         serviceId,
         clientId,
         rating,
-        review
+        review ?? ""
       );
 
       res.status(HttpStatusCode.OK).json(

@@ -10,7 +10,7 @@ export class AuthMiddleware {
   constructor(private readonly _tokenService: ITokenService) { }
 
   public verify: RequestHandler = (req: Request, res: Response, next: NextFunction) => {
-    let token = req.cookies?.accessToken;
+    let token = (req.cookies as Record<string, string> | undefined)?.accessToken;
 
     if (!token) {
       const authHeader = req.headers.authorization;
@@ -29,7 +29,7 @@ export class AuthMiddleware {
       const payload = this._tokenService.verifyAccessToken(token);
       req.user = payload;
       next();
-    } catch (error) {
+    } catch {
       return res
         .status(HttpStatusCode.FORBIDDEN)
         .json({ message: "Invalid or expired token" });
@@ -41,7 +41,7 @@ export class AuthMiddleware {
       if (req.user && req.user.role === Role.ADMIN) {
         next();
       } else {
-        return res
+        res
           .status(HttpStatusCode.FORBIDDEN)
           .json({ message: "Admin access required" });
       }

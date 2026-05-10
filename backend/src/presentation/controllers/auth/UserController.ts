@@ -13,6 +13,8 @@ import { ResponseHandler } from "../../../shared/responses/ApiResponse";
 import { LoginResponseDTO } from "../../../application/dtos/UserDTO";
 import { RESPONSE_MESSAGES } from "../../../shared/responses/ResponseMessages";
 
+import { Role } from "../../../shared/enums/authEnums";
+
 export class UserController implements IUserController {
 
     constructor(
@@ -29,9 +31,15 @@ export class UserController implements IUserController {
                     ResponseHandler.error(RESPONSE_MESSAGES.UNAUTHORIZED)
                 );
             }
-            const { role } = req.body;
+            const { role } = req.body as { role?: string };
 
-            const result = await this._changeUserRoleUseCase.execute(userId, role);
+            if (!role) {
+                return res.status(HttpStatusCode.BAD_REQUEST).json(
+                    ResponseHandler.error(RESPONSE_MESSAGES.BAD_REQUEST, "Role is required")
+                );
+            }
+
+            const result = await this._changeUserRoleUseCase.execute(userId, role as Role);
 
             return res.status(HttpStatusCode.OK).json(
                 ResponseHandler.success<LoginResponseDTO>(

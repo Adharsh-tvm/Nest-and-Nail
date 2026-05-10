@@ -5,8 +5,8 @@ import { IGetClientOngoingServicesUseCase } from "../../../application/interface
 import { IBookWorkerUseCase } from "../../../domain/repositories/IBookWorkerUseCase";
 import { HttpStatusCode } from "../../../shared/enums/httpCodes";
 import { ResponseHandler } from "../../../shared/responses/ApiResponse";
-import { RESPONSE_MESSAGES } from "../../../shared/responses/ResponseMessages";
 import { ICancelServiceUseCase } from "../../../application/interfaces/service/ICancelServiceUseCase";
+import { SlotType } from "../../../shared/enums/slotEnums";
 
 export class ClientServiceController {
     constructor(
@@ -31,7 +31,28 @@ export class ClientServiceController {
                 description,
                 address,
                 pricePerWorker,
-            } = req.body;
+            } = req.body as {
+                workerId: string;
+                category: string;
+                date: string;
+                selectedSlots?: { date: string | Date; slotType: string }[];
+                slotType?: string;
+                numberOfDays: number;
+                numberOfWorkers: number;
+                title: string;
+                description: string;
+                address?: {
+                    street?: string;
+                    city?: string;
+                    state?: string;
+                    country?: string;
+                    zip?: string;
+                    label?: string;
+                    lng?: number;
+                    lat?: number;
+                };
+                pricePerWorker: number;
+            };
 
             const clientId = req.user?.id;
 
@@ -46,9 +67,9 @@ export class ClientServiceController {
             const parsedSelectedSlots = selectedSlots
                 ? selectedSlots.map((s: { date: string | Date; slotType: string }) => ({
                     date: new Date(s.date),
-                    slotType: s.slotType,
+                    slotType: s.slotType as SlotType,
                 }))
-                : [{ date: scheduledDate, slotType }];
+                : [{ date: scheduledDate, slotType: (slotType as SlotType | undefined) ?? SlotType.FULL_DAY }];
 
             const bookingAddress = address ? {
                 street: address.street,
@@ -59,7 +80,7 @@ export class ClientServiceController {
                 label: address.label
             } : undefined;
 
-            const bookingLocation = address?.lng && address?.lat ? {
+            const bookingLocation = address?.lng && address.lat ? {
                 type: "Point" as const,
                 coordinates: [address.lng, address.lat] as [number, number]
             } : {
@@ -162,7 +183,7 @@ export class ClientServiceController {
                 return;
             }
             const { serviceId } = req.params;
-            const { reason } = req.body;
+            const { reason } = req.body as { reason?: string };
 
             await this._cancelServiceUseCase.execute(serviceId, userId, reason);
 

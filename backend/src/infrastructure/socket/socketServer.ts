@@ -16,10 +16,12 @@ export class SocketServer {
         this.io.on("connection", (socket: Socket) => {
 
             socket.on("register", (userId: string) => {
-                if (!this.userSocketMap.has(userId)) {
-                    this.userSocketMap.set(userId, new Set());
+                let sockets = this.userSocketMap.get(userId);
+                if (!sockets) {
+                    sockets = new Set();
+                    this.userSocketMap.set(userId, sockets);
                 }
-                this.userSocketMap.get(userId)!.add(socket.id);
+                sockets.add(socket.id);
             });
 
             new ChatHandler(this.io).handle(socket);

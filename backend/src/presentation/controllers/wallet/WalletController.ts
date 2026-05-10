@@ -67,8 +67,8 @@ export class WalletController {
 
   getTransactions = async (req: Request, res: Response): Promise<void> => {
     const userId = req.user?.id;
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 10;
+    const page = typeof req.query.page === "string" ? parseInt(req.query.page) : 1;
+    const limit = typeof req.query.limit === "string" ? parseInt(req.query.limit) : 10;
 
     if (!userId) {
       res.status(HttpStatusCode.UNAUTHORIZED).json(
@@ -89,7 +89,7 @@ export class WalletController {
 
   createRechargeOrder = async (req: Request, res: Response): Promise<void> => {
     const userId = req.user?.id;
-    const { amount } = req.body;
+    const { amount } = req.body as { amount?: number };
 
     if (!userId) {
       res.status(HttpStatusCode.UNAUTHORIZED).json(ResponseHandler.error(RESPONSE_MESSAGES.UNAUTHORIZED));
@@ -112,7 +112,12 @@ export class WalletController {
 
   verifyRechargePayment = async (req: Request, res: Response): Promise<void> => {
     const userId = req.user?.id;
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, amount } = req.body;
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, amount } = req.body as {
+      razorpay_order_id: string;
+      razorpay_payment_id: string;
+      razorpay_signature: string;
+      amount: number;
+    };
 
     if (!userId) {
       res.status(HttpStatusCode.UNAUTHORIZED).json(ResponseHandler.error(RESPONSE_MESSAGES.UNAUTHORIZED));

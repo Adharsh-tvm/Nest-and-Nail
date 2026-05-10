@@ -100,7 +100,7 @@ export class WorkerServiceController {
   startService = async (req: Request, res: Response): Promise<void> => {
     const workerId = req.user?.id;
     const { serviceId } = req.params;
-    const { lat, lng } = req.body;
+    const { lat, lng } = req.body as { lat?: number; lng?: number };
 
     if (!workerId) {
       res.status(HttpStatusCode.UNAUTHORIZED).json(

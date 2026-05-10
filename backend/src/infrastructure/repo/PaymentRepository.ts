@@ -2,8 +2,6 @@ import { IPaymentRepository } from "../../domain/repositories/IPaymentRepository
 import { Payment } from "../../domain/entities/Payment";
 import { PaymentDocument } from "../database/models/PaymentModel";
 import { Model } from "mongoose";
-import { PaymentStatus } from "../../shared/enums/paymentEnums";
-import { Types } from "mongoose";
 
 export class PaymentRepository implements IPaymentRepository {
 
@@ -15,7 +13,7 @@ export class PaymentRepository implements IPaymentRepository {
     });
 
     return {
-      id: (created._id as Types.ObjectId).toString(),
+      id: created._id.toString(),
       serviceId: created.serviceId,
       clientId: created.clientId,
       amount: created.amount,
@@ -23,7 +21,7 @@ export class PaymentRepository implements IPaymentRepository {
       orderId: created.orderId,
       paymentId: created.paymentId,
       signature: created.signature,
-      status: created.status as PaymentStatus,
+      status: created.status,
       createdAt: created.createdAt
     };
   }
@@ -42,7 +40,7 @@ export class PaymentRepository implements IPaymentRepository {
       orderId: doc.orderId,
       paymentId: doc.paymentId,
       signature: doc.signature,
-      status: doc.status as PaymentStatus,
+      status: doc.status,
       createdAt: doc.createdAt
     };
   }

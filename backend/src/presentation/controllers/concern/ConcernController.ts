@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 import { ICreateConcernUseCase } from "../../../application/interfaces/concern/ICreateConcernUseCase";
 import { IGetUserConcernsUseCase } from "../../../application/interfaces/concern/IGetUserConcernsUseCase";
 import { HttpStatusCode } from "../../../shared/enums/httpCodes";
@@ -13,13 +13,19 @@ export class ConcernController {
 
   createConcern = async (req: Request, res: Response) => {
     try {
-      const userId = req.user?.id;
-      if (!userId) {
+      if (!req.user) {
         return res.status(HttpStatusCode.UNAUTHORIZED)
           .json(ResponseHandler.error("Unauthorized"));
       }
-      const { serviceId, message } = req.body;
-      const role = req.user?.role?.toUpperCase() as concernBy;
+      const userId = req.user.id;
+      const { serviceId, message } = req.body as { serviceId?: string; message?: string };
+
+      if (!serviceId || !message) {
+        return res.status(HttpStatusCode.BAD_REQUEST)
+          .json(ResponseHandler.error("Service ID and message are required"));
+      }
+
+      const role = req.user.role.toUpperCase() as concernBy;
 
       const files = req.files as Express.Multer.File[] | undefined;
 

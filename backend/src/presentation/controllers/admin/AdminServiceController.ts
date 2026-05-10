@@ -22,7 +22,7 @@ export class AdminServiceController {
                 ResponseHandler.success(services, "All Services Fetched Successfully")
             )
 
-        } catch (error: unknown) {
+        } catch {
             res.status(HttpStatusCode.INTERNAL_SERVER).json(
                 ResponseHandler.error(RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR)
             )
@@ -46,7 +46,7 @@ export class AdminServiceController {
                 ResponseHandler.success(service, "Service details fetched successfully")
             )
 
-        } catch (error: unknown) {
+        } catch {
             res.status(HttpStatusCode.INTERNAL_SERVER).json(
                 ResponseHandler.error("Failed to fetch service details")
             );

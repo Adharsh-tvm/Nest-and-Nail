@@ -16,16 +16,16 @@ export class UploadController implements IUploadController {
   uploadProfile = async (req: Request, res: Response): Promise<Response> => {
     try {
       const workerId = req.params.workerId;
-      const filePath = req.file?.path;
+      const file = req.file;
 
-      if (!filePath) {
+      if (!file) {
         return res.status(HttpStatusCode.BAD_REQUEST).json(ResponseHandler.error(RESPONSE_MESSAGES.BAD_REQUEST))
       }
 
       const result = await this._uploadProfilePictureUseCase.execute(
         workerId,
-        filePath,
-        req.file!.mimetype
+        file.path,
+        file.mimetype
       );
 
       return res.status(HttpStatusCode.OK).json(ResponseHandler.success(result.url, RESPONSE_MESSAGES.PROFILE_UPDATED))
@@ -39,16 +39,16 @@ export class UploadController implements IUploadController {
   uploadDocument = async (req: Request, res: Response): Promise<Response> => {
     try {
       const workerId = req.params.workerId;
-      const filePath = req.file?.path;
+      const file = req.file;
 
-      if (!filePath) {
+      if (!file) {
         return res.status(HttpStatusCode.BAD_REQUEST).json(ResponseHandler.error(RESPONSE_MESSAGES.FILE_MISSING))
       }
 
       const result = await this._uploadDocumentUseCase.execute(
         workerId,
-        filePath,
-        req.file!.mimetype
+        file.path,
+        file.mimetype
       );
 
       return res.status(HttpStatusCode.OK).json(ResponseHandler.success(result, RESPONSE_MESSAGES.DOCUMENT_UPLOADED));

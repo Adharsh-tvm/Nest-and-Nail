@@ -5,10 +5,10 @@ export class ChatHandler {
 
   handle(socket: Socket) {
     socket.on("join-chat", (chatId: string) => {
-      socket.join(chatId);
+      void socket.join(chatId);
     });
 
-    socket.on("send-message", ({ chatId, message }) => {
+    socket.on("send-message", ({ chatId, message }: { chatId: string; message: unknown }) => {
       this.io.to(chatId).emit("receive-message", message);
     });
   }

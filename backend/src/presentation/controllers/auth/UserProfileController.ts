@@ -26,12 +26,13 @@ export class UserProfileController implements IUserProfileController {
             const profilePictureFilePath = req.file?.path;
             const mimetype = req.file?.mimetype;
 
+            const body = req.body as Record<string, unknown> & { isOnline?: unknown };
             const updates: Record<string, unknown> = {
-                ...req.body,
+                ...body,
             };
 
-            if (req.body.isOnline !== undefined) {
-                updates.isOnline = req.body.isOnline === "true";
+            if (body.isOnline !== undefined) {
+                updates.isOnline = body.isOnline === "true";
             }
 
             const updatedUser = await this._updateUserProfileUseCase.execute(
@@ -63,7 +64,7 @@ export class UserProfileController implements IUserProfileController {
     updateSkills = async (req: Request, res: Response): Promise<Response> => {
         try {
             const { userId } = req.params;
-            const { skills } = req.body;
+            const { skills } = req.body as { skills?: unknown };
 
             if (!Array.isArray(skills)) {
                 return res.status(HttpStatusCode.BAD_REQUEST).json(
@@ -72,7 +73,7 @@ export class UserProfileController implements IUserProfileController {
                 )
             }
 
-            const updateUser = await this._updateUserSkillsUseCase.execute(userId, skills);
+            const updateUser = await this._updateUserSkillsUseCase.execute(userId, skills as string[]);
 
             return res.status(HttpStatusCode.OK).json(
                 ResponseHandler.success(updateUser, RESPONSE_MESSAGES.SKILLS_UPDATED)
@@ -92,11 +93,11 @@ export class UserProfileController implements IUserProfileController {
     addAddress = async (req: Request, res: Response): Promise<Response> => {
         try {
             const { userId } = req.params;
-            const data = req.body;
+            const data = req.body as Record<string, unknown>;
 
             const result = await this._addUserAddressUseCase.execute(
                 userId,
-                data
+                data as never
             );
 
             return res.status(HttpStatusCode.CREATED).json(
@@ -115,17 +116,17 @@ export class UserProfileController implements IUserProfileController {
     editAddress = async (req: Request, res: Response): Promise<Response> => {
         try {
             const { userId, addressId } = req.params;
-            const data = req.body;
+            const data = req.body as Record<string, unknown>;
 
-            const result = await this._editUserAddressUseCase.execute(
+            await this._editUserAddressUseCase.execute(
                 userId,
                 addressId,
-                data
+                data as never
             );
 
             return res.status(HttpStatusCode.OK).json(
                 ResponseHandler.success(
-                    result,
+                    null,
                     RESPONSE_MESSAGES.ADDRESS_UPDATED
                 )
             );
@@ -140,14 +141,14 @@ export class UserProfileController implements IUserProfileController {
         try {
             const { userId, addressId } = req.params;
 
-            const result = await this._deleteUserAddressUseCase.execute(
+            await this._deleteUserAddressUseCase.execute(
                 userId,
                 addressId
             );
 
             return res.status(HttpStatusCode.OK).json(
                 ResponseHandler.success(
-                    result,
+                    null,
                     RESPONSE_MESSAGES.ADDRESS_UPDATED
                 )
             );

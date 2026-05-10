@@ -21,7 +21,13 @@ export class CategoryController implements ICategoryController {
 
     create = async (req: Request, res: Response) => {
         try {
-            const { name } = req.body;
+            const { name } = req.body as { name?: string };
+            if (!name) {
+                res.status(HttpStatusCode.BAD_REQUEST).json(
+                    ResponseHandler.error("Category name is required")
+                );
+                return;
+            }
             const category = await this._createCategoryUseCase.execute(name);
             res.status(HttpStatusCode.CREATED).json(ResponseHandler.success(category, RESPONSE_MESSAGES.UPDATED));
         } catch (error: unknown) {
@@ -63,7 +69,14 @@ export class CategoryController implements ICategoryController {
     async update(req: Request, res: Response): Promise<void> {
         try {
             const { id } = req.params;
-            const { name, isActive } = req.body;
+            const { name, isActive } = req.body as { name?: string; isActive?: boolean };
+
+            if (name === undefined || isActive === undefined) {
+                res.status(HttpStatusCode.BAD_REQUEST).json(
+                    ResponseHandler.error("Category name and isActive status are required")
+                );
+                return;
+            }
 
             const category = await this._updateCategoryUseCase.execute(id, {
                 name,
@@ -107,7 +120,7 @@ export class CategoryController implements ICategoryController {
     updateUserCategories = async (req: Request, res: Response): Promise<void> => {
         try {
             const userId = req.params.userId;
-            const { categoryIds } = req.body;
+            const { categoryIds } = req.body as { categoryIds?: unknown };
 
             if (!Array.isArray(categoryIds)) {
                 res.status(HttpStatusCode.BAD_REQUEST).json(
@@ -118,7 +131,7 @@ export class CategoryController implements ICategoryController {
 
             const updatedUser = await this._updateWorkerCategoriesUseCase.execute(
                 userId,
-                categoryIds
+                categoryIds as string[]
             );
 
             res.status(HttpStatusCode.OK).json(

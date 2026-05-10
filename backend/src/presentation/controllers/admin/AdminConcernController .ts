@@ -23,7 +23,7 @@ export class AdminConcernController {
         ResponseHandler.success(result, "Concerns fetched successfully")
       );
 
-    } catch (error) {
+    } catch {
       res.status(HttpStatusCode.INTERNAL_SERVER).json(
         ResponseHandler.error("Failed to fetch concerns")
       );

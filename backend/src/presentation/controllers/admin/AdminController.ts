@@ -105,7 +105,7 @@ export class AdminController implements IAdminController {
     rejectVerification = async (req: Request, res: Response): Promise<void> => {
         try {
             const { userId } = req.params;
-            const { reason } = req.body;
+            const { reason } = req.body as { reason?: string };
 
             if (!reason) {
                 res.status(HttpStatusCode.BAD_REQUEST).json(

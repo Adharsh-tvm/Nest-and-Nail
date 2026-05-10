@@ -26,7 +26,7 @@ export class AdminMeetingController {
                 ResponseHandler.success(result, "Meetings fetched successfully")
             );
 
-        } catch (error) {
+        } catch {
             res.status(HttpStatusCode.INTERNAL_SERVER).json(
                 ResponseHandler.error("Failed to fetch meetings")
             );
@@ -43,7 +43,7 @@ export class AdminMeetingController {
                 ResponseHandler.success(result, "Meeting fetched successfully")
             );
 
-        } catch (error) {
+        } catch {
             res.status(HttpStatusCode.INTERNAL_SERVER).json(
                 ResponseHandler.error("Failed to fetch meeting")
             );

@@ -34,7 +34,7 @@ export class TransactionController {
       res.status(HttpStatusCode.OK).json(
         ResponseHandler.success(result, "Transactions fetched")
       );
-    } catch (error) {
+    } catch {
       res.status(HttpStatusCode.INTERNAL_SERVER).json(
         ResponseHandler.error("Failed to fetch transactions")
       );
@@ -63,7 +63,7 @@ export class TransactionController {
       res.status(HttpStatusCode.OK).json(
         ResponseHandler.success(result, "Transactions fetched")
       );
-    } catch (error) {
+    } catch {
       res.status(HttpStatusCode.INTERNAL_SERVER).json(
         ResponseHandler.error("Failed to fetch transactions")
       );
@@ -83,7 +83,7 @@ export class TransactionController {
       res.status(HttpStatusCode.OK).json(
         ResponseHandler.success(result, "Transactions fetched")
       );
-    } catch (error) {
+    } catch {
       res.status(HttpStatusCode.INTERNAL_SERVER).json(
         ResponseHandler.error("Failed to fetch transactions")
       );

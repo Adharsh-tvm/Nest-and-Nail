@@ -6,6 +6,8 @@ import { HttpStatusCode } from "../../../shared/enums/httpCodes";
 import { ResponseHandler } from "../../../shared/responses/ApiResponse";
 import { RESPONSE_MESSAGES } from "../../../shared/responses/ResponseMessages";
 
+import { SlotType } from "../../../shared/enums/slotEnums";
+
 export class WorkerController {
   constructor(
     private readonly _blockWorkerDatesUseCase: IBlockWorkerDatesUseCase,
@@ -15,7 +17,7 @@ export class WorkerController {
 
   blockDates = async (req: Request, res: Response): Promise<void> => {
     const workerId = req.user?.id;
-    const { dates, slotTypes } = req.body;
+    const { dates, slotTypes } = req.body as { dates?: unknown; slotTypes?: SlotType[] };
 
     if (!workerId) {
       res.status(HttpStatusCode.UNAUTHORIZED).json(
@@ -33,7 +35,7 @@ export class WorkerController {
 
     await this._blockWorkerDatesUseCase.execute({
       workerId,
-      dates: dates.map((d: string) => new Date(d)),
+      dates: (dates as string[]).map((d: string) => new Date(d)),
       slotTypes
     });
 

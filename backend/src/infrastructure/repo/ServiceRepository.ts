@@ -12,7 +12,9 @@ export class ServiceRepository implements IServiceRepository {
 
         const obj = created.toObject();
 
-        const { _id, __v, ...clean } = obj;
+        const clean = { ...obj };
+        delete (clean as Record<string, unknown>)._id;
+        delete (clean as Record<string, unknown>).__v;
 
         return clean as Service;
     }
@@ -121,7 +123,7 @@ export class ServiceRepository implements IServiceRepository {
         ]);
     }
 
-    async findDetailedByServiceId(serviceId: string): Promise<unknown | null> {
+    async findDetailedByServiceId(serviceId: string): Promise<unknown> {
 
         const result = await ServiceModel.aggregate([
             {
@@ -190,7 +192,7 @@ export class ServiceRepository implements IServiceRepository {
             }
         ]);
 
-        return result[0] || null;
+        return result[0] ?? null;
     }
 
     async getMeetingsByClient(clientId: string): Promise<Service[]> {

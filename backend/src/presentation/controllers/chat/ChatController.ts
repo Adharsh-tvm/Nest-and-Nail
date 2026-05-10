@@ -11,10 +11,14 @@ export class ChatController {
     ) { }
 
     sendMessage = async (req: Request, res: Response) => {
-        const { chatId, receiverId, message } = req.body;
+        const { chatId, receiverId, message } = req.body as { chatId?: string; receiverId?: string; message?: string };
         const senderId = req.user?.id;
         if (!senderId) {
             return res.status(HttpStatusCode.UNAUTHORIZED).json({ success: false, message: "Unauthorized" });
+        }
+
+        if (!chatId || !receiverId || !message) {
+            return res.status(HttpStatusCode.BAD_REQUEST).json({ success: false, message: "Missing required fields" });
         }
 
         await this._sendMessageUseCase.execute({

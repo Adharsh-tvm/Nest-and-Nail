@@ -14,7 +14,7 @@ export class PaymentController {
   ) {}
 
   createOrder = async (req: Request, res: Response): Promise<void> => {
-    const { serviceId } = req.body;
+    const { serviceId } = req.body as { serviceId?: string };
     const clientId = req.user?.id;
 
     if (!clientId) {
@@ -46,11 +46,18 @@ export class PaymentController {
       paymentId,
       orderId,
       signature
-    } = req.body;
+    } = req.body as {
+      razorpay_payment_id?: string;
+      razorpay_order_id?: string;
+      razorpay_signature?: string;
+      paymentId?: string;
+      orderId?: string;
+      signature?: string;
+    };
 
-    const finalPaymentId = razorpay_payment_id || paymentId;
-    const finalOrderId = razorpay_order_id || orderId;
-    const finalSignature = razorpay_signature || signature;
+    const finalPaymentId = razorpay_payment_id ?? paymentId;
+    const finalOrderId = razorpay_order_id ?? orderId;
+    const finalSignature = razorpay_signature ?? signature;
 
     if (!finalPaymentId || !finalOrderId || !finalSignature) {
       res.status(HttpStatusCode.BAD_REQUEST).json(
@@ -74,7 +81,7 @@ export class PaymentController {
   };
 
   processWalletPayment = async (req: Request, res: Response): Promise<void> => {
-    const { serviceId } = req.body;
+    const { serviceId } = req.body as { serviceId?: string };
     const clientId = req.user?.id;
 
     if (!clientId) {

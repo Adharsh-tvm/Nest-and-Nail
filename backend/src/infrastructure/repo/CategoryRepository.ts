@@ -12,7 +12,7 @@ export class CategoryRepository implements ICategoryRepository {
         });
 
         return new Category(
-            doc.id,
+            doc.id as string,
             doc.name,
             doc.slug,
             doc.isActive,
@@ -46,13 +46,13 @@ export class CategoryRepository implements ICategoryRepository {
         const activeCount = await CategoryModel.countDocuments({ ...query, isActive: true } as FilterQuery<typeof CategoryModel>);
         const inactiveCount = total - activeCount;
 
-        const sortField = options?.sortBy || "name";
+        const sortField = options?.sortBy ?? "name";
         const sortOrder = options?.sortOrder === "desc" ? -1 : 1;
         const sortOptions: Record<string, 1 | -1> = { [sortField]: sortOrder };
 
         let mongoQuery = CategoryModel.find(query).sort(sortOptions);
 
-        if (options?.page && options?.limit) {
+        if (options?.page && options.limit) {
             mongoQuery = mongoQuery
                 .skip((options.page - 1) * options.limit)
                 .limit(options.limit);
@@ -63,7 +63,7 @@ export class CategoryRepository implements ICategoryRepository {
         const categories = docs.map(
             (doc) =>
                 new Category(
-                    doc.id,
+                    doc.id as string,
                     doc.name,
                     doc.slug,
                     doc.isActive,
@@ -80,7 +80,7 @@ export class CategoryRepository implements ICategoryRepository {
         if (!doc) return null;
 
         return new Category(
-            doc.id,
+            doc.id as string,
             doc.name,
             doc.slug,
             doc.isActive,
@@ -98,7 +98,7 @@ export class CategoryRepository implements ICategoryRepository {
         return docs.map(
             doc =>
                 new Category(
-                    doc._id.toString(),
+                    (doc._id as { toString(): string }).toString(),
                     doc.name,
                     doc.slug,
                     doc.isActive,
@@ -113,7 +113,7 @@ export class CategoryRepository implements ICategoryRepository {
         if (!doc) return null;
 
         return new Category(
-            doc.id,
+            doc.id as string,
             doc.name,
             doc.slug,
             doc.isActive,
@@ -145,7 +145,7 @@ export class CategoryRepository implements ICategoryRepository {
         }
 
         return new Category(
-            updated.id,
+            updated.id as string,
             updated.name,
             updated.slug,
             updated.isActive,

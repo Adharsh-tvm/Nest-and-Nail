@@ -26,8 +26,8 @@ export class WalletRepository implements IWalletRepository {
         const doc = await WalletModel.create({
             walletId: wallet.walletId || uuidv4(),
             userId: wallet.userId,
-            balance: wallet.balance ?? 0,
-            currency: wallet.currency ?? "INR",
+            balance: wallet.balance,
+            currency: wallet.currency,
         });
         return this.toEntity(doc);
     }

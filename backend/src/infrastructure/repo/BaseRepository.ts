@@ -17,14 +17,17 @@ export abstract class BaseRepository<T extends User, D extends Document = Docume
             return null;
         }
 
-        const leanObj = result as unknown as Record<string, unknown> & { categories?: Array<{ _id?: { toString(): string } } | string> };
+        const leanObj = result as unknown as Record<string, unknown> & { categories?: ({ _id?: { toString(): string } } | string)[] };
         const mappedCategories = leanObj.categories?.map((cat) => {
-            if (typeof cat === 'object' && cat !== null && '_id' in cat && cat._id) {
-                return cat._id.toString();
+            if (typeof cat === 'object' && '_id' in cat && cat._id) {
+                return (cat._id as { toString(): string }).toString();
             }
-            return cat.toString();
-        }) || [];
-        const { _id, __v, categories, ...cleanResult } = leanObj;
+            return typeof cat === 'string' ? cat : "";
+        }) ?? [];
+        const cleanResult = { ...leanObj };
+        delete (cleanResult as Record<string, unknown>)._id;
+        delete (cleanResult as Record<string, unknown>).__v;
+        delete (cleanResult as Record<string, unknown>).categories;
 
         return { ...cleanResult, categories: mappedCategories } as unknown as T;
     }
@@ -32,8 +35,9 @@ export abstract class BaseRepository<T extends User, D extends Document = Docume
     async create(user: T): Promise<T> {
         const created = await this.model.create(user as unknown as Partial<D>);
         const obj = created.toObject();
-
-        const { _id, __v, ...cleanResult } = obj as unknown as Record<string, unknown>;
+        const cleanResult = { ...obj as unknown as Record<string, unknown> };
+        delete cleanResult._id;
+        delete cleanResult.__v;
 
         return cleanResult as unknown as T;
     }
@@ -51,14 +55,17 @@ export abstract class BaseRepository<T extends User, D extends Document = Docume
             return null;
         }
 
-        const leanObj = result as unknown as Record<string, unknown> & { categories?: Array<{ _id?: { toString(): string } } | string> };
+        const leanObj = result as unknown as Record<string, unknown> & { categories?: ({ _id?: { toString(): string } } | string)[] };
         const mappedCategories = leanObj.categories?.map((cat) => {
-            if (typeof cat === 'object' && cat !== null && '_id' in cat && cat._id) {
-                return cat._id.toString();
+            if (typeof cat === 'object' && '_id' in cat && cat._id) {
+                return (cat._id as { toString(): string }).toString();
             }
-            return cat.toString();
-        }) || [];
-        const { _id, __v, categories, ...cleanResult } = leanObj;
+            return typeof cat === 'string' ? cat : "";
+        }) ?? [];
+        const cleanResult = { ...leanObj };
+        delete (cleanResult as Record<string, unknown>)._id;
+        delete (cleanResult as Record<string, unknown>).__v;
+        delete (cleanResult as Record<string, unknown>).categories;
 
         return { ...cleanResult, categories: mappedCategories } as unknown as T;
     }
@@ -68,8 +75,11 @@ export abstract class BaseRepository<T extends User, D extends Document = Docume
 
         return clients.map(doc => {
             const leanDoc = doc as Record<string, unknown> & { _id: { toString(): string } };
-            const { _id, __v, ...rest } = leanDoc;
-            return { id: _id.toString(), ...rest } as unknown as T;
+            const rest = { ...leanDoc };
+            const id = leanDoc._id.toString();
+            delete (rest as Record<string, unknown>)._id;
+            delete (rest as Record<string, unknown>).__v;
+            return { id, ...rest } as unknown as T;
         });
     }
 
@@ -85,7 +95,9 @@ export abstract class BaseRepository<T extends User, D extends Document = Docume
 
         if (!updated) return null;
 
-        const { _id, __v, ...clean } = updated as Record<string, unknown>;
+        const clean = { ...updated as Record<string, unknown> };
+        delete clean._id;
+        delete clean.__v;
         return clean as unknown as T;
     }
 
@@ -127,7 +139,9 @@ export abstract class BaseRepository<T extends User, D extends Document = Docume
             return null;
         }
 
-        const { _id, __v, ...clean } = updated as Record<string, unknown>;
+        const clean = { ...updated as Record<string, unknown> };
+        delete clean._id;
+        delete clean.__v;
         return clean as unknown as T;
     }
 
@@ -182,7 +196,9 @@ export abstract class BaseRepository<T extends User, D extends Document = Docume
             .exec();
 
         return results.map(doc => {
-            const { _id, __v, ...rest } = doc as Record<string, unknown>;
+            const rest = { ...doc as Record<string, unknown> };
+            delete rest._id;
+            delete rest.__v;
             return rest as unknown as T;
         });
     }
@@ -244,8 +260,11 @@ export abstract class BaseRepository<T extends User, D extends Document = Docume
         return {
             users: users.map(doc => {
                 const leanDoc = doc as Record<string, unknown> & { _id: { toString(): string } };
-                const { _id, __v, ...rest } = leanDoc;
-                return { id: _id.toString(), ...rest } as unknown as T;
+                const rest = { ...leanDoc };
+                const id = leanDoc._id.toString();
+                delete (rest as Record<string, unknown>)._id;
+                delete (rest as Record<string, unknown>).__v;
+                return { id, ...rest } as unknown as T;
             }),
             total,
             totalPages,
