@@ -1,11 +1,13 @@
 import { IServiceRepository } from "../../../../domain/repositories/IServiceRepository";
+import { IReviewRepository } from "../../../../domain/repositories/IReviewRepository";
 import { IGetClientServiceByIdUseCase } from "../../../interfaces/service/client/IGetClientServiceByIdUseCase";
 import { ServiceMapper } from "../../../mappers/ServiceMapper";
 import { ServiceStatus } from "../../../../shared/enums/serviceEnums";
 
 export class GetClientServiceByIdUseCase implements IGetClientServiceByIdUseCase {
   constructor(
-    private readonly _serviceRepo: IServiceRepository
+    private readonly _serviceRepo: IServiceRepository,
+    private readonly _reviewRepo: IReviewRepository
   ) { }
 
   async execute(serviceId: string, clientId: string) {
@@ -24,6 +26,19 @@ export class GetClientServiceByIdUseCase implements IGetClientServiceByIdUseCase
       throw new Error("Service not found");
     }
 
-    return ServiceMapper.toResponse(service);
+    const response = ServiceMapper.toResponse(service);
+
+    if (service.status === ServiceStatus.COMPLETED) {
+      const reviewObj = await this._reviewRepo.findByServiceId(serviceId);
+      if (reviewObj) {
+        response.review = {
+          rating: reviewObj.rating,
+          review: reviewObj.review,
+          createdAt: reviewObj.createdAt
+        };
+      }
+    }
+
+    return response;
   }
 }

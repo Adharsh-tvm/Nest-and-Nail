@@ -90,6 +90,12 @@ export interface ServiceResponseDTO {
       endedAt?: Date;
       duration?: string;
     };
+
+  review?: {
+    rating: number;
+    review?: string;
+    createdAt?: Date | string;
+  };
 }
 
 export interface AdminServiceResponseDTO {

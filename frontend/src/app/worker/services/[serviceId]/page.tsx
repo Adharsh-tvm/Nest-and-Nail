@@ -19,6 +19,8 @@ import {
   Loader2,
   AlertTriangle,
   X,
+  Star,
+  MessageSquare,
 } from "lucide-react";
 import {
   ServiceResponseDTO,
@@ -899,6 +901,64 @@ export default function WorkerServiceDetailsPage() {
                   </div>
                 )}
               </div>
+
+              {/* Rating & Review Card */}
+              {service.status === ServiceStatus.COMPLETED && (
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8 space-y-4">
+                  <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                    <Star className="w-5 h-5 text-amber-500 fill-amber-500" />
+                    Service Rating & Review
+                  </h3>
+                  
+                  {service.review ? (
+                    <div className="bg-gradient-to-br from-indigo-50/40 via-purple-50/20 to-white rounded-2xl p-6 border border-indigo-50/60 shadow-inner relative overflow-hidden">
+                      {/* Subtle decorative background quote mark */}
+                      <div className="absolute right-4 bottom-2 text-indigo-100/40 pointer-events-none select-none font-serif text-8xl">
+                        ”
+                      </div>
+                      
+                      <div className="flex items-center justify-between flex-wrap gap-3 mb-4">
+                        <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-1">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <Star
+                                key={star}
+                                className={clsx(
+                                  "w-5 h-5",
+                                  star <= (service.review?.rating ?? 0)
+                                    ? "fill-amber-400 text-amber-400"
+                                    : "text-gray-200"
+                                )}
+                              />
+                            ))}
+                          </div>
+                          <span className="text-sm font-bold text-gray-700 bg-amber-50 border border-amber-100 px-2 py-0.5 rounded-lg">
+                            {service.review.rating.toFixed(1)} / 5.0
+                          </span>
+                        </div>
+                        {service.review.createdAt && (
+                          <span className="text-xs text-gray-400 font-medium">
+                            Reviewed on {new Date(service.review.createdAt).toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                            })}
+                          </span>
+                        )}
+                      </div>
+                      
+                      <p className="text-gray-700 text-sm leading-relaxed italic relative z-10">
+                        "{service.review.review || "No review description left."}"
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="bg-slate-50 border border-dashed border-slate-200 rounded-2xl p-6 text-center text-gray-500">
+                      <p className="text-sm font-medium">No review has been submitted for this service yet.</p>
+                      <p className="text-xs text-gray-400 mt-1">When the client rates this service, it will appear here.</p>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Footer card */}
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col space-y-4">

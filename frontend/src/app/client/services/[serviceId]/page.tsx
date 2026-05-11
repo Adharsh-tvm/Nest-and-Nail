@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   ArrowLeft, Calendar, Clock, MapPin, Phone, Mail, FileText, CreditCard,
-  CheckCircle2, Briefcase, User as UserIcon, Loader2, AlertTriangle, XCircle
+  CheckCircle2, Briefcase, User as UserIcon, Loader2, AlertTriangle, XCircle, Star, MessageSquare
 } from "lucide-react";
 import Image from "next/image";
 import { ServiceResponseDTO, ServiceStatus, PaymentStatus } from "@/shared/types/serviceTypes";
@@ -303,10 +303,61 @@ export default function ClientServiceDetailsPage() {
                 {service.status === ServiceStatus.COMPLETED && (
                   <div className="mt-6 pt-6 border-t border-gray-100 flex flex-col gap-3">
                     <RaiseConcernButton serviceId={serviceId} />
-                    <AddReviewButton serviceId={serviceId} />
+                    {!service.review && <AddReviewButton serviceId={serviceId} />}
                   </div>
                 )}
               </div>
+
+              {/* Rating & Review Card */}
+              {service.status === ServiceStatus.COMPLETED && service.review && (
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8 space-y-4">
+                  <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                    <Star className="w-5 h-5 text-amber-500 fill-amber-500" />
+                    Your Rating & Review
+                  </h3>
+                  
+                  <div className="bg-gradient-to-br from-indigo-50/40 via-purple-50/20 to-white rounded-2xl p-6 border border-indigo-50/60 shadow-inner relative overflow-hidden">
+                    {/* Subtle decorative background quote mark */}
+                    <div className="absolute right-4 bottom-2 text-indigo-100/40 pointer-events-none select-none font-serif text-8xl">
+                      ”
+                    </div>
+                    
+                    <div className="flex items-center justify-between flex-wrap gap-3 mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-1">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <Star
+                              key={star}
+                              className={clsx(
+                                "w-5 h-5",
+                                star <= (service.review?.rating ?? 0)
+                                  ? "fill-amber-400 text-amber-400"
+                                  : "text-gray-200"
+                              )}
+                            />
+                          ))}
+                        </div>
+                        <span className="text-sm font-bold text-gray-700 bg-amber-50 border border-amber-100 px-2 py-0.5 rounded-lg">
+                          {service.review.rating.toFixed(1)} / 5.0
+                        </span>
+                      </div>
+                      {service.review.createdAt && (
+                        <span className="text-xs text-gray-400 font-medium">
+                          Reviewed on {new Date(service.review.createdAt).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          })}
+                        </span>
+                      )}
+                    </div>
+                    
+                    <p className="text-gray-700 text-sm leading-relaxed italic relative z-10">
+                      "{service.review.review || "No review description left."}"
+                    </p>
+                  </div>
+                </div>
+              )}
 
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col space-y-4">
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-gray-100 pb-4">

@@ -170,6 +170,11 @@ export interface ServiceResponseDTO {
         endedAt?: string | Date;
         duration?: string;
     };
+    review?: {
+        rating: number;
+        review?: string;
+        createdAt?: string | Date;
+    };
 }
 
 export interface AdminServiceResponseDTO {

@@ -1,4 +1,5 @@
 import { IServiceRepository } from "../../../../domain/repositories/IServiceRepository";
+import { IReviewRepository } from "../../../../domain/repositories/IReviewRepository";
 import { IGetWorkerServiceDetailsUseCase } from "../../../interfaces/service/worker/IGetWorkerServiceDetailsUseCase";
 import { ServiceMapper } from "../../../mappers/ServiceMapper";
 import { IUserRepositoryFactory } from "../../../../domain/repositories/IUserRepositoryFactory";
@@ -11,7 +12,8 @@ export class GetWorkerServiceDetailsUseCase implements IGetWorkerServiceDetailsU
     constructor(
         private readonly _serviceRepo: IServiceRepository,
         private readonly _userRepoFactory: IUserRepositoryFactory,
-        private readonly _s3Service: S3Service
+        private readonly _s3Service: S3Service,
+        private readonly _reviewRepo: IReviewRepository
     ) {}
 
     async execute(serviceId: string, workerId: string) {
@@ -35,6 +37,17 @@ export class GetWorkerServiceDetailsUseCase implements IGetWorkerServiceDetailsU
         const client = await userRepo.findById(service.clientId);
 
         const responseDTO = ServiceMapper.toResponse(service);
+
+        if (service.status === ServiceStatus.COMPLETED) {
+            const reviewObj = await this._reviewRepo.findByServiceId(serviceId);
+            if (reviewObj) {
+                responseDTO.review = {
+                    rating: reviewObj.rating,
+                    review: reviewObj.review,
+                    createdAt: reviewObj.createdAt
+                };
+            }
+        }
 
         let profilePictureUrl = client?.profilePictureUrl;
         if (profilePictureUrl && !profilePictureUrl.startsWith('http')) {

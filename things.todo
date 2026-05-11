@@ -328,10 +328,10 @@ resolutionType:
 
 NEXT REVIEW PENDINGS
 
-☐ avoid usage of any
-☐ keep retention for logs
-☐ elsint -improve rules
-☐ eslint issue need to improve
+✔ avoid usage of any @done (5/11/2026, 1:08:13 PM)
+✔ keep retention for logs @done (5/11/2026, 1:08:15 PM)
+✔ elsint -improve rules @done (5/11/2026, 1:08:16 PM)
+✔ eslint issue need to improve @done (5/11/2026, 1:08:17 PM)
 ✔ video call ring feature @done (5/8/2026, 3:22:15 PM)
 ✔ video call history @done (5/5/2026, 10:30:55 AM)
 ✔ Store meeting history along with call duration details. @done (5/5/2026, 10:31:16 AM)
@@ -340,11 +340,11 @@ NEXT REVIEW PENDINGS
 ✔ wallet system need pagination @done (5/5/2026, 7:21:35 PM)
 ☐ Complete the service option module for workers.in profile
 ✔ show already reviews details in page @done (5/5/2026, 8:04:43 PM)
-☐ list review and rating in user side
+✔ list review and rating in user side @done (5/11/2026, 3:56:22 PM)
 ✔ Add a concern-raising feature for users.-option to add attachment @done (5/6/2026, 5:37:08 PM)
 ✔ concern listing need list in admin @done (5/6/2026, 5:37:06 PM)
 ☐ based concern -admin can do action
 ✔ notification for all action like meeting cancelled e.t.c @done (5/6/2026, 5:37:03 PM)
-☐ real time chatting issue in message while reloading
+✔ real time chatting issue in message while reloading @done (5/11/2026, 1:08:22 PM)
 ✔ Admin Dashboard not completed @done (5/7/2026, 7:50:03 PM)
 ✔ worker dashboard needed @done (5/7/2026, 7:50:02 PM)

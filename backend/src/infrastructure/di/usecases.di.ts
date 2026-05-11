@@ -520,7 +520,8 @@ export class UseCaseDI {
 
   get getClientServiceByIdUseCase(): IGetClientServiceByIdUseCase {
     return (this._getClientServiceByIdUseCase ??= new GetClientServiceByIdUseCase(
-        this.infra.serviceRepository
+        this.infra.serviceRepository,
+        this.infra.reviewRepository
       ));
   }
 
@@ -540,7 +541,8 @@ export class UseCaseDI {
     return (this._getWorkerServiceDetailsUseCase ??= new GetWorkerServiceDetailsUseCase(
         this.infra.serviceRepository,
         this.infra.userRepositoryFactory,
-        this.infra.s3Service
+        this.infra.s3Service,
+        this.infra.reviewRepository
       ));
   }
 
