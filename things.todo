@@ -39,14 +39,14 @@ WEEK FEEDBACK / PENDINGS TO DO
 ✔ Implement abstraction each layer @done (11/10/2025, 6:51:11 PM)
 ✔ Usage of base repository @done (11/20/2025, 3:09:59 PM)
 ✔ any vs unknown @done (11/25/2025, 4:21:42 AM)
-☐ Narrow down error type
-☐ Add proper comments for method-Low priority
+✔ Narrow down error type @done (5/11/2026, 7:20:42 PM)
+✔ Add proper comments for method-Low priority @done (5/11/2026, 7:20:44 PM)
 ✔ Open closed principles and its implementation @done (11/10/2025, 6:46:12 PM)
 ✔ Routed in constant @done (12/11/2025, 12:21:44 AM)
 ✔ error interceptor @done (12/11/2025, 12:21:45 AM)
 ✔ error handling middle ware @done (12/11/2025, 12:21:47 AM)
-☐ eslint errors in backend
-☐ lint errors in frontend
+✔ eslint errors in backend @done (5/11/2026, 7:20:46 PM)
+✔ lint errors in frontend @done (5/11/2026, 7:20:46 PM)
 ✔ dl @done (11/13/2025, 1:16:50 PM)
 ✔ maxAge in env @done (11/10/2025, 6:41:58 PM)
 ✔ base repo @done (11/11/2025, 6:39:32 PM)
@@ -142,7 +142,7 @@ NEW PENDINGS...
 ✔ option to re-apply @done (1/13/2026, 11:06:12 PM)
 ✔ ask for confirmation @done (2/10/2026, 10:18:30 AM)
 ✔ user block / unblock - bug @done (1/13/2026, 11:06:20 PM)
-☐ avoid using any/void
+✔ avoid using any/void @done (5/11/2026, 7:21:21 PM)
 ✔ types of inheritance @done (1/13/2026, 11:07:50 PM)
 ✔ make the ui smaller especially footer @done (1/13/2026, 11:07:52 PM)
 ✔ make the profile pages perfect @done (2/8/2026, 12:56:33 PM)
@@ -178,9 +178,9 @@ NEW PENDINGS...
 ✔ when the role is switched correct page should be shown using auto refresh @done (2/10/2026, 10:20:36 AM)
 ✔ make document upload to cloudinary from frontend @done (2/20/2026, 12:16:43 PM)
 ✔ address edit and delete and also make default option @done (2/20/2026, 12:16:47 PM)
-☐ make the google login button responsive
+✔ make the google login button responsive @done (5/11/2026, 7:21:42 PM)
 ✔ adding category in admin side @done (2/10/2026, 10:20:49 AM)
-☐ duplicate category error fix 
+✔ duplicate category error fix @done (5/11/2026, 7:21:43 PM)
 ✔ fix category toggle error @done (2/10/2026, 10:20:54 AM)
 ✔ error handling interceptor @done (2/10/2026, 10:20:56 AM)
 ✔ 400 ,500 pages @done (2/10/2026, 10:20:57 AM)
@@ -200,7 +200,7 @@ NEW PENDINGS...
 ✔ list all the service requests in admin side @done (2/20/2026, 12:20:10 PM)
 ✔ show category name instead of id in service requests @done (2/20/2026, 12:20:13 PM)
 ✔ analyse how search and filters are done in admin side @done (2/20/2026, 12:20:17 PM)
-☐ back button issue after otp logged in 
+✔ back button issue after otp logged in @done (5/11/2026, 7:21:58 PM)
 ✔ how debouncing works @done (2/20/2026, 12:20:25 PM)
 ✔ CUSTOMER DETAILS ON REVEIW REQUEST @done (2/20/2026, 12:20:27 PM)
 ☐ show proper error message in add service request validation
@@ -343,7 +343,7 @@ NEXT REVIEW PENDINGS
 ✔ list review and rating in user side @done (5/11/2026, 3:56:22 PM)
 ✔ Add a concern-raising feature for users.-option to add attachment @done (5/6/2026, 5:37:08 PM)
 ✔ concern listing need list in admin @done (5/6/2026, 5:37:06 PM)
-☐ based concern -admin can do action
+✔ based concern -admin can do action @done (5/11/2026, 7:27:45 PM)
 ✔ notification for all action like meeting cancelled e.t.c @done (5/6/2026, 5:37:03 PM)
 ✔ real time chatting issue in message while reloading @done (5/11/2026, 1:08:22 PM)
 ✔ Admin Dashboard not completed @done (5/7/2026, 7:50:03 PM)
