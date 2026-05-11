@@ -5,6 +5,7 @@ import { IUserRepositoryFactory } from "../../../domain/repositories/IUserReposi
 import { IGetAllConcernsUseCase } from "../../interfaces/concern/IGetAllConcernsUseCase";
 import { Role } from "../../../shared/enums/authEnums";
 import { S3Service } from "../../../infrastructure/adapters/S3service";
+import { ConcernModel } from "../../../infrastructure/database/models/ConcernModel";
 
 export class GetAllConcernsUseCase implements IGetAllConcernsUseCase {
   constructor(
@@ -48,11 +49,24 @@ export class GetAllConcernsUseCase implements IGetAllConcernsUseCase {
         let serviceScheduledDate = undefined;
         let serviceAmount = undefined;
 
+        let workerId = "";
+        let workerIsSuspended = false;
+        let workerSuspensionEndDate = undefined;
+
+        let clientId = "";
+        let clientIsSuspended = false;
+        let clientSuspensionEndDate = undefined;
+
+        let workerConcernCount = 0;
+        let clientConcernCount = 0;
+
         if (service) {
           serviceName = service.title;
           serviceDescription = service.description;
           serviceScheduledDate = service.scheduledDate;
           serviceAmount = service.totalAmount;
+          workerId = service.workerId;
+          clientId = service.clientId;
 
           // Fetch Client details
           try {
@@ -62,6 +76,8 @@ export class GetAllConcernsUseCase implements IGetAllConcernsUseCase {
             if (client) {
               clientName = client.name;
               clientEmail = client.email;
+              clientIsSuspended = client.isSuspended ?? false;
+              clientSuspensionEndDate = client.suspensionEndDate;
             }
           } catch (e) {
             console.error("Error fetching client details in GetAllConcernsUseCase", e);
@@ -75,9 +91,35 @@ export class GetAllConcernsUseCase implements IGetAllConcernsUseCase {
             if (worker) {
               workerName = worker.name;
               workerEmail = worker.email;
+              workerIsSuspended = worker.isSuspended ?? false;
+              workerSuspensionEndDate = worker.suspensionEndDate;
             }
           } catch (e) {
             console.error("Error fetching worker details in GetAllConcernsUseCase", e);
+          }
+
+          // Calculate concern counts against the worker
+          try {
+            const workerServices = await this._serviceRepo.findByWorkerId(service.workerId);
+            const workerServiceIds = workerServices.map(s => s.serviceId);
+            workerConcernCount = await ConcernModel.countDocuments({
+              serviceId: { $in: workerServiceIds },
+              raisedBy: "CLIENT"
+            });
+          } catch (err) {
+            console.error("Error counting worker concerns:", err);
+          }
+
+          // Calculate concern counts against the client
+          try {
+            const clientServices = await this._serviceRepo.findByClientId(service.clientId);
+            const clientServiceIds = clientServices.map(s => s.serviceId);
+            clientConcernCount = await ConcernModel.countDocuments({
+              serviceId: { $in: clientServiceIds },
+              raisedBy: "WORKER"
+            });
+          } catch (err) {
+            console.error("Error counting client concerns:", err);
           }
         }
 
@@ -127,6 +169,14 @@ export class GetAllConcernsUseCase implements IGetAllConcernsUseCase {
           serviceDescription,
           serviceScheduledDate,
           serviceAmount,
+          workerId,
+          workerIsSuspended,
+          workerSuspensionEndDate: workerSuspensionEndDate ? workerSuspensionEndDate.toISOString() : undefined,
+          clientId,
+          clientIsSuspended,
+          clientSuspensionEndDate: clientSuspensionEndDate ? clientSuspensionEndDate.toISOString() : undefined,
+          workerConcernCount,
+          clientConcernCount,
         };
       })
     );

@@ -97,7 +97,8 @@ export class ControllerDI {
                 this._useCases.updateVerificationStatusUseCase,
                 this._useCases.updateUserAccessUseCase,
                 this._useCases.getAllUsersUseCase,
-                this._useCases.getAdminDashboardDataUseCase
+                this._useCases.getAdminDashboardDataUseCase,
+                this._infra.userRepository
             ));
     }
 

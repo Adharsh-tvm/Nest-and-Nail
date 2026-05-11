@@ -4,18 +4,34 @@ import { IBookWorkerUseCase } from "../../../domain/repositories/IBookWorkerUseC
 import { IServiceRepository } from "../../../domain/repositories/IServiceRepository";
 import { IWorkerRepository } from "../../../domain/repositories/IWorkerRepository";
 import { IWorkerScheduleRepository } from "../../../domain/repositories/IWorkerScheduleRepository";
-
-
+import { IBaseRepository } from "../../../domain/repositories/IBaseRepository";
+import { User } from "../../../domain/entities/User";
 
 export class BookWorkerUseCase implements IBookWorkerUseCase {
 
   constructor(
     private readonly _serviceRepo: IServiceRepository,
     private readonly _workerRepo: IWorkerRepository,
-    private readonly _scheduleRepo: IWorkerScheduleRepository
+    private readonly _scheduleRepo: IWorkerScheduleRepository,
+    private readonly _userRepo: IBaseRepository<User>
   ) { }
 
   async execute(dto: CreateServiceDTO): Promise<ServiceResponseDTO> {
+
+    // Enforce Client Suspension check
+    const client = await this._userRepo.findById(dto.clientId);
+    if (client?.isSuspended) {
+      if (client.suspensionEndDate && new Date() < new Date(client.suspensionEndDate)) {
+        throw new Error("Your account is currently suspended. You cannot book services at this time.");
+      } else {
+        // Auto unsuspend if suspension period is over
+        await this._userRepo.updateById(dto.clientId, {
+          isSuspended: false,
+          suspensionStartDate: null,
+          suspensionEndDate: null
+        });
+      }
+    }
 
     if (dto.category === "VIDEO_CALL") {
 
@@ -40,6 +56,21 @@ export class BookWorkerUseCase implements IBookWorkerUseCase {
 
     const worker = await this._workerRepo.findById(dto.workerId);
     if (!worker) throw new Error("Worker not found");
+
+    // Enforce Worker Suspension check
+    if (worker.isSuspended) {
+      if (worker.suspensionEndDate && new Date() < new Date(worker.suspensionEndDate)) {
+        throw new Error("This worker is currently suspended and cannot accept new bookings.");
+      } else {
+        // Auto unsuspend if suspension period is over
+        await this._workerRepo.updateById(dto.workerId, {
+          isSuspended: false,
+          suspensionStartDate: null,
+          suspensionEndDate: null,
+          canAcceptBookings: true
+        });
+      }
+    }
 
     if (!dto.numberOfWorkers || dto.numberOfWorkers < 1) {
       dto.numberOfWorkers = 1; // fallback

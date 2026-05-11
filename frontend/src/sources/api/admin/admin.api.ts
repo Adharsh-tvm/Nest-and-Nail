@@ -199,6 +199,18 @@ export async function toggleUserAccess(userId: string): Promise<User> {
   return mapUserFromApi(res.data.payload as Record<string, unknown>);
 }
 
+export async function toggleUserSuspension(userId: string, durationDays: number): Promise<User> {
+  const res = await axiosInstance.patch<ApiResponse<unknown>>(
+    ADMIN_ROUTES.SUSPEND(userId),
+    { durationDays }
+  );
+
+  if (!res.data.success) {
+    throw new Error(res.data.message || "Failed to toggle user suspension");
+  }
+  return mapUserFromApi(res.data.payload as Record<string, unknown>);
+}
+
 export async function fetchAllAdminServices(): Promise<AdminServiceResponseDTO[]> {
   try {
     const res = await axiosInstance.get<ApiResponse<AdminServiceResponseDTO[]>>(ADMIN_ROUTES.SERVICES);
@@ -276,6 +288,15 @@ export interface AdminConcern {
   serviceDescription?: string;
   serviceScheduledDate?: string;
   serviceAmount?: number;
+
+  workerId?: string;
+  workerIsSuspended?: boolean;
+  workerSuspensionEndDate?: string;
+  clientId?: string;
+  clientIsSuspended?: boolean;
+  clientSuspensionEndDate?: string;
+  workerConcernCount?: number;
+  clientConcernCount?: number;
 }
 
 export async function fetchAllAdminConcerns(params?: {

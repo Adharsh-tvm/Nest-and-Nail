@@ -12,19 +12,19 @@ export function createWorkerMeetingsRoutes(
     router.get(
         "/scheduled",
         authMiddleware.verify.bind(authMiddleware),
-        workerMeetingsController.getScheduledMeetings
+        (req, res) => { void workerMeetingsController.getScheduledMeetings(req, res); }
     );
 
     router.get(
         "/history",
         authMiddleware.verify.bind(authMiddleware),
-        workerMeetingsController.getMeetingsHistory
+        (req, res) => { void workerMeetingsController.getMeetingsHistory(req, res); }
     );
 
     router.get(
         "/:serviceId",
         authMiddleware.verify.bind(authMiddleware),
-        workerMeetingsController.getMeetingById
+        (req, res) => { void workerMeetingsController.getMeetingById(req, res); }
     );
 
     return router;

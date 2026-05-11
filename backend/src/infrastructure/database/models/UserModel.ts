@@ -24,6 +24,10 @@ export interface IUserDocument extends Document {
     totalRatings: number;
     weeklyJobCount: number;
     currentActiveRequestId?: string | null;
+    isSuspended?: boolean;
+    suspensionStartDate?: Date | null;
+    suspensionEndDate?: Date | null;
+    canAcceptBookings?: boolean;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -66,7 +70,12 @@ const UserSchema = new Schema<IUserDocument>(
 
         weeklyJobCount: { type: Number, default: 0 },
 
-        currentActiveRequestId: { type: String, default: null }
+        currentActiveRequestId: { type: String, default: null },
+
+        isSuspended: { type: Boolean, default: false },
+        suspensionStartDate: { type: Date, default: null },
+        suspensionEndDate: { type: Date, default: null },
+        canAcceptBookings: { type: Boolean, default: true }
     },
     {
         timestamps: true,

@@ -71,3 +71,13 @@ export async function getAdminDashboardDataAction() {
     return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
+
+export async function toggleUserSuspensionAction(userId: string, durationDays: number) {
+  try {
+    const { toggleUserSuspension } = await import("@/sources/api/admin/admin.api");
+    const res = await toggleUserSuspension(userId, durationDays);
+    return { success: true, payload: res };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
+  }
+}

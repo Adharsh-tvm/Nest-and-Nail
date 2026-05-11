@@ -8,6 +8,7 @@ export const ADMIN_ROUTES = {
     VERIFY: (id: string) => `${BASE}/verify/${id}`,
     REJECT: (id: string) => `${BASE}/reject/${id}`,
     ACCESS: (id: string) => `${BASE}/access/${id}`,
+    SUSPEND: (id: string) => `${BASE}/suspend/${id}`,
 
     SERVICES: `${BASE}/services`,
     SERVICE_DETAILS: (id: string) => `${BASE}/services/${id}`,

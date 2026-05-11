@@ -508,7 +508,8 @@ export class UseCaseDI {
     return (this._bookWorkerUseCase ??= new BookWorkerUseCase(
         this.infra.serviceRepository,
         this.infra.workerRepository,
-        this.infra.workerScheduleRepo
+        this.infra.workerScheduleRepo,
+        this.infra.userRepository
       ));
   }
 

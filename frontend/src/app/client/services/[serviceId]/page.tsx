@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   ArrowLeft, Calendar, Clock, MapPin, Phone, Mail, FileText, CreditCard,
-  CheckCircle2, Briefcase, User as UserIcon, Loader2, AlertTriangle, XCircle, Star, MessageSquare
+  CheckCircle2, Briefcase, User as UserIcon, Loader2, AlertTriangle, XCircle, Star
 } from "lucide-react";
 import Image from "next/image";
 import { ServiceResponseDTO, ServiceStatus, PaymentStatus } from "@/shared/types/serviceTypes";
@@ -353,7 +353,7 @@ export default function ClientServiceDetailsPage() {
                     </div>
                     
                     <p className="text-gray-700 text-sm leading-relaxed italic relative z-10">
-                      "{service.review.review || "No review description left."}"
+                      &ldquo;{service.review.review || "No review description left."}&rdquo;
                     </p>
                   </div>
                 </div>

@@ -20,7 +20,6 @@ import {
   AlertTriangle,
   X,
   Star,
-  MessageSquare,
 } from "lucide-react";
 import {
   ServiceResponseDTO,
@@ -948,7 +947,7 @@ export default function WorkerServiceDetailsPage() {
                       </div>
                       
                       <p className="text-gray-700 text-sm leading-relaxed italic relative z-10">
-                        "{service.review.review || "No review description left."}"
+                        &ldquo;{service.review.review || "No review description left."}&rdquo;
                       </p>
                     </div>
                   ) : (

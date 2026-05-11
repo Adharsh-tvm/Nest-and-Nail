@@ -16,10 +16,14 @@ import {
   ZoomIn,
   X,
   Briefcase,
+  ShieldAlert,
+  ShieldCheck,
+  UserMinus,
+  UserPlus,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { AdminConcern } from "@/sources/api/admin/admin.api";
-import { getAllConcernsAction } from "@/app/actions/admin/admin-actions";
+import { getAllConcernsAction, toggleUserSuspensionAction } from "@/app/actions/admin/admin-actions";
 import Pagination from "@/app/components/ui/Pagination";
 import Image from "next/image";
 
@@ -36,6 +40,29 @@ export default function AdminConcernsPage() {
   // UI state for expansions and media previews
   const [expandedConcernId, setExpandedConcernId] = useState<string | null>(null);
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
+  const [suspendingId, setSuspendingId] = useState<string | null>(null);
+
+  const handleToggleSuspension = async (userId: string, durationDays: number, userName: string) => {
+    try {
+      setSuspendingId(userId);
+      const isSuspending = durationDays > 0;
+      const res = await toggleUserSuspensionAction(userId, durationDays);
+      if (res.success) {
+        toast.success(
+          isSuspending 
+            ? `${userName} has been suspended for ${durationDays} days.` 
+            : `${userName} suspension has been lifted.`
+        );
+        loadConcerns();
+      } else {
+        toast.error(res.error || "Action failed");
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setSuspendingId(null);
+    }
+  };
 
 
 
@@ -377,33 +404,173 @@ export default function AdminConcernsPage() {
                     <div className="border-t border-gray-100 pt-6 animate-in slide-in-from-top-4 duration-300 space-y-6">
                       <div className="grid md:grid-cols-2 gap-6">
                         {/* Client Details Box */}
-                        <div className="p-5 rounded-2xl bg-white border border-gray-150 space-y-3 shadow-sm">
-                          <h6 className="text-xs font-bold uppercase tracking-wider text-emerald-600 flex items-center gap-1.5">
-                            <User className="w-4 h-4" /> Client Information
-                          </h6>
-                          <div className="space-y-1">
-                            <p className="text-sm font-extrabold text-gray-800">
-                              {concern.clientName || "—"}
-                            </p>
-                            <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
-                              <Mail className="w-3.5 h-3.5" /> {concern.clientEmail || "—"}
-                            </p>
+                        <div className="p-5 rounded-2xl bg-white border border-gray-150 space-y-4 shadow-sm flex flex-col justify-between">
+                          <div className="space-y-3">
+                            <h6 className="text-xs font-bold uppercase tracking-wider text-emerald-600 flex items-center gap-1.5">
+                              <User className="w-4 h-4" /> Client Information
+                            </h6>
+                            <div className="space-y-1">
+                              <p className="text-sm font-extrabold text-gray-800">
+                                {concern.clientName || "—"}
+                              </p>
+                              <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
+                                <Mail className="w-3.5 h-3.5" /> {concern.clientEmail || "—"}
+                              </p>
+                            </div>
+
+                            <div className="border-t border-gray-100 pt-2.5 space-y-2">
+                              <div className="flex items-center justify-between text-xs font-semibold text-gray-500">
+                                <span>Concerns against Client:</span>
+                                <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
+                                  (concern.clientConcernCount || 0) > 5 
+                                    ? "bg-red-100 text-red-700 animate-pulse" 
+                                    : "bg-gray-100 text-gray-700"
+                                }`}>
+                                  {concern.clientConcernCount || 0}
+                                </span>
+                              </div>
+
+                              {(concern.clientConcernCount || 0) > 5 && (
+                                <div className="flex items-center gap-1.5 bg-red-50 text-red-700 border border-red-200 p-2.5 rounded-xl text-xs font-bold">
+                                  <AlertTriangle className="w-4 h-4 shrink-0 animate-bounce" />
+                                  <span>Critical: More than 5 concerns recorded!</span>
+                                </div>
+                              )}
+
+                              {concern.clientIsSuspended ? (
+                                <div className="bg-rose-50 border border-rose-200 p-3 rounded-xl space-y-2 text-xs">
+                                  <div className="flex items-center gap-1.5 text-rose-700 font-extrabold">
+                                    <ShieldAlert className="w-4 h-4 text-rose-600" />
+                                    <span>Currently Suspended</span>
+                                  </div>
+                                  <p className="text-gray-500 font-medium">
+                                    Ends: {concern.clientSuspensionEndDate ? new Date(concern.clientSuspensionEndDate).toLocaleDateString() : "—"}
+                                  </p>
+                                </div>
+                              ) : (
+                                <div className="bg-emerald-50 border border-emerald-100 p-2 rounded-xl flex items-center gap-1.5 text-xs text-emerald-700 font-semibold">
+                                  <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                                  <span>Active (No suspension)</span>
+                                </div>
+                              )}
+                            </div>
                           </div>
+
+                          {concern.clientId && (
+                            <div className="pt-4 border-t border-gray-100 flex flex-col gap-2">
+                              {concern.clientIsSuspended ? (
+                                <button
+                                  onClick={() => handleToggleSuspension(concern.clientId!, 0, concern.clientName || "Client")}
+                                  disabled={suspendingId !== null}
+                                  className="w-full py-2 bg-rose-600 hover:bg-rose-700 disabled:bg-rose-400 text-white rounded-xl text-xs font-black tracking-wider transition-colors flex items-center justify-center gap-1.5 shadow-md shadow-rose-200"
+                                >
+                                  <UserPlus className="w-4 h-4" /> Lift Suspension
+                                </button>
+                              ) : (
+                                <div className="grid grid-cols-2 gap-2">
+                                  <button
+                                    onClick={() => handleToggleSuspension(concern.clientId!, 5, concern.clientName || "Client")}
+                                    disabled={suspendingId !== null}
+                                    className="py-2 px-3 bg-amber-500 hover:bg-amber-600 disabled:bg-amber-300 text-white rounded-xl text-[11px] font-black tracking-wider transition-all flex items-center justify-center gap-1 shadow-md shadow-amber-100"
+                                  >
+                                    <UserMinus className="w-3.5 h-3.5" /> Suspend 5 Days
+                                  </button>
+                                  <button
+                                    onClick={() => handleToggleSuspension(concern.clientId!, 7, concern.clientName || "Client")}
+                                    disabled={suspendingId !== null}
+                                    className="py-2 px-3 bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white rounded-xl text-[11px] font-black tracking-wider transition-all flex items-center justify-center gap-1 shadow-md shadow-red-100"
+                                  >
+                                    <UserMinus className="w-3.5 h-3.5" /> Suspend 7 Days
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
 
                         {/* Worker Details Box */}
-                        <div className="p-5 rounded-2xl bg-white border border-gray-150 space-y-3 shadow-sm">
-                          <h6 className="text-xs font-bold uppercase tracking-wider text-blue-600 flex items-center gap-1.5">
-                            <User className="w-4 h-4" /> Assigned Worker Information
-                          </h6>
-                          <div className="space-y-1">
-                            <p className="text-sm font-extrabold text-gray-800">
-                              {concern.workerName || "—"}
-                            </p>
-                            <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
-                              <Mail className="w-3.5 h-3.5" /> {concern.workerEmail || "—"}
-                            </p>
+                        <div className="p-5 rounded-2xl bg-white border border-gray-150 space-y-4 shadow-sm flex flex-col justify-between">
+                          <div className="space-y-3">
+                            <h6 className="text-xs font-bold uppercase tracking-wider text-blue-600 flex items-center gap-1.5">
+                              <User className="w-4 h-4" /> Assigned Worker Information
+                            </h6>
+                            <div className="space-y-1">
+                              <p className="text-sm font-extrabold text-gray-800">
+                                {concern.workerName || "—"}
+                              </p>
+                              <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
+                                <Mail className="w-3.5 h-3.5" /> {concern.workerEmail || "—"}
+                              </p>
+                            </div>
+
+                            <div className="border-t border-gray-100 pt-2.5 space-y-2">
+                              <div className="flex items-center justify-between text-xs font-semibold text-gray-500">
+                                <span>Concerns against Worker:</span>
+                                <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
+                                  (concern.workerConcernCount || 0) > 5 
+                                    ? "bg-red-100 text-red-700 animate-pulse" 
+                                    : "bg-gray-100 text-gray-700"
+                                }`}>
+                                  {concern.workerConcernCount || 0}
+                                </span>
+                              </div>
+
+                              {(concern.workerConcernCount || 0) > 5 && (
+                                <div className="flex items-center gap-1.5 bg-red-50 text-red-700 border border-red-200 p-2.5 rounded-xl text-xs font-bold">
+                                  <AlertTriangle className="w-4 h-4 shrink-0 animate-bounce" />
+                                  <span>Critical: More than 5 concerns recorded!</span>
+                                </div>
+                              )}
+
+                              {concern.workerIsSuspended ? (
+                                <div className="bg-rose-50 border border-rose-200 p-3 rounded-xl space-y-2 text-xs">
+                                  <div className="flex items-center gap-1.5 text-rose-700 font-extrabold">
+                                    <ShieldAlert className="w-4 h-4 text-rose-600" />
+                                    <span>Currently Suspended</span>
+                                  </div>
+                                  <p className="text-gray-500 font-medium">
+                                    Ends: {concern.workerSuspensionEndDate ? new Date(concern.workerSuspensionEndDate).toLocaleDateString() : "—"}
+                                  </p>
+                                </div>
+                              ) : (
+                                <div className="bg-blue-50 border border-blue-100 p-2 rounded-xl flex items-center gap-1.5 text-xs text-blue-700 font-semibold">
+                                  <ShieldCheck className="w-4 h-4 text-blue-600" />
+                                  <span>Active (No suspension)</span>
+                                </div>
+                              )}
+                            </div>
                           </div>
+
+                          {concern.workerId && (
+                            <div className="pt-4 border-t border-gray-100 flex flex-col gap-2">
+                              {concern.workerIsSuspended ? (
+                                <button
+                                  onClick={() => handleToggleSuspension(concern.workerId!, 0, concern.workerName || "Worker")}
+                                  disabled={suspendingId !== null}
+                                  className="w-full py-2 bg-rose-600 hover:bg-rose-700 disabled:bg-rose-400 text-white rounded-xl text-xs font-black tracking-wider transition-colors flex items-center justify-center gap-1.5 shadow-md shadow-rose-200"
+                                >
+                                  <UserPlus className="w-4 h-4" /> Lift Suspension
+                                </button>
+                              ) : (
+                                <div className="grid grid-cols-2 gap-2">
+                                  <button
+                                    onClick={() => handleToggleSuspension(concern.workerId!, 5, concern.workerName || "Worker")}
+                                    disabled={suspendingId !== null}
+                                    className="py-2 px-3 bg-amber-500 hover:bg-amber-600 disabled:bg-amber-300 text-white rounded-xl text-[11px] font-black tracking-wider transition-all flex items-center justify-center gap-1 shadow-md shadow-amber-100"
+                                  >
+                                    <UserMinus className="w-3.5 h-3.5" /> Suspend 5 Days
+                                  </button>
+                                  <button
+                                    onClick={() => handleToggleSuspension(concern.workerId!, 7, concern.workerName || "Worker")}
+                                    disabled={suspendingId !== null}
+                                    className="py-2 px-3 bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white rounded-xl text-[11px] font-black tracking-wider transition-all flex items-center justify-center gap-1 shadow-md shadow-red-100"
+                                  >
+                                    <UserMinus className="w-3.5 h-3.5" /> Suspend 7 Days
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
                       </div>
 

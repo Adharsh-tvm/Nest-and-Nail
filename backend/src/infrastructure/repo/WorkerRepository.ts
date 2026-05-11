@@ -64,6 +64,7 @@ export class WorkerRepository extends BaseRepository<Worker, IWorkerDocument> im
             role: "worker",
             isBlocked: false,
             isVerified: "VERIFIED",
+            isSuspended: { $ne: true }
         };
         if (isOnline === true) baseMatch.isOnline = true;
         if (search && search.trim().length > 0) {

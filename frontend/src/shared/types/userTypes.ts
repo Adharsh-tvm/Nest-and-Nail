@@ -28,6 +28,10 @@ export type User = {
   totalRatings?: number;
   weeklyJobCount?: number;
   currentActiveRequestId?: string;
+  isSuspended?: boolean;
+  suspensionStartDate?: string;
+  suspensionEndDate?: string;
+  canAcceptBookings?: boolean;
 
   iat?: number;
   exp?: number;
