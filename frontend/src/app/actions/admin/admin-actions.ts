@@ -81,3 +81,13 @@ export async function toggleUserSuspensionAction(userId: string, durationDays: n
     return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
+
+export async function resolveConcernAction(concernId: string, resolutionMessage: string) {
+  try {
+    const { resolveConcern } = await import("@/sources/api/admin/admin.api");
+    const res = await resolveConcern(concernId, resolutionMessage);
+    return { success: true, payload: res };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
+  }
+}

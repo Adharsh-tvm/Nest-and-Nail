@@ -14,4 +14,6 @@ export interface IConcernRepository {
         total: number;
         totalPages: number;
     }>;
+    findById(concernId: string): Promise<Concern | null>;
+    update(concernId: string, data: Partial<Concern>): Promise<Concern | null>;
 }

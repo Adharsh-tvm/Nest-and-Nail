@@ -12,6 +12,7 @@ export interface ConcernDocument extends Document {
   updatedAt: Date;
   resolvedAt?: Date;
   resolvedBy?: string;
+  resolutionMessage?: string;
   images?: string[];
 }
 
@@ -60,6 +61,11 @@ const ConcernSchema = new Schema<ConcernDocument>(
 
     resolvedBy: {
       type: String
+    },
+
+    resolutionMessage: {
+      type: String,
+      trim: true
     },
 
     images: {

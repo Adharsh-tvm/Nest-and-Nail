@@ -297,6 +297,9 @@ export interface AdminConcern {
   clientSuspensionEndDate?: string;
   workerConcernCount?: number;
   clientConcernCount?: number;
+  resolvedAt?: string;
+  resolvedBy?: string;
+  resolutionMessage?: string;
 }
 
 export async function fetchAllAdminConcerns(params?: {
@@ -336,5 +339,21 @@ export async function fetchAdminDashboardData(): Promise<unknown> {
   } catch (error: unknown) {
     const message = axios.isAxiosError(error) ? error.response?.data?.message : (error instanceof Error ? error.message : undefined);
     throw new Error(message || "Failed to fetch dashboard data");
+  }
+}
+
+export async function resolveConcern(concernId: string, resolutionMessage: string): Promise<AdminConcern> {
+  try {
+    const res = await axiosInstance.patch<ApiResponse<AdminConcern>>(
+      `/api/admin/concerns/${concernId}/resolve`,
+      { resolutionMessage }
+    );
+    if (!res.data.success) {
+      throw new Error(res.data.message || "Failed to resolve concern");
+    }
+    return res.data.payload;
+  } catch (error: unknown) {
+    const message = axios.isAxiosError(error) ? error.response?.data?.message : (error instanceof Error ? error.message : undefined);
+    throw new Error(message || "Failed to resolve concern");
   }
 }

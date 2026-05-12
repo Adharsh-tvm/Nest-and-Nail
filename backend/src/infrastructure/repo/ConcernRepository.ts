@@ -55,4 +55,12 @@ export class ConcernRepository implements IConcernRepository {
             totalPages: Math.ceil(total / limit)
         };
     }
+
+    async findById(concernId: string): Promise<Concern | null> {
+        return ConcernModel.findOne({ concernId });
+    }
+
+    async update(concernId: string, data: Partial<Concern>): Promise<Concern | null> {
+        return ConcernModel.findOneAndUpdate({ concernId }, { $set: data }, { new: true });
+    }
 }

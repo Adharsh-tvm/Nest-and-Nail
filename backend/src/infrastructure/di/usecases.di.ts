@@ -148,6 +148,8 @@ import { IGetAllConcernsUseCase } from "../../application/interfaces/concern/IGe
 import { CreateConcernUseCase } from "../../application/use-cases/concern/CreateConcernUseCase";
 import { GetUserConcernsUseCase } from "../../application/use-cases/concern/GetUserConcernsUseCase";
 import { GetAllConcernsUseCase } from "../../application/use-cases/concern/GetAllConcernsUseCase";
+import { IResolveConcernUseCase } from "../../application/interfaces/concern/IResolveConcernUseCase";
+import { ResolveConcernUseCase } from "../../application/use-cases/concern/ResolveConcernUseCase";
 import { IAddReviewUseCase } from "../../application/interfaces/review/IAddReviewUseCase";
 import { AddReviewUseCase } from "../../application/use-cases/review/AddReviewUseCase";
 import { ISendNotificationUseCase } from "../../application/interfaces/notifications/ISendNotificationUseCase";
@@ -247,6 +249,7 @@ export class UseCaseDI {
   private _createConcernUseCase?: ICreateConcernUseCase;
   private _getUserConcernsUseCase?: IGetUserConcernsUseCase;
   private _getAllConcernsUseCase?: IGetAllConcernsUseCase;
+  private _resolveConcernUseCase?: IResolveConcernUseCase;
   private _addReviewUseCase?: IAddReviewUseCase;
 
   private _sendNotificationUseCase?: ISendNotificationUseCase;
@@ -771,6 +774,12 @@ export class UseCaseDI {
         this.infra.serviceRepository,
         this.infra.userRepositoryFactory,
         this.infra.s3Service
+      ));
+  }
+
+  get resolveConcernUseCase(): IResolveConcernUseCase {
+    return (this._resolveConcernUseCase ??= new ResolveConcernUseCase(
+        this.infra.concernRepository
       ));
   }
 

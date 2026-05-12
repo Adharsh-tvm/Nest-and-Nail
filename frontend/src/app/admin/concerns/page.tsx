@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { AdminConcern } from "@/sources/api/admin/admin.api";
-import { getAllConcernsAction, toggleUserSuspensionAction } from "@/app/actions/admin/admin-actions";
+import { getAllConcernsAction, toggleUserSuspensionAction, resolveConcernAction } from "@/app/actions/admin/admin-actions";
 import Pagination from "@/app/components/ui/Pagination";
 import Image from "next/image";
 
@@ -41,6 +41,35 @@ export default function AdminConcernsPage() {
   const [expandedConcernId, setExpandedConcernId] = useState<string | null>(null);
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
   const [suspendingId, setSuspendingId] = useState<string | null>(null);
+
+  // Resolution states
+  const [resolvingId, setResolvingId] = useState<string | null>(null);
+  const [resolutionText, setResolutionText] = useState("");
+  const [submittingResolution, setSubmittingResolution] = useState(false);
+
+  const handleSubmitResolution = async (concernId: string) => {
+    if (!resolutionText.trim()) {
+      toast.error("Resolution message is required");
+      return;
+    }
+
+    try {
+      setSubmittingResolution(true);
+      const res = await resolveConcernAction(concernId, resolutionText);
+      if (res.success) {
+        toast.success("Concern resolved successfully");
+        setResolvingId(null);
+        setResolutionText("");
+        loadConcerns();
+      } else {
+        toast.error(res.error || "Failed to resolve concern");
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setSubmittingResolution(false);
+    }
+  };
 
   const handleToggleSuspension = async (userId: string, durationDays: number, userName: string) => {
     try {
@@ -398,6 +427,79 @@ export default function AdminConcernsPage() {
                       </>
                     )}
                   </button>
+
+                  {/* Resolution Section */}
+                  {concern.status.toUpperCase() === "RESOLVED" ? (
+                    concern.resolutionMessage && (
+                      <div className="bg-emerald-50/40 border border-emerald-100 p-4 rounded-xl space-y-2">
+                        <div className="flex items-center gap-2 text-emerald-800 font-extrabold text-xs">
+                          <CheckCircle className="w-4 h-4 text-emerald-600" />
+                          <span>Resolution Details</span>
+                        </div>
+                        <p className="text-xs text-emerald-700 font-medium whitespace-pre-wrap bg-white/60 p-3 rounded-lg border border-emerald-150/40">
+                          {concern.resolutionMessage}
+                        </p>
+                        <div className="text-[10px] text-emerald-600/80 flex justify-between items-center font-medium mt-1">
+                          <span>Resolved By: {concern.resolvedBy || "ADMIN"}</span>
+                          <span>
+                            {concern.resolvedAt
+                              ? new Date(concern.resolvedAt).toLocaleString()
+                              : "—"}
+                          </span>
+                        </div>
+                      </div>
+                    )
+                  ) : (
+                    <div className="pt-2">
+                      {resolvingId === concern._id ? (
+                        <div className="space-y-3 bg-slate-50/50 p-4 rounded-xl border border-slate-150 animate-in slide-in-from-top-2 duration-200">
+                          <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider">
+                            Describe resolution message (required)
+                          </label>
+                          <textarea
+                            value={resolutionText}
+                            onChange={(e) => setResolutionText(e.target.value)}
+                            placeholder="Describe how this customer's concern was resolved, any actions taken, or refund outcomes..."
+                            rows={3}
+                            className="w-full p-3 rounded-xl border border-gray-150 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-gray-800 font-medium"
+                          />
+                          <div className="flex items-center justify-end gap-2 pt-1">
+                            <button
+                              onClick={() => {
+                                setResolvingId(null);
+                                setResolutionText("");
+                              }}
+                              className="px-4 py-2 hover:bg-slate-100 border border-slate-250 text-slate-700 rounded-xl text-xs font-bold transition-colors"
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              onClick={() => handleSubmitResolution(concern._id)}
+                              disabled={submittingResolution || !resolutionText.trim()}
+                              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-300 text-white rounded-xl text-xs font-black tracking-wider transition-all shadow-md shadow-emerald-100 flex items-center gap-1.5"
+                            >
+                              {submittingResolution ? (
+                                <span className="animate-spin inline-block w-3 h-3 border-2 border-white border-t-transparent rounded-full" />
+                              ) : (
+                                <CheckCircle className="w-4 h-4" />
+                              )}
+                              Mark as Resolved
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => {
+                            setResolvingId(concern._id);
+                            setResolutionText("");
+                          }}
+                          className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl flex items-center justify-center gap-1.5 text-xs font-black tracking-wider transition-colors shadow-lg shadow-emerald-100 hover:scale-[1.01] active:scale-95"
+                        >
+                          <CheckCircle className="w-4.5 h-4.5" /> Resolve Concern
+                        </button>
+                      )}
+                    </div>
+                  )}
 
                   {/* Expanded block containing every single other detail */}
                   {isExpanded && (

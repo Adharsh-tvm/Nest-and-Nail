@@ -254,7 +254,8 @@ export class ControllerDI {
 
     get adminConcernController(): AdminConcernController {
         return (this._adminConcernController ??= new AdminConcernController(
-                this._useCases.getAllConcernsUseCase
+                this._useCases.getAllConcernsUseCase,
+                this._useCases.resolveConcernUseCase
             ));
     }
 
