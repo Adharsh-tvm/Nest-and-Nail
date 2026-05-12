@@ -13,19 +13,19 @@ export function createClientMeetingsRoutes(
     router.get(
         "/scheduled",
         authMiddleware.verify.bind(authMiddleware),
-        (req, res) => { void clientMeetingsController.getScheduledMeetings(req, res); }
+        (req, res, next) => { void clientMeetingsController.getScheduledMeetings(req, res, next); }
     );
 
     router.get(
         "/history",
         authMiddleware.verify.bind(authMiddleware),
-        (req, res) => { void clientMeetingsController.getMeetingsHistory(req, res); }
+        (req, res, next) => { void clientMeetingsController.getMeetingsHistory(req, res, next); }
     );
 
     router.get(
         "/:serviceId",
         authMiddleware.verify.bind(authMiddleware),
-        (req, res) => { void clientMeetingsController.getMeetingById(req, res); }
+        (req, res, next) => { void clientMeetingsController.getMeetingById(req, res, next); }
     );
 
     return router;

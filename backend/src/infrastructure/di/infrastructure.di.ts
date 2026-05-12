@@ -49,6 +49,8 @@ import { INotificationRepository } from "../../domain/repositories/INotification
 import { NotificationRepository } from "../repo/NotificationRepository";
 import { IChatRepository } from "../../domain/repositories/IChatRepository";
 import { ChatRepository } from "../repo/ChatRepository";
+import { IClientWorkerRestrictionRepository } from "../../domain/repositories/IClientWorkerRestrictionRepository";
+import { ClientWorkerRestrictionRepository } from "../repo/ClientWorkerRestrictionRepository";
 
 export class InfrastructureDI {
   private _userRepositoryFactory?: IUserRepositoryFactory;
@@ -64,6 +66,7 @@ export class InfrastructureDI {
   private _transactionRepository?: ITransactionRepository;
   private _concernRepository?: IConcernRepository;
   private _reviewRepository?: IReviewRepository;
+  private _clientWorkerRestrictionRepository?: IClientWorkerRestrictionRepository;
 
   private _paymentGateway?: IPaymentGateway;
 
@@ -198,5 +201,9 @@ export class InfrastructureDI {
 
   get chatRepository(): IChatRepository {
     return (this._chatRepository ??= new ChatRepository());
+  }
+
+  get clientWorkerRestrictionRepository(): IClientWorkerRestrictionRepository {
+    return (this._clientWorkerRestrictionRepository ??= new ClientWorkerRestrictionRepository());
   }
 }

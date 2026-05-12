@@ -31,4 +31,7 @@ export interface IServiceRepository {
         serviceId: string,
         data: { cancelledAt: Date; reason?: string }
     ): Promise<void>;
+
+    findPassedConfirmedPhysicalServices(now: Date): Promise<Service[]>;
+    findPassedConfirmedVideoCalls(now: Date): Promise<Service[]>;
 }    

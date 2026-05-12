@@ -20,6 +20,8 @@ import { IUpdateUserProfileUseCase } from "../../application/interfaces/user/IUp
 import { IUpdateUserSkillsUseCase } from "../../application/interfaces/user/IUpdateUserSkillsUseCase";
 import { IUpdateVerificationStatusUseCase } from "../../application/interfaces/admin/IUpdateVerificationStatusUseCase";
 import { IUpdateWorkerCategoriesUseCase } from "../../application/interfaces/worker/profile/IUpdateWorkerCategoriesUseCase";
+import { IProcessModerationActionsUseCase } from "../../application/interfaces/moderation/IProcessModerationActionsUseCase";
+import { ProcessModerationActionsUseCase } from "../../application/use-cases/moderation/ProcessModerationActionsUseCase";
 
 import { IUploadProfilePictureUseCase } from "../../application/interfaces/user/IUploadProfilePictureUseCase";
 import { IUploadWorkerDocumentUseCase } from "../../application/interfaces/user/IUploadWorkerDocumentUseCase";
@@ -250,6 +252,7 @@ export class UseCaseDI {
   private _sendNotificationUseCase?: ISendNotificationUseCase;
   private _sendMessageUseCase?: ISendMessageUseCase;
   private _getMessagesUseCase?: IGetMessagesUseCase;
+  private _processModerationActionsUseCase?: IProcessModerationActionsUseCase;
 
 
 
@@ -509,7 +512,8 @@ export class UseCaseDI {
         this.infra.serviceRepository,
         this.infra.workerRepository,
         this.infra.workerScheduleRepo,
-        this.infra.userRepository
+        this.infra.userRepository,
+        this.infra.clientWorkerRestrictionRepository
       ));
   }
 
@@ -804,4 +808,16 @@ export class UseCaseDI {
       ));
   }
 
+  get processModerationActionsUseCase(): IProcessModerationActionsUseCase {
+    return (this._processModerationActionsUseCase ??= new ProcessModerationActionsUseCase(
+        this.infra.serviceRepository,
+        this.infra.workerRepository,
+        this.infra.userRepository,
+        this.infra.walletRepository,
+        this.infra.transactionRepository,
+        this.infra.clientWorkerRestrictionRepository,
+        this.infra.userRepositoryFactory,
+        this.sendNotificationUseCase
+      ));
+  }
 }

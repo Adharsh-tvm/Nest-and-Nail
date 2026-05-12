@@ -62,6 +62,21 @@ async function bootstrap() {
   
   // Routes
   app.use("/", createRoutes(container));
+
+  // Start automatic moderation checking background job (runs every 15 minutes)
+  const MODERATION_CHECK_INTERVAL_MS = 15 * 60 * 1000;
+  setInterval(() => {
+    void (async () => {
+      try {
+        container.infra.logger.info("Running automatic moderation detection checks...");
+        const result = await container.useCases.processModerationActionsUseCase.execute();
+        container.infra.logger.info(`Automatic moderation check completed. Case 1: ${String(result.case1ProcessedCount)} physical no-shows, Case 2: ${String(result.case2ProcessedCount)} worker meeting absences, Case 3: ${String(result.case3ProcessedCount)} client meeting absences.`);
+      } catch (err: unknown) {
+        const errMsg = err instanceof Error ? err.message : String(err);
+        container.infra.logger.error(`Error running automatic moderation background check: ${errMsg}`);
+      }
+    })();
+  }, MODERATION_CHECK_INTERVAL_MS);
   
   // Start server
   const PORT = env.PORT;

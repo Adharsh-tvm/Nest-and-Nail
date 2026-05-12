@@ -1,4 +1,5 @@
 import { AdminController } from "../../presentation/controllers/admin/AdminController";
+import { AdminModerationController } from "../../presentation/controllers/admin/AdminModerationController";
 import { AuthController } from "../../presentation/controllers/auth/AuthController";
 import { CategoryController } from "../../presentation/controllers/worker/CategoryController";
 import { ClientServiceController } from "../../presentation/controllers/client/ClientServiceController";
@@ -46,6 +47,7 @@ export class ControllerDI {
     private _clientController?: ClientController;
     private _clientServiceController?: ClientServiceController;
     private _adminServiceControler?: AdminServiceController;
+    private _adminModerationController?: AdminModerationController;
 
     private _workerServiceController?: WorkerServiceController;
     private _workerController?: WorkerController;
@@ -281,6 +283,12 @@ export class ControllerDI {
                 this._useCases.getClientTransactionsUseCase,
                 this._useCases.getWorkerTransactionsUseCase,
                 this._useCases.getAllTransactionsUseCase
+            ));
+    }
+
+    get adminModerationController(): AdminModerationController {
+        return (this._adminModerationController ??= new AdminModerationController(
+                this._useCases.processModerationActionsUseCase
             ));
     }
 }

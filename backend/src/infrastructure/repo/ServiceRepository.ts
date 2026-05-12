@@ -297,4 +297,23 @@ export class ServiceRepository implements IServiceRepository {
             }
         );
     }
+
+    async findPassedConfirmedPhysicalServices(now: Date): Promise<Service[]> {
+        const docs = await ServiceModel.find({
+            category: { $ne: "VIDEO_CALL" },
+            status: ServiceStatus.CONFIRMED,
+            scheduledDate: { $lt: now },
+            startedAt: { $exists: false }
+        }).lean();
+        return docs as unknown as Service[];
+    }
+
+    async findPassedConfirmedVideoCalls(now: Date): Promise<Service[]> {
+        const docs = await ServiceModel.find({
+            category: "VIDEO_CALL",
+            status: ServiceStatus.CONFIRMED,
+            "videoCall.endTime": { $lt: now }
+        }).lean();
+        return docs as unknown as Service[];
+    }
 }
