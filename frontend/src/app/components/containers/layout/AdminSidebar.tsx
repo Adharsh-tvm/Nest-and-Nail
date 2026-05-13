@@ -54,11 +54,11 @@ const navItems = [
   },
 
   {
-    id: "payments",
-    label: "Payments",
+    id: "transactions",
+    label: "Transactions",
     icon: CreditCard,
-    href: "/admin/payments",
-  },
+    href: "/admin/transactions",
+  }, 
   {
     id: "concerns",
     label: "Concerns",
