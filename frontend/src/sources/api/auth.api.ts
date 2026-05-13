@@ -38,7 +38,7 @@ export const authApi = {
       payload
     ),
 
-  signup: (payload: any) =>
+  signup: (payload: Record<string, unknown>) =>
     axiosInstance.post<ApiResponse<AuthPayload>>(
       "/api/auth/register",
       payload

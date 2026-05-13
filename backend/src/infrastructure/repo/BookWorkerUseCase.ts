@@ -29,7 +29,7 @@ export class BookWorkerUseCase implements IBookWorkerUseCase {
         slot.slotType
       );
 
-      if (existing && existing.isBooked) {
+      if (existing?.isBooked) {
         throw new Error(`Slot already booked for date: ${slot.date.toISOString().split('T')[0]}`);
       }
     }

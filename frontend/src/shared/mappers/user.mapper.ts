@@ -15,7 +15,9 @@ export interface RawUserApiData {
   profile_picture?: string | null;
   isBlocked?: boolean;
   isOnline?: boolean;
-  isVerified?: string;
+  isVerified?: string | boolean;
+  is_verified?: string | boolean;
+  verified?: string | boolean;
   skills?: string[];
   address?: unknown[];
   documents?: unknown[];

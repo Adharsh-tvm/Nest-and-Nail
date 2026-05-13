@@ -2,7 +2,7 @@
 
 import axiosInstance from "@/lib/axiosInstance";
 import { VerificationStatus } from "@/shared/enums/authEnums";
-import { mapUserFromApi } from "@/shared/mappers/user.mapper";
+import { mapUserFromApi, RawUserApiData } from "@/shared/mappers/user.mapper";
 import { ApiResponse } from "@/shared/types/responseTypes";
 import { User, UserQueryParams } from "@/shared/types/userTypes";
 
@@ -39,7 +39,7 @@ export type Worker = {
 
 /* ---------------- HELPERS ---------------- */
 
-function normalizeVerification(value: any): VerificationStatus {
+function normalizeVerification(value: unknown): VerificationStatus {
   if (
     value === true ||
     value === 1 ||
@@ -58,9 +58,11 @@ function normalizeVerification(value: any): VerificationStatus {
 
 /* ---------------- API CALLS ---------------- */
 
+
+
 export async function fetchAllClients(): Promise<Client[]> {
   try {
-    const res = await axiosInstance.get<ApiResponse<any[]>>(
+    const res = await axiosInstance.get<ApiResponse<RawUserApiData[]>>(
       "/api/admin/clients"
     );
 
@@ -73,15 +75,16 @@ export async function fetchAllClients(): Promise<Client[]> {
       isVerified: normalizeVerification(
         u.isVerified ?? u.is_verified ?? u.verified
       ),
-    }));
-  } catch (error: any) {
-    throw new Error(error.normalizedMessage || "Failed to fetch clients");
+    })) as unknown as Client[];
+  } catch (error: unknown) {
+    const msg = error && typeof error === 'object' && 'normalizedMessage' in error ? String((error as { normalizedMessage: unknown }).normalizedMessage) : "Failed to fetch clients";
+    throw new Error(msg);
   }
 }
 
 export async function fetchAllWorkers(): Promise<Worker[]> {
   try {
-    const res = await axiosInstance.get<ApiResponse<any[]>>(
+    const res = await axiosInstance.get<ApiResponse<RawUserApiData[]>>(
       "/api/admin/workers"
     );
 
@@ -94,9 +97,10 @@ export async function fetchAllWorkers(): Promise<Worker[]> {
       isVerified: normalizeVerification(
         u.isVerified ?? u.is_verified ?? u.verified
       ),
-    }));
-  } catch (error: any) {
-    throw new Error(error.normalizedMessage || "Failed to fetch workers");
+    })) as unknown as Worker[];
+  } catch (error: unknown) {
+    const msg = error && typeof error === 'object' && 'normalizedMessage' in error ? String((error as { normalizedMessage: unknown }).normalizedMessage) : "Failed to fetch workers";
+    throw new Error(msg);
   }
 }
 
@@ -135,7 +139,7 @@ export async function fetchAllUsers(
   const queryString = buildQueryString(params);
   const url = `/api/admin/users/all${queryString ? `?${queryString}` : ""}`;
 
-  const res = await axiosInstance.get<ApiResponse<any>>(url);
+  const res = await axiosInstance.get<ApiResponse<{ users?: RawUserApiData[]; total?: number; totalPages?: number } | RawUserApiData[]>>(url);
 
   if (!res.data.success) {
     throw new Error(res.data.message || "Failed to fetch users");
@@ -144,15 +148,16 @@ export async function fetchAllUsers(
   // Handle both array response (legacy) and paginated response
   if (Array.isArray(res.data.payload)) {
     return {
-      users: res.data.payload.map(mapUserFromApi),
+      users: (res.data.payload as RawUserApiData[]).map(mapUserFromApi),
       total: res.data.payload.length,
       totalPages: 1,
     };
   } else {
+    const payload = res.data.payload as { users?: RawUserApiData[]; total?: number; totalPages?: number } | null;
     return {
-      users: (res.data.payload.users || []).map(mapUserFromApi),
-      total: res.data.payload.total || 0,
-      totalPages: res.data.payload.totalPages || 1,
+      users: (payload?.users || []).map(mapUserFromApi),
+      total: payload?.total || 0,
+      totalPages: payload?.totalPages || 1,
     };
   }
 }
@@ -182,7 +187,7 @@ export async function rejectVerification(
 }
 
 export async function toggleUserAccess(userId: string): Promise<User> {
-  const res = await axiosInstance.patch<ApiResponse<null>>(
+  const res = await axiosInstance.patch<ApiResponse<RawUserApiData>>(
     `/api/admin/access/${userId}`
   );
 

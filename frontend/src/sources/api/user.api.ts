@@ -7,7 +7,7 @@ import { User } from "@/shared/types/userTypes";
 
 
 export type UpdateRolePayload = {
-  user: any;
+  user: User;
   accessToken: string;
   refreshToken: string;
 };
@@ -27,8 +27,8 @@ const userApi = {
 
   getCurrentUserByEmail: async (
     email: string
-  ): Promise<ApiResponse<any>> => {
-    const response = await axiosInstance.get<ApiResponse<any>>(
+  ): Promise<ApiResponse<User>> => {
+    const response = await axiosInstance.get<ApiResponse<User>>(
       `/api/auth/current/${encodeURIComponent(email)}`,
       { withCredentials: true }
     );

@@ -273,7 +273,7 @@ export default function WorkerDashboardPage() {
                   contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                   itemStyle={{ fontWeight: '600', fontSize: '14px', color: '#111827' }}
                   labelStyle={{ display: 'none' }}
-                  formatter={(value: unknown, name: any) => [Number(value), String(name)]}
+                  formatter={(value: unknown, name: unknown) => [Number(value), String(name)]}
                 />
                 <Legend 
                   verticalAlign="bottom" 

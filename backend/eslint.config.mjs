@@ -25,6 +25,6 @@ export default defineConfig([
         },
     },
     {
-        ignores: ["dist/**", "node_modules/**", "eslint.config.mjs"]
+        ignores: ["dist/**", "node_modules/**", "eslint.config.mjs", "migrate-payments.ts"]
     }
 ]);
