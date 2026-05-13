@@ -54,6 +54,7 @@ export class UserMapper {
 
             documents: userData.documents ?? [],
             certificates: userData.certificates ?? [],
+            excludedServices: userData.excludedServices ?? [],
             categories: userData.categories ?? [],
             workPhotos: userData.workPhotos ?? [],
 

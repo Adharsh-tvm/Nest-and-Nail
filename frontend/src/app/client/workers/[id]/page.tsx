@@ -474,6 +474,28 @@ export default async function WorkerDetailPage({
                                         )}
                                     </div>
                                 </div>
+
+                                {/* Excluded Services */}
+                                {worker.excludedServices && worker.excludedServices.length > 0 && (
+                                    <div style={{ marginTop: '24px' }}>
+                                        <p style={{
+                                            fontSize: '11px', fontWeight: 700, color: '#f87171',
+                                            textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '12px'
+                                        }}>Services Not Provided</p>
+                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                                            {worker.excludedServices.map((service, idx) => (
+                                                <span key={idx} style={{
+                                                    padding: '7px 16px',
+                                                    background: '#fef2f2', color: '#ef4444',
+                                                    fontWeight: 600, fontSize: '13px',
+                                                    borderRadius: '20px', border: '1px solid #fca5a5',
+                                                }}>
+                                                    {service}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
 

@@ -19,6 +19,7 @@ export type User = {
   address?: Address[];
   documents?: string[];
   certificates?: string[];
+  excludedServices?: string[];
   categories: string[];
   workPhotos?: string[];
   createdAt?: string;

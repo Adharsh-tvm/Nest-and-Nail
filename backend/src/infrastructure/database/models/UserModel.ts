@@ -18,6 +18,7 @@ export interface IUserDocument extends Document {
     lastLoginAt: Date;
     documents?: string[];
     certificates?: string[];
+    excludedServices?: string[];
     categories?: mongoose.Types.ObjectId[];
     workPhotos?: string[];
     rating: number;
@@ -57,6 +58,7 @@ const UserSchema = new Schema<IUserDocument>(
 
         documents: [String],
         certificates: [String],
+        excludedServices: { type: [String], default: [] },
 
         categories: [{
             type: mongoose.Schema.Types.ObjectId,

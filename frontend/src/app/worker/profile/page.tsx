@@ -28,6 +28,7 @@ import {
   Camera,
   Trash2,
   Calendar1,
+  XCircle
 } from "lucide-react";
 import { useUserStore } from "@/store/userStore";
 import { updateUserProfileAction } from "@/app/actions/users/user-profile-actions";
@@ -221,6 +222,8 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
     useState(false);
   const [formData, setFormData] = useState<User>(user);
   const [newSkill, setNewSkill] = useState("");
+  const [isEditingExcluded, setIsEditingExcluded] = useState(false);
+  const [newExcluded, setNewExcluded] = useState("");
   const [viewingDocument, setViewingDocument] = useState<string | null>(null);
   const [availableCategories, setAvailableCategories] = useState<Category[]>(
     [],
@@ -292,6 +295,41 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
       ...prev,
       skills: prev.skills?.filter((s) => s !== skill),
     }));
+  };
+
+  const handleAddExcluded = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newExcluded.trim() && !formData.excludedServices?.includes(newExcluded.trim())) {
+      setFormData((prev) => ({
+        ...prev,
+        excludedServices: [...(prev.excludedServices || []), newExcluded.trim()],
+      }));
+      setNewExcluded("");
+    }
+  };
+
+  const handleRemoveExcluded = (service: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      excludedServices: prev.excludedServices?.filter((s) => s !== service),
+    }));
+  };
+
+  const handleSaveExcluded = async () => {
+    setUser(formData);
+    setIsEditingExcluded(false);
+    try {
+      const response = await updateUserProfileAction(user.id, {
+        excludedServices: formData.excludedServices || []
+      });
+      if (!response.success) {
+        toast.error(response.message);
+        return;
+      }
+      toast.success("Excluded services updated");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Update failed");
+    }
   };
 
   const handleSaveDetails = async () => {
@@ -713,6 +751,77 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
                       );
                     })}
                   </div>
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mt-8">
+            <div className="px-8 py-5 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
+              <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2.5">
+                <XCircle size={20} className="text-red-500" /> Excluded Services
+              </h3>
+              {isEditingExcluded ? (
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => {
+                      setFormData(user);
+                      setIsEditingExcluded(false);
+                    }}
+                    className="text-sm font-medium text-gray-500 hover:text-gray-900 px-4 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSaveExcluded}
+                    className="text-sm font-medium bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors flex items-center gap-2"
+                  >
+                    <Save size={16} /> Save
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setIsEditingExcluded(true)}
+                  className="text-sm font-medium text-gray-600 hover:text-red-600 flex items-center gap-2 px-3 py-1.5 rounded hover:bg-red-50 transition-colors"
+                >
+                  <Edit2 size={16} /> Edit
+                </button>
+              )}
+            </div>
+            <div className="p-8">
+              <div className="flex flex-wrap gap-3 mb-6">
+                {(isEditingExcluded ? formData.excludedServices : user.excludedServices)?.map((service, i) => (
+                  <span
+                    key={i}
+                    className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium border ${isEditingExcluded ? "bg-white border-red-200 text-red-600" : "bg-red-50 border-red-100 text-red-600"}`}
+                  >
+                    {service}
+                    {isEditingExcluded && (
+                      <button onClick={() => handleRemoveExcluded(service)} className="hover:text-red-800">
+                        <X size={14} />
+                      </button>
+                    )}
+                  </span>
+                ))}
+                {!(isEditingExcluded ? formData.excludedServices : user.excludedServices)?.length && !isEditingExcluded && (
+                  <span className="text-gray-500 text-sm italic">No excluded services</span>
+                )}
+              </div>
+              {isEditingExcluded && (
+                <div className="flex gap-3">
+                  <input
+                    type="text"
+                    value={newExcluded}
+                    onChange={(e) => setNewExcluded(e.target.value)}
+                    placeholder="Add a service you don't do..."
+                    className="flex-1 text-base p-2.5 border border-gray-200 rounded-lg focus:ring-1 focus:ring-red-500 outline-none"
+                  />
+                  <button
+                    onClick={handleAddExcluded}
+                    disabled={!newExcluded.trim()}
+                    className="px-6 py-2.5 bg-red-600 text-white rounded-lg text-sm font-bold hover:bg-red-700 transition-colors disabled:opacity-50"
+                  >
+                    Add
+                  </button>
                 </div>
               )}
             </div>

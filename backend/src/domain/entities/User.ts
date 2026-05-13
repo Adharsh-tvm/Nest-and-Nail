@@ -22,6 +22,7 @@ export interface User {
 
     documents?: string[];
     certificates?: string[];
+    excludedServices?: string[];
     categories?: string[];
     workPhotos?: string[];
 

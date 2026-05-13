@@ -17,6 +17,7 @@ interface ProfileUpdates {
   profilePicture?: File | null;
   documents?: string[];
   certificates?: string[];
+  excludedServices?: string[];
 }
 
 export async function updateUserProfileAction(userId: string, updates: ProfileUpdates) {
@@ -85,6 +86,10 @@ export async function updateUserProfileAction(userId: string, updates: ProfileUp
 
   if (updates.certificates) {
     fd.append("certificates", JSON.stringify(updates.certificates));
+  }
+
+  if (updates.excludedServices) {
+    fd.append("excludedServices", JSON.stringify(updates.excludedServices));
   }
 
   try {
