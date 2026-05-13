@@ -71,7 +71,7 @@ export class ChangeUserRoleUseCase implements IChangeUserRoleUseCase {
             newUser = await workerRepo.create(workerData);
         }
 
-        if (newRole === Role.CLIENT) {
+        else if (newRole === Role.CLIENT) {
             await workerRepo.deleteByUserId(userId);
 
             const clientData = {
