@@ -1,5 +1,5 @@
-import { PaymentStatus } from "../../shared/enums/paymentStatus";
-import { ServiceStatus } from "../../shared/enums/serviceEnums";
+import { PaymentStatus } from "../../shared/enums/paymentEnums";
+import { ServiceStatus, VideoCallStatus } from "../../shared/enums/serviceEnums";
 import { SlotType } from "../../shared/enums/slotEnums";
 
 export interface Service {
@@ -19,6 +19,15 @@ export interface Service {
     coordinates: [number, number];
   };
 
+  address?: {
+    street?: string;
+    city?: string;
+    state?: string;
+    country?: string;
+    zip?: string;
+    label?: string;
+  };
+
   scheduledDate: Date;
   selectedSlots: {
     date: Date;
@@ -27,9 +36,13 @@ export interface Service {
 
   numberOfDays: number;
 
+  numberOfWorkers: number;
+
   advanceAmount?: number;
 
-  totalAmount?: number;
+  pricePerWorker: number;
+
+  totalAmount: number;
 
   bufferDay?: boolean;
 
@@ -47,6 +60,21 @@ export interface Service {
 
   rating?: number;
   review?: string;
+
+  videoCall?: {
+    roomId: string;
+    startTime: Date;
+    endTime: Date;
+    meetingLink?: string;
+
+    status?: VideoCallStatus
+    joinedUsers?: string[];
+
+    startedAt?: Date | null;
+    endedAt?: Date;
+    duration?: string;
+    accumulatedDuration?: number
+  };
 
   createdAt: Date;
   updatedAt: Date;

@@ -1,7 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose";
-import { ServiceStatus } from "../../../shared/enums/serviceEnums";
-import { PaymentStatus } from "../../../shared/enums/paymentStatus";
-
+import { ServiceStatus, VideoCallStatus } from "../../../shared/enums/serviceEnums";
+import { PaymentStatus } from "../../../shared/enums/paymentEnums";
 import { SlotType } from "../../../shared/enums/slotEnums";
 
 export interface IServiceDocument extends Document {
@@ -20,6 +19,15 @@ export interface IServiceDocument extends Document {
     coordinates: [number, number];
   };
 
+  address?: {
+    street?: string;
+    city?: string;
+    state?: string;
+    country?: string;
+    zip?: string;
+    label?: string;
+  };
+
   scheduledDate: Date;
   selectedSlots: {
     date: Date;
@@ -28,7 +36,11 @@ export interface IServiceDocument extends Document {
 
   numberOfDays: number;
 
+  numberOfWorkers?: number;
+
   advanceAmount?: number;
+
+  pricePerWorker: number;
 
   totalAmount?: number;
 
@@ -48,6 +60,19 @@ export interface IServiceDocument extends Document {
 
   rating?: number;
   review?: string;
+
+  videoCall?: {
+    roomId: string;
+    startTime: Date;
+    endTime: Date;
+    meetingLink?: string;
+    status?: VideoCallStatus;
+    joinedUsers?: string[];
+    startedAt?: Date;
+    endedAt?: Date;
+    duration?: string;
+    accumulatedDuration?: number;
+  };
 
   createdAt: Date;
   updatedAt: Date;
@@ -77,6 +102,15 @@ const ServiceSchema = new Schema<IServiceDocument>(
       },
     },
 
+    address: {
+      street: String,
+      city: String,
+      state: String,
+      country: String,
+      zip: String,
+      label: String,
+    },
+
     scheduledDate: { type: Date, required: true },
     selectedSlots: {
       type: [{
@@ -92,8 +126,20 @@ const ServiceSchema = new Schema<IServiceDocument>(
       default: 1,
     },
 
+    numberOfWorkers: {
+      type: Number,
+      default: 1,
+      min: 1
+    },
+
     advanceAmount: {
       type: Number,
+    },
+
+    pricePerWorker: {
+      type: Number,
+      required: true,
+      min: 0
     },
 
     totalAmount: {
@@ -112,7 +158,7 @@ const ServiceSchema = new Schema<IServiceDocument>(
     status: {
       type: String,
       enum: Object.values(ServiceStatus),
-      default: ServiceStatus.CONFIRMED,
+      default: ServiceStatus.PENDING,
     },
 
     paymentStatus: {
@@ -129,6 +175,19 @@ const ServiceSchema = new Schema<IServiceDocument>(
 
     rating: Number,
     review: String,
+
+    videoCall: {
+      roomId: String,
+      startTime: Date,
+      endTime: Date,
+      meetingLink: String,
+      status: { type: String, enum: Object.values(VideoCallStatus) },
+      joinedUsers: [String],
+      startedAt: Date,
+      endedAt: Date,
+      duration: String,
+      accumulatedDuration: Number
+    }
   },
   { timestamps: true }
 );

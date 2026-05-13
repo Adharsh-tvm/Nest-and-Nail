@@ -1,6 +1,6 @@
 "use server";
 
-import userApi from "@/sources/api/user.api";
+import userApi from "@/sources/api/user/user.api";
 import { Address } from "@/shared/types/addressType";
 import { ApiResponse } from "@/shared/types/responseTypes";
 import { User } from "@/shared/types/userTypes";
@@ -9,7 +9,17 @@ import { cookies } from "next/headers";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
-export async function updateUserProfileAction(userId: string, updates: any) {
+interface ProfileUpdates {
+  name?: string;
+  phone?: string | number;
+  address?: unknown;
+  isOnline?: boolean;
+  profilePicture?: File | null;
+  documents?: string[];
+  certificates?: string[];
+}
+
+export async function updateUserProfileAction(userId: string, updates: ProfileUpdates) {
   const cookieStore = await cookies();
   const token = cookieStore.get("accessToken")?.value;
 
@@ -57,7 +67,7 @@ export async function updateUserProfileAction(userId: string, updates: any) {
       "address",
       typeof updates.address === "object"
         ? JSON.stringify(updates.address)
-        : updates.address
+        : (updates.address as string)
     );
   }
 
@@ -67,6 +77,14 @@ export async function updateUserProfileAction(userId: string, updates: any) {
 
   if (updates.profilePicture instanceof File) {
     fd.append("profilePicture", updates.profilePicture);
+  }
+
+  if (updates.documents) {
+    fd.append("documents", JSON.stringify(updates.documents));
+  }
+
+  if (updates.certificates) {
+    fd.append("certificates", JSON.stringify(updates.certificates));
   }
 
   try {
@@ -86,12 +104,18 @@ export async function updateUserProfileAction(userId: string, updates: any) {
       message: "Profile Updated successfully",
       user: res.data.user,
     };
-  } catch (err: any) {
-    console.error("Profile update failed", err.response?.data || err);
-
+  } catch (err: unknown) {
+    if (axios.isAxiosError(err)) {
+      console.error("Profile update failed", err.response?.data || err);
+      return {
+        success: false,
+        message: err.response?.data?.message || "Profile update failed",
+      };
+    }
+    console.error("Profile update failed", err);
     return {
       success: false,
-      message: err.response?.data?.message || "Profile update failed",
+      message: err instanceof Error ? err.message : "Profile update failed",
     };
   }
 }
@@ -124,17 +148,14 @@ export async function addUSerAddressAction(
 ): Promise<ApiResponse<User>> {
   try {
     return await userApi.addUserAddressApi(userId, address);
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = axios.isAxiosError(error) ? error.response?.data?.message : (error instanceof Error ? error.message : undefined);
     return {
       success: false,
       message:
-        error?.response?.data?.message ||
-        error?.message ||
+        message ||
         "Failed to add address",
-      error: {
-        status: error?.response?.status,
-        data: error?.response?.data,
-      },
+      error: null,
     };
   }
 }
@@ -146,17 +167,14 @@ export async function editUserAddressAction(
 ): Promise<ApiResponse<User>> {
   try {
     return await userApi.editUserAddressApi(userId, addressId, address);
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = axios.isAxiosError(error) ? error.response?.data?.message : (error instanceof Error ? error.message : undefined);
     return {
       success: false,
       message:
-        error?.response?.data?.message ||
-        error?.message ||
+        message ||
         "Failed to edit address",
-      error: {
-        status: error?.response?.status,
-        data: error?.response?.data,
-      },
+      error: null,
     };
   }
 }
@@ -167,17 +185,14 @@ export async function deleteUserAddressAction(
 ): Promise<ApiResponse<User>> {
   try {
     return await userApi.deleteUserAddressApi(userId, addressId);
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = axios.isAxiosError(error) ? error.response?.data?.message : (error instanceof Error ? error.message : undefined);
     return {
       success: false,
       message:
-        error?.response?.data?.message ||
-        error?.message ||
+        message ||
         "Failed to delete address",
-      error: {
-        status: error?.response?.status,
-        data: error?.response?.data,
-      },
+      error: null,
     };
   }
 }

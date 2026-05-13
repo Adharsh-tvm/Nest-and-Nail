@@ -5,16 +5,7 @@ import { useClients } from "@/hooks/useClients";
 
 import { Users, Search, Mail, Phone, MoreHorizontal } from "lucide-react";
 
-const formatDate = (iso?: string | undefined) => {
-  if (!iso) return "—";
-  try {
-    const d = new Date(iso);
-    if (isNaN(d.getTime())) return iso;
-    return d.toLocaleDateString();
-  } catch {
-    return iso;
-  }
-};
+
 
 const ClientsView = () => {
   const { clients, loading, error } = useClients();
@@ -72,7 +63,7 @@ const ClientsView = () => {
             </thead>
 
             <tbody className="divide-y divide-slate-100">
-              {clients.map((client, i) => {
+              {clients.map((client) => {
                 return (
                   <tr
                     key={client.user_id}

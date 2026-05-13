@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import {
   Search,
   MapPin,
@@ -10,21 +10,10 @@ import {
   Droplets,
   PaintBucket,
   Truck,
-  Star,
-  CheckCircle2,
   ArrowRight,
-  Menu,
-  X,
   ShieldCheck,
   Clock,
   UserCheck,
-  GalleryVerticalEnd,
-  User,
-  Phone,
-  Mail,
-  Instagram,
-  Twitter,
-  Linkedin,
   Briefcase,
 } from "lucide-react";
 
@@ -43,88 +32,6 @@ interface ServiceCardProps {
 
 // --- Components ---
 
-const Navbar = () => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  return (
-    <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm transition-all duration-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-20">
-          {/* Logo */}
-          <div className="flex items-center gap-2 group cursor-pointer">
-            <div className="bg-[#1B4332] text-white flex size-9 items-center justify-center rounded-xl shadow-md group-hover:bg-[#DC2626] transition-colors duration-300">
-              <GalleryVerticalEnd size={20} />
-            </div>
-            <span className="text-2xl font-bold text-[#1B4332] tracking-tight group-hover:text-[#DC2626] transition-colors duration-300">
-              NEST & NAIL
-            </span>
-          </div>
-
-          {/* Desktop Nav */}
-          <div className="hidden md:flex items-center space-x-8">
-            {["Services", "Find Workers", "For Professionals", "Support"].map(
-              (item) => (
-                <a
-                  key={item}
-                  href="#"
-                  className="text-gray-600 hover:text-[#DC2626] font-medium transition-colors relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-[#DC2626] after:transition-all hover:after:w-full"
-                >
-                  {item}
-                </a>
-              )
-            )}
-          </div>
-
-          {/* Auth Buttons */}
-          <div className="hidden md:flex items-center gap-4">
-            <button className="text-[#1B4332] font-semibold hover:text-[#DC2626] transition-colors px-4 py-2">
-              Log In
-            </button>
-            <button className="bg-[#DC2626] text-white px-6 py-2.5 rounded-full font-bold hover:bg-[#b91c1c] transition-all shadow-lg shadow-red-500/30 hover:shadow-red-500/50 hover:-translate-y-0.5 active:translate-y-0">
-              Sign Up
-            </button>
-          </div>
-
-          {/* Mobile Menu Button */}
-          <button
-            className="md:hidden text-[#1B4332] p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile Menu */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden bg-white border-t border-gray-100 absolute w-full left-0 animate-in slide-in-from-top-5 z-40 shadow-xl">
-          <div className="px-4 pt-2 pb-6 space-y-2">
-            {["Services", "Find Workers", "For Professionals", "Support"].map(
-              (item) => (
-                <a
-                  key={item}
-                  href="#"
-                  className="block px-4 py-3 text-base font-medium text-gray-700 hover:bg-red-50 hover:text-[#DC2626] rounded-xl transition-colors"
-                >
-                  {item}
-                </a>
-              )
-            )}
-            <div className="pt-4 flex flex-col gap-3 mt-4 border-t border-gray-100">
-              <button className="w-full text-center py-3 border-2 border-[#1B4332] text-[#1B4332] font-bold rounded-xl hover:bg-[#1B4332] hover:text-white transition-colors">
-                Log In
-              </button>
-              <button className="w-full text-center py-3 bg-[#DC2626] text-white font-bold rounded-xl hover:bg-[#b91c1c] transition-colors shadow-lg shadow-red-500/20">
-                Sign Up
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </nav>
-  );
-};
-
 const HeroSection = () => (
   <div className="relative bg-[#1B4332] overflow-hidden">
     {/* Pattern Overlay */}
@@ -136,11 +43,6 @@ const HeroSection = () => (
       }}
     ></div>
 
-    {/* Abstract Shapes */}
-    {/* <div
-      className="absolute top-0 right-0 w-[800px] h-[800px] bg-white opacity-5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 animate-pulse"
-      style={{ animationDuration: "10s" }}
-    ></div> */}
     <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-[#DC2626] opacity-10 rounded-full blur-3xl translate-y-1/3 -translate-x-1/4"></div>
 
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32 relative z-10">
@@ -410,119 +312,6 @@ const CTASection = () => (
       </div>
     </div>
   </section>
-);
-
-const Footer = () => (
-  <footer className="bg-[#0f291e] pt-20 pb-10 text-gray-400">
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-        {/* Brand Column */}
-        <div className="space-y-6">
-          <div className="flex items-center gap-2">
-            <div className="bg-white text-[#1B4332] flex size-8 items-center justify-center rounded-lg shadow-sm">
-              <GalleryVerticalEnd size={18} />
-            </div>
-            <span className="text-2xl font-bold text-white tracking-tight">
-              NEST & NAIL
-            </span>
-          </div>
-          <p className="text-sm leading-relaxed max-w-xs">
-            The most trusted marketplace for home services. We connect you with
-            skilled professionals to make your home better, safer, and more
-            comfortable.
-          </p>
-          <div className="flex gap-4">
-            {[Instagram, Twitter, Linkedin].map((Icon, i) => (
-              <a
-                key={i}
-                href="#"
-                className="w-10 h-10 rounded-full bg-[#1B4332] flex items-center justify-center hover:bg-[#DC2626] hover:text-white transition-all duration-300"
-              >
-                <Icon size={18} />
-              </a>
-            ))}
-          </div>
-        </div>
-
-        {/* Links Columns */}
-        <div>
-          <h4 className="font-bold text-white mb-6 text-lg">Company</h4>
-          <ul className="space-y-4 text-sm">
-            {["About Us", "Careers", "Press", "Blog", "Contact"].map((item) => (
-              <li key={item}>
-                <a href="#" className="hover:text-[#DC2626] transition-colors">
-                  {item}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div>
-          <h4 className="font-bold text-white mb-6 text-lg">
-            Popular Services
-          </h4>
-          <ul className="space-y-4 text-sm">
-            {[
-              "Plumbing Repair",
-              "Electrical Wiring",
-              "Home Cleaning",
-              "Interior Painting",
-              "Furniture Assembly",
-            ].map((item) => (
-              <li key={item}>
-                <a href="#" className="hover:text-[#DC2626] transition-colors">
-                  {item}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div>
-          <h4 className="font-bold text-white mb-6 text-lg">Get the App</h4>
-          <p className="text-sm mb-6">Manage your projects on the go.</p>
-          <div className="space-y-3">
-            <button className="w-full bg-[#1B4332] hover:bg-[#255c45] text-white py-3 px-4 rounded-xl flex items-center gap-3 transition-colors border border-white/5">
-              <div className="text-2xl"></div>
-              <div className="text-left">
-                <div className="text-[10px] uppercase font-bold text-white/60">
-                  Download on the
-                </div>
-                <div className="text-sm font-bold leading-none">App Store</div>
-              </div>
-            </button>
-            <button className="w-full bg-[#1B4332] hover:bg-[#255c45] text-white py-3 px-4 rounded-xl flex items-center gap-3 transition-colors border border-white/5">
-              <div className="text-2xl">▶</div>
-              <div className="text-left">
-                <div className="text-[10px] uppercase font-bold text-white/60">
-                  Get it on
-                </div>
-                <div className="text-sm font-bold leading-none">
-                  Google Play
-                </div>
-              </div>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div className="pt-8 flex flex-col md:flex-row justify-between items-center text-sm">
-        <p>© 2024 Nest & Nail Inc. All rights reserved.</p>
-        <div className="flex gap-8 mt-4 md:mt-0">
-          <a href="#" className="hover:text-white transition-colors">
-            Privacy
-          </a>
-          <a href="#" className="hover:text-white transition-colors">
-            Terms
-          </a>
-          <a href="#" className="hover:text-white transition-colors">
-            Sitemap
-          </a>
-        </div>
-      </div>
-    </div>
-  </footer>
 );
 
 const HomePage = () => {

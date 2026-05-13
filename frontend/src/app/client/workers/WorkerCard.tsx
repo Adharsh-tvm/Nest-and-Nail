@@ -36,6 +36,7 @@ export default function WorkerCard({ worker, index }: WorkerCardProps) {
                     <div className="relative shrink-0">
                         <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center border-2 border-white shadow-sm">
                             {(worker.profileImageUrl || worker.profilePictureUrl) ? (
+                                // eslint-disable-next-line @next/next/no-img-element
                                 <img
                                     src={(() => {
                                         const url = worker.profileImageUrl || worker.profilePictureUrl;
@@ -163,7 +164,7 @@ export default function WorkerCard({ worker, index }: WorkerCardProps) {
                 ) : (
                     <div className="flex items-center gap-1.5 px-3 py-1 bg-red-50 text-red-700 rounded-full text-xs font-bold border border-red-100">
                         <XCircle className="w-3.5 h-3.5" />
-                        Busy
+                        Offline
                     </div>
                 )}
 

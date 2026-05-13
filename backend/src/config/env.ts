@@ -10,7 +10,8 @@ const envSchema = z.object({
 
   // Logging
   LOG_RETENTION_DAYS: z.coerce.number().int().positive().default(14),
-
+  LOG_MAX_SIZE: z.string().default("20m"),
+  ERROR_LOG_MAX_SIZE: z.string().default("10m"),
   // Database
   MONGO_URI: z.string().min(1, "MONGO_URI is required"),
 
@@ -25,10 +26,12 @@ const envSchema = z.object({
   GOOGLE_CLIENT_SECRET: z.string().min(1),
 
   // Email
+  // eslint-disable-next-line @typescript-eslint/no-deprecated
   EMAIL_USER: z.string().email(),
   EMAIL_PASS: z.string().min(1),
 
   // Frontend
+  // eslint-disable-next-line @typescript-eslint/no-deprecated
   FRONTEND_URL: z.string().url(),
 
   // Cloudinary
@@ -42,6 +45,8 @@ const envSchema = z.object({
   AWS_ACCESS_KEY_ID: z.string().min(1),
   AWS_SECRET_ACCESS_KEY: z.string().min(1),
 
+  RAZORPAY_KEY: z.string().min(1, "RAZORPAY_KEY is required"),
+  RAZORPAY_SECRET: z.string().min(1, "RAZORPAY_SECRET is required"),
 
 });
 
@@ -49,6 +54,7 @@ const parsed = envSchema.safeParse(process.env);
 
 if (!parsed.success) {
   console.error(" Invalid environment variables:");
+  // eslint-disable-next-line @typescript-eslint/no-deprecated
   console.error(parsed.error.format());
   process.exit(1);
 }

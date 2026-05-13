@@ -5,7 +5,10 @@ export interface IGetAvailableWorkersUseCase {
     categoryId?: string,
     lat?: number,
     lng?: number,
-    search?: string,    // name keyword
-    isOnline?: boolean  // availability filter
-  ): Promise<Worker[]>;
-} 
+    search?: string,
+    isOnline?: boolean,
+    page?: number,
+    limit?: number,
+    sortBy?: string
+  ): Promise<{ workers: Worker[]; total: number }>;
+}

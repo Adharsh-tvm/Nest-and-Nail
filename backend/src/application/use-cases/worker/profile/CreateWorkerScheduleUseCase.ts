@@ -11,7 +11,6 @@ export class CreateWorkerScheduleUseCase implements ICreateWorkerScheduleUseCase
   async execute(dto: CreateWorkerScheduleDTO): Promise<WorkerScheduleDTO[]> {
     const { workerId, startDate, endDate } = dto;
 
-    // Validate dates
     const start = new Date(startDate);
     const end = new Date(endDate);
 
@@ -19,51 +18,73 @@ export class CreateWorkerScheduleUseCase implements ICreateWorkerScheduleUseCase
       throw new Error("Start date cannot be after end date");
     }
 
-    // Generate slots for each day in the date range
     const schedulesToCreate: WorkerSchedule[] = [];
     const currentDate = new Date(start);
 
     while (currentDate <= end) {
-      // Create a copy of the current date for the slots
       const dateForSlot = new Date(currentDate);
 
-      // Generate the three slots for the day
-      schedulesToCreate.push({
-        workerId,
-        date: dateForSlot,
-        slotType: SlotType.SHORT,
-        isBooked: false,
-      });
       schedulesToCreate.push({
         workerId,
         date: dateForSlot,
         slotType: SlotType.MORNING_HALF,
         isBooked: false,
+        isAvailable: true,
       });
       schedulesToCreate.push({
         workerId,
         date: dateForSlot,
         slotType: SlotType.EVENING_HALF,
         isBooked: false,
+        isAvailable: true,
       });
       schedulesToCreate.push({
         workerId,
         date: dateForSlot,
         slotType: SlotType.FULL_DAY,
         isBooked: false,
+        isAvailable: true,
       });
 
-      // Move to the next day
+      schedulesToCreate.push(
+        {
+          workerId,
+          date: dateForSlot,
+          slotType: SlotType.VIDEO_SLOT_1,
+          isBooked: false,
+          isAvailable: true,
+        },
+        {
+          workerId,
+          date: dateForSlot,
+          slotType: SlotType.VIDEO_SLOT_2,
+          isBooked: false,
+          isAvailable: true,
+        },
+        {
+          workerId,
+          date: dateForSlot,
+          slotType: SlotType.VIDEO_SLOT_3,
+          isBooked: false,
+          isAvailable: true,
+        },
+        {
+          workerId,
+          date: dateForSlot,
+          slotType: SlotType.VIDEO_SLOT_4,
+          isBooked: false,
+          isAvailable: true,
+        }
+      );
+
       currentDate.setDate(currentDate.getDate() + 1);
     }
 
-    // Attempt to save to the database
     try {
       const createdSchedules = await this.workerScheduleRepository.createBulk(schedulesToCreate);
-      return createdSchedules.map(WorkerScheduleMapper.toDTO);
-    } catch (error: any) {
-      // Handle potential duplicate key errors (11000) from MongoDB
-      if (error.code === 11000) {
+      return createdSchedules.map(s => WorkerScheduleMapper.toDTO(s));
+    } catch (error: unknown) {
+      if (typeof error === 'object' && error !== null && 'code' in error && (error as { code: number }).code === 11000) {
         throw new Error("Some schedules in this date range already exist for the worker.");
       }
       throw error;

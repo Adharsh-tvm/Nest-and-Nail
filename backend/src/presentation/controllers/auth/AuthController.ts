@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { HttpStatusCode } from "../../../shared/enums/httpCodes";
-import { loggerInstance } from "../../../infrastructure/logger/Logger";
 import { IAuthController } from "../../interfaces/IAuthController";
+import { ILogger } from "../../../infrastructure/logger/ILogger";
 import { IRegisterUserUseCase } from "../../../application/interfaces/auth/IRegisterUserUseCase";
 import { ILoginUserUseCase } from "../../../application/interfaces/auth/ILoginUserUseCase";
 import { ISendOtpUseCase } from "../../../application/interfaces/auth/ISendOtpUseCase";
@@ -12,6 +12,8 @@ import { IRefreshTokenUseCase } from "../../../application/interfaces/auth/IRefr
 import { IValidateUserUseCase } from "../../../application/interfaces/auth/IValidateUserUseCase";
 import { ResponseHandler } from "../../../shared/responses/ApiResponse";
 import { RESPONSE_MESSAGES } from "../../../shared/responses/ResponseMessages";
+import { UserRequestDTO } from "../../../application/dtos/UserDTO";
+import { IChangePasswordUseCase } from "../../../application/interfaces/auth/IChangePasswordUseCase";
 
 export class AuthController implements IAuthController {
 
@@ -23,13 +25,15 @@ export class AuthController implements IAuthController {
     private readonly _refreshTokenUseCase: IRefreshTokenUseCase,
     private readonly _forgotPasswordUseCase: IForgotPasswordUseCase,
     private readonly _resetPasswordUseCase: IResetPasswordUseCase,
-    private readonly _validateUserUseCase: IValidateUserUseCase
+    private readonly _validateUserUseCase: IValidateUserUseCase,
+    private readonly _changePasswordUseCase: IChangePasswordUseCase,
+    private readonly _logger: ILogger
   ) { }
 
   // ---------------- REGISTER ----------------
   async register(req: Request, res: Response): Promise<void> {
     try {
-      const { user_role, email_address, password } = req.body;
+      const { user_role, email_address, password } = req.body as { user_role?: string; email_address?: string; password?: string };
 
       if (!user_role) {
         res.status(HttpStatusCode.BAD_REQUEST).json(
@@ -37,13 +41,13 @@ export class AuthController implements IAuthController {
         );
       }
 
-      loggerInstance.info(`[AuthController] Register request for ${email_address}`);
+      this._logger.info(`[AuthController] Register request for ${email_address ?? ""}`);
 
-      await this._registerUserUseCase.execute(req.body);
+      await this._registerUserUseCase.execute(req.body as UserRequestDTO);
 
       const loginResult = await this._loginUserUseCase.execute({
-        email_address,
-        password
+        email_address: email_address ?? "",
+        password: password ?? ""
       });
 
       res.status(HttpStatusCode.CREATED).json(
@@ -58,7 +62,7 @@ export class AuthController implements IAuthController {
       );
 
     } catch (error: unknown) {
-      loggerInstance.error("[AuthController] Register error:", error);
+      this._logger.error("[AuthController] Register error:", error);
 
       res.status(HttpStatusCode.BAD_REQUEST).json(
         ResponseHandler.error(RESPONSE_MESSAGES.BAD_REQUEST, error)
@@ -69,7 +73,7 @@ export class AuthController implements IAuthController {
   // ---------------- LOGIN ----------------
   async login(req: Request, res: Response): Promise<void> {
     try {
-      const { email_address, password } = req.body;
+      const { email_address, password } = req.body as { email_address?: string; password?: string };
 
       if (!email_address || !password) {
         res.status(HttpStatusCode.BAD_REQUEST).json(
@@ -80,7 +84,7 @@ export class AuthController implements IAuthController {
         );
       }
 
-      const result = await this._loginUserUseCase.execute({ email_address, password });
+      const result = await this._loginUserUseCase.execute({ email_address: email_address ?? "", password: password ?? "" });
 
       res.status(HttpStatusCode.OK).json(
         ResponseHandler.success(
@@ -94,7 +98,7 @@ export class AuthController implements IAuthController {
       );
 
     } catch (error: unknown) {
-      loggerInstance.error("[AuthController] Login error:", error);
+      this._logger.error("[AuthController] Login error:", error);
 
       res.status(HttpStatusCode.UNAUTHORIZED).json(
         ResponseHandler.error(RESPONSE_MESSAGES.INVALID_CREDENTIALS, error)
@@ -105,8 +109,9 @@ export class AuthController implements IAuthController {
   // ---------------- SEND OTP ----------------
   async sendOtp(req: Request, res: Response): Promise<void> {
     try {
-      const email = req.body.email || req.body.email_address;
-      const role = req.body.role || req.body.user_role;
+      const body = req.body as { email?: string; email_address?: string; role?: string; user_role?: string };
+      const email = body.email ?? body.email_address;
+      const role = body.role ?? body.user_role;
 
       if (!email || !role) {
         res.status(HttpStatusCode.BAD_REQUEST).json(
@@ -114,7 +119,7 @@ export class AuthController implements IAuthController {
         );
       }
 
-      await this._sendOtpUseCase.execute(email, role);
+      await this._sendOtpUseCase.execute(email ?? "", role ?? "");
 
       res.status(HttpStatusCode.OK).json(
         ResponseHandler.success(null, RESPONSE_MESSAGES.OTP_SENT)
@@ -130,14 +135,15 @@ export class AuthController implements IAuthController {
   // ---------------- VERIFY OTP ----------------
   async verifyOtp(req: Request, res: Response): Promise<void> {
     try {
-      const email = req.body.email || req.body.email_address;
-      const otp = req.body.otp;
+      const body = req.body as { email?: string; email_address?: string; otp?: string };
+      const email = body.email ?? body.email_address;
+      const otp = body.otp;
 
-      const result = await this._verifyOtpUseCase.execute(email, otp);
+      const result = await this._verifyOtpUseCase.execute(email ?? "", otp ?? "");
 
       if (!result) {
         res.status(HttpStatusCode.BAD_REQUEST).json(
-          ResponseHandler.error(RESPONSE_MESSAGES.BAD_REQUEST, "Invalid OTP")
+          ResponseHandler.error(RESPONSE_MESSAGES.INVALID_OTP, "Invalid or expired OTP")
         );
         return;
       }
@@ -155,20 +161,21 @@ export class AuthController implements IAuthController {
   }
 
 
-  // ---------------- LOGOUT ----------------
-  async logout(req: Request, res: Response): Promise<void> {
+  logout(req: Request, res: Response): Promise<void> {
     res.clearCookie("accessToken", { path: "/" });
     res.clearCookie("refreshToken", { path: "/" });
 
     res.status(HttpStatusCode.OK).json(
       ResponseHandler.success(null, RESPONSE_MESSAGES.LOGOUT_SUCCESS)
     );
+    return Promise.resolve();
   }
 
   // ---------------- FORGOT PASSWORD ----------------
   async forgotPassword(req: Request, res: Response): Promise<void> {
     try {
-      const email = req.body.email_address || req.body.email;
+      const body = req.body as { email_address?: string; email?: string };
+      const email = body.email_address ?? body.email;
 
       if (!email) {
         res.status(HttpStatusCode.BAD_REQUEST).json(
@@ -176,15 +183,16 @@ export class AuthController implements IAuthController {
         );
       }
 
-      const result = await this._forgotPasswordUseCase.execute(email);
+      const result = await this._forgotPasswordUseCase.execute(email ?? "");
 
       res.status(HttpStatusCode.OK).json(
         ResponseHandler.success(result, RESPONSE_MESSAGES.OTP_SENT)
       );
 
     } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : RESPONSE_MESSAGES.BAD_REQUEST;
       res.status(HttpStatusCode.BAD_REQUEST).json(
-        ResponseHandler.error(RESPONSE_MESSAGES.INVALID_OTP, error)
+        ResponseHandler.error(message, error)
       );
     }
   };
@@ -192,8 +200,9 @@ export class AuthController implements IAuthController {
   // ---------------- RESET PASSWORD ----------------
   async resetPassword(req: Request, res: Response): Promise<void> {
     try {
-      const email = req.body.email || req.body.email_address;
-      const { newPassword, confirmPassword } = req.body;
+      const body = req.body as { email?: string; email_address?: string; newPassword?: string; confirmPassword?: string };
+      const email = body.email ?? body.email_address;
+      const { newPassword, confirmPassword } = body;
 
       if (!email || !newPassword || !confirmPassword) {
         res.status(HttpStatusCode.BAD_REQUEST).json(
@@ -207,7 +216,7 @@ export class AuthController implements IAuthController {
         );
       }
 
-      await this._resetPasswordUseCase.execute(email, newPassword);
+      await this._resetPasswordUseCase.execute(email ?? "", newPassword ?? "");
 
       res.status(HttpStatusCode.OK).json(
         ResponseHandler.success(null, RESPONSE_MESSAGES.SUCCESS)
@@ -223,7 +232,9 @@ export class AuthController implements IAuthController {
   // ---------------- REFRESH TOKEN ----------------
   async refreshToken(req: Request, res: Response): Promise<void> {
     try {
-      const refreshToken = req.cookies.refreshToken || req.body.refreshToken;
+      const cookies = req.cookies as { refreshToken?: string };
+      const body = req.body as { refreshToken?: string };
+      const refreshToken = cookies.refreshToken ?? body.refreshToken;
 
       console.log("reeeeeeeeeeeeeeeefrrrrrrrreeeeessssssssh ")
 
@@ -233,7 +244,7 @@ export class AuthController implements IAuthController {
         );
       }
 
-      const tokens = await this._refreshTokenUseCase.execute(refreshToken);
+      const tokens = await this._refreshTokenUseCase.execute(refreshToken ?? "");
 
       res.status(HttpStatusCode.OK).json(
         ResponseHandler.success(
@@ -274,7 +285,7 @@ export class AuthController implements IAuthController {
       const result = await this._validateUserUseCase.execute(userId);
 
       if (!result.success) {
-        res.status(HttpStatusCode.OK).json({ // Return 200 even if blocked, frontend handles logic
+        res.status(HttpStatusCode.OK).json({ 
           success: false,
           message: result.message
         });
@@ -290,6 +301,43 @@ export class AuthController implements IAuthController {
       res.status(HttpStatusCode.INTERNAL_SERVER).json(
         ResponseHandler.error("Internal Server Error", error)
       );
+    }
+  }
+
+  async changePassword(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = req.user?.id;
+
+      const { currentPassword, newPassword, confirmPassword } = req.body as { currentPassword?: string; newPassword?: string; confirmPassword?: string };
+
+      if (!userId) {
+        res.status(HttpStatusCode.UNAUTHORIZED).json(ResponseHandler.error("Unauthorized"));
+        return;
+      }
+
+      if (!currentPassword || !newPassword || !confirmPassword) {
+        res.status(HttpStatusCode.BAD_REQUEST).json(ResponseHandler.error("All fields are required"));
+        return;
+      }
+
+      if (newPassword !== confirmPassword) {
+        res.status(HttpStatusCode.BAD_REQUEST).json(ResponseHandler.error("Passwords do not match"));
+        return;
+      }
+
+      await this._changePasswordUseCase.execute(
+        userId,
+        currentPassword,
+        newPassword
+      );
+
+      res.status(HttpStatusCode.OK).json(
+        ResponseHandler.success(null, "Password changed successfully")
+      );
+
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Failed to change password";
+      res.status(HttpStatusCode.BAD_REQUEST).json(ResponseHandler.error(message));
     }
   }
 }

@@ -5,6 +5,7 @@ import UserHydration from "@/app/components/containers/providers/UserHydration";
 import { ToastProvider } from "./components/containers/providers/ToasterProvider";
 import { getCurrentUser } from "./actions/users/user-actions";
 
+
 export default async function RootLayout({
   children,
 }: {

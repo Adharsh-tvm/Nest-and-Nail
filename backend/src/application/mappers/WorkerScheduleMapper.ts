@@ -9,6 +9,7 @@ export class WorkerScheduleMapper {
       date: entity.date,
       slotType: entity.slotType,
       isBooked: entity.isBooked,
+      isAvailable: entity.isAvailable,
       serviceId: entity.serviceId,
     };
   }
@@ -20,6 +21,7 @@ export class WorkerScheduleMapper {
       date: dto.date,
       slotType: dto.slotType,
       isBooked: dto.isBooked,
+      isAvailable: dto.isAvailable,
       serviceId: dto.serviceId,
     };
   }

@@ -7,4 +7,6 @@ export interface IAdminController {
     approveVerification(req: Request, res: Response): Promise<void>;
     rejectVerification(req: Request, res: Response): Promise<void>;
     updateUserAccess(req: Request, res: Response): Promise<void>;
+    toggleUserSuspension(req: Request, res: Response): Promise<void>;
+    getDashboardData(req: Request, res: Response): Promise<void>;
 }

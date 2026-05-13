@@ -10,9 +10,9 @@ export interface IBaseRepository<T> {
     findWithQuery(
         filter: {
             isBlocked?: boolean;
-            isVerified?: any;
+            isVerified?: string | boolean;
             search?: string;
-            role?: any;
+            role?: string | Record<string, unknown>;
         },
         options: {
             sortBy: string;
@@ -24,9 +24,9 @@ export interface IBaseRepository<T> {
     findWithPagination(
         filter: {
             isBlocked?: boolean;
-            isVerified?: any;
+            isVerified?: string | boolean;
             search?: string;
-            role?: any;
+            role?: string | Record<string, unknown>;
         },
         options: {
             sortBy: string;

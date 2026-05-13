@@ -1,4 +1,5 @@
 import { AdminController } from "../../presentation/controllers/admin/AdminController";
+import { AdminModerationController } from "../../presentation/controllers/admin/AdminModerationController";
 import { AuthController } from "../../presentation/controllers/auth/AuthController";
 import { CategoryController } from "../../presentation/controllers/worker/CategoryController";
 import { ClientServiceController } from "../../presentation/controllers/client/ClientServiceController";
@@ -19,6 +20,22 @@ import { AuthMiddleware } from "../../presentation/middlewares/AuthMiddleware";
 import { InfrastructureDI } from "./infrastructure.di";
 import { UseCaseDI } from "./usecases.di";
 import { WorkerServiceController } from "../../presentation/controllers/worker/WorkerServiceController";
+import { AdminServiceController } from "../../presentation/controllers/admin/AdminServiceController";
+import { WorkerController } from "../../presentation/controllers/worker/WorkerController";
+import { ClientMeetingsController } from "../../presentation/controllers/client/ClientMeetingController";
+import { WorkerMeetingsController } from "../../presentation/controllers/worker/WorkerMeetingController";
+import { VideoCallController } from "../../presentation/controllers/common/videoCallController";
+import { PaymentController } from "../../presentation/controllers/payment/PaymentController";
+import { AdminMeetingController } from "../../presentation/controllers/admin/AdminMeetingController";
+import { WalletController } from "../../presentation/controllers/wallet/WalletController";
+import { ConcernController } from "../../presentation/controllers/concern/ConcernController";
+import { AdminConcernController } from "../../presentation/controllers/admin/AdminConcernController ";
+import { ClientReviewController } from "../../presentation/controllers/client/ClientReviewController";
+import { NotificationController } from "../../presentation/controllers/notification/NotificationController";
+import { GetUserNotificationsUseCase } from "../../application/use-cases/notification/GetUserNotificationsUseCase";
+import { MarkNotificationReadUseCase } from "../../application/use-cases/notification/MarkNotificationReadUseCase";
+import { ChatController } from "../../presentation/controllers/chat/ChatController";
+import { TransactionController } from "../../presentation/controllers/payment/TransactionController";
 
 export class ControllerDI {
     private _authController?: IAuthController;
@@ -29,8 +46,13 @@ export class ControllerDI {
     private _userController?: IUserController;
     private _clientController?: ClientController;
     private _clientServiceController?: ClientServiceController;
+    private _adminServiceControler?: AdminServiceController;
+    private _adminModerationController?: AdminModerationController;
 
     private _workerServiceController?: WorkerServiceController;
+    private _workerController?: WorkerController;
+    private _clientMeetingsController?: ClientMeetingsController;
+    private _workerMeetingsController?: WorkerMeetingsController;
 
     private _uploadController?: IUploadController;
     private _userProfileController?: IUserProfileController;
@@ -39,14 +61,24 @@ export class ControllerDI {
 
     private _mediaController?: MediaController;
 
+    private _videoCallController?: VideoCallController;
+    private _paymentController?: PaymentController;
+    private _adminMeetingController?: AdminMeetingController;
+    private _walletController?: WalletController;
+    private _concernController?: ConcernController;
+    private _adminConcernController?: AdminConcernController;
+    private _clientReviewController?: ClientReviewController;
+    private _notificationController?: NotificationController;
+    private _chatController?: ChatController;
+    private _transactionController?: TransactionController;
+
     constructor(
         private _useCases: UseCaseDI,
         private _infra: InfrastructureDI
     ) { };
 
     get authController(): IAuthController {
-        if (!this._authController) {
-            this._authController = new AuthController(
+        return (this._authController ??= new AuthController(
                 this._useCases.registerUserUseCase,
                 this._useCases.loginUserUseCase,
                 this._useCases.sendOtpUseCase,
@@ -54,128 +86,210 @@ export class ControllerDI {
                 this._useCases.refreshTokenUseCase,
                 this._useCases.forgotPasswordUseCase,
                 this._useCases.resetPasswordUseCase,
-                this._useCases.validateUserUseCase
-            );
-        }
-        return this._authController;
+                this._useCases.validateUserUseCase,
+                this._useCases.changePasswordUseCase,
+                this._infra.logger
+            ));
     }
 
     get adminController(): IAdminController {
-        if (!this._adminController) {
-            this._adminController = new AdminController(
+        return (this._adminController ??= new AdminController(
                 this._useCases.getAllClientsUseCase,
                 this._useCases.getAllWorkersUseCase,
                 this._useCases.updateVerificationStatusUseCase,
                 this._useCases.updateUserAccessUseCase,
-                this._useCases.getAllUsersUseCase
-            );
-        }
-        return this._adminController;
+                this._useCases.getAllUsersUseCase,
+                this._useCases.getAdminDashboardDataUseCase,
+                this._infra.userRepository
+            ));
     }
 
     get googleAuthController(): IGoogleAuthController {
-        if (!this._googleAuthController) {
-            this._googleAuthController = new GoogleAuthController(
+        return (this._googleAuthController ??= new GoogleAuthController(
                 this._useCases.googleLoginUseCase
-            );
-        }
-        return this._googleAuthController;
+            ));
     }
 
     get userController(): IUserController {
-        if (!this._userController) {
-            this._userController = new UserController(
+        return (this._userController ??= new UserController(
                 this._useCases.changeUserRoleUseCase,
                 this._useCases.getCurrentUserUseCase,
-            )
-        }
-        return this._userController;
+            ));
     }
 
     get authMiddleware(): AuthMiddleware {
-        if (!this._authMiddleware) {
-            this._authMiddleware = new AuthMiddleware(this._infra.tokenService);
-        }
-        return this._authMiddleware;
+        return (this._authMiddleware ??= new AuthMiddleware(this._infra.tokenService));
     }
 
     get uploadController(): IUploadController {
-        if (!this._uploadController) {
-            this._uploadController = new UploadController(
+        return (this._uploadController ??= new UploadController(
                 this._useCases.uploadProfilePictureUseCase,
                 this._useCases.uploadWorkerDocumentUseCase,
-            );
-        }
-        return this._uploadController;
+            ));
     }
 
     get userProfileController(): IUserProfileController {
-        if (!this._userProfileController) {
-            this._userProfileController = new UserProfileController(
+        return (this._userProfileController ??= new UserProfileController(
                 this._useCases.updateUserProfileUseCase,
                 this._useCases.updateUserSkillsUseCase,
                 this._useCases.addUserAddressUseCase,
                 this._useCases.editUserAddressUseCase,
                 this._useCases.deleteUserAddressUseCase
-            );
-        }
-        return this._userProfileController
+            ));
     }
 
     get categoryController(): ICategoryController {
-        if (!this._categoryController) {
-            this._categoryController = new CategoryController(
+        return (this._categoryController ??= new CategoryController(
                 this._useCases.createCategoryUseCase,
                 this._useCases.getAllCategoriesUseCase,
                 this._useCases.updateCategoryUseCase,
                 this._useCases.updateCategoryStatusUseCase,
                 this._useCases.updateWorkerCategoriesUseCase
-            )
-        }
-        return this._categoryController
+            ));
     }
 
     get mediaController(): MediaController {
-        if (!this._mediaController) {
-            this._mediaController = new MediaController(
+        return (this._mediaController ??= new MediaController(
                 this._useCases.getS3UploadUrlUseCase
-            )
-        }
-        return this._mediaController;
+            ));
     }
 
     get clientController(): ClientController {
-        if (!this._clientController) {
-            this._clientController = new ClientController(
+        return (this._clientController ??= new ClientController(
                 this._useCases.getAvailableWorkersUseCase,
                 this._useCases.getWorkerByIdUseCase,
                 this._useCases.getWorkerAvailabilityUseCase,
-            )
-        }
-        return this._clientController
+            ));
     }
 
     get clientServiceController(): ClientServiceController {
-        if (!this._clientServiceController) {
-            this._clientServiceController = new ClientServiceController(
+        return (this._clientServiceController ??= new ClientServiceController(
                 this._useCases.getClientServiceHistoryUseCase,
                 this._useCases.getClientServiceByIdUseCase,
                 this._useCases.getClientOngoingServicesUseCase,
-                this._useCases.bookWorkerUseCase
-            )
-        }
-        return this._clientServiceController
+                this._useCases.bookWorkerUseCase,
+                this._useCases.cancelServiceUseCase
+            ));
     }
 
     get workerServiceController(): WorkerServiceController {
-        if(!this._workerServiceController) {
-            this._workerServiceController = new WorkerServiceController(
+        return (this._workerServiceController ??= new WorkerServiceController(
                 this._useCases.getWorkerServicesUseCase,
                 this._useCases.getWorkerServiceDetailsUseCase,
-                this._useCases.getActiveWorkerServiceUseCase
-            )
-        }
-        return this._workerServiceController
+                this._useCases.getActiveWorkerServiceUseCase,
+                this._useCases.startServiceUseCase,
+                this._useCases.completeServiceUseCase,
+            ));
+    }
+
+    get adminServiceController(): AdminServiceController {
+        return (this._adminServiceControler ??= new AdminServiceController(
+                this._useCases.getAllServicesUseCase,
+                this._useCases.getServiceDetailsForAdminUseCase
+            ));
+    }
+
+    get workerController(): WorkerController {
+        return (this._workerController ??= new WorkerController(
+                this._useCases.blockWorkerDatesUsecase,
+                this._useCases.getWorkerBlockedDatesUseCase,
+                this._useCases.getWorkerDashboardDataUseCase
+            ));
+    }
+
+    get clientMeetingsController(): ClientMeetingsController {
+        return (this._clientMeetingsController ??= new ClientMeetingsController(
+                this._useCases.getClientScheduledMeetingsUseCase,
+                this._useCases.getClientMeetingsHistoryUseCase,
+                this._useCases.getClientMeetingByIdUseCase,
+            ));
+    }
+
+    get workerMeetingsController(): WorkerMeetingsController {
+        return (this._workerMeetingsController ??= new WorkerMeetingsController(
+                this._useCases.getWorkerScheduledMeetingsUseCase,
+                this._useCases.getWorkerMeetingsHistoryUseCase,
+                this._useCases.getWorkerMeetingByIdUseCase,
+            ));
+    }
+
+    get videoCallController(): VideoCallController {
+        return (this._videoCallController ??= new VideoCallController(
+                this._useCases.joinVideoCallUseCase,
+                this._useCases.endVideoCallUseCase,
+                this._useCases.leaveVideoCallUseCase
+            ));
+    }
+
+    get paymentController(): PaymentController {
+        return (this._paymentController ??= new PaymentController(
+                this._useCases.createPaymentUseCase,
+                this._useCases.verifyPaymentUseCase,
+                this._useCases.processWalletPaymentUseCase
+            ));
+    }
+
+    get adminMeetingController(): AdminMeetingController {
+        return (this._adminMeetingController ??= new AdminMeetingController(
+                this._useCases.getAllMeetingsForAdminUseCase,
+                this._useCases.getMeetingByIdForAdminUseCase
+            ));
+    }
+
+    get walletController(): WalletController {
+        return (this._walletController ??= new WalletController(
+                this._useCases.getWalletBalanceUseCase,
+                this._useCases.getTransactionsUseCase,
+                this._useCases.createRechargeOrderUseCase,
+                this._useCases.verifyRechargePaymentUseCase
+            ));
+    }
+
+    get concernController(): ConcernController {
+        return (this._concernController ??= new ConcernController(
+                this._useCases.createConcernUseCase,
+                this._useCases.getUserConcernsUseCase
+            ));
+    }
+
+    get adminConcernController(): AdminConcernController {
+        return (this._adminConcernController ??= new AdminConcernController(
+                this._useCases.getAllConcernsUseCase,
+                this._useCases.resolveConcernUseCase
+            ));
+    }
+
+    get clientReviewController(): ClientReviewController {
+        return (this._clientReviewController ??= new ClientReviewController(
+                this._useCases.addReviewUseCase
+            ));
+    }
+
+    get notificationController(): NotificationController {
+        return (this._notificationController ??= new NotificationController(
+                new GetUserNotificationsUseCase(this._infra.notificationRepository),
+                new MarkNotificationReadUseCase(this._infra.notificationRepository)
+            ));
+    }
+
+    get chatController(): ChatController {
+        return (this._chatController ??= new ChatController(
+                this._useCases.sendMessageUseCase,
+                this._useCases.getMessagesUseCase
+            ));
+    }
+
+    get transactionController(): TransactionController {
+        return (this._transactionController ??= new TransactionController(
+                this._useCases.getClientTransactionsUseCase,
+                this._useCases.getWorkerTransactionsUseCase,
+                this._useCases.getAllTransactionsUseCase
+            ));
+    }
+
+    get adminModerationController(): AdminModerationController {
+        return (this._adminModerationController ??= new AdminModerationController(
+                this._useCases.processModerationActionsUseCase
+            ));
     }
 }
-

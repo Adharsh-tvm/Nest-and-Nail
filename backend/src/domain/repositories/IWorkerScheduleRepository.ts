@@ -8,4 +8,5 @@ export interface IWorkerScheduleRepository {
   findByWorkerDateAndSlot(workerId: string, date: Date, slotType: string): Promise<WorkerSchedule | null>;
   markAsBooked(workerId: string, date: Date, slotType: string, serviceId: string): Promise<void>;
   unmarkAsBooked(workerId: string, date: Date, slotType: string): Promise<void>;
+  findBlockedAndBookedDates(workerId: string): Promise<WorkerSchedule[]>;
 }

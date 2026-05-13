@@ -6,8 +6,7 @@ import {
   Instagram, 
   Twitter, 
   Linkedin, 
-  Archive, // Using Archive as a placeholder for the Nest jar icon
-  Facebook
+  Archive // Using Archive as a placeholder for the Nest jar icon
 } from 'lucide-react';
 
 const Footer = () => {

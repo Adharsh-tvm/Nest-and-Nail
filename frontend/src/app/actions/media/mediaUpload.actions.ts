@@ -15,11 +15,12 @@ export async function getMediaUploadUrlAction(
 > {
     try {
         return await getMediaUploadUrlApi(fileName, contentType);
-    } catch (error: any) {
+    } catch (error: unknown) {
+        const errorMessage = (error instanceof Error ? error.message : undefined) || "Failed to get upload URL";
         return {
             success: false,
-            message: error.message || "Failed to get upload URL",
-            error,
+            message: String(errorMessage),
+            error: null,
         };
     }
 }

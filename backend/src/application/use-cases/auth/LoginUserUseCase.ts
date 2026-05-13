@@ -34,7 +34,7 @@ export class LoginUserUseCase implements ILoginUserUseCase {
                 userRole = Role.CLIENT;
                 this._logger.info(`[LoginUserUseCase] User found as CLIENT`);
             }
-        } catch (error) {
+        } catch {
             this._logger.info(`[LoginUserUseCase] User not found in CLIENT repository`);
         }
 
@@ -46,7 +46,7 @@ export class LoginUserUseCase implements ILoginUserUseCase {
                     userRole = Role.WORKER;
                     this._logger.info(`[LoginUserUseCase] User found as WORKER`);
                 }
-            } catch (error) {
+            } catch {
                 this._logger.info(`[LoginUserUseCase] User not found in WORKER repository`);
             }
         }
@@ -59,7 +59,7 @@ export class LoginUserUseCase implements ILoginUserUseCase {
                     userRole = Role.ADMIN;
                     this._logger.info(`[LoginUserUseCase] User found as ADMIN`);
                 }
-            } catch (error) {
+            } catch {
                 this._logger.info(`[LoginUserUseCase] User not found in ADMIN repository`);
             }
         }

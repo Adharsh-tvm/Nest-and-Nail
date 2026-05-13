@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback, Suspense } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import Image from "next/image";
 import {
   Mail,
   Phone,
@@ -30,14 +31,14 @@ import { VerificationStatus } from "@/shared/enums/authEnums";
  * HELPER: ACTION MENU COMPONENT
  * ----------------------------------------------------------------------------
  */
-const ActionMenu = ({
+const ActionMenu = <RowType extends { isBlocked: boolean }>({
   row,
   onBlockToggle,
   onViewDetails,
 }: {
-  row: any;
-  onBlockToggle: (row: any) => void;
-  onViewDetails: (row: any) => void;
+  row: RowType;
+  onBlockToggle: (row: RowType) => void;
+  onViewDetails: (row: RowType) => void;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
@@ -132,40 +133,11 @@ const UsersView = () => {
 
   useEffect(() => {
     const urlSearch = searchParams.get("search") || "";
-    if (urlSearch !== searchTerm) {
-      setSearchTerm(urlSearch);
-    }
+    setSearchTerm(urlSearch);
   }, [searchParams]);
 
-  // Debounce URL update
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const urlSearch = searchParams.get("search") || "";
-      if (searchTerm !== urlSearch) {
-        updateUrl("search", searchTerm || null);
-      }
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [searchTerm]);
-
-  const { users, loading, error, total, totalPages } = useUsers({
-    page,
-    limit,
-    search: search, // The hook uses the URL param directly, which is updated after debounce
-    isBlocked,
-    isVerified,
-    sortBy: "createdAt",
-    sortOrder: "desc",
-  });
-
-  const [localUsers, setLocalUsers] = useState<any[]>([]);
-  const [selectedUser, setSelectedUser] = useState<any>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [blockConfirmOpen, setBlockConfirmOpen] = useState(false);
-  const [userToBlock, setUserToBlock] = useState<any>(null);
-
   // Helper to update URL params
-  const updateUrl = (key: string, value: string | null) => {
+  const updateUrl = useCallback((key: string, value: string | null) => {
     const params = new URLSearchParams(searchParams.toString());
     if (value === null) {
       params.delete(key);
@@ -179,7 +151,36 @@ const UsersView = () => {
     }
 
     router.replace(`${pathname}?${params.toString()}`);
-  };
+  }, [searchParams, router, pathname]);
+
+  // Debounce URL update
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const urlSearch = searchParams.get("search") || "";
+      if (searchTerm !== urlSearch) {
+        updateUrl("search", searchTerm || null);
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchTerm, searchParams, updateUrl]);
+
+  const { users, loading, error, total, totalPages } = useUsers({
+    page,
+    limit,
+    search: search, // The hook uses the URL param directly, which is updated after debounce
+    isBlocked,
+    isVerified,
+    sortBy: "createdAt",
+    sortOrder: "desc",
+  });
+
+  const [localUsers, setLocalUsers] = useState<ClientRow[]>([]);
+  const [selectedUser, setSelectedUser] = useState<ClientRow | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [blockConfirmOpen, setBlockConfirmOpen] = useState(false);
+  const [userToBlock, setUserToBlock] = useState<ClientRow | null>(null);
+
+
 
   const handleSearchChange = (value: string) => {
     setSearchTerm(value);
@@ -193,7 +194,7 @@ const UsersView = () => {
     if (users) setLocalUsers(users);
   }, [users]);
 
-  const handleBlockToggle = (row: any) => {
+  const handleBlockToggle = (row: ClientRow) => {
     setUserToBlock(row);
     setBlockConfirmOpen(true);
   };
@@ -224,7 +225,7 @@ const UsersView = () => {
     }
   };
 
-  const handleViewDetails = (row: any) => {
+  const handleViewDetails = (row: ClientRow) => {
     setSelectedUser(row);
     setIsModalOpen(true);
   };
@@ -242,9 +243,11 @@ const UsersView = () => {
           <div className="relative">
             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-50 to-emerald-100 flex items-center justify-center text-[#1B4332] font-bold text-lg shadow-sm border border-emerald-100/50 overflow-hidden">
               {row.profileImageUrl ? (
-                <img
+                <Image
                   src={row.profileImageUrl}
                   alt={row.name}
+                  fill
+                  unoptimized
                   className="w-full h-full object-cover"
                 />
               ) : (
@@ -351,7 +354,7 @@ const UsersView = () => {
           <ShieldAlert size={24} />
         </div>
         <h3 className="font-bold text-lg">Failed to load</h3>
-        <p className="text-sm opacity-80">{error as any}</p>
+        <p className="text-sm opacity-80">{String(error)}</p>
       </div>
     );
   }
@@ -363,7 +366,14 @@ const UsersView = () => {
     color,
     iconColor,
     trend,
-  }: any) => (
+  }: {
+    title: string;
+    value: React.ReactNode;
+    icon: React.ComponentType<{ size?: number; className?: string }>;
+    color: string;
+    iconColor: string;
+    trend?: string;
+  }) => (
     <div
       className={`p-6 rounded-2xl shadow-sm flex items-center justify-between group hover:shadow-md transition-all ${color}`}
     >
@@ -477,4 +487,17 @@ const UsersView = () => {
   );
 };
 
-export default UsersView;
+const UsersViewWithSuspense = () => {
+  return (
+    <Suspense fallback={
+      <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-4">
+        <div className="w-12 h-12 border-4 border-[#1B4332] border-t-transparent rounded-full animate-spin shadow-md" />
+        <p className="text-gray-500 font-medium">Loading...</p>
+      </div>
+    }>
+      <UsersView />
+    </Suspense>
+  );
+};
+
+export default UsersViewWithSuspense;

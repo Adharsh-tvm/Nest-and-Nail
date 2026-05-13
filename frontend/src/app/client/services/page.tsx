@@ -3,6 +3,8 @@ import { getClientServiceHistoryAction } from "@/app/actions/client/service-acti
 import { getWorkerDetailAction } from "@/app/actions/client/view-worker-actions";
 import ClientServicesView from "./ClientServicesView";
 
+import { User } from "@/shared/types/userTypes";
+
 export const metadata = {
   title: "My Services | Client",
 };
@@ -18,11 +20,19 @@ export default async function ClientServicesPage() {
   );
 
   const ongoingServices = sortedServices.filter((s) =>
-    ["OPEN", "CONFIRMED", "IN_PROGRESS"].includes(s.status),
+    ["OPEN", "PENDING", "CONFIRMED", "IN_PROGRESS"].includes(s.status),
+  );
+
+  const cancelledServices = sortedServices.filter((s) =>
+    ["CANCELLED", "CANCELLED_BY_CLIENT", "CANCELLED_BY_WORKER"].includes(s.status),
   );
 
   const historyServices = sortedServices.filter(
-    (s) => !["OPEN", "CONFIRMED", "IN_PROGRESS"].includes(s.status),
+    (s) =>
+      ![
+        "OPEN", "PENDING", "CONFIRMED", "IN_PROGRESS",
+        "CANCELLED", "CANCELLED_BY_CLIENT", "CANCELLED_BY_WORKER",
+      ].includes(s.status),
   );
 
   const allServices = sortedServices;
@@ -39,7 +49,7 @@ export default async function ClientServicesPage() {
   const workerResponses = await Promise.all(workerDetailsPromises);
 
   // Map worker ID to worker data
-  const workerMap: Record<string, any> = {};
+  const workerMap: Record<string, Partial<User>> = {};
   workerResponses.forEach((res) => {
     if (res.success && res.data) {
       workerMap[res.data.id || res.data.userId || ""] = res.data;
@@ -58,6 +68,7 @@ export default async function ClientServicesPage() {
         <ClientServicesView
           ongoing={ongoingServices}
           history={historyServices}
+          cancelled={cancelledServices}
           workerMap={workerMap}
         />
       </div>

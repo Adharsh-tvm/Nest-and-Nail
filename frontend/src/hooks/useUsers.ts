@@ -21,35 +21,29 @@ export const useUsers = (params: UserQueryParams = {}): UseUsersResult => {
     // Use a ref to track if the component is mounted to avoid state updates on unmounted component
     const mountedRef = useRef(true);
 
+    const { page, limit, search, isBlocked, isVerified, sortBy, sortOrder } = params;
+
     // Memoize the load function
     const load = useCallback(async () => {
         setLoading(true);
         setError(null);
 
         try {
-            const result = await getAllUsers(params);
+            const result = await getAllUsers({ page, limit, search, isBlocked, isVerified, sortBy, sortOrder });
 
             if (mountedRef.current) {
                 setUsers(result.users);
                 setTotal(result.total);
                 setTotalPages(result.totalPages);
             }
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error("[useUsers] error:", err);
-            const msg = err?.message ?? "Failed to load users";
+            const msg = (err instanceof Error ? err.message : undefined) ?? "Failed to load users";
             if (mountedRef.current) setError(msg);
         } finally {
             if (mountedRef.current) setLoading(false);
         }
-    }, [
-        params.page,
-        params.limit,
-        params.search,
-        params.isBlocked,
-        params.isVerified,
-        params.sortBy,
-        params.sortOrder,
-    ]);
+    }, [page, limit, search, isBlocked, isVerified, sortBy, sortOrder]);
 
     useEffect(() => {
         mountedRef.current = true;

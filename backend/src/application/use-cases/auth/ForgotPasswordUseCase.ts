@@ -36,7 +36,6 @@ export class ForgotPasswordUseCase implements IForgotPasswordUseCase {
             throw new UserNotFoundError()
         }
 
-        // Generate OTP
         const otp = this._otpService.generateOtp();
         const hashedOtp = await this._otpService.hashOtp(otp);
 

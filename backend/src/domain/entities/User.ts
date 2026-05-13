@@ -31,4 +31,8 @@ export interface User {
     lastAssignedAt?: Date;
     currentActiveRequestId?: string | null;
     distance?: number;
+    isSuspended?: boolean;
+    suspensionStartDate?: Date | null;
+    suspensionEndDate?: Date | null;
+    canAcceptBookings?: boolean;
 }

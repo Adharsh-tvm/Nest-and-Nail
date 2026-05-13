@@ -10,7 +10,7 @@ export type BookingState =
   | { status: "success"; data: BookingResult }
   | { status: "error"; message: string };
 
-export function useBookWorker(refetchAvailability: () => Promise<any>) {
+export function useBookWorker(refetchAvailability: () => Promise<SlotAvailability | null>) {
   const [bookingState, setBookingState] = useState<BookingState>({
     status: "idle",
   });
@@ -23,8 +23,11 @@ export function useBookWorker(refetchAvailability: () => Promise<any>) {
       selectedSlots,
       slotType,
       numberOfDays,
+      numberOfWorkers,
+      pricePerWorker,
       title,
       description,
+      address,
     }: {
       workerId: string;
       category: string;
@@ -32,8 +35,18 @@ export function useBookWorker(refetchAvailability: () => Promise<any>) {
       selectedSlots?: { date: string; slotType: SlotType }[];
       slotType: SlotType;
       numberOfDays?: number;
+      numberOfWorkers?: number;
+      pricePerWorker?: number;
       title?: string;
       description?: string;
+      address?: {
+        street?: string;
+        city?: string;
+        state?: string;
+        country?: string;
+        zip?: string;
+        label?: string;
+      };
     }) => {
       setBookingState({ status: "loading" });
 
@@ -41,11 +54,12 @@ export function useBookWorker(refetchAvailability: () => Promise<any>) {
       const freshAvail = await refetchAvailability();
 
       if (freshAvail) {
-        let slotKey: keyof SlotAvailability = "fullDayAvailable";
+        let slotKey: keyof SlotAvailability | null = null;
         if (slotType === SlotType.MORNING_HALF) slotKey = "morningAvailable";
         if (slotType === SlotType.EVENING_HALF) slotKey = "eveningAvailable";
+        if (slotType === SlotType.FULL_DAY) slotKey = "fullDayAvailable";
 
-        if (!freshAvail[slotKey]) {
+        if (slotKey && freshAvail && !freshAvail[slotKey]) {
           setBookingState({
             status: "error",
             message: "Slot just got booked. Please select another slot.",
@@ -55,7 +69,7 @@ export function useBookWorker(refetchAvailability: () => Promise<any>) {
       }
 
       const payload: BookingPayload = { 
-        workerId, category, date, selectedSlots, slotType, numberOfDays, title, description 
+        workerId, category, date, selectedSlots, slotType, numberOfDays, numberOfWorkers, pricePerWorker, title, description, address 
       };
       const res = await bookWorkerAction(payload);
 

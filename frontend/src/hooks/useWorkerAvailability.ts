@@ -60,6 +60,7 @@ export function useWorkerAvailability(workerId: string) {
                       eveningAvailable: avail.eveningAvailable,
                       fullDayAvailable: avail.fullDayAvailable,
                       highlight,
+                      bookedSlots: avail.bookedSlots,
                     };
                     cache.current.set(date, summary);
                     map.set(date, summary);
@@ -112,6 +113,7 @@ export function useWorkerAvailability(workerId: string) {
         eveningAvailable: avail.eveningAvailable,
         fullDayAvailable: avail.fullDayAvailable,
         highlight,
+        bookedSlots: avail.bookedSlots,
       };
       cache.current.set(dateStr, summary);
 

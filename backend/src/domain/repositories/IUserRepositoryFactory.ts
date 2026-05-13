@@ -3,5 +3,5 @@ import { IBaseRepository } from "./IBaseRepository";
 import { User } from "../entities/User";
 
 export interface IUserRepositoryFactory {
-    getRepository<T extends User>(role: Role): IBaseRepository<T>;
+    getRepository<T extends User>(role: Role | "USER"): IBaseRepository<T>;
 }

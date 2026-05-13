@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import NextImage from "next/image";
 import {
     X,
     Mail,
@@ -23,6 +24,36 @@ import {
 } from "lucide-react";
 import { VerificationStatus } from "@/shared/enums/authEnums";
 import { User as UserType } from "@/shared/types/userTypes";
+import { getUserWalletBalanceByAdminAction } from "@/app/actions/admin/admin-actions";
+
+const WalletBalanceDisplay = ({ userId }: { userId: string }) => {
+    const [balance, setBalance] = useState<number | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        let mounted = true;
+        setLoading(true);
+        getUserWalletBalanceByAdminAction(userId).then(res => {
+            if (mounted && res.success && res.data) {
+                setBalance(res.data.balance);
+            }
+            if (mounted) setLoading(false);
+        });
+        return () => { mounted = false };
+    }, [userId]);
+
+    return (
+        <div className="flex items-center gap-3 p-3 bg-purple-50 rounded-xl border border-purple-100">
+            <div className="p-2 bg-white rounded-lg text-purple-700 shadow-sm"><span className="font-bold">₹</span></div>
+            <div>
+                <p className="text-xs text-purple-400 font-medium uppercase tracking-wider">Current Balance</p>
+                <p className="text-sm font-bold text-purple-900">
+                    {loading ? "Loading..." : balance !== null ? `₹${balance.toLocaleString()}` : "No Wallet"}
+                </p>
+            </div>
+        </div>
+    );
+};
 
 interface UserDetailsModalProps {
     isOpen: boolean;
@@ -54,7 +85,23 @@ const UserDetailsModal = ({ isOpen, onClose, user }: UserDetailsModalProps) => {
 
     if (!mounted || !isOpen || !user) return null;
 
-    const TabButton = ({ id, label, icon: Icon }: { id: TabType, label: string, icon: any }) => (
+    interface DocObj {
+        name?: string;
+        type?: string;
+        url?: string;
+    }
+    interface CertObj {
+        name?: string;
+        organization?: string;
+        issuer?: string;
+        date?: string;
+        url?: string;
+    }
+    interface PhotoObj {
+        url?: string;
+    }
+
+    const TabButton = ({ id, label, icon: Icon }: { id: TabType, label: string, icon: React.ComponentType<{ size?: number; className?: string }> }) => (
         <button
             onClick={() => setActiveTab(id)}
             className={`flex items-center gap-2 px-4 py-3 text-sm font-bold border-b-2 transition-all ${activeTab === id
@@ -68,28 +115,31 @@ const UserDetailsModal = ({ isOpen, onClose, user }: UserDetailsModalProps) => {
     );
 
     // Helper to determine if an item is an object or string and extract name/url safely
-    const safeRender = (item: any, type: 'doc' | 'cert' | 'photo') => {
+    const safeRender = (item: unknown, type: 'doc' | 'cert' | 'photo') => {
         const isString = typeof item === 'string';
 
         if (type === 'doc') {
+            const doc = !isString && item && typeof item === 'object' ? (item as DocObj) : {};
             return {
-                name: isString ? 'Document' : item.name || item.type || 'Document',
-                type: isString ? 'FILE' : item.type || 'FILE',
-                url: isString ? item : item.url,
+                name: isString ? 'Document' : doc.name || doc.type || 'Document',
+                type: isString ? 'FILE' : doc.type || 'FILE',
+                url: isString ? (item as string) : doc.url,
                 raw: item
             }
         }
         if (type === 'cert') {
+            const cert = !isString && item && typeof item === 'object' ? (item as CertObj) : {};
             return {
-                name: isString ? item : item.name || 'Certificate',
-                org: isString ? 'Unknown Organization' : item.organization || item.issuer || '',
-                date: isString ? null : item.date,
-                url: isString ? null : item.url
+                name: isString ? (item as string) : cert.name || 'Certificate',
+                org: isString ? 'Unknown Organization' : cert.organization || cert.issuer || '',
+                date: isString ? null : cert.date,
+                url: isString ? null : cert.url
             }
         }
         if (type === 'photo') {
+            const photo = !isString && item && typeof item === 'object' ? (item as PhotoObj) : {};
             return {
-                url: isString ? item : item.url
+                url: isString ? (item as string) : photo.url
             }
         }
         return { name: 'Unknown', url: '' };
@@ -145,7 +195,7 @@ const UserDetailsModal = ({ isOpen, onClose, user }: UserDetailsModalProps) => {
                             <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-8 items-start">
                                 <div className="w-32 h-32 shrink-0 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 border-4 border-white shadow-xl flex items-center justify-center overflow-hidden relative">
                                     {user.profileImageUrl ? (
-                                        <img src={user.profileImageUrl} alt={user.name} className="w-full h-full object-cover" />
+                                        <NextImage src={user.profileImageUrl} alt={user.name} fill unoptimized className="w-full h-full object-cover" />
                                     ) : (
                                         <span className="text-4xl font-bold text-gray-300">{user.name?.charAt(0)}</span>
                                     )}
@@ -176,6 +226,10 @@ const UserDetailsModal = ({ isOpen, onClose, user }: UserDetailsModalProps) => {
                                                     </div>
                                                 </div>
                                             )}
+                                        </div>
+                                        <h4 className="text-sm font-bold text-gray-400 uppercase tracking-wider mt-4">Wallet</h4>
+                                        <div className="space-y-3">
+                                            <WalletBalanceDisplay userId={user.id} />
                                         </div>
                                     </div>
 
@@ -213,7 +267,7 @@ const UserDetailsModal = ({ isOpen, onClose, user }: UserDetailsModalProps) => {
                                             <MapPin size={18} className="text-[#1B4332]" /> Locations
                                         </h4>
                                         <div className="space-y-3">
-                                            {user.address.map((addr: any, idx: number) => (
+                                            {(user.address as { label?: string; isDefault?: boolean; street?: string; city?: string; zip?: string }[]).map((addr, idx) => (
                                                 <div key={idx} className="p-4 bg-gray-50 rounded-2xl border border-gray-100 group hover:border-[#1B4332]/20 transition-colors">
                                                     <div className="flex items-center justify-between mb-2">
                                                         <div className="flex items-center gap-2">
@@ -277,7 +331,7 @@ const UserDetailsModal = ({ isOpen, onClose, user }: UserDetailsModalProps) => {
                                 </h4>
                                 {user.skills && user.skills.length > 0 ? (
                                     <div className="flex flex-wrap gap-2">
-                                        {user.skills.map((skill: any, idx: number) => (
+                                        {(user.skills as (string | { name: string })[]).map((skill, idx) => (
                                             <span key={idx} className="px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-lg text-sm font-bold border border-emerald-100">
                                                 {typeof skill === 'string' ? skill : skill.name}
                                             </span>
@@ -298,7 +352,7 @@ const UserDetailsModal = ({ isOpen, onClose, user }: UserDetailsModalProps) => {
                                 </h4>
                                 {user.certificates && user.certificates.length > 0 ? (
                                     <div className="grid grid-cols-1 gap-4">
-                                        {user.certificates.map((cert: any, idx: number) => {
+                                        {user.certificates.map((cert: unknown, idx: number) => {
                                             const data = safeRender(cert, 'cert');
                                             return (
                                                 <div key={idx} className="flex items-start gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100">
@@ -332,7 +386,7 @@ const UserDetailsModal = ({ isOpen, onClose, user }: UserDetailsModalProps) => {
                                 </h4>
                                 {user.documents && user.documents.length > 0 ? (
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        {user.documents.map((doc: any, idx: number) => {
+                                        {user.documents.map((doc: unknown, idx: number) => {
                                             const data = safeRender(doc, 'doc');
                                             return (
                                                 <div key={idx} className="group relative p-4 bg-gray-50 rounded-2xl border border-gray-100 hover:border-emerald-200 hover:shadow-md transition-all flex items-start gap-3">
@@ -364,13 +418,13 @@ const UserDetailsModal = ({ isOpen, onClose, user }: UserDetailsModalProps) => {
                                     <div className="text-center py-12 bg-gray-50 rounded-xl border border-dashed border-gray-200">
                                         <FileText size={48} className="mx-auto text-gray-200 mb-3" />
                                         <p className="text-gray-400 font-medium">No documents uploaded</p>
-                                        <p className="text-xs text-gray-300 mt-1">User hasn't submitted verification documents yet.</p>
+                                        <p className="text-xs text-gray-300 mt-1">{"User hasn't submitted verification documents yet."}</p>
                                     </div>
                                 )}
                             </div>
                         </div>
                     )}
-
+ 
                     {activeTab === 'gallery' && (
                         <div className="space-y-6 animate-in slide-in-from-bottom-2 duration-300">
                             <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
@@ -379,13 +433,15 @@ const UserDetailsModal = ({ isOpen, onClose, user }: UserDetailsModalProps) => {
                                 </h4>
                                 {user.workPhotos && user.workPhotos.length > 0 ? (
                                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                                        {user.workPhotos.map((photo: any, idx: number) => {
+                                        {user.workPhotos.map((photo: unknown, idx: number) => {
                                             const data = safeRender(photo, 'photo');
                                             return (
                                                 <div key={idx} className="aspect-square rounded-xl overflow-hidden relative group cursor-pointer border border-gray-100 bg-gray-50">
-                                                    <img
-                                                        src={data.url}
+                                                    <NextImage
+                                                        src={data.url || ""}
                                                         alt={`Work ${idx + 1}`}
+                                                        fill
+                                                        unoptimized
                                                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                                     />
                                                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -401,7 +457,7 @@ const UserDetailsModal = ({ isOpen, onClose, user }: UserDetailsModalProps) => {
                                     <div className="text-center py-12 bg-gray-50 rounded-xl border border-dashed border-gray-200">
                                         <ImageIcon size={48} className="mx-auto text-gray-200 mb-3" />
                                         <p className="text-gray-400 font-medium">No work photos added</p>
-                                        <p className="text-xs text-gray-300 mt-1">User hasn't uploaded any portfolio images.</p>
+                                        <p className="text-xs text-gray-300 mt-1">{"User hasn't uploaded any portfolio images."}</p>
                                     </div>
                                 )}
                             </div>

@@ -9,6 +9,9 @@ import { IUpdateUserAccessUseCase } from "../../../application/interfaces/admin/
 import { ResponseHandler } from "../../../shared/responses/ApiResponse";
 import { RESPONSE_MESSAGES } from "../../../shared/responses/ResponseMessages";
 import { IGetAllUsersUseCase } from "../../../application/interfaces/admin/IGetAllUsersUseCase";
+import { IGetAdminDashboardDataUseCase } from "../../../application/interfaces/admin/IGetAdminDashboardDataUseCase";
+import { IBaseRepository } from "../../../domain/repositories/IBaseRepository";
+import { User } from "../../../domain/entities/User";
 
 export class AdminController implements IAdminController {
     constructor(
@@ -16,8 +19,9 @@ export class AdminController implements IAdminController {
         private readonly _getAllWorkersUseCase: IGetAllWorkersUseCase,
         private readonly _updateVerificationStatusUseCase: IUpdateVerificationStatusUseCase,
         private readonly _updateUserAccessUseCase: IUpdateUserAccessUseCase,
-        private readonly _getAllUsersUseCase: IGetAllUsersUseCase
-
+        private readonly _getAllUsersUseCase: IGetAllUsersUseCase,
+        private readonly _getAdminDashboardDataUseCase: IGetAdminDashboardDataUseCase,
+        private readonly _userRepo: IBaseRepository<User>
     ) { }
 
     async getAllUsers(req: Request, res: Response): Promise<void> {
@@ -28,11 +32,11 @@ export class AdminController implements IAdminController {
                         ? req.query.isBlocked === "true"
                         : undefined,
 
-                isVerified: req.query.isVerified as any,
+                isVerified: req.query.isVerified as VerificationStatus,
                 search: req.query.search as string,
 
-                sortBy: req.query.sortBy as any,
-                sortOrder: req.query.sortOrder as any,
+                sortBy: req.query.sortBy as "createdAt" | "name" | "email" | undefined,
+                sortOrder: req.query.sortOrder as "asc" | "desc" | undefined,
 
                 page: req.query.page ? Number(req.query.page) : 1,
                 limit: req.query.limit ? Number(req.query.limit) : 20,
@@ -92,16 +96,17 @@ export class AdminController implements IAdminController {
 
             res.status(HttpStatusCode.OK).json(ResponseHandler.success(result, RESPONSE_MESSAGES.SUCCESS));
 
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error(error);
-            res.status(HttpStatusCode.INTERNAL_SERVER).json(ResponseHandler.error(RESPONSE_MESSAGES.BAD_REQUEST, error));
+            const message = error instanceof Error ? error.message : String(error);
+            res.status(HttpStatusCode.INTERNAL_SERVER).json(ResponseHandler.error(RESPONSE_MESSAGES.BAD_REQUEST, message));
         }
     };
 
     rejectVerification = async (req: Request, res: Response): Promise<void> => {
         try {
             const { userId } = req.params;
-            const { reason } = req.body;
+            const { reason } = req.body as { reason?: string };
 
             if (!reason) {
                 res.status(HttpStatusCode.BAD_REQUEST).json(
@@ -118,9 +123,10 @@ export class AdminController implements IAdminController {
 
             res.status(HttpStatusCode.OK).json(ResponseHandler.success(result, RESPONSE_MESSAGES.SUCCESS));
 
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error(error);
-            res.status(HttpStatusCode.INTERNAL_SERVER).json(ResponseHandler.error(RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR, error));
+            const message = error instanceof Error ? error.message : String(error);
+            res.status(HttpStatusCode.INTERNAL_SERVER).json(ResponseHandler.error(RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR, message));
         }
     };
 
@@ -133,9 +139,60 @@ export class AdminController implements IAdminController {
 
             res.status(HttpStatusCode.OK).json(ResponseHandler.success(result, RESPONSE_MESSAGES.UPDATED));
 
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error(error);
-            res.status(HttpStatusCode.INTERNAL_SERVER).json(ResponseHandler.error(RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR, error));
+            const message = error instanceof Error ? error.message : String(error);
+            res.status(HttpStatusCode.INTERNAL_SERVER).json(ResponseHandler.error(RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR, message));
+        }
+    }
+
+    toggleUserSuspension = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const { userId } = req.params;
+            const { durationDays } = req.body as { durationDays?: number };
+
+            const user = await this._userRepo.findById(userId);
+            if (!user) {
+                res.status(HttpStatusCode.BAD_REQUEST).json(ResponseHandler.error("User not found"));
+                return;
+            }
+
+            let result: User | null = null;
+            if (durationDays && durationDays > 0) {
+                const startDate = new Date();
+                const endDate = new Date(Date.now() + durationDays * 24 * 60 * 60 * 1000);
+
+                result = await this._userRepo.updateById(userId, {
+                    isSuspended: true,
+                    suspensionStartDate: startDate,
+                    suspensionEndDate: endDate,
+                    canAcceptBookings: false
+                });
+            } else {
+                result = await this._userRepo.updateById(userId, {
+                    isSuspended: false,
+                    suspensionStartDate: null,
+                    suspensionEndDate: null,
+                    canAcceptBookings: true
+                });
+            }
+
+            res.status(HttpStatusCode.OK).json(ResponseHandler.success(result, RESPONSE_MESSAGES.UPDATED));
+        } catch (error: unknown) {
+            console.error(error);
+            const message = error instanceof Error ? error.message : String(error);
+            res.status(HttpStatusCode.INTERNAL_SERVER).json(ResponseHandler.error(RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR, message));
+        }
+    }
+
+    getDashboardData = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const data = await this._getAdminDashboardDataUseCase.execute();
+            res.status(HttpStatusCode.OK).json(ResponseHandler.success(data, "Dashboard data fetched successfully"));
+        } catch (error: unknown) {
+            console.error(error);
+            const message = error instanceof Error ? error.message : String(error);
+            res.status(HttpStatusCode.INTERNAL_SERVER).json(ResponseHandler.error(RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR, message));
         }
     }
 }

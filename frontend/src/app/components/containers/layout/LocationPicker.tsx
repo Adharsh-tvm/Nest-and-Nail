@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
@@ -30,8 +30,12 @@ interface LocationPickerProps {
     onLocationSelect: (lat: number, lng: number) => void;
     initialLat?: number;
     initialLng?: number;
+    /** Pass a new value here to imperatively fly the map to a GPS position */
+    flyToLat?: number;
+    flyToLng?: number;
 }
 
+/* ── Click-to-pin + show marker ── */
 const LocationMarker = ({
     onLocationSelect,
     initialPosition,
@@ -48,7 +52,7 @@ const LocationMarker = ({
         },
     });
 
-    // Update internal state if initialPosition changes (e.g. from parent GPS fetch)
+    // Sync marker when initialPosition changes (GPS fly-to from parent)
     useEffect(() => {
         if (initialPosition) {
             setPosition(initialPosition);
@@ -58,31 +62,37 @@ const LocationMarker = ({
     return position === null ? null : <Marker position={position} />;
 };
 
-// Component to recenter map when props change
-const MapRecenter = ({ position }: { position: L.LatLng | null }) => {
-    const map = useMapEvents({});
+/* ── Fly to a position when it changes (GPS button) ── */
+const MapFlyTo = ({ position }: { position: L.LatLng | null }) => {
+    const map = useMap();
     useEffect(() => {
         if (position) {
-            map.flyTo(position, map.getZoom());
+            map.flyTo(position, Math.max(map.getZoom(), 15), { duration: 1.2 });
         }
-    }, [position, map]);
+    }, [map, position]);
     return null;
-}
+};
 
 export const LocationPicker: React.FC<LocationPickerProps> = ({
     onLocationSelect,
-    initialLat = 51.505, // Default to London or somewhere generic if 0
+    initialLat = 51.505,
     initialLng = -0.09,
+    flyToLat,
+    flyToLng,
 }) => {
-    // Use a default center if initialLat/Lng are 0 (which might be passed from empty state)
-    // If they are explicitly provided and non-zero (or valid 0 like prime meridian), use them.
-    // But usually 0,0 is "null island".
     const hasInitialValid = initialLat !== 0 || initialLng !== 0;
-
     const centerLat = hasInitialValid ? initialLat : 51.505;
     const centerLng = hasInitialValid ? initialLng : -0.09;
-
     const initialPosition = hasInitialValid ? new L.LatLng(centerLat, centerLng) : null;
+
+    // Derive fly-to position from props; undefined means no GPS pin yet
+    const flyToPosition =
+        flyToLat !== undefined && flyToLng !== undefined
+            ? new L.LatLng(flyToLat, flyToLng)
+            : null;
+
+    // The marker should show at flyToPosition if available, else initialPosition
+    const markerPosition = flyToPosition ?? initialPosition;
 
     return (
         <div className="h-[300px] w-full rounded-lg overflow-hidden border border-gray-200 shadow-sm isolate" style={{ zIndex: 0, position: 'relative' }}>
@@ -96,8 +106,9 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
-                <LocationMarker onLocationSelect={onLocationSelect} initialPosition={initialPosition} />
-                {initialPosition && <MapRecenter position={initialPosition} />}
+                <LocationMarker onLocationSelect={onLocationSelect} initialPosition={markerPosition} />
+                {/* Fly to GPS position when it changes */}
+                <MapFlyTo position={flyToPosition} />
             </MapContainer>
         </div>
     );

@@ -81,7 +81,7 @@ const fieldVariants = cva(
 export interface FieldProps
   extends React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof fieldVariants> {
-  invalid?: boolean; // ✅ allow invalid prop
+  invalid?: boolean; 
 }
 
 function Field({

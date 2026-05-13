@@ -69,7 +69,7 @@ export default function WorkerSidebar({ categories, activeCategory }: WorkerSide
         router.push('?');
     };
 
-    // GPS location
+    // GPS location — used from sidebar (applies immediately)
     const handleGps = () => {
         setIsLocating(true);
         navigator.geolocation.getCurrentPosition(
@@ -83,7 +83,25 @@ export default function WorkerSidebar({ categories, activeCategory }: WorkerSide
             () => {
                 alert('Unable to access location. Please check browser permissions.');
                 setIsLocating(false);
-            }
+            },
+            { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
+        );
+    };
+
+    // GPS location — used from inside the map modal (pins on map, does NOT navigate)
+    const handleGpsInMap = () => {
+        setIsLocating(true);
+        navigator.geolocation.getCurrentPosition(
+            ({ coords }) => {
+                setPendingLat(coords.latitude);
+                setPendingLng(coords.longitude);
+                setIsLocating(false);
+            },
+            () => {
+                alert('Unable to access location. Please check browser permissions.');
+                setIsLocating(false);
+            },
+            { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
         );
     };
 
@@ -261,6 +279,8 @@ export default function WorkerSidebar({ categories, activeCategory }: WorkerSide
                                 onLocationSelect={(lat, lng) => { setPendingLat(lat); setPendingLng(lng); }}
                                 initialLat={pendingLat ?? undefined}
                                 initialLng={pendingLng ?? undefined}
+                                flyToLat={pendingLat ?? undefined}
+                                flyToLng={pendingLng ?? undefined}
                             />
                         </div>
 
@@ -272,7 +292,7 @@ export default function WorkerSidebar({ categories, activeCategory }: WorkerSide
 
                         {/* Footer */}
                         <div className="flex items-center justify-between px-5 py-3.5 border-t border-gray-100">
-                            <button onClick={handleGps} disabled={isLocating} className="flex items-center gap-1.5 text-sm font-medium text-emerald-700 border border-emerald-200 hover:bg-emerald-50 px-3 py-2 rounded-lg transition-colors">
+                            <button onClick={handleGpsInMap} disabled={isLocating} className="flex items-center gap-1.5 text-sm font-medium text-emerald-700 border border-emerald-200 hover:bg-emerald-50 px-3 py-2 rounded-lg transition-colors">
                                 {isLocating ? <span className="w-3.5 h-3.5 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin" /> : <Navigation className="w-3.5 h-3.5" />}
                                 Use GPS
                             </button>

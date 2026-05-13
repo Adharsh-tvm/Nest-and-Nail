@@ -12,7 +12,11 @@ export default function WorkerSearchBar() {
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
             const params = new URLSearchParams(searchParams.toString());
-            keyword.trim() ? params.set('search', keyword.trim()) : params.delete('search');
+            if (keyword.trim()) {
+                params.set('search', keyword.trim());
+            } else {
+                params.delete('search');
+            }
             router.push(`?${params.toString()}`);
         }
     };

@@ -1,6 +1,6 @@
 "use client";
 
-import { fetchAllWorkers, Worker } from "@/sources/api/admin.api";
+import { fetchAllWorkers, Worker } from "@/sources/api/admin/admin.api";
 import { useEffect, useState } from "react";
 
 
@@ -31,9 +31,9 @@ export const useWorkers = (): UseWorkersResult => {
                 } else if (!cancelled) {
                     setWorkers(res);
                 }
-            } catch (err: any) {
+            } catch (err: unknown) {
                 console.error("[useWorkers] error:", err);
-                const msg = err?.message ?? "Failed to load workers";
+                const msg = (err instanceof Error ? err.message : undefined) ?? "Failed to load workers";
                 if (!cancelled) setError(msg);
             } finally {
                 if (!cancelled) setLoading(false);

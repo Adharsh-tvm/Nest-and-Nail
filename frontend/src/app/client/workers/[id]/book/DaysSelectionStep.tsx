@@ -7,6 +7,8 @@ interface DaysSelectionStepProps {
   onSelectCategory: (cat: string) => void;
   selectedDays: number;
   onSelectDays: (days: number) => void;
+  numberOfWorkers: number;
+  onSelectWorkers: (workers: number) => void;
   onNext: () => void;
 }
 
@@ -16,6 +18,8 @@ export function DaysSelectionStep({
   onSelectCategory,
   selectedDays,
   onSelectDays,
+  numberOfWorkers,
+  onSelectWorkers,
   onNext,
 }: DaysSelectionStepProps) {
   const options = Array.from({ length: 10 }, (_, i) => i + 1);
@@ -66,6 +70,30 @@ export function DaysSelectionStep({
               }`}
             >
               {num} {num === 1 ? "Day" : "Days"}
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="text-center mb-8 border-t border-gray-100 pt-8 mt-4">
+        <h2 className="text-2xl font-black text-gray-900 mb-2">Team Size</h2>
+        <p className="text-gray-500">How many workers are needed for this service?</p>
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-8">
+        {options.map((num) => {
+          const isSelected = numberOfWorkers === num;
+          return (
+            <button
+              key={`workers-${num}`}
+              onClick={() => onSelectWorkers(num)}
+              className={`py-4 rounded-2xl border-2 font-bold text-lg transition-all active:scale-95 ${
+                isSelected
+                  ? "border-emerald-500 bg-emerald-50 text-emerald-700 shadow-sm"
+                  : "border-gray-100 bg-white text-gray-600 hover:border-emerald-200 hover:bg-emerald-50/50"
+              }`}
+            >
+              {num} {num === 1 ? "Worker" : "Workers"}
             </button>
           );
         })}

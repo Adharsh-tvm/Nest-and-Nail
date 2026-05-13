@@ -26,9 +26,9 @@ export class ClientRepository extends BaseRepository<Client, IClientDocument> im
             role: worker.role,
             skills: worker.skills,
             loginMethod: worker.loginMethod,
-            documents: worker.documents || [],
-            certificates: worker.certificates || [],
-            workPhotos: worker.workPhotos || []
+            documents: worker.documents ?? [],
+            certificates: worker.certificates ?? [],
+            workPhotos: worker.workPhotos ?? []
         }));
     }
 }

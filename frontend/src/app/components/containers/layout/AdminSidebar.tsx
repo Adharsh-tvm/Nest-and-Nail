@@ -13,7 +13,7 @@ import {
   LogOut,
   Settings,
   HelpCircle,
-  Menu,
+  Calendar,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -35,6 +35,18 @@ const navItems = [
     href: "/admin/categories",
   },
   {
+    id: "services",
+    label: "Services",
+    icon: Wrench,
+    href: "/admin/services",
+  },
+  {
+    id: "meetings",
+    label: "Meetings",
+    icon: Calendar,
+    href: "/admin/meetings",
+  },
+  {
     id: "verification",
     label: "Verification",
     icon: ShieldCheck,
@@ -42,16 +54,16 @@ const navItems = [
   },
 
   {
-    id: "payments",
-    label: "Payments",
+    id: "transactions",
+    label: "Transactions",
     icon: CreditCard,
-    href: "/admin/payments",
-  },
+    href: "/admin/transactions",
+  }, 
   {
-    id: "complaints",
-    label: "Complaints",
+    id: "concerns",
+    label: "Concerns",
     icon: MessageSquare,
-    href: "/admin/complaints",
+    href: "/admin/concerns",
   },
   { id: "wallet", label: "Wallet", icon: Wallet, href: "/admin/wallet" },
 ];

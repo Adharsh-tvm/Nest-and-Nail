@@ -2,31 +2,43 @@ import React from "react";
 import { CheckCircle2, RotateCcw } from "lucide-react";
 import { SlotType, SLOT_LABELS, SLOT_PRICES } from "@/shared/types/serviceTypes";
 
+interface Address {
+  label: string;
+  street: string;
+  city: string;
+  state?: string;
+  zip: string;
+}
+
 interface BookingSummaryStepProps {
   title: string;
   description: string;
   numberOfDays: number;
+  numberOfWorkers: number;
   startDate: Date | null;
   selectedSlots: { date: string; slotType: SlotType }[];
   slotType: SlotType | null;
   workerName: string;
   category: string;
+  address?: Address;
   isBooking: boolean;
   onConfirm: () => void;
   onBackReq?: () => void;
+  platformFee?: number;
 }
 
 export function BookingSummaryStep({
   title,
   description,
   numberOfDays,
-  startDate,
+  numberOfWorkers,
   selectedSlots,
-  slotType,
   workerName,
   category,
+  address,
   isBooking,
   onConfirm,
+  platformFee = 50,
 }: BookingSummaryStepProps) {
   
   if (!selectedSlots || selectedSlots.length === 0) return null;
@@ -40,7 +52,8 @@ export function BookingSummaryStep({
       ? new Date(sortedDates[0].date).toLocaleDateString("en-US", formatOpts)
       : sortedDates.map(s => new Date(s.date).toLocaleDateString("en-US", { month: 'short', day: 'numeric' })).join(', ');
 
-  const totalAmount = selectedSlots.reduce((sum, slot) => sum + SLOT_PRICES[slot.slotType], 0);
+  const pricePerWorkerPerDay = selectedSlots.reduce((sum, slot) => sum + SLOT_PRICES[slot.slotType], 0) / (selectedSlots.length || 1);
+  const totalAmount = selectedSlots.reduce((sum, slot) => sum + SLOT_PRICES[slot.slotType], 0) * numberOfWorkers;
 
   return (
     <div className="bg-white rounded-[24px] p-6 sm:p-8 shadow-sm border border-gray-100 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -58,6 +71,16 @@ export function BookingSummaryStep({
           </div>
         </div>
 
+        {address && (
+          <div className="flex justify-between items-start pb-4 border-b border-gray-200">
+             <div>
+              <p className="text-sm font-bold text-gray-500 mb-1">Service Location</p>
+              <p className="font-bold text-gray-900">{address.label}</p>
+              <p className="text-sm text-gray-600 mt-1">{address.street}, {address.city}, {address.state} {address.zip}</p>
+            </div>
+          </div>
+        )}
+
         <div className="flex justify-between items-start pb-4 border-b border-gray-200">
            <div>
             <p className="text-sm font-bold text-gray-500 mb-1">Service Details</p>
@@ -68,9 +91,11 @@ export function BookingSummaryStep({
 
         <div className="flex justify-between items-center pb-4 border-b border-gray-200">
            <div>
-            <p className="text-sm font-bold text-gray-500 mb-1">Date & Duration</p>
+            <p className="text-sm font-bold text-gray-500 mb-1">Date, Duration & Team</p>
             <p className="font-bold text-gray-900">{dateString}</p>
-            <p className="text-sm text-gray-500">{numberOfDays} {numberOfDays === 1 ? 'Day' : 'Days'}</p>
+            <p className="text-sm text-gray-500">
+               {numberOfDays} {numberOfDays === 1 ? 'Day' : 'Days'} • {numberOfWorkers} {numberOfWorkers === 1 ? 'Worker' : 'Workers'}
+            </p>
           </div>
         </div>
 
@@ -80,11 +105,26 @@ export function BookingSummaryStep({
             <p className="font-bold text-gray-900">
                {selectedSlots.length === 1 ? SLOT_LABELS[selectedSlots[0].slotType] : 'Mixed Slots / Full Days'}
             </p>
+            <p className="text-xs text-gray-500 mt-1">₹{pricePerWorkerPerDay} per worker / day</p>
           </div>
            <div className="text-right">
-            <p className="text-sm font-bold text-gray-500 mb-1">Total Expected</p>
-            <p className="text-xl font-bold text-emerald-600">₹{totalAmount}</p>
+            <p className="text-sm font-bold text-gray-500 mb-1">Service Total</p>
+            <p className="text-xl font-bold text-gray-800">₹{totalAmount}</p>
           </div>
+        </div>
+
+        {/* Platform fee breakdown */}
+        <div className="flex justify-between items-center pt-3 border-t border-dashed border-gray-200">
+          <div>
+            <p className="text-sm font-bold text-gray-500 mb-0.5">Platform Fee</p>
+            <p className="text-xs text-gray-400">One-time convenience fee</p>
+          </div>
+          <p className="text-base font-bold text-amber-600">+ ₹{platformFee}</p>
+        </div>
+
+        <div className="flex justify-between items-center pt-3 border-t border-gray-200">
+          <p className="text-sm font-bold text-gray-700">Total Payable</p>
+          <p className="text-2xl font-black text-emerald-600">₹{totalAmount + platformFee}</p>
         </div>
       </div>
 

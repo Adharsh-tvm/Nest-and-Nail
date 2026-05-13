@@ -27,23 +27,22 @@ const MONTH_NAMES = [
 
 const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-const HIGHLIGHT_CLASSES: Record<string, string> = {
-  green: "bg-emerald-500 text-white",
-  yellow: "bg-amber-400 text-white",
-  red: "bg-red-400 text-white",
-};
 
-const HIGHLIGHT_DOT: Record<string, string> = {
-  green: "bg-emerald-400",
-  yellow: "bg-amber-400",
-  red: "bg-red-400",
+
+const isSlotWithin12Hours = (dateKey: string, slotType: SlotType): boolean => {
+  const slotDate = new Date(dateKey);
+  let startHour = 9;
+  if (slotType === SlotType.EVENING_HALF) {
+    startHour = 14;
+  }
+  slotDate.setUTCHours(startHour, 0, 0, 0);
+  return slotDate.getTime() < Date.now() + 12 * 60 * 60 * 1000;
 };
 
 export function CalendarSelector({
   selectedSlots,
   onSlotChange,
   availabilityData,
-  isLoadingDate,
   numberOfDays,
   onMonthChange,
   viewYear,
@@ -52,7 +51,6 @@ export function CalendarSelector({
 }: CalendarSelectorProps) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const todayKey = toDateKey(today.getFullYear(), today.getMonth(), today.getDate());
 
   const firstDayOfMonth = new Date(viewYear, viewMonth, 1).getDay();
   const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
@@ -72,9 +70,9 @@ export function CalendarSelector({
       const slot = newSlots[date];
       if (
         avail.highlight === "red" ||
-        (slot === SlotType.FULL_DAY && !avail.fullDayAvailable) ||
-        (slot === SlotType.MORNING_HALF && !avail.morningAvailable) ||
-        (slot === SlotType.EVENING_HALF && !avail.eveningAvailable)
+        (slot === SlotType.FULL_DAY && (!avail.fullDayAvailable || isSlotWithin12Hours(date, SlotType.FULL_DAY))) ||
+        (slot === SlotType.MORNING_HALF && (!avail.morningAvailable || isSlotWithin12Hours(date, SlotType.MORNING_HALF))) ||
+        (slot === SlotType.EVENING_HALF && (!avail.eveningAvailable || isSlotWithin12Hours(date, SlotType.EVENING_HALF)))
       ) {
         delete newSlots[date];
         changed = true;
@@ -129,9 +127,19 @@ export function CalendarSelector({
     }
   };
 
-  const isDateUnavailable = (availability: DateAvailabilitySummary | undefined) => {
+  const isDateUnavailable = (dateKey: string, availability: DateAvailabilitySummary | undefined) => {
     if (!availability) return false;
     if (availability.highlight === "red") return true;
+
+    // Also mark as unavailable if ALL available slots for this date are blocked by the 12 hr rule.
+    const morningBlocked = !availability.morningAvailable || isSlotWithin12Hours(dateKey, SlotType.MORNING_HALF);
+    const eveningBlocked = !availability.eveningAvailable || isSlotWithin12Hours(dateKey, SlotType.EVENING_HALF);
+    const fullDayBlocked = !availability.fullDayAvailable || isSlotWithin12Hours(dateKey, SlotType.FULL_DAY);
+
+    if (morningBlocked && eveningBlocked && fullDayBlocked) {
+       return true;
+    }
+
     return false;
   };
 
@@ -217,7 +225,7 @@ export function CalendarSelector({
           const dateObj = new Date(viewYear, viewMonth, day);
           const isPast = dateObj < today;
           const dayAvailability = availabilityData[key];
-          const isUnavailable = isDateUnavailable(dayAvailability);
+          const isUnavailable = isDateUnavailable(key, dayAvailability);
 
           return (
             <div
@@ -227,14 +235,46 @@ export function CalendarSelector({
                 if (isPast || isUnavailable) return;
                 
                 if (isDateSelected(dateObj)) {
-                  // If already selected, clicking the DATE toggles it off
-                  const newSlots = { ...selectedSlots };
-                  delete newSlots[key];
-                  onSlotChange(newSlots);
-                  if (focusedDate === key) setFocusedDate(null);
+                  if (focusedDate === key) {
+                    // If already focused, clicking again toggles it off
+                    const newSlots = { ...selectedSlots };
+                    delete newSlots[key];
+                    onSlotChange(newSlots);
+                    setFocusedDate(null);
+                  } else {
+                    // Selected but not focused: open the slot picker to allow changing the slot!
+                    setFocusedDate(key);
+                  }
                 } else {
-                  // Not selected. Focus it to show the panel.
-                  setFocusedDate(key);
+                  if (numberOfDays > 1) {
+                    let newSlots = { ...selectedSlots };
+                    // If already fully selected, reset and start over from this click
+                    if (Object.keys(newSlots).length >= numberOfDays) {
+                      newSlots = {};
+                    }
+                    
+                    const needed = numberOfDays - Object.keys(newSlots).length;
+                    const current = new Date(dateObj);
+                    
+                    for (let i = 0; i < needed; i++) {
+                       const cKey = toDateKey(current.getFullYear(), current.getMonth(), current.getDate());
+                       const avail = availabilityData[cKey];
+                       
+                       const isPastCheck = current < today;
+                       if (isPastCheck || isDateUnavailable(cKey, avail) || !avail?.fullDayAvailable || isSlotWithin12Hours(cKey, SlotType.FULL_DAY) || newSlots[cKey]) {
+                           break; // Hit a blocked day, stop auto-selecting
+                       }
+                       
+                       newSlots[cKey] = SlotType.FULL_DAY;
+                       current.setDate(current.getDate() + 1);
+                    }
+                    
+                    onSlotChange(newSlots);
+                    setFocusedDate(null);
+                  } else {
+                    // Not selected. Focus it to show the panel.
+                    setFocusedDate(key);
+                  }
                 }
               }}
             >
@@ -294,14 +334,19 @@ export function CalendarSelector({
                  newSlots[focusedDate] = SlotType.MORNING_HALF;
                  onSlotChange(newSlots);
                }}
-               disabled={!availabilityData[focusedDate].morningAvailable}
-               className={`py-3 px-2 rounded-xl text-sm font-bold transition-all border-2 flex flex-col items-center justify-center gap-1 
+               disabled={!availabilityData[focusedDate].morningAvailable || isSlotWithin12Hours(focusedDate, SlotType.MORNING_HALF)}
+               className={`py-3 px-2 rounded-xl text-sm font-bold transition-all border-2 flex flex-col items-center justify-center gap-1 relative overflow-hidden
                 ${selectedSlots[focusedDate] === SlotType.MORNING_HALF 
                   ? 'bg-emerald-600 text-white border-emerald-600 shadow-md' 
-                  : !availabilityData[focusedDate].morningAvailable 
+                  : (!availabilityData[focusedDate].morningAvailable || isSlotWithin12Hours(focusedDate, SlotType.MORNING_HALF))
                     ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-60' 
                     : 'bg-white text-gray-700 border-gray-200 hover:border-emerald-500 hover:text-emerald-600'}`}
              >
+                {isSlotWithin12Hours(focusedDate, SlotType.MORNING_HALF) && (
+                  <div className="absolute top-0 right-0 bg-red-100 text-red-600 text-[9px] px-1.5 py-0.5 rounded-bl-lg font-black uppercase">
+                    &lt;12h
+                  </div>
+                )}
                 <span>Morning</span>
                 <span className="text-xs font-medium opacity-80">(4-5 hrs)</span>
              </button>
@@ -316,14 +361,19 @@ export function CalendarSelector({
                  newSlots[focusedDate] = SlotType.EVENING_HALF;
                  onSlotChange(newSlots);
                }}
-               disabled={!availabilityData[focusedDate].eveningAvailable}
-               className={`py-3 px-2 rounded-xl text-sm font-bold transition-all border-2 flex flex-col items-center justify-center gap-1 
+               disabled={!availabilityData[focusedDate].eveningAvailable || isSlotWithin12Hours(focusedDate, SlotType.EVENING_HALF)}
+               className={`py-3 px-2 rounded-xl text-sm font-bold transition-all border-2 flex flex-col items-center justify-center gap-1 relative overflow-hidden
                 ${selectedSlots[focusedDate] === SlotType.EVENING_HALF 
                   ? 'bg-emerald-600 text-white border-emerald-600 shadow-md' 
-                  : !availabilityData[focusedDate].eveningAvailable
+                  : (!availabilityData[focusedDate].eveningAvailable || isSlotWithin12Hours(focusedDate, SlotType.EVENING_HALF))
                     ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-60' 
                     : 'bg-white text-gray-700 border-gray-200 hover:border-emerald-500 hover:text-emerald-600'}`}
              >
+                {isSlotWithin12Hours(focusedDate, SlotType.EVENING_HALF) && (
+                  <div className="absolute top-0 right-0 bg-red-100 text-red-600 text-[9px] px-1.5 py-0.5 rounded-bl-lg font-black uppercase">
+                    &lt;12h
+                  </div>
+                )}
                 <span>Evening</span>
                 <span className="text-xs font-medium opacity-80">(4-5 hrs)</span>
              </button>
@@ -338,17 +388,39 @@ export function CalendarSelector({
                  newSlots[focusedDate] = SlotType.FULL_DAY;
                  onSlotChange(newSlots);
                }}
-               disabled={!availabilityData[focusedDate].fullDayAvailable}
-               className={`py-3 px-2 rounded-xl text-sm font-bold transition-all border-2 flex flex-col items-center justify-center gap-1 
+               disabled={!availabilityData[focusedDate].fullDayAvailable || isSlotWithin12Hours(focusedDate, SlotType.FULL_DAY)}
+               className={`py-3 px-2 rounded-xl text-sm font-bold transition-all border-2 flex flex-col items-center justify-center gap-1 relative overflow-hidden
                 ${selectedSlots[focusedDate] === SlotType.FULL_DAY 
                   ? 'bg-emerald-600 text-white border-emerald-600 shadow-md' 
-                  : !availabilityData[focusedDate].fullDayAvailable
+                  : (!availabilityData[focusedDate].fullDayAvailable || isSlotWithin12Hours(focusedDate, SlotType.FULL_DAY))
                     ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-60' 
                     : 'bg-white text-gray-700 border-gray-200 hover:border-emerald-500 hover:text-emerald-600'}`}
              >
+                {isSlotWithin12Hours(focusedDate, SlotType.FULL_DAY) && (
+                  <div className="absolute top-0 right-0 bg-red-100 text-red-600 text-[9px] px-1.5 py-0.5 rounded-bl-lg font-black uppercase">
+                    &lt;12h
+                  </div>
+                )}
                 <span>Full Day</span>
                 <span className="text-xs font-medium opacity-80">(8-9 hrs)</span>
              </button>
+           </div>
+           
+           <div className="flex flex-col sm:flex-row sm:items-center justify-between mt-4 border-t border-gray-200 pt-3 gap-2">
+             <span className="text-xs text-gray-500">Tip: You can also click the date cell again to deselect it.</span>
+             {selectedSlots[focusedDate] && (
+               <button 
+                 onClick={() => {
+                   const newSlots = { ...selectedSlots };
+                   delete newSlots[focusedDate];
+                   onSlotChange(newSlots);
+                   setFocusedDate(null);
+                 }}
+                 className="text-red-600 hover:text-red-700 font-bold text-xs px-3 py-1.5 rounded-lg bg-red-50 border border-red-100 hover:bg-red-100 transition-colors"
+               >
+                 Remove Date
+               </button>
+             )}
            </div>
         </div>
       )}

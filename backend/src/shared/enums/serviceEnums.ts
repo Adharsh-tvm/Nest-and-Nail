@@ -1,5 +1,5 @@
 export enum ServiceStatus {
-    OPEN = "OPEN",
+    PENDING = "PENDING",
     CONFIRMED = "CONFIRMED",
     IN_PROGRESS = "IN_PROGRESS",
     COMPLETED = "COMPLETED",
@@ -7,4 +7,14 @@ export enum ServiceStatus {
     CANCELLED_BY_WORKER = "CANCELLED_BY_WORKER",
     CANCELLED = "CANCELLED",
     EXPIRED = "EXPIRED",
+    NO_SHOW = "NO_SHOW",
+    WORKER_ABSENT = "WORKER_ABSENT",
+    CLIENT_ABSENT = "CLIENT_ABSENT",
+}
+
+export enum VideoCallStatus {
+    SCHEDULED = "SCHEDULED",
+    ONGOING = "ONGOING",
+    ENDED = "ENDED",
+    MISSED = "MISSED"
 }

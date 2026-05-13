@@ -7,25 +7,28 @@ import { IGetWorkerAvailabilityUseCase } from "../../../application/interfaces/c
 
 export class ClientController {
   constructor(
-    private readonly getAvailableWorkersUseCase: IGetAvailableWorkersUseCase,
-    private readonly getWorkerByIdUseCase: IGetWorkerByIdUseCase,
-    private readonly getWorkerAvailabilityUseCase: IGetWorkerAvailabilityUseCase,
-  ) {}
+    private readonly _getAvailableWorkersUseCase: IGetAvailableWorkersUseCase,
+    private readonly _getWorkerByIdUseCase: IGetWorkerByIdUseCase,
+    private readonly _getWorkerAvailabilityUseCase: IGetWorkerAvailabilityUseCase,
+  ) { }
 
   getAvailableWorkers = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { category, lat, lng, search, isOnline } = req.query;
+      const { category, lat, lng, search, isOnline, page, limit, sort } = req.query;
 
-      const workers = await this.getAvailableWorkersUseCase.execute(
+      const { workers, total } = await this._getAvailableWorkersUseCase.execute(
         category as string,
-        Number(lat),
-        Number(lng),
+        lat ? Number(lat) : undefined,
+        lng ? Number(lng) : undefined,
         search as string | undefined,
-        isOnline === "true" ? true : undefined
+        isOnline === "true" ? true : undefined,
+        page ? parseInt(page as string) : undefined,
+        limit ? parseInt(limit as string) : undefined,
+        sort as string
       );
 
       res.status(HttpStatusCode.OK).json(
-        ResponseHandler.success(workers, "Workers fetched successfully")
+        ResponseHandler.success({ workers, total }, "Workers fetched successfully")
       );
     } catch (error) {
       next(error);
@@ -36,7 +39,7 @@ export class ClientController {
     try {
       const { id } = req.params;
 
-      const worker = await this.getWorkerByIdUseCase.execute(id);
+      const worker = await this._getWorkerByIdUseCase.execute(id);
 
       if (!worker) {
         return res.status(HttpStatusCode.NOT_FOUND).json(
@@ -67,8 +70,8 @@ export class ClientController {
           );
         }
 
-        if (this.getWorkerAvailabilityUseCase.executeBulk) {
-          const result = await this.getWorkerAvailabilityUseCase.executeBulk(
+        if (this._getWorkerAvailabilityUseCase.executeBulk) {
+          const result = await this._getWorkerAvailabilityUseCase.executeBulk(
             id,
             parsedStart,
             parsedEnd
@@ -94,7 +97,7 @@ export class ClientController {
         );
       }
 
-      const result = await this.getWorkerAvailabilityUseCase.execute(
+      const result = await this._getWorkerAvailabilityUseCase.execute(
         id,
         parsedDate
       );

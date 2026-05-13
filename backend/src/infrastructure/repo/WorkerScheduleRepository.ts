@@ -3,8 +3,6 @@ import { IWorkerScheduleRepository } from "../../domain/repositories/IWorkerSche
 import { WorkerScheduleModel } from "../database/models/WorkerScheduleModel";
 
 export class WorkerScheduleRepository implements IWorkerScheduleRepository {
-  constructor() {
-  }
 
   async createBulk(schedules: WorkerSchedule[]): Promise<WorkerSchedule[]> {
     const created = await WorkerScheduleModel.insertMany(schedules, { ordered: false });
@@ -80,7 +78,8 @@ export class WorkerScheduleRepository implements IWorkerScheduleRepository {
           serviceId
         },
         $setOnInsert: {
-          date: start
+          date: start,
+          isAvailable: true
         }
       },
       { upsert: true }
@@ -106,5 +105,15 @@ export class WorkerScheduleRepository implements IWorkerScheduleRepository {
         serviceId: null
       }
     );
+  }
+
+  async findBlockedAndBookedDates(workerId: string) {
+    return await WorkerScheduleModel.find({
+      workerId,
+      $or: [
+        { isBooked: true },
+        { isAvailable: false }
+      ]
+    }).lean();
   }
 }

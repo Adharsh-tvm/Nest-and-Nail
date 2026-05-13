@@ -34,7 +34,7 @@ export class UserMapper {
             user_role: userData.role,
             profileImageUrl: userData.profilePictureUrl,
             isBlocked: userData.isBlocked ?? false,
-            isOnline: userData.isOnline ?? false,
+            isOnline: userData.isOnline,
             isVerified: userData.isVerified ?? VerificationStatus.NOT_VERIFIED,
 
             skills: userData.skills ?? [],
@@ -61,9 +61,13 @@ export class UserMapper {
             totalRatings: userData.totalRatings ?? 0,
             weeklyJobCount: userData.weeklyJobCount ?? 0,
             currentActiveRequestId: userData.currentActiveRequestId ?? undefined,
+            isSuspended: userData.isSuspended ?? false,
+            suspensionStartDate: userData.suspensionStartDate ? userData.suspensionStartDate.toISOString() : undefined,
+            suspensionEndDate: userData.suspensionEndDate ? userData.suspensionEndDate.toISOString() : undefined,
+            canAcceptBookings: userData.canAcceptBookings ?? true,
 
-            createdAt: userData.createdAt?.toISOString?.() ?? "",
-            updatedAt: userData.updatedAt?.toISOString?.() ?? "",
+            createdAt: userData.createdAt.toISOString(),
+            updatedAt: userData.updatedAt.toISOString(),
         };
     }
 }

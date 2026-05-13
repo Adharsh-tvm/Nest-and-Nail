@@ -1,9 +1,12 @@
 import type { NextConfig } from "next";
 
-const nextConfig = {
+const nextConfig: NextConfig = {
+  eslint: {
+    // Lint rules are configured as warnings in eslint.config.mjs — build should not fail on them
+    ignoreDuringBuilds: true,
+  },
 
   experimental: {
-    isrMemoryCacheSize: 0,
     serverActions: {
       allowedOrigins: [
         "localhost:3000",

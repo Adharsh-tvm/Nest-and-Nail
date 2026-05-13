@@ -8,6 +8,20 @@ export class ValidationError extends Error {
 }
 
 export class AuthValidator {
+  static validatePassword(password: string): void {
+    if (!password || password.length < 8) {
+      throw new ValidationError(
+        "Password must be at least 8 characters with uppercase, lowercase, number, and special character"
+      );
+    }
+
+    if (!this._isStrongPassword(password)) {
+      throw new ValidationError(
+        "Password must include uppercase, lowercase, number, and special character"
+      );
+    }
+  }
+
   static validateRegistration(data: UserRequestDTO): void {
     if (!data.user_name || data.user_name.trim().length < 2) {
       throw new ValidationError("Name must be at least 2 characters");
@@ -17,17 +31,7 @@ export class AuthValidator {
       throw new ValidationError("Invalid email format");
     }
 
-    if (!data.password || data.password.length < 8) {
-      throw new ValidationError(
-        "Password must be at least 8 characters with uppercase, lowercase, number, and special character"
-      );
-    }
-
-    if (!this._isStrongPassword(data.password)) {
-      throw new ValidationError(
-        "Password must include uppercase, lowercase, number, and special character"
-      );
-    }
+    this.validatePassword(data.password);
 
     if (data.phone_number && !this._isValidPhone(data.phone_number)) {
       throw new ValidationError("Invalid phone number");

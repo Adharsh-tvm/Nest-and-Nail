@@ -1,6 +1,10 @@
 import React from 'react';
 import { getWorkerDetailAction } from '@/app/actions/client/view-worker-actions';
-import { MapPin, Star, Briefcase, CheckCircle2, XCircle, ChevronLeft, Phone } from 'lucide-react';
+import {
+    MapPin, Star, Briefcase, CheckCircle2, XCircle,
+    ChevronLeft, Phone, Calendar, Zap, Award, Clock,
+    ShieldCheck, ArrowRight
+} from 'lucide-react';
 import Link from 'next/link';
 
 export default async function WorkerDetailPage({
@@ -13,15 +17,37 @@ export default async function WorkerDetailPage({
 
     if (error || !success || !worker) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-                <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 max-w-md w-full text-center">
-                    <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <XCircle className="w-8 h-8" />
+            <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdf4 100%)' }}>
+                <div style={{
+                    background: 'white',
+                    borderRadius: '24px',
+                    padding: '48px',
+                    maxWidth: '440px',
+                    width: '100%',
+                    textAlign: 'center',
+                    boxShadow: '0 25px 50px -12px rgba(0,0,0,0.08)',
+                    border: '1px solid #f1f5f9'
+                }}>
+                    <div style={{
+                        width: '72px', height: '72px',
+                        background: 'linear-gradient(135deg, #fef2f2, #fee2e2)',
+                        borderRadius: '50%',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        margin: '0 auto 20px'
+                    }}>
+                        <XCircle style={{ width: '32px', height: '32px', color: '#ef4444' }} />
                     </div>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Worker Not Found</h2>
-                    <p className="text-gray-500 mb-6">{error || "The worker profile you're looking for doesn't exist or is unavailable."}</p>
-                    <Link href="/client/workers" className="text-emerald-600 font-semibold hover:text-emerald-700 underline">
-                        Back to available workers
+                    <h2 style={{ fontSize: '24px', fontWeight: 800, color: '#111827', marginBottom: '8px' }}>Worker Not Found</h2>
+                    <p style={{ color: '#6b7280', marginBottom: '28px', lineHeight: 1.6 }}>
+                        {error || "The worker profile you're looking for doesn't exist or is unavailable."}
+                    </p>
+                    <Link href="/client/workers" style={{
+                        display: 'inline-flex', alignItems: 'center', gap: '6px',
+                        background: 'linear-gradient(135deg, #059669, #10b981)',
+                        color: 'white', padding: '12px 24px', borderRadius: '12px',
+                        fontWeight: 700, textDecoration: 'none', fontSize: '14px'
+                    }}>
+                        <ChevronLeft size={16} /> Back to workers
                     </Link>
                 </div>
             </div>
@@ -29,205 +55,586 @@ export default async function WorkerDetailPage({
     }
 
     const initials = worker.name.substring(0, 2).toUpperCase();
-    const primaryRole = worker.categories && worker.categories.length > 0 
-        ? worker.categories[0] 
+    const primaryRole = worker.categories && worker.categories.length > 0
+        ? worker.categories[0]
         : (worker.skills && worker.skills.length > 0 ? worker.skills[0] : 'Professional Worker');
 
-    return (
-        <div className="min-h-screen bg-gray-50 py-10">
-            <div className="container mx-auto px-4 max-w-5xl">
-                {/* Back Link */}
-                <Link href="/client/workers" className="inline-flex items-center text-gray-500 hover:text-emerald-600 transition-colors mb-6 font-medium">
-                    <ChevronLeft className="w-5 h-5 mr-1" />
-                    Back to workers
-                </Link>
+    const profileImageSrc = (() => {
+        const url = worker.profileImageUrl || worker.profilePictureUrl;
+        if (!url) return null;
+        if (url.startsWith('http') || url.startsWith('blob:') || url.startsWith('data:')) return url;
+        if (!url.startsWith('/')) return `https://nestnail-storage-2026.s3.ap-south-1.amazonaws.com/${url}`;
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+        return `${baseUrl}/${url.replace(/^\//, '')}`;
+    })();
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Left Column - Main Profile Info */}
-                    <div className="lg:col-span-1 space-y-6">
+    const memberSince = worker.createdAt
+        ? new Date(worker.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+        : 'Recently';
+
+    const addressText = worker.address && worker.address.length > 0
+        ? `${worker.address[0].street ? worker.address[0].street + ', ' : ''}${worker.address[0].city}${worker.address[0].state ? ', ' + worker.address[0].state : ''}`
+        : 'Location details hidden';
+
+    return (
+        <div style={{ minHeight: '100vh', background: '#f8fafc' }}>
+
+            {/* ── Hero Banner ── */}
+            <div style={{
+                background: 'linear-gradient(135deg, #064e3b 0%, #065f46 40%, #047857 100%)',
+                position: 'relative',
+                overflow: 'hidden',
+                paddingTop: '28px',
+                paddingBottom: '100px',
+            }}>
+                {/* Decorative blobs */}
+                <div style={{
+                    position: 'absolute', top: '-60px', right: '-60px',
+                    width: '320px', height: '320px', borderRadius: '50%',
+                    background: 'rgba(16,185,129,0.15)', filter: 'blur(60px)'
+                }} />
+                <div style={{
+                    position: 'absolute', bottom: '-40px', left: '10%',
+                    width: '200px', height: '200px', borderRadius: '50%',
+                    background: 'rgba(52,211,153,0.12)', filter: 'blur(50px)'
+                }} />
+
+                <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 24px', position: 'relative', zIndex: 1 }}>
+                    <Link href="/client/workers" style={{
+                        display: 'inline-flex', alignItems: 'center', gap: '6px',
+                        color: 'rgba(255,255,255,0.75)', textDecoration: 'none',
+                        fontSize: '14px', fontWeight: 600,
+                        padding: '8px 16px', borderRadius: '10px',
+                        background: 'rgba(255,255,255,0.1)',
+                        border: '1px solid rgba(255,255,255,0.15)',
+                        backdropFilter: 'blur(8px)',
+                        transition: 'all 0.2s',
+                        marginBottom: '32px',
+                    }}>
+                        <ChevronLeft size={16} /> Back to Workers
+                    </Link>
+                </div>
+            </div>
+
+            {/* ── Content ── */}
+            <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 24px 64px' }}>
+                <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+                    gap: '28px',
+                    marginTop: '-72px',
+                    position: 'relative',
+                    zIndex: 10,
+                    alignItems: 'start',
+                }}>
+
+                    {/* ════ LEFT PANEL ════ */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+
                         {/* Profile Card */}
-                        <div className="bg-white rounded-[24px] border border-gray-200 overflow-hidden shadow-sm relative pt-10 px-6 pb-6 text-center text-black">
-                            {/* Online Status Badge */}
-                            <div className="absolute top-4 right-4">
+                        <div style={{
+                            background: 'white',
+                            borderRadius: '28px',
+                            padding: '36px 28px 28px',
+                            boxShadow: '0 20px 60px rgba(0,0,0,0.1)',
+                            border: '1px solid #e2e8f0',
+                            textAlign: 'center',
+                            position: 'relative',
+                            overflow: 'hidden',
+                        }}>
+                            {/* Card accent top strip */}
+                            <div style={{
+                                position: 'absolute', top: 0, left: 0, right: 0, height: '5px',
+                                background: worker.isOnline
+                                    ? 'linear-gradient(90deg, #10b981, #34d399)'
+                                    : 'linear-gradient(90deg, #94a3b8, #cbd5e1)'
+                            }} />
+
+                            {/* Online badge */}
+                            <div style={{ position: 'absolute', top: '18px', right: '18px' }}>
                                 {worker.isOnline ? (
-                                    <span className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full text-xs font-bold border border-emerald-100 shadow-sm">
-                                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                                    <span style={{
+                                        display: 'inline-flex', alignItems: 'center', gap: '6px',
+                                        padding: '5px 12px', borderRadius: '20px',
+                                        background: 'linear-gradient(135deg, #d1fae5, #a7f3d0)',
+                                        color: '#065f46', fontSize: '12px', fontWeight: 700,
+                                        border: '1px solid #6ee7b7',
+                                    }}>
+                                        <span style={{
+                                            width: '7px', height: '7px', borderRadius: '50%',
+                                            background: '#10b981',
+                                            boxShadow: '0 0 0 3px rgba(16,185,129,0.25)',
+                                            animation: 'pulse 2s infinite'
+                                        }} />
                                         Online
                                     </span>
                                 ) : (
-                                    <span className="flex items-center gap-1.5 px-3 py-1 bg-gray-50 text-gray-600 rounded-full text-xs font-bold border border-gray-200 shadow-sm">
-                                        <div className="w-2 h-2 rounded-full bg-gray-400"></div>
+                                    <span style={{
+                                        display: 'inline-flex', alignItems: 'center', gap: '6px',
+                                        padding: '5px 12px', borderRadius: '20px',
+                                        background: '#f1f5f9', color: '#64748b',
+                                        fontSize: '12px', fontWeight: 700,
+                                        border: '1px solid #e2e8f0',
+                                    }}>
+                                        <span style={{
+                                            width: '7px', height: '7px', borderRadius: '50%',
+                                            background: '#94a3b8'
+                                        }} />
                                         Offline
                                     </span>
                                 )}
                             </div>
 
-                            <div className="w-32 h-32 mx-auto rounded-full overflow-hidden bg-gray-100 flex items-center justify-center border-4 border-white shadow-lg mb-4">
-                                {(worker.profileImageUrl || worker.profilePictureUrl) ? (
-                                    <img
-                                        src={(() => {
-                                            const url = worker.profileImageUrl || worker.profilePictureUrl;
-                                            if (!url) return '';
-                                            if (url.startsWith('http') || url.startsWith('blob:') || url.startsWith('data:')) {
-                                                return url;
-                                            }
-                                            // Fallback for S3 raw keys
-                                            if (!url.startsWith('/')) {
-                                                return `https://nestnail-storage-2026.s3.ap-south-1.amazonaws.com/${url}`;
-                                            }
-                                            
-                                            const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-                                            return `${baseUrl}/${url.replace(/^\//, '')}`;
-                                        })()}
-                                        alt={worker.name}
-                                        className="object-cover w-full h-full"
-                                    />
-                                ) : (
-                                    <span className="text-4xl font-extrabold text-gray-300 tracking-wider">
-                                        {initials}
-                                    </span>
-                                )}
+                            {/* Avatar */}
+                            <div style={{
+                                width: '110px', height: '110px',
+                                borderRadius: '50%',
+                                margin: '0 auto 16px',
+                                position: 'relative',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            }}>
+                                <div style={{
+                                    position: 'absolute', inset: '-4px', borderRadius: '50%',
+                                    background: worker.isOnline
+                                        ? 'linear-gradient(135deg, #10b981, #34d399)'
+                                        : 'linear-gradient(135deg, #94a3b8, #cbd5e1)',
+                                    zIndex: 0,
+                                }} />
+                                <div style={{
+                                    width: '110px', height: '110px', borderRadius: '50%',
+                                    overflow: 'hidden',
+                                    background: 'linear-gradient(135deg, #e2e8f0, #f1f5f9)',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    position: 'relative', zIndex: 1,
+                                    border: '3px solid white',
+                                }}>
+                                    {profileImageSrc ? (
+                                        // eslint-disable-next-line @next/next/no-img-element
+                                        <img src={profileImageSrc} alt={worker.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                    ) : (
+                                        <span style={{ fontSize: '36px', fontWeight: 800, color: '#94a3b8', letterSpacing: '-1px' }}>{initials}</span>
+                                    )}
+                                </div>
                             </div>
 
-                            <h1 className="text-2xl font-black text-gray-900 mb-1">{worker.name}</h1>
-                            <div className="flex items-center justify-center text-[#111827] mb-2">
-                                <Briefcase className="w-4 h-4 mr-1.5 text-gray-400" />
-                                <span className="font-semibold text-gray-700 tracking-tight">{primaryRole}</span>
+                            {/* Name + role */}
+                            <h1 style={{ fontSize: '22px', fontWeight: 800, color: '#0f172a', marginBottom: '4px', letterSpacing: '-0.5px' }}>
+                                {worker.name}
+                            </h1>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginBottom: '14px' }}>
+                                <Briefcase size={14} style={{ color: '#10b981' }} />
+                                <span style={{ fontSize: '14px', fontWeight: 600, color: '#475569' }}>{primaryRole}</span>
                             </div>
 
+                            {/* Rating row */}
+                            <div style={{
+                                display: 'inline-flex', alignItems: 'center', gap: '8px',
+                                background: 'linear-gradient(135deg, #fffbeb, #fef3c7)',
+                                padding: '8px 18px', borderRadius: '12px',
+                                border: '1px solid #fde68a', marginBottom: '20px',
+                            }}>
+                                <Star size={15} style={{ fill: '#f59e0b', color: '#f59e0b' }} />
+                                <span style={{ fontSize: '15px', fontWeight: 800, color: '#92400e' }}>
+                                    {worker.rating ? worker.rating.toFixed(1) : 'New'}
+                                </span>
+                                <span style={{ fontSize: '13px', color: '#a16207', fontWeight: 500 }}>
+                                    ({worker.totalRatings || 0} reviews)
+                                </span>
+                            </div>
+
+                            {/* Distance */}
                             {worker.distance !== undefined && (
-                                <div className="flex items-center justify-center text-sm mb-4">
-                                    <span className="inline-flex items-center px-3 py-1 rounded-md font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100 shadow-sm">
-                                        <MapPin className="w-4 h-4 mr-1.5" />
-                                        {worker.distance < 1000 
-                                            ? `${Math.round(worker.distance)} m away`
-                                            : `${(worker.distance / 1000).toFixed(1)} km away`}
-                                    </span>
+                                <div style={{
+                                    display: 'inline-flex', alignItems: 'center', gap: '5px',
+                                    fontSize: '13px', fontWeight: 600, color: '#064e3b',
+                                    background: '#d1fae5', padding: '5px 12px',
+                                    borderRadius: '8px', border: '1px solid #a7f3d0',
+                                    marginBottom: '20px', marginLeft: '8px',
+                                }}>
+                                    <MapPin size={13} />
+                                    {worker.distance < 1000
+                                        ? `${Math.round(worker.distance)} m away`
+                                        : `${(worker.distance / 1000).toFixed(1)} km away`}
                                 </div>
                             )}
 
-                            <div className="flex items-center justify-center gap-2 mb-6">
-                                <Star className="w-5 h-5 fill-emerald-500 text-emerald-500" />
-                                <span className="text-xl font-bold text-gray-900">{worker.rating ? worker.rating.toFixed(1) : 'New'}</span>
-                                <span className="text-sm font-medium text-gray-400">({worker.totalRatings || 0} reviews)</span>
+                            {/* CTA */}
+                            <div style={{ marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                {worker.isOnline ? (
+                                    <>
+                                        <Link href={`/client/workers/${paramsObj.id}/book`} style={{
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                                            width: '100%',
+                                            background: 'linear-gradient(135deg, #059669, #10b981)',
+                                            color: 'white', fontWeight: 700, fontSize: '15px',
+                                            padding: '14px 20px', borderRadius: '14px',
+                                            textDecoration: 'none',
+                                            boxShadow: '0 8px 24px rgba(5,150,105,0.3)',
+                                            transition: 'all 0.2s',
+                                        }}>
+                                            Book a Service <ArrowRight size={16} />
+                                        </Link>
+                                        <Link href={`/client/workers/${paramsObj.id}/meeting`} style={{
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                                            width: '100%',
+                                            background: 'white',
+                                            color: '#059669', fontWeight: 700, fontSize: '15px',
+                                            padding: '12px 20px', borderRadius: '14px',
+                                            border: '2px solid #10b981',
+                                            textDecoration: 'none',
+                                            transition: 'all 0.2s',
+                                        }}>
+                                            Schedule a Meeting <Calendar size={16} />
+                                        </Link>
+                                    </>
+                                ) : (
+                                    <>
+                                        <button disabled title="Worker is currently offline" style={{
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                                            width: '100%', border: 'none',
+                                            background: '#f1f5f9', color: '#94a3b8',
+                                            fontWeight: 700, fontSize: '15px',
+                                            padding: '14px 20px', borderRadius: '14px',
+                                            cursor: 'not-allowed',
+                                        }}>
+                                            Book a Service
+                                            <span style={{ fontSize: '12px', fontWeight: 500, color: '#b0bfcf' }}>· Unavailable</span>
+                                        </button>
+                                        <button disabled title="Worker is currently offline" style={{
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                                            width: '100%', border: '2px solid #e2e8f0',
+                                            background: 'transparent', color: '#94a3b8',
+                                            fontWeight: 700, fontSize: '15px',
+                                            padding: '12px 20px', borderRadius: '14px',
+                                            cursor: 'not-allowed',
+                                        }}>
+                                            Schedule a Meeting
+                                        </button>
+                                    </>
+                                )}
                             </div>
+                        </div>
 
-                            <Link href={`/client/workers/${paramsObj.id}/book`} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 px-4 rounded-xl transition-all shadow-md hover:shadow-lg active:scale-[0.98] flex items-center justify-center gap-2">
-                                Book a Service
-                            </Link>
+                        {/* Stats row */}
+                        <div style={{
+                            display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px',
+                        }}>
+                            {[
+                                { icon: <Calendar size={18} style={{ color: '#7c3aed' }} />, label: 'Member Since', value: memberSince, bg: '#f5f3ff', border: '#ede9fe' },
+                                { icon: <Zap size={18} style={{ color: '#d97706' }} />, label: 'Weekly Jobs', value: String(worker.weeklyJobCount || 0), bg: '#fffbeb', border: '#fde68a' },
+                            ].map((stat, i) => (
+                                <div key={i} style={{
+                                    background: stat.bg, border: `1px solid ${stat.border}`,
+                                    borderRadius: '18px', padding: '18px 14px', textAlign: 'center',
+                                }}>
+                                    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '8px' }}>{stat.icon}</div>
+                                    <div style={{ fontSize: '16px', fontWeight: 800, color: '#0f172a', marginBottom: '3px' }}>{stat.value}</div>
+                                    <div style={{ fontSize: '11px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{stat.label}</div>
+                                </div>
+                            ))}
                         </div>
 
                         {/* Contact & Info Card */}
-                        <div className="bg-white rounded-[20px] border border-gray-200 p-6 shadow-sm">
-                            <h3 className="text-lg font-bold text-gray-900 mb-4 border-b border-gray-100 pb-3">Contact & Location</h3>
-                            
-                            <div className="space-y-4">
-                                <div className="flex items-start gap-3">
-                                    <MapPin className="w-5 h-5 text-emerald-600 mt-0.5" />
+                        <div style={{
+                            background: 'white', borderRadius: '22px',
+                            padding: '24px', boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+                            border: '1px solid #e2e8f0',
+                        }}>
+                            <h3 style={{
+                                fontSize: '13px', fontWeight: 700, color: '#94a3b8',
+                                textTransform: 'uppercase', letterSpacing: '1px',
+                                marginBottom: '18px', paddingBottom: '12px',
+                                borderBottom: '1px solid #f1f5f9'
+                            }}>
+                                Contact & Location
+                            </h3>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+                                {/* Address */}
+                                <div style={{ display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
+                                    <div style={{
+                                        width: '38px', height: '38px', borderRadius: '10px',
+                                        background: '#ecfdf5', display: 'flex',
+                                        alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                                    }}>
+                                        <MapPin size={17} style={{ color: '#059669' }} />
+                                    </div>
                                     <div>
-                                        <p className="text-sm font-medium text-gray-500 mb-0.5">Service Area</p>
-                                        <p className="text-gray-900 font-medium">
-                                            {worker.address && worker.address.length > 0
-                                                ? `${worker.address[0].street ? worker.address[0].street + ', ' : ''}${worker.address[0].city}, ${worker.address[0].state || ''} ${worker.address[0].zip || ''}`
-                                                : 'Location details hidden'}
-                                        </p>
+                                        <p style={{ fontSize: '12px', fontWeight: 600, color: '#94a3b8', marginBottom: '3px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Service Area</p>
+                                        <p style={{ fontSize: '14px', fontWeight: 600, color: '#1e293b' }}>{addressText}</p>
                                     </div>
                                 </div>
-                                
+
+                                {/* Phone */}
                                 {worker.phone_number && (
-                                    <div className="flex items-start gap-3">
-                                        <Phone className="w-5 h-5 text-emerald-600 mt-0.5" />
+                                    <div style={{ display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
+                                        <div style={{
+                                            width: '38px', height: '38px', borderRadius: '10px',
+                                            background: '#f0fdf4', display: 'flex',
+                                            alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                                        }}>
+                                            <Phone size={17} style={{ color: '#059669' }} />
+                                        </div>
                                         <div>
-                                            <p className="text-sm font-medium text-gray-500 mb-0.5">Phone (Verified)</p>
-                                            <p className="text-gray-900 font-medium">{worker.phone_number}</p>
+                                            <p style={{ fontSize: '12px', fontWeight: 600, color: '#94a3b8', marginBottom: '3px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Phone</p>
+                                            <p style={{ fontSize: '14px', fontWeight: 600, color: '#1e293b' }}>{worker.phone_number}</p>
                                         </div>
                                     </div>
                                 )}
 
-                                <div className="flex items-start gap-3">
-                                    <CheckCircle2 className="w-5 h-5 text-emerald-600 mt-0.5" />
+                                {/* Verification */}
+                                <div style={{ display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
+                                    <div style={{
+                                        width: '38px', height: '38px', borderRadius: '10px',
+                                        background: '#f0fdf4', display: 'flex',
+                                        alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                                    }}>
+                                        <ShieldCheck size={17} style={{ color: '#059669' }} />
+                                    </div>
                                     <div>
-                                        <p className="text-sm font-medium text-gray-500 mb-0.5">Verification</p>
-                                        <p className="text-gray-900 font-medium capitalize">{worker.isVerified.toLowerCase()}</p>
+                                        <p style={{ fontSize: '12px', fontWeight: 600, color: '#94a3b8', marginBottom: '3px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Verification</p>
+                                        <p style={{ fontSize: '14px', fontWeight: 600, color: '#1e293b', textTransform: 'capitalize' }}>{worker.isVerified.toLowerCase()}</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    {/* Right Column - Detailed Info */}
-                    <div className="lg:col-span-2 space-y-6">
-                        {/* Expertise & Skills */}
-                        <div className="bg-white rounded-[24px] border border-gray-200 p-8 shadow-sm">
-                            <h2 className="text-2xl font-extrabold text-gray-900 mb-6 flex items-center gap-2">
-                                Expertise & Skills
-                            </h2>
+                    {/* ════ RIGHT PANEL ════ */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
-                            <div className="mb-8">
-                                <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3">Service Categories</h3>
-                                <div className="flex flex-wrap gap-2">
-                                    {worker.categories && worker.categories.length > 0 ? (
-                                        worker.categories.map((cat, idx) => (
-                                            <span key={`cat-${idx}`} className="px-4 py-2 bg-emerald-50 text-emerald-700 font-bold text-sm rounded-lg border border-emerald-100">
-                                                {cat}
-                                            </span>
-                                        ))
-                                    ) : (
-                                        <span className="text-gray-500 italic">No specific categories listed.</span>
-                                    )}
+                        {/* Expertise Banner */}
+                        <div style={{
+                            background: 'white', borderRadius: '28px',
+                            boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+                            border: '1px solid #e2e8f0', overflow: 'hidden',
+                        }}>
+                            {/* Section header */}
+                            <div style={{
+                                padding: '24px 28px 20px',
+                                borderBottom: '1px solid #f1f5f9',
+                                display: 'flex', alignItems: 'center', gap: '10px',
+                            }}>
+                                <div style={{
+                                    width: '36px', height: '36px', borderRadius: '10px',
+                                    background: 'linear-gradient(135deg, #ecfdf5, #d1fae5)',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                }}>
+                                    <Award size={18} style={{ color: '#059669' }} />
                                 </div>
+                                <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.3px' }}>
+                                    Expertise & Skills
+                                </h2>
                             </div>
 
-                            <div>
-                                <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3">Specialized Skills</h3>
-                                <div className="flex flex-wrap gap-2">
-                                    {worker.skills && worker.skills.length > 0 ? (
-                                        worker.skills.map((skill, idx) => (
-                                            <span key={`skill-${idx}`} className="px-4 py-2 bg-gray-50 text-gray-700 font-semibold text-sm rounded-lg border border-gray-200">
-                                                {skill}
-                                            </span>
-                                        ))
-                                    ) : (
-                                        <span className="text-gray-500 italic">No specific skills listed.</span>
-                                    )}
+                            <div style={{ padding: '24px 28px' }}>
+                                {/* Categories */}
+                                <div style={{ marginBottom: '24px' }}>
+                                    <p style={{
+                                        fontSize: '11px', fontWeight: 700, color: '#94a3b8',
+                                        textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '12px'
+                                    }}>Service Categories</p>
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                                        {worker.categories && worker.categories.length > 0 ? (
+                                            worker.categories.map((cat, idx) => (
+                                                <span key={idx} style={{
+                                                    padding: '7px 16px',
+                                                    background: 'linear-gradient(135deg, #ecfdf5, #d1fae5)',
+                                                    color: '#065f46', fontWeight: 700, fontSize: '13px',
+                                                    borderRadius: '20px', border: '1px solid #a7f3d0',
+                                                }}>
+                                                    {cat}
+                                                </span>
+                                            ))
+                                        ) : (
+                                            <span style={{ color: '#94a3b8', fontStyle: 'italic', fontSize: '14px' }}>No categories listed.</span>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Skills */}
+                                <div>
+                                    <p style={{
+                                        fontSize: '11px', fontWeight: 700, color: '#94a3b8',
+                                        textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '12px'
+                                    }}>Specialized Skills</p>
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                                        {worker.skills && worker.skills.length > 0 ? (
+                                            worker.skills.map((skill, idx) => (
+                                                <span key={idx} style={{
+                                                    padding: '7px 16px',
+                                                    background: '#f8fafc', color: '#334155',
+                                                    fontWeight: 600, fontSize: '13px',
+                                                    borderRadius: '20px', border: '1px solid #e2e8f0',
+                                                }}>
+                                                    {skill}
+                                                </span>
+                                            ))
+                                        ) : (
+                                            <span style={{ color: '#94a3b8', fontStyle: 'italic', fontSize: '14px' }}>No skills listed.</span>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Work Photos Portfolio (if available) */}
+                        {/* Work Portfolio */}
                         {worker.workPhotos && worker.workPhotos.length > 0 && (
-                            <div className="bg-white rounded-[24px] border border-gray-200 p-8 shadow-sm">
-                                <h2 className="text-2xl font-extrabold text-gray-900 mb-6 flex items-center gap-2">
-                                    Work Portfolio
-                                </h2>
-                                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                                    {worker.workPhotos.map((photo, idx) => (
-                                        <div key={idx} className="aspect-square rounded-xl overflow-hidden bg-gray-100 border border-gray-200 relative group">
-                                            <img
-                                                src={
-                                                    photo.startsWith('http') || photo.startsWith('blob:') || photo.startsWith('data:')
-                                                        ? photo
-                                                        : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/${photo.startsWith('/') ? photo.slice(1) : photo}`
-                                                }
-                                                alt={`Work example ${idx + 1}`}
-                                                className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-300"
-                                            />
-                                        </div>
-                                    ))}
+                            <div style={{
+                                background: 'white', borderRadius: '28px',
+                                boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+                                border: '1px solid #e2e8f0', overflow: 'hidden',
+                            }}>
+                                <div style={{
+                                    padding: '24px 28px 20px',
+                                    borderBottom: '1px solid #f1f5f9',
+                                    display: 'flex', alignItems: 'center', gap: '10px',
+                                }}>
+                                    <div style={{
+                                        width: '36px', height: '36px', borderRadius: '10px',
+                                        background: 'linear-gradient(135deg, #ede9fe, #ddd6fe)',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    }}>
+                                        <Briefcase size={18} style={{ color: '#7c3aed' }} />
+                                    </div>
+                                    <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.3px' }}>
+                                        Work Portfolio
+                                    </h2>
+                                    <span style={{
+                                        marginLeft: 'auto', background: '#ede9fe',
+                                        color: '#7c3aed', fontWeight: 700, fontSize: '12px',
+                                        padding: '3px 10px', borderRadius: '20px'
+                                    }}>
+                                        {worker.workPhotos.length} photos
+                                    </span>
+                                </div>
+                                <div style={{ padding: '24px 28px' }}>
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+                                        {worker.workPhotos.map((photo: string, idx: number) => {
+                                            const src = photo.startsWith('http') || photo.startsWith('blob:') || photo.startsWith('data:')
+                                                ? photo
+                                                : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/${photo.startsWith('/') ? photo.slice(1) : photo}`;
+                                            return (
+                                                <div key={idx} style={{
+                                                    aspectRatio: '1',
+                                                    borderRadius: '14px', overflow: 'hidden',
+                                                    background: '#f1f5f9',
+                                                    border: '1px solid #e2e8f0',
+                                                    position: 'relative',
+                                                }}>
+                                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                    <img
+                                                        src={src}
+                                                        alt={`Work example ${idx + 1}`}
+                                                        style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s ease' }}
+                                                    />
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
                             </div>
                         )}
-                        
-                        {/* Member since & Activity */}
-                        <div className="bg-white rounded-[20px] border border-gray-200 p-6 shadow-sm flex items-center justify-between text-sm">
-                            <div className="text-gray-500">
-                                Member since <span className="font-bold text-gray-900">{worker.createdAt ? new Date(worker.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'recently'}</span>
+
+                        {/* Ratings & Reviews */}
+                        <div style={{
+                            background: 'white', borderRadius: '28px',
+                            boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+                            border: '1px solid #e2e8f0', overflow: 'hidden',
+                        }}>
+                            <div style={{
+                                padding: '24px 28px 20px',
+                                borderBottom: '1px solid #f1f5f9',
+                                display: 'flex', alignItems: 'center', gap: '10px',
+                            }}>
+                                <div style={{
+                                    width: '36px', height: '36px', borderRadius: '10px',
+                                    background: 'linear-gradient(135deg, #fffbeb, #fef3c7)',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                }}>
+                                    <Star size={18} style={{ color: '#f59e0b', fill: '#f59e0b' }} />
+                                </div>
+                                <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.3px' }}>
+                                    Ratings & Reviews
+                                </h2>
+                                <span style={{
+                                    marginLeft: 'auto', background: '#fffbeb',
+                                    color: '#92400e', fontWeight: 700, fontSize: '12px',
+                                    padding: '3px 10px', borderRadius: '20px', border: '1px solid #fef3c7'
+                                }}>
+                                    {worker.totalRatings || 0} reviews
+                                </span>
                             </div>
-                            <div className="text-gray-500">
-                                Weekly Jobs: <span className="font-bold text-emerald-600">{worker.weeklyJobCount || 0}</span>
+
+                            <div style={{ padding: '24px 28px' }}>
+                                {worker.reviews && worker.reviews.length > 0 ? (
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                                        {worker.reviews.map((rev, idx) => (
+                                            <div key={idx} style={{ 
+                                                borderBottom: idx === worker.reviews!.length - 1 ? 'none' : '1px solid #f1f5f9',
+                                                paddingBottom: idx === worker.reviews!.length - 1 ? 0 : '24px'
+                                            }}>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', alignItems: 'center' }}>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                        <div style={{ 
+                                                            width: '32px', height: '32px', borderRadius: '50%', 
+                                                            background: '#f1f5f9', display: 'flex', alignItems: 'center', 
+                                                            justifyContent: 'center', fontSize: '12px', fontWeight: 700, color: '#64748b'
+                                                        }}>
+                                                            {rev.clientName?.substring(0, 1).toUpperCase()}
+                                                        </div>
+                                                        <span style={{ fontWeight: 700, color: '#1e293b', fontSize: '14px' }}>{rev.clientName}</span>
+                                                    </div>
+                                                    <div style={{ display: 'flex', gap: '2px' }}>
+                                                        {[...Array(5)].map((_, i) => (
+                                                            <Star key={i} size={14} style={{ 
+                                                                color: i < rev.rating ? '#f59e0b' : '#e2e8f0', 
+                                                                fill: i < rev.rating ? '#f59e0b' : '#e2e8f0' 
+                                                            }} />
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                                <p style={{ fontSize: '14px', color: '#475569', lineHeight: 1.6, margin: '0 0 8px 42px' }}>
+                                                    {rev.review || "No comment provided."}
+                                                </p>
+                                                <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 500, marginLeft: '42px' }}>
+                                                    {new Date(rev.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div style={{ textAlign: 'center', padding: '32px 0', color: '#94a3b8' }}>
+                                        <div style={{ marginBottom: '12px' }}>
+                                            <Star size={32} style={{ color: '#e2e8f0', margin: '0 auto' }} />
+                                        </div>
+                                        <p style={{ fontSize: '14px', fontWeight: 500 }}>No reviews yet for this worker.</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Bottom info strip */}
+                        <div style={{
+                            background: 'white', borderRadius: '18px',
+                            padding: '18px 24px', border: '1px solid #e2e8f0',
+                            boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
+                            display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px',
+                        }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <Clock size={15} style={{ color: '#94a3b8' }} />
+                                <span style={{ fontSize: '13px', color: '#64748b', fontWeight: 500 }}>
+                                    Member since <strong style={{ color: '#334155' }}>{memberSince}</strong>
+                                </span>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <CheckCircle2 size={15} style={{ color: '#10b981' }} />
+                                <span style={{ fontSize: '13px', color: '#64748b', fontWeight: 500 }}>
+                                    Verification: <strong style={{ color: '#065f46', textTransform: 'capitalize' }}>{worker.isVerified.toLowerCase()}</strong>
+                                </span>
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>

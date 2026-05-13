@@ -2,14 +2,7 @@
 
 import React from "react";
 import {
-  User,
-  Bell,
-  Settings,
   Menu,
-  ChevronLeft,
-  Search,
-  Mail,
-  LogOut,
 } from "lucide-react";
 
 interface NavbarProps {
@@ -17,7 +10,7 @@ interface NavbarProps {
   sidebarOpen: boolean;
 }
 
-export default function Navbar({ onMenuClick, sidebarOpen }: NavbarProps) {
+export default function Navbar({ onMenuClick }: NavbarProps) {
   return (
     <header className="bg-[#F3F4F6] sticky top-0 z-10 px-4 py-3 lg:px-6 lg:py-4">
       <div className="flex justify-between items-center gap-4">

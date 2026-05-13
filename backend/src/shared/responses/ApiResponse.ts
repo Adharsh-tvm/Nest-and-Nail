@@ -1,5 +1,5 @@
 
-export interface SuccessResponse<T = any> {
+export interface SuccessResponse<T = unknown> {
   success: true,
   message: string,
   payload: T,
@@ -8,7 +8,7 @@ export interface SuccessResponse<T = any> {
 export interface FailedResponse {
   success: false,
   message: string,
-  error: any
+  error: unknown
 }
 
 export class ResponseHandler {

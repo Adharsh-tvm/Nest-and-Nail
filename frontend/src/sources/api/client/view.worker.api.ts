@@ -1,6 +1,7 @@
 import axiosInstance from "@/lib/axiosInstance";
 import { ApiResponse } from "@/shared/types/responseTypes";
-import { User, UserQueryParams } from "@/shared/types/userTypes";
+import { User } from "@/shared/types/userTypes";
+import { CLIENT_ROUTES } from "@/sources/constant-api";
 import axios from 'axios';
 
 export async function getAvailableWorkersApi(
@@ -8,22 +9,29 @@ export async function getAvailableWorkersApi(
     lat?: number,
     lng?: number,
     search?: string,
-    isOnline?: boolean
-): Promise<ApiResponse<User[]>> {
-    const params = new URLSearchParams();
-    if (category) params.append('category', category);
-    if (lat) params.append('lat', lat.toString());
-    if (lng) params.append('lng', lng.toString());
-    if (search) params.append('search', search);
-    if (isOnline === true) params.append('isOnline', 'true');
-    
-    const queryStr = params.toString();
-    const url = `/api/client/workers${queryStr ? `?${queryStr}` : ''}`;
-    
+    isOnline?: boolean,
+    page?: number,
+    limit?: number,
+    sortBy?: string
+): Promise<ApiResponse<{ workers: User[]; total: number }>> {
     try {
-        const response = await axiosInstance.get<ApiResponse<User[]>>(url, { withCredentials: true });
+        const response = await axiosInstance.get<ApiResponse<{ workers: User[]; total: number }>>(
+            "/api/client/workers",
+            {
+                params: {
+                    category,
+                    lat,
+                    lng,
+                    search,
+                    isOnline,
+                    page,
+                    limit,
+                    sort: sortBy
+                },
+                withCredentials: true
+            }
+        );
         
-        // If the API returns success: false, we still want to propagate that as a successful API call but with an error message
         if (!response.data.success) {
             return {
                 error: response.data.error || null,
@@ -55,7 +63,7 @@ export async function getAvailableWorkersApi(
 
 export async function getWorkerDetailApi(id: string): Promise<ApiResponse<User>> { // Changed return type to ApiResponse<User>
     try {
-        const response = await axiosInstance.get<ApiResponse<User>>(`/api/client/workers/${id}`, { withCredentials: true });
+        const response = await axiosInstance.get<ApiResponse<User>>(CLIENT_ROUTES.WORKER_DETAILS(id), { withCredentials: true });
         
         // If the API returns success: false, we still want to propagate that as a successful API call but with an error message
         if (!response.data.success) {

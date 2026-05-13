@@ -10,6 +10,8 @@ import {
   AtSign,
   Loader2,
   X,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import {
   signup,
@@ -18,9 +20,10 @@ import {
 } from "../../actions/authentication/signup-actions";
 import OtpVerificationForm from "../otp/page";
 import { redirect, useRouter } from "next/navigation";
-import { GoogleLogin } from "@react-oauth/google";
+import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
 import { handleGoogleSignIn } from "@/app/actions/authentication/google-actions";
-import { Toaster, toast } from "react-hot-toast";
+import { toast } from "react-hot-toast";
+import { motion } from "framer-motion";
 
 const roleConfig = {
   client: {
@@ -75,6 +78,11 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
 
   const passwordCaptureRef = useRef<string>("");
   const formRef = useRef<HTMLFormElement>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  
+  const [passwordValue, setPasswordValue] = useState("");
+  const [confirmPasswordValue, setConfirmPasswordValue] = useState("");
 
   const currentRoleConfig = roleConfig[role];
   const roleName = role.charAt(0).toUpperCase() + role.slice(1);
@@ -96,7 +104,7 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
     if (state.errorId && state.error) {
       toast.error(state.error);
     }
-  }, [state.errorId]);
+  }, [state.errorId, state.error]);
 
   useEffect(() => {
     if (state.otpSent) {
@@ -191,13 +199,14 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
     }
   };
 
-  async function onGoogleSuccess(credentialResponse: any) {
+  async function onGoogleSuccess(credentialResponse: CredentialResponse) {
     const token = credentialResponse.credential;
+    if (!token) return;
 
     const result = await handleGoogleSignIn(token, role);
 
     if (result?.success) {
-      const redirectPath = result.user.user_role;
+      const redirectPath = result.user?.user_role || "client";
       toast.success(result?.message)
       redirect(redirectPath);
     } else {
@@ -219,6 +228,7 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
       }
     } catch (err) {
       setOtpError("Failed to resend OTP");
+      console.log(err)
     }
   };
 
@@ -234,8 +244,13 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
   return (
     <>
       {/* <Toaster /> */}
-      <div className="w-full max-w-sm">
-        <div className="bg-white border-t-4 border-[#DC2626] rounded-2xl shadow-xl overflow-hidden">
+      <motion.div 
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
+        className="w-full"
+      >
+        <div className="w-full">
           <div className="p-6 pb-0 text-center">
             <div className="flex justify-center mb-4">
               <div
@@ -319,12 +334,23 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
                   <input
                     id={`password-signup-${role}`}
                     name="password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     required
+                    value={passwordValue}
+                    onChange={(e) => setPasswordValue(e.target.value)}
                     disabled={pending}
                     placeholder="••••••••"
-                    className={inputClass}
+                    className={`${inputClass} pr-10`}
                   />
+                  {passwordValue && (
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -340,12 +366,23 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
                   <input
                     id={`confirm-password-signup-${role}`}
                     name="confirmPassword"
-                    type="password"
+                    type={showConfirmPassword ? "text" : "password"}
                     required
+                    value={confirmPasswordValue}
+                    onChange={(e) => setConfirmPasswordValue(e.target.value)}
                     disabled={pending}
                     placeholder="••••••••"
-                    className={inputClass}
+                    className={`${inputClass} pr-10`}
                   />
+                  {confirmPasswordValue && (
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                    >
+                      {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -376,7 +413,7 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
               </div>
             </div>
 
-            <div className="mt-2">
+            <div className="mt-6 flex justify-center w-full">
               <GoogleLogin
                 onSuccess={onGoogleSuccess}
                 useOneTap
@@ -399,7 +436,7 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
             </p>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {showOtpModal && signupData && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">

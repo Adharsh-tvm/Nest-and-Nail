@@ -6,6 +6,7 @@ export interface IWorkerScheduleDocument extends Document {
   date: Date;
   slotType: SlotType;
   isBooked: boolean;
+  isAvailable: boolean;
   serviceId?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -21,6 +22,7 @@ const WorkerScheduleSchema = new Schema<IWorkerScheduleDocument>(
       required: true,
     },
     isBooked: { type: Boolean, default: false },
+    isAvailable: { type: Boolean, required: true },
     serviceId: { type: String },
   },
   { timestamps: true }

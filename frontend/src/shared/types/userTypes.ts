@@ -1,5 +1,6 @@
 import { VerificationStatus } from "../enums/authEnums";
 import { Address } from "./addressType";
+import { Review } from "./reviewTypes";
 
 export type User = {
   id: string;
@@ -27,10 +28,15 @@ export type User = {
   totalRatings?: number;
   weeklyJobCount?: number;
   currentActiveRequestId?: string;
+  isSuspended?: boolean;
+  suspensionStartDate?: string;
+  suspensionEndDate?: string;
+  canAcceptBookings?: boolean;
 
   iat?: number;
   exp?: number;
   distance?: number;
+  reviews?: Review[];
 };
 
 export type UserQueryParams = {
@@ -50,3 +56,12 @@ export type PaginatedUserResponse = {
   limit: number;
   totalPages: number;
 };
+
+export type Wallet = {
+  walletId: string;
+  userId: string;
+  balance: number;
+  currency: "INR";
+  createdAt?: string;
+  updatedAt?: string;
+};

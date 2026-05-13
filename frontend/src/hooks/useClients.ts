@@ -1,7 +1,7 @@
 "use client";
 
 import { getAllClientsAction } from "@/app/actions/admin/admin-actions";
-import { Client } from "@/sources/api/admin.api";
+import { Client } from "@/sources/api/admin/admin.api";
 import { useEffect, useState } from "react";
 
 type UseClientsResult = {
@@ -31,9 +31,9 @@ export const useClients = (): UseClientsResult => {
         } else if (!cancelled) {
           setClients(res);
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("[useClients] error:", err);
-        const msg = err?.message ?? "Failed to load clients";
+        const msg = (err instanceof Error ? err.message : undefined) ?? "Failed to load clients";
         if (!cancelled) setError(msg);
       } finally {
         if (!cancelled) setLoading(false);

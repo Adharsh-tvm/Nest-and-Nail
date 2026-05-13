@@ -1,13 +1,14 @@
 "use server";
 
 import { cookies } from "next/headers";
-import userApi from "@/sources/api/user.api";
-import { fetchAllCategories } from "@/sources/api/category.api";
+import userApi from "@/sources/api/user/user.api";
 import { VerificationStatus } from "@/shared/enums/authEnums";
 import { ApiResponse } from "@/shared/types/responseTypes";
 import { User } from "@/shared/types/userTypes";
+import { Address } from "@/shared/types/addressType";
+import axios from "axios";
 
-function normalizeIsVerified(v: any): VerificationStatus {
+function normalizeIsVerified(v: unknown): VerificationStatus {
   if (v === true || v === "VERIFIED" || v === "verified") {
     return VerificationStatus.VERIFIED;
   }
@@ -23,39 +24,39 @@ export async function getCurrentUser(): Promise<User | null> {
     const email = cookieStore.get("user_email")?.value;
     if (!email) return null;
 
-    const data = (await userApi.getCurrentUserByEmail(email)) as ApiResponse<any>;
+    const data = (await userApi.getCurrentUserByEmail(email)) as ApiResponse<Record<string, unknown>>;
     if (!data.success || !data.payload) return null;
 
     const u = data.payload;
 
     const user: User = {
-      id: u.user_id,
-      name: u.user_name,
-      email: u.email_address,
-      role: u.user_role,
+      id: String(u.user_id || ""),
+      name: String(u.user_name || ""),
+      email: String(u.email_address || ""),
+      role: String(u.user_role || ""),
       isBlocked: Boolean(u.isBlocked),
       isOnline: Boolean(u.isOnline),
       isVerified: normalizeIsVerified(u.isVerified),
 
-      profileImageUrl: u.profileImageUrl || u.profilePictureUrl || u.profilePicture || u.profile_image_url || u.profile_picture || null,
-      phone_number: u.phone_number,
-      skills: u.skills ?? [],
-      address: u.address ?? [],
-      documents: u.documents ?? [],
-      certificates: u.certificates ?? [],
-      categories: u.categories ?? [],
-      workPhotos: u.workPhotos ?? [],
+      profileImageUrl: (u.profileImageUrl || u.profilePictureUrl || u.profilePicture || u.profile_image_url || u.profile_picture || null) as string | null,
+      phone_number: typeof u.phone_number === "number" ? u.phone_number : (u.phone_number ? Number(u.phone_number) : undefined),
+      skills: (u.skills ?? []) as string[],
+      address: (u.address ?? []) as Address[],
+      documents: (u.documents ?? []) as string[],
+      certificates: (u.certificates ?? []) as string[],
+      categories: (u.categories ?? []) as string[],
+      workPhotos: (u.workPhotos ?? []) as string[],
 
-      createdAt: u.createdAt,
-      updatedAt: u.updatedAt,
+      createdAt: u.createdAt ? String(u.createdAt) : undefined,
+      updatedAt: u.updatedAt ? String(u.updatedAt) : undefined,
     };
 
     return user;
-  } catch (err: any) {
-    // If 401/403, just return null (user not logged in or session expired)
-    // Don't log to console to avoid noise
-    if (err?.response?.status === 401 || err?.response?.status === 403) {
-      return null;
+  } catch (err: unknown) {
+    if (axios.isAxiosError(err)) {
+      if (err.response?.status === 401 || err.response?.status === 403) {
+        return null;
+      }
     }
 
     console.error("[getCurrentUser] failed:", err);
@@ -65,7 +66,7 @@ export async function getCurrentUser(): Promise<User | null> {
 
 export async function validateUser() {
   try {
-    const { authApi } = await import("@/sources/api/auth.api");
+    const { authApi } = await import("@/sources/api/user/auth.api");
     const res = await authApi.validate();
     return res.data;
   } catch {

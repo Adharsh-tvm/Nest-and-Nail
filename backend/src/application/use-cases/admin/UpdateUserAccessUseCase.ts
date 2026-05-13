@@ -17,7 +17,7 @@ export class UpdateUserAccessUseCase implements IUpdateUserAccessUseCase {
         const workerRepo = this._repoFactory.getRepository(Role.WORKER);
 
         let user = await clientRepo.findById(userId);
-        if (!user) user = await workerRepo.findById(userId);
+        user ??= await workerRepo.findById(userId);
 
         if (!user) throw new Error("User not found");
 
@@ -26,10 +26,10 @@ export class UpdateUserAccessUseCase implements IUpdateUserAccessUseCase {
         const newIsBlocked = !user.isBlocked;
 
         this._logger.info(
-            `User ${userId} access changed: isBlocked → ${newIsBlocked}`
+            `User ${userId} access changed: isBlocked → ${String(newIsBlocked)}`
         );
 
-        const updated = await repo.updateById(userId, { isBlocked: newIsBlocked });;
+        const updated = await repo.updateById(userId, { isBlocked: newIsBlocked });
 
         if (!updated) throw new Error("Failed to update verification status");
 

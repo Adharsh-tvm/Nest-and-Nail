@@ -42,7 +42,7 @@ export async function middleware(req: NextRequest) {
     }
   }
 
-  // 3️⃣ Validate user status from backend
+  // 3Validate user status from backend
   if (userRole) {
     // Skip validating against backend for Next.js Server Actions to prevent multiple redundant API calls
     const isServerAction = req.headers.has("next-action");

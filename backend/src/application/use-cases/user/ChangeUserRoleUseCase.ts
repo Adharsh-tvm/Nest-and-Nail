@@ -5,6 +5,7 @@ import { ILogger } from "../../../infrastructure/logger/ILogger";
 import { UserMapper } from "../../mappers/UserMapper";
 import { ITokenService } from "../../contracts/ITokenService";
 import { IUserRepositoryFactory } from "../../../domain/repositories/IUserRepositoryFactory";
+import { User } from "../../../domain/entities/User";
 
 export class ChangeUserRoleUseCase implements IChangeUserRoleUseCase {
     constructor(
@@ -34,7 +35,7 @@ export class ChangeUserRoleUseCase implements IChangeUserRoleUseCase {
 
         if (!user) throw new Error("User not found");
 
-        const raw = user as any;
+        const raw = user;
 
         if (currentRole === newRole) {
             const response = UserMapper.toResponseDTO(user);
@@ -56,7 +57,7 @@ export class ChangeUserRoleUseCase implements IChangeUserRoleUseCase {
             };
         }
 
-        let newUser: any;
+        let newUser: User;
 
         if (newRole === Role.WORKER) {
             await clientRepo.deleteByUserId(userId);
@@ -78,9 +79,11 @@ export class ChangeUserRoleUseCase implements IChangeUserRoleUseCase {
                 role: Role.CLIENT
             };
 
-            delete clientData.skills;
+            clientData.skills = undefined;
 
-            newUser = await clientRepo.create(clientData);
+            newUser = await clientRepo.create(clientData as User);
+        } else {
+            throw new Error(`Cannot change role to ${newRole}`);
         }
 
         const userDto = UserMapper.toResponseDTO(newUser);

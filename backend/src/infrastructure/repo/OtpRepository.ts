@@ -1,4 +1,4 @@
-import { IOtpRepository } from "../../domain/repositories/IOtpRepository";
+import { IOtpRepository, IOtp } from "../../domain/repositories/IOtpRepository";
 import { OtpModel } from "../database/models/OtpModel";
 
 export class OtpRepository implements IOtpRepository {
@@ -13,7 +13,7 @@ export class OtpRepository implements IOtpRepository {
         );
     }
 
-    async findByEmail(email: string) {
+    async findByEmail(email: string): Promise<IOtp | null> {
         return OtpModel.findOne({ email });
     }
 

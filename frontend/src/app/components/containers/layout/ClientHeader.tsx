@@ -7,9 +7,7 @@ import {
   GalleryVerticalEnd,
   User,
   LogOut,
-  Settings,
   ChevronDown,
-  Briefcase,
   Hammer,
 } from "lucide-react";
 import { logoutAction } from "@/app/actions/authentication/logout-actions";
@@ -22,13 +20,13 @@ import toast from "react-hot-toast";
 import { useRouter, usePathname } from "next/navigation";
 import SwitchRoleConfirmationModal from "./SwitchRoleConfirmationModal";
 import { Spinner } from "@/app/components/ui/spinner";
+import NotificationBell from "./NotificationBell";
 
 const ClientHeader: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isTogglingRole, setIsTogglingRole] = useState(false);
   const [isSwitchRoleModalOpen, setIsSwitchRoleModalOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [imageError, setImageError] = useState(false);
 
   const router = useRouter();
@@ -50,9 +48,7 @@ const ClientHeader: React.FC = () => {
   const profileHref =
     userMode === "worker" ? "/worker/profile" : "/client/profile";
 
-  useEffect(() => {
-    setIsLoggedIn(Boolean(currentUser && Object.keys(currentUser).length));
-  }, [currentUser]);
+
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -72,7 +68,6 @@ const ClientHeader: React.FC = () => {
       toast.loading("Logging out...", { id: "logout" });
       await logoutAction();
       toast.success("Logged out successfully", { id: "logout" });
-      setIsLoggedIn(false);
       setIsUserMenuOpen(false);
       window.location.replace("/login");
     } catch (error) {
@@ -158,12 +153,24 @@ const ClientHeader: React.FC = () => {
                   <Link
                     href="/worker/ongoing"
                     className={`text-sm font-medium transition-all ${
-                      pathname?.startsWith("/worker/find-works")
+                      pathname?.startsWith("/worker/ongoing")
                         ? "text-[#1B4332] border-b-2 border-[#1B4332] pb-1"
                         : "text-gray-500 hover:text-[#1B4332]"
                     }`}
                   >
                     Ongoing
+                  </Link>
+                )}
+                {userMode === "worker" && (
+                  <Link
+                    href="/worker"
+                    className={`text-sm font-medium transition-all ${
+                      pathname === "/worker"
+                        ? "text-[#1B4332] border-b-2 border-[#1B4332] pb-1"
+                        : "text-gray-500 hover:text-[#1B4332]"
+                    }`}
+                  >
+                    Dashboard
                   </Link>
                 )}
                 {userMode !== "worker" && (
@@ -178,7 +185,7 @@ const ClientHeader: React.FC = () => {
                     Workers
                   </Link>
                 )}
-                 {userMode === "worker" && (
+                {userMode === "worker" && (
                   <Link
                     href="/worker/services"
                     className={`text-sm font-medium transition-all ${
@@ -202,16 +209,30 @@ const ClientHeader: React.FC = () => {
                     Services
                   </Link>
                 )}
-                <Link
-                  href="/client/meetings"
-                  className={`text-sm font-medium transition-all ${
-                    pathname?.startsWith("/client/meetings")
-                      ? "text-[#1B4332] border-b-2 border-[#1B4332] pb-1"
-                      : "text-gray-500 hover:text-[#1B4332]"
-                  }`}
-                >
-                  Meetings
-                </Link>
+                {userMode === "worker" && (
+                  <Link
+                    href="/worker/meetings"
+                    className={`text-sm font-medium transition-all ${
+                      pathname?.startsWith("/worker/meetings")
+                        ? "text-[#1B4332] border-b-2 border-[#1B4332] pb-1"
+                        : "text-gray-500 hover:text-[#1B4332]"
+                    }`}
+                  >
+                    Meetings
+                  </Link>
+                )}
+                {userMode !== "worker" && (
+                  <Link
+                    href="/client/meetings"
+                    className={`text-sm font-medium transition-all ${
+                      pathname?.startsWith("/client/meetings")
+                        ? "text-[#1B4332] border-b-2 border-[#1B4332] pb-1"
+                        : "text-gray-500 hover:text-[#1B4332]"
+                    }`}
+                  >
+                    Meetings
+                  </Link>
+                )}
               </div>
             )}
 
@@ -280,6 +301,9 @@ const ClientHeader: React.FC = () => {
                 )}
                 <div className="h-6 w-px bg-gray-200 mx-2" />
 
+                {/* Notification Bell */}
+                <NotificationBell />
+
                 {/* User dropdown */}
                 <div className="relative" ref={userMenuRef}>
                   <button
@@ -288,6 +312,7 @@ const ClientHeader: React.FC = () => {
                   >
                     <div className="w-8 h-8 rounded-full bg-[#1B4332] text-white flex items-center justify-center shadow-sm overflow-hidden">
                       {currentUser?.profileImageUrl && !imageError ? (
+                        // eslint-disable-next-line @next/next/no-img-element
                         <img
                           src={currentUser.profileImageUrl}
                           alt={currentUser.name || "User"}
@@ -323,7 +348,11 @@ const ClientHeader: React.FC = () => {
                       </div>
 
                       <div className="p-1.5 space-y-0.5">
-                        <Link href={profileHref} className="block">
+                        <Link
+                          href={profileHref}
+                          className="block"
+                          onClick={() => setIsUserMenuOpen(false)}
+                        >
                           <div className="w-full flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-[#1B4332] rounded-lg transition-colors text-left group cursor-pointer">
                             <User
                               size={16}

@@ -9,15 +9,16 @@ import {
   ArrowUpDown,
 } from "lucide-react";
 
-export type Column<T = any> = {
+export type Column<T = unknown> = {
   header: React.ReactNode;
   accessorKey?: string;
   className?: string;
   cell?: (row: T) => React.ReactNode;
   sortable?: boolean;
+  sortKey?: string;
 };
 
-export interface DataTableProps<T = any> {
+export interface DataTableProps<T = unknown> {
   columns: Column<T>[];
   data: T[];
   onRowClick?: (row: T) => void;
@@ -31,7 +32,11 @@ export interface DataTableProps<T = any> {
   page?: number;
   totalPages?: number;
   onPageChange?: (page: number) => void;
+  onSort?: (key: string, order: "asc" | "desc") => void;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
   onFilterClick?: () => void;
+  total?: number;
 }
 
 const DataTable = <T,>({
@@ -47,7 +52,11 @@ const DataTable = <T,>({
   page = 1,
   totalPages = 1,
   onPageChange,
+  onSort,
+  sortBy,
+  sortOrder,
   onFilterClick,
+  total,
 }: DataTableProps<T>) => {
   // Use internal state if no controlled props provided
   const [internalSearch, setInternalSearch] = React.useState("");
@@ -59,6 +68,18 @@ const DataTable = <T,>({
       onSearchChange?.(e.target.value);
     } else {
       setInternalSearch(e.target.value);
+    }
+  };
+
+  const handleSort = (col: Column<T>) => {
+    if (!col.sortable || !onSort) return;
+    const key = col.sortKey || col.accessorKey;
+    if (!key) return;
+
+    if (sortBy === key) {
+      onSort(key, sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      onSort(key, "asc");
     }
   };
 
@@ -167,12 +188,18 @@ const DataTable = <T,>({
                   className={`px-6 py-5 text-xs font-bold text-gray-400 uppercase tracking-wider first:pl-2 ${col.className || ""
                     }`}
                 >
-                  <div className="flex items-center gap-2 group cursor-pointer hover:text-gray-600">
+                  <div
+                    onClick={() => handleSort(col)}
+                    className={`flex items-center gap-2 group ${col.sortable ? "cursor-pointer hover:text-gray-600" : ""}`}
+                  >
                     {col.header}
                     {col.sortable && (
                       <ArrowUpDown
                         size={12}
-                        className="opacity-0 group-hover:opacity-100 transition-opacity"
+                        className={`transition-all ${sortBy === (col.sortKey || col.accessorKey)
+                          ? "opacity-100 text-[#1B4332] scale-110"
+                          : "opacity-0 group-hover:opacity-40"
+                          } ${sortBy === (col.sortKey || col.accessorKey) && sortOrder === "desc" ? "rotate-180" : ""}`}
                       />
                     )}
                   </div>
@@ -197,9 +224,9 @@ const DataTable = <T,>({
               ))
             ) : data && data.length > 0 ? (
               // Data Rows
-              data.map((row: any, rowIndex: number) => (
+              data.map((row: T, rowIndex: number) => (
                 <tr
-                  key={row.id || row.user_id || rowIndex}
+                  key={(row as { id?: string | number }).id || (row as { user_id?: string | number }).user_id || rowIndex}
                   onClick={(e) => {
                     // Prevent row click if clicking on action menu or interactive elements
                     if (
@@ -210,7 +237,9 @@ const DataTable = <T,>({
                       (e.target as HTMLElement).closest("a")
                     )
                       return;
-                    onRowClick && onRowClick(row);
+                    if (onRowClick) {
+                      onRowClick(row);
+                    }
                   }}
                   className={`group transition-all duration-200 hover:bg-emerald-50/30 ${onRowClick
                       ? "cursor-pointer hover:transform hover:scale-[1.01]"
@@ -220,7 +249,7 @@ const DataTable = <T,>({
                   {columns.map((col, colIndex) => {
                     const value =
                       col.accessorKey !== undefined
-                        ? row[col.accessorKey]
+                        ? (row as Record<string, unknown>)[col.accessorKey]
                         : undefined;
 
                     return (
@@ -229,7 +258,7 @@ const DataTable = <T,>({
                         className={`px-6 py-5 text-sm text-gray-600 first:pl-2 first:rounded-l-2xl last:rounded-r-2xl ${col.className || ""
                           }`}
                       >
-                        {col.cell ? col.cell(row) : value ?? "—"}
+                        {col.cell ? col.cell(row) : (value as React.ReactNode) ?? "—"}
                       </td>
                     );
                   })}
@@ -261,9 +290,9 @@ const DataTable = <T,>({
       <div className="p-6 md:p-8 flex items-center justify-between text-xs text-gray-500 bg-white border-t border-gray-50">
         <div className="flex items-center gap-2">
           <span className="font-medium bg-gray-100 px-2 py-1 rounded text-gray-600">
-            {data ? data.length : 0}
+            {total !== undefined ? total : (data ? data.length : 0)}
           </span>
-          <span>records showing</span>
+          <span>records {total !== undefined ? "total" : "showing"}</span>
         </div>
 
         <div className="flex items-center gap-2">

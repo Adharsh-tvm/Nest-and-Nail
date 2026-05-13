@@ -5,24 +5,38 @@ import {
     createCategory,
     updateCategory,
     toggleCategoryStatus,
-} from "@/sources/api/category.api";
+} from "@/sources/api/category/category.api";
 import { Category, CategoryInput } from "@/shared/types/categoryTypes";
 import { ApiResponse } from "@/shared/types/responseTypes";
+import axios from "axios";
 
-export async function getAllCategoriesAction(): Promise<ApiResponse<Category[]>> {
+export async function getAllCategoriesAction(params?: {
+    search?: string;
+    page?: number;
+    limit?: number;
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+}): Promise<ApiResponse<{
+    categories: Category[];
+    total: number;
+    activeCount: number;
+    inactiveCount: number;
+}>> {
     try {
-        const categories = await fetchAllCategories();
+        const payload = await fetchAllCategories(params);
 
         return {
             success: true,
             message: "Categories fetched successfully",
-            payload: categories,
+            payload: payload,
         };
-    } catch (error: any) {
+    } catch (error: unknown) {
+        console.error("Fetch Categories Action Error:", error);
+        const errorMessage = axios.isAxiosError(error) ? error.response?.data?.message : (error instanceof Error ? error.message : undefined);
         return {
             success: false,
-            message: error.message || "Failed to fetch categories",
-            error,
+            message: String(errorMessage || "Failed to fetch categories"),
+            error: null,
         };
     }
 }
@@ -38,11 +52,13 @@ export async function createCategoryAction(
             message: "Category created successfully",
             payload: category,
         };
-    } catch (error: any) {
+    } catch (error: unknown) {
+        console.error("Create Category Action Error:", error);
+        const errorMessage = axios.isAxiosError(error) ? error.response?.data?.message : (error instanceof Error ? error.message : undefined);
         return {
             success: false,
-            message: error.message || "Failed to create category",
-            error,
+            message: String(errorMessage || "Failed to create category"),
+            error: null,
         };
     }
 }
@@ -60,11 +76,13 @@ export async function updateCategoryAction(
             message: "Category updated successfully",
             payload: category,
         };
-    } catch (error: any) {
+    } catch (error: unknown) {
+        console.error("Update Category Action Error:", error);
+        const errorMessage = axios.isAxiosError(error) ? error.response?.data?.message : (error instanceof Error ? error.message : undefined);
         return {
             success: false,
-            message: error.message || "Failed to update category",
-            error,
+            message: String(errorMessage || "Failed to update category"),
+            error: null,
         };
     }
 }
@@ -80,11 +98,13 @@ export async function toggleCategoryStatusAction(
             message: "Category status updated",
             payload: category,
         };
-    } catch (error: any) {
+    } catch (error: unknown) {
+        console.error("Toggle Category Status Action Error:", error);
+        const errorMessage = axios.isAxiosError(error) ? error.response?.data?.message : (error instanceof Error ? error.message : undefined);
         return {
             success: false,
-            message: error.message || "Failed to update category status",
-            error,
+            message: String(errorMessage || "Failed to update category status"),
+            error: null,
         };
     }
 }

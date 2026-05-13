@@ -1,22 +1,33 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
-  Briefcase,
-  Clock,
-  CheckCircle2,
-  AlertCircle,
-  MoreHorizontal,
   ArrowUpRight,
-  Plus,
+  TrendingUp,
+  Users,
+  BriefcaseBusiness
 } from "lucide-react";
+import { getAdminDashboardDataAction } from "@/app/actions/admin/admin-actions";
+import {
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Legend
+} from "recharts";
 
 interface StatCardProps {
   title: string;
   value: string;
   change?: string;
-  isPositive?: boolean;
-  icon?: React.ComponentType<any>;
   theme: "green" | "white";
 }
 
@@ -24,8 +35,6 @@ const StatCard: React.FC<StatCardProps> = ({
   title,
   value,
   change,
-  isPositive,
-  icon: Icon,
   theme,
 }) => (
   <div
@@ -90,253 +99,289 @@ const StatCard: React.FC<StatCardProps> = ({
 
 // --- Mock Components ---
 
-const ServiceCategoryBar = ({
-  label,
-  value,
-  color,
-}: {
-  label: string;
-  value: number;
-  color: string;
-}) => (
-  <div className="flex flex-col gap-2 group cursor-pointer">
-    <div className="h-32 w-full bg-gray-50 rounded-2xl relative flex items-end overflow-hidden">
-      <div
-        className={`w-full ${color} rounded-2xl transition-all duration-500 group-hover:opacity-90`}
-        style={{ height: `${value}%` }}
-      />
-    </div>
-    <span className="text-xs font-medium text-gray-500 text-center">
-      {label}
-    </span>
-  </div>
-);
-
 const WorkerRow = ({
   name,
   role,
-  status,
 }: {
   name: string;
   role: string;
-  status: "Completed" | "In Progress" | "Pending";
 }) => (
-  <div className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-2xl transition-colors cursor-pointer">
-    <div className="flex items-center gap-3">
-      <div className="w-10 h-10 rounded-full bg-gray-200 border-2 border-white shadow-sm overflow-hidden">
-        <img
-          src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${name}`}
-          alt={name}
-        />
-      </div>
+  <div className="flex items-center justify-between p-4 bg-gray-50 hover:bg-emerald-50/50 rounded-2xl transition-all border border-transparent hover:border-emerald-100 cursor-pointer">
+    <div className="flex items-center gap-4">
       <div>
-        <h4 className="font-bold text-sm text-gray-900">{name}</h4>
-        <p className="text-xs text-gray-500">Working on {role}</p>
+        <h4 className="font-bold text-gray-900">{name}</h4>
+        <p className="text-xs font-medium text-emerald-600">{role}</p>
       </div>
     </div>
-    <span
-      className={`px-2 py-1 rounded-lg text-[10px] font-bold uppercase ${
-        status === "Completed"
-          ? "bg-green-50 text-green-600"
-          : status === "In Progress"
-          ? "bg-amber-50 text-amber-600"
-          : "bg-gray-100 text-gray-500"
-      }`}
-    >
-      {status}
-    </span>
+    <div className="flex items-center gap-2">
+      <span className="px-3 py-1.5 rounded-full text-xs font-bold uppercase bg-emerald-100 text-emerald-700">
+        Top Rated
+      </span>
+    </div>
   </div>
 );
 
+interface MonthlyChartData {
+  name: string;
+  revenue: number;
+  sales: number;
+}
+
+interface ServiceStatusChartData {
+  name: string;
+  value: number;
+  color: string;
+}
+
+interface CategoryChartData {
+  name: string;
+  value: number;
+  fill: string;
+}
+
+interface TopWorkerData {
+  id: string;
+  name: string;
+  rating: number;
+  totalRatings: number;
+}
+
+interface DashboardData {
+  stats: {
+    totalServices: number;
+    completedServices: number;
+    activeJobs: number;
+    pendingJobs: number;
+    totalRevenue: number;
+    totalRefunds: number;
+  };
+  charts: {
+    monthlyData: MonthlyChartData[];
+    servicesByStatus: ServiceStatusChartData[];
+    topCategories: CategoryChartData[];
+  };
+  topWorkers: TopWorkerData[];
+}
+
 export default function DashboardPage() {
-  return <>Dashboard</>;
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getAdminDashboardDataAction().then((res) => {
+      if (res.success) {
+        setData(res.payload as DashboardData || null);
+      }
+      setLoading(false);
+    });
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="h-16 w-16 animate-spin rounded-full border-4 border-[#1B4332] border-t-transparent"></div>
+      </div>
+    );
+  }
+
+  if (!data) {
+    return <div>Failed to load dashboard data.</div>;
+  }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-10">
       {/* Header Section */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Dashboard</h2>
-          <p className="text-gray-500">
-            Plan, prioritize, and accomplish your tasks with ease.
+          <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">Admin Dashboard</h2>
+          <p className="text-gray-500 mt-1 font-medium">
+            Overview of platform performance, sales, and top metrics.
           </p>
-        </div>
-        <div className="flex gap-3">
-          <button className="px-4 py-2 bg-[#1B4332] text-white font-bold rounded-xl shadow-lg shadow-[#1B4332]/20 hover:bg-[#153426] transition-colors flex items-center gap-2">
-            <Plus size={18} /> Add Service
-          </button>
         </div>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
         <StatCard
           title="Total Services"
-          value="24"
-          change="+12%"
+          value={data.stats.totalServices.toString()}
           theme="green"
         />
-        <StatCard title="Completed" value="10" change="+5%" theme="white" />
-        <StatCard title="Active Jobs" value="12" change="+8%" theme="white" />
-        <StatCard title="Pending" value="2" theme="white" />
+        <StatCard 
+          title="Completed Jobs" 
+          value={data.stats.completedServices.toString()} 
+          theme="white" 
+        />
+        <StatCard 
+          title="Active & Pending" 
+          value={(data.stats.activeJobs + data.stats.pendingJobs).toString()} 
+          theme="white" 
+        />
+        <StatCard 
+          title="Total Revenue" 
+          value={`₹${data.stats.totalRevenue.toLocaleString()}`} 
+          theme="white" 
+        />
+        <StatCard 
+          title="Total Refunds" 
+          value={`₹${(data.stats.totalRefunds || 0).toLocaleString()}`} 
+          theme="white" 
+        />
       </div>
 
-      {/* Middle Section: Analytics & Reminders */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Analytics Chart */}
-        <div className="lg:col-span-2 bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="font-bold text-lg text-gray-900">
-              Service Analytics
-            </h3>
-            <select className="bg-gray-50 border-none text-sm font-medium text-gray-500 rounded-lg py-1 px-3 focus:ring-0">
-              <option>Monthly</option>
-              <option>Weekly</option>
-            </select>
+      {/* Charts Section 1 */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        {/* Revenue Area Chart */}
+        <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col h-[400px]">
+          <div className="mb-6 flex justify-between items-center">
+            <div>
+              <h3 className="font-bold text-xl text-gray-900 flex items-center gap-2">
+                <TrendingUp className="text-emerald-500" size={24} />
+                Revenue Over Time
+              </h3>
+              <p className="text-gray-500 text-sm mt-1">Last 6 months revenue progression</p>
+            </div>
           </div>
-          <div className="grid grid-cols-7 gap-4 h-64 items-end px-2">
-            {/* Mock Bar Chart */}
-            <ServiceCategoryBar label="Mon" value={40} color="bg-emerald-200" />
-            <ServiceCategoryBar label="Tue" value={65} color="bg-[#1B4332]" />
-            <ServiceCategoryBar label="Wed" value={45} color="bg-emerald-300" />
-            <ServiceCategoryBar label="Thu" value={80} color="bg-[#1B4332]" />
-            <ServiceCategoryBar label="Fri" value={55} color="bg-emerald-200" />
-            <ServiceCategoryBar label="Sat" value={30} color="bg-emerald-100" />
-            <ServiceCategoryBar label="Sun" value={20} color="bg-emerald-100" />
+          <div className="flex-1 w-full min-h-0">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={data?.charts?.monthlyData || []} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#1B4332" stopOpacity={0.8}/>
+                    <stop offset="95%" stopColor="#1B4332" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0fdf4" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#6b7280', fontSize: 12}} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{fill: '#6b7280', fontSize: 12}} tickFormatter={(val) => `₹${val}`} dx={-10} />
+                <Tooltip 
+                  contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                  itemStyle={{ color: '#1B4332', fontWeight: 'bold' }}
+                  formatter={(value: unknown) => [`₹${(Number(value) || 0).toLocaleString()}`, 'Revenue']}
+                />
+                <Area type="monotone" dataKey="revenue" stroke="#1B4332" strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" />
+              </AreaChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
-        {/* Reminders / Quick Actions */}
-        <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col">
+        {/* Sales Bar Chart */}
+        <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col h-[400px]">
           <div className="mb-6">
-            <h3 className="font-bold text-lg text-gray-900">Reminders</h3>
-            <p className="text-gray-500 text-sm">Upcoming tasks & meetings</p>
+            <h3 className="font-bold text-xl text-gray-900 flex items-center gap-2">
+              <BriefcaseBusiness className="text-emerald-500" size={24} />
+              Monthly Sales (Services)
+            </h3>
+            <p className="text-gray-500 text-sm mt-1">Number of services booked per month</p>
           </div>
-
-          <div className="flex-1 space-y-4">
-            <div className="p-4 rounded-2xl bg-gray-50 border border-gray-100">
-              <h4 className="font-bold text-gray-800 mb-1">Weekly Team Sync</h4>
-              <p className="text-xs text-gray-500 mb-3">
-                Today, 02:00 pm - 03:00 pm
-              </p>
-              <button className="w-full py-2 bg-[#1B4332] text-white rounded-xl text-xs font-bold hover:bg-[#153426] transition-colors">
-                Join Meeting
-              </button>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-white border border-gray-100 hover:border-emerald-200 transition-colors cursor-pointer group">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center text-orange-500">
-                  <AlertCircle size={20} />
-                </div>
-                <div>
-                  <h4 className="font-bold text-sm text-gray-800 group-hover:text-[#1B4332]">
-                    Review Complaints
-                  </h4>
-                  <p className="text-xs text-gray-500">3 new items</p>
-                </div>
-              </div>
-            </div>
+          <div className="flex-1 w-full min-h-0">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={data?.charts?.monthlyData || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#6b7280', fontSize: 12}} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{fill: '#6b7280', fontSize: 12}} />
+                <Tooltip 
+                  cursor={{fill: '#f0fdf4'}}
+                  contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                  formatter={(value: unknown) => [Number(value) || 0, 'Sales']}
+                />
+                <Bar dataKey="sales" fill="#34d399" radius={[6, 6, 0, 0]} barSize={40} />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         </div>
       </div>
 
-      {/* Bottom Section: Team & Projects */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Team Collaboration */}
-        <div className="lg:col-span-1 bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="font-bold text-lg text-gray-900">Active Workers</h3>
-            <button className="text-xs font-bold text-[#1B4332] hover:underline">
-              + Add
-            </button>
+      {/* Charts Section 2 */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        
+        {/* Services by Status (Pie) */}
+        <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center h-[400px]">
+          <div className="w-full mb-2">
+            <h3 className="font-bold text-xl text-gray-900">Service Success Rate</h3>
+            <p className="text-gray-500 text-sm mt-1">Breakdown by current status</p>
           </div>
-          <div className="space-y-2">
-            <WorkerRow
-              name="Alexandra Deff"
-              role="Plumbing Service"
-              status="Completed"
-            />
-            <WorkerRow
-              name="Edwin Adenike"
-              role="Electrical Repair"
-              status="In Progress"
-            />
-            <WorkerRow
-              name="Isaac Oluwa"
-              role="House Cleaning"
-              status="Pending"
-            />
-          </div>
-        </div>
-
-        {/* Project Progress */}
-        <div className="lg:col-span-1 bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center justify-center relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 to-[#1B4332]" />
-          <div className="relative w-40 h-40 flex items-center justify-center">
-            {/* Simple CSS Circle Chart */}
-            <svg className="w-full h-full transform -rotate-90">
-              <circle
-                cx="80"
-                cy="80"
-                r="70"
-                fill="none"
-                stroke="#F3F4F6"
-                strokeWidth="12"
-              />
-              <circle
-                cx="80"
-                cy="80"
-                r="70"
-                fill="none"
-                stroke="#1B4332"
-                strokeWidth="12"
-                strokeDasharray="440"
-                strokeDashoffset="132"
-                strokeLinecap="round"
-              />
-            </svg>
-            <div className="absolute text-center">
-              <span className="text-4xl font-bold text-[#1B4332]">70%</span>
-              <p className="text-xs text-gray-500">Goal Reached</p>
-            </div>
-          </div>
-          <div className="mt-6 text-center">
-            <h3 className="font-bold text-lg text-gray-900">Monthly Target</h3>
-            <div className="flex items-center gap-4 mt-2 justify-center text-xs font-medium text-gray-500">
-              <div className="flex items-center gap-1">
-                <div className="w-2 h-2 rounded-full bg-[#1B4332]" /> Completed
-              </div>
-              <div className="flex items-center gap-1">
-                <div className="w-2 h-2 rounded-full bg-gray-200" /> Pending
-              </div>
-            </div>
+          <div className="flex-1 w-full min-h-0 flex items-center justify-center">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={data?.charts?.servicesByStatus || []}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={80}
+                  outerRadius={110}
+                  paddingAngle={5}
+                  dataKey="value"
+                  stroke="none"
+                >
+                  {(data?.charts?.servicesByStatus || []).map((entry: ServiceStatusChartData, index: number) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip 
+                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                  formatter={(value: unknown) => [Number(value) || 0, 'Services']}
+                />
+                <Legend verticalAlign="bottom" height={36} iconType="circle" />
+              </PieChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
-        {/* Recent Projects/Tasks */}
-        <div className="lg:col-span-1 bg-[#1B4332] p-6 rounded-3xl shadow-lg shadow-[#1B4332]/20 text-white flex flex-col justify-between relative overflow-hidden">
-          {/* Background Effects */}
-          <div className="absolute -top-20 -right-20 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl" />
+        {/* Top Categories */}
+        <div className="bg-[#1B4332] p-6 rounded-3xl shadow-lg shadow-[#1B4332]/20 flex flex-col h-[400px] relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full -mr-20 -mt-20 blur-3xl" />
+          <div className="relative z-10 mb-6">
+            <h3 className="font-bold text-xl text-white">Top 5 Categories</h3>
+            <p className="text-emerald-200 text-sm mt-1">Most popular service categories</p>
+          </div>
+          <div className="flex-1 w-full min-h-0 relative z-10">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={data?.charts?.topCategories || []} layout="vertical" margin={{ top: 0, right: 20, left: 0, bottom: 0 }}>
+                <XAxis type="number" hide />
+                <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{fill: '#a7f3d0', fontSize: 12, fontWeight: 500}} width={100} />
+                <Tooltip 
+                  cursor={{fill: 'rgba(255,255,255,0.05)'}}
+                  contentStyle={{ borderRadius: '12px', backgroundColor: '#064e3b', border: 'none', color: 'white' }}
+                  formatter={(value: unknown) => [Number(value) || 0, 'Services']}
+                />
+                <Bar dataKey="value" radius={[0, 6, 6, 0]} barSize={24}>
+                  {(data?.charts?.topCategories || []).map((entry: CategoryChartData, index: number) => (
+                    <Cell key={`cell-${index}`} fill={entry.fill} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+            {(data?.charts?.topCategories || []).length === 0 && (
+              <div className="absolute inset-0 flex items-center justify-center text-emerald-200">
+                No categories data available
+              </div>
+            )}
+          </div>
+        </div>
 
-          <div className="relative z-10">
-            <h3 className="font-bold text-lg mb-1">Time Tracker</h3>
-            <p className="text-emerald-200 text-sm mb-8">
-              Track your productivity
-            </p>
-
-            <div className="text-5xl font-mono font-bold tracking-wider mb-8">
-              01:24:08
+        {/* Top Workers List */}
+        <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col h-[400px]">
+          <div className="mb-4 flex justify-between items-center">
+            <div>
+              <h3 className="font-bold text-xl text-gray-900 flex items-center gap-2">
+                <Users className="text-emerald-500" size={24} />
+                Top Rated Workers
+              </h3>
+              <p className="text-gray-500 text-sm mt-1">Highest rated professionals</p>
             </div>
-
-            <div className="flex items-center gap-4">
-              <button className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-[#1B4332] hover:bg-emerald-50 transition-colors">
-                <div className="w-3 h-3 bg-[#1B4332] rounded-sm" />
-              </button>
-              <button className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center text-white hover:bg-red-600 transition-colors shadow-lg shadow-red-900/20">
-                <div className="w-3 h-3 bg-white rounded-full" />
-              </button>
-            </div>
+          </div>
+          <div className="flex-1 overflow-y-auto pr-2 space-y-3 custom-scrollbar">
+            {(data?.topWorkers || []).map((worker: TopWorkerData) => (
+              <WorkerRow
+                key={worker.id}
+                name={worker.name}
+                role={`Rating: ${worker.rating.toFixed(1)} ⭐ (${worker.totalRatings} reviews)`}
+              />
+            ))}
+            {(data?.topWorkers || []).length === 0 && (
+                <div className="h-full flex items-center justify-center text-gray-400">No workers found</div>
+            )}
           </div>
         </div>
       </div>

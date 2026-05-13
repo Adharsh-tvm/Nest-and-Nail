@@ -3,7 +3,7 @@ import { X, MapPin, Loader2, Save, Map as MapIcon } from "lucide-react";
 import { Address } from "@/shared/types/addressType";
 import toast from "react-hot-toast";
 import { useUserStore } from "@/store/userStore";
-import { addUSerAddressAction } from "@/app/actions/users/user-profile-actions";
+
 import dynamic from "next/dynamic";
 
 const LocationPicker = dynamic(
@@ -127,7 +127,7 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
 
       // Automatically open address fields if hidden or ensure they are visible
       // (Currently they are always visible)
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Reverse geocoding error:", err);
       toast.error("Unable to fetch address details for this location");
     }
@@ -156,7 +156,7 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
 
       await reverseGeocode(lat, lng);
       toast.success("Location detected successfully");
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("GPS error:", err);
       toast.error("Unable to fetch location");
     } finally {
@@ -172,7 +172,7 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
     setIsLoadingLocation(false);
   };
 
-  const { user, setUser } = useUserStore();
+  const { user } = useUserStore();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -192,7 +192,7 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
     try {
       await onSave(formData as Address);
       onClose();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Failed to save address: ", error);
       toast.error("Failed to save address");
     } finally {

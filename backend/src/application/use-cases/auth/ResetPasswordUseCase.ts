@@ -4,6 +4,7 @@ import { IPasswordHasher } from "../../contracts/IPasswordHasher";
 import { Role } from "../../../shared/enums/authEnums";
 import { IResetPasswordUseCase } from "../../interfaces/auth/IResetPasswordUseCase";
 import { IUserRepositoryFactory } from "../../../domain/repositories/IUserRepositoryFactory";
+import { AuthValidator } from "../../validators/AuthValidator";
 
 export class ResetPasswordUseCase implements IResetPasswordUseCase {
     constructor(
@@ -14,6 +15,8 @@ export class ResetPasswordUseCase implements IResetPasswordUseCase {
     ) { }
 
     async execute(email: string, newPassword: string): Promise<void> {
+        AuthValidator.validatePassword(newPassword);
+
         const roles = [Role.CLIENT, Role.WORKER, Role.ADMIN];
 
         let user = null;
@@ -41,6 +44,7 @@ export class ResetPasswordUseCase implements IResetPasswordUseCase {
 
         await this._otpRepo.delete(email);
 
-        this._logger?.info(`Password reset successful for ${email}`);
+        this._logger.info(`Password reset successful for ${email}`);
     }
 }
+    

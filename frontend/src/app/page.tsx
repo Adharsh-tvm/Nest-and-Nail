@@ -3,7 +3,6 @@
 import React from 'react';
 import Link from "next/link";
 import {
-  Home,
   MapPin,
   Phone,
   Mail,
@@ -86,6 +85,7 @@ const App = () => {
 
               {/* Ad 1 */}
               <div className="relative overflow-hidden rounded-2xl shadow-lg group cursor-pointer h-96">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="https://images.unsplash.com/photo-1581578731117-104f885d3254?auto=format&fit=crop&q=80&w=600"
                   alt="Cleaning Ad"
@@ -106,6 +106,7 @@ const App = () => {
 
               {/* Ad 2 */}
               <div className="relative overflow-hidden rounded-2xl shadow-lg group cursor-pointer h-96">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&q=80&w=600"
                   alt="Electrical Ad"
@@ -126,6 +127,7 @@ const App = () => {
 
               {/* Ad 3 */}
               <div className="relative overflow-hidden rounded-2xl shadow-lg group cursor-pointer h-96">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&q=80&w=600"
                   alt="Worker Ad"

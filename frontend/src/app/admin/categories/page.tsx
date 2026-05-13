@@ -1,20 +1,18 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, Suspense } from "react";
 import {
-  Search,
   Plus,
   Edit2,
   Trash2,
-  MoreHorizontal,
   CheckCircle,
   XCircle,
-  Tag,
   Hash,
   List,
   Activity,
   Calendar,
 } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import DataTable, {
   Column,
@@ -22,7 +20,6 @@ import DataTable, {
 import { Category, CategoryInput } from "@/shared/types/categoryTypes";
 import {
   getAllCategoriesAction,
-  createCategoryAction,
   updateCategoryAction,
   toggleCategoryStatusAction,
 } from "@/app/actions/admin/category-actions";
@@ -30,6 +27,9 @@ import { CategoryModal } from "./CategoryModal";
 import toast from "react-hot-toast";
 
 const CategoriesPage = () => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -37,29 +37,60 @@ const CategoriesPage = () => {
     null,
   );
   const [actionLoading, setActionLoading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
 
-  const fetchCategories = async () => {
+  // Derive state from URL
+  const searchQuery = searchParams.get("search") || "";
+  const currentPage = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
+  const sortBy = searchParams.get("sortBy") || "name";
+  const sortOrder = (searchParams.get("sortOrder") as "asc" | "desc") || "asc";
+  const itemsPerPage = 8;
+
+  const [totalCount, setTotalCount] = useState(0);
+  const [activeCount, setActiveCount] = useState(0);
+  const [inactiveCount, setInactiveCount] = useState(0);
+
+  const updateParams = useCallback((updates: Record<string, string | null>) => {
+    const params = new URLSearchParams(searchParams.toString());
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value === null) {
+        params.delete(key);
+      } else {
+        params.set(key, value);
+      }
+    });
+    router.push(`?${params.toString()}`);
+  }, [searchParams, router]);
+
+  const fetchCategories = useCallback(async () => {
     try {
       setLoading(true);
 
-      const res = await getAllCategoriesAction();
+      const res = await getAllCategoriesAction({
+        search: searchQuery,
+        page: currentPage,
+        limit: itemsPerPage,
+        sortBy,
+        sortOrder,
+      });
 
       if (!res.success) {
         throw new Error(res.message);
       }
 
-      setCategories(res.payload);
-    } catch (error: any) {
-      toast.error(error.message || "Failed to load categories");
+      setCategories(res.payload.categories);
+      setTotalCount(res.payload.total);
+      setActiveCount(res.payload.activeCount);
+      setInactiveCount(res.payload.inactiveCount);
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : "Failed to load categories");
     } finally {
       setLoading(false);
     }
-  };
+  }, [searchQuery, currentPage, itemsPerPage, sortBy, sortOrder]);
 
   useEffect(() => {
     fetchCategories();
-  }, []);
+  }, [fetchCategories]);
 
   const handleCreate = () => {
     setSelectedCategory(null);
@@ -83,21 +114,8 @@ const CategoriesPage = () => {
           return;
         }
 
-        setCategories((prev) =>
-          prev.map((c) => (c.id === res.payload!.id ? res.payload! : c)),
-        );
-
-        toast.success("Category updated successfully");
-      } else {
-        const res = await createCategoryAction(data);
-
-        if (!res.success) {
-          toast.error(res.message);
-          return;
-        }
-
-        setCategories((prev) => [res.payload!, ...prev]);
-        toast.success("Category created successfully");
+        toast.success(`Category ${selectedCategory ? "updated" : "created"} successfully`);
+        fetchCategories();
       }
 
       setIsModalOpen(false);
@@ -108,14 +126,6 @@ const CategoriesPage = () => {
   };
 
   const handleToggleStatus = async (category: Category) => {
-    const previous = category;
-
-    setCategories((prev) =>
-      prev.map((c) =>
-        c.id === category.id ? { ...c, isActive: !c.isActive } : c,
-      ),
-    );
-
     try {
       const res = await toggleCategoryStatusAction(category.id);
 
@@ -123,42 +133,45 @@ const CategoriesPage = () => {
         throw new Error(res.message);
       }
 
-      if (!res.payload) {
-        throw new Error("Invalid server response");
-      }
-
-      setCategories((prev) =>
-        prev.map((c) => (c.id === res.payload!.id ? res.payload! : c)),
-      );
-
       toast.success(
-        `Category ${res.payload.isActive ? "activated" : "blocked"} successfully`,
+        `Category ${res.payload!.isActive ? "activated" : "blocked"} successfully`,
       );
-    } catch (error: any) {
-      setCategories((prev) =>
-        prev.map((c) => (c.id === previous.id ? previous : c)),
-      );
-
-      toast.error(error.message || "Failed to update category status");
+      fetchCategories();
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : "Failed to update category status");
     }
   };
 
-  const filteredCategories = categories.filter(
-    (c) =>
-      c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      c.slug.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  const handleSort = (key: string, order: "asc" | "desc") => {
+    updateParams({ sortBy: key, sortOrder: order, page: "1" });
+  };
+
+  const [localSearch, setLocalSearch] = useState(searchQuery);
+
+  useEffect(() => {
+    setLocalSearch(searchQuery);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (localSearch !== searchQuery) {
+        updateParams({ search: localSearch || null, page: "1" });
+      }
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [localSearch, searchQuery, updateParams]);
 
   // Stats
-  const totalCategories = categories.length;
-  const activeCategories = categories.filter((c) => c.isActive).length;
-  const inactiveCategories = totalCategories - activeCategories;
+  const totalCategories = totalCount;
+  const activeCategories = activeCount;
+  const inactiveCategories = inactiveCount;
 
   // Columns
   const columns: Column<Category>[] = [
     {
       header: "Category Name",
       accessorKey: "name",
+      sortable: true,
       className: "min-w-[200px]",
       cell: (row) => (
         <div className="flex items-center gap-3">
@@ -174,6 +187,7 @@ const CategoriesPage = () => {
     {
       header: "Slug",
       accessorKey: "slug",
+      sortable: true,
       cell: (row) => (
         <div className="flex items-center gap-2 text-sm text-gray-600 font-mono bg-gray-50 px-2 py-1 rounded-lg w-fit">
           <Hash size={12} className="text-gray-400" />
@@ -184,6 +198,8 @@ const CategoriesPage = () => {
     {
       header: "Status",
       accessorKey: "isActive",
+      sortable: true,
+      sortKey: "isActive",
       cell: (row) => (
         <div className="flex items-center gap-2">
           <label className="relative inline-flex items-center cursor-pointer">
@@ -249,7 +265,14 @@ const CategoriesPage = () => {
     },
   ];
 
-  const StatCard = ({ title, value, icon: Icon, color, iconColor }: any) => (
+  interface StatCardProps {
+    title: string;
+    value: number | string;
+    icon: React.ComponentType<{ size?: number; className?: string }>;
+    iconColor?: string;
+  }
+
+  const StatCard = ({ title, value, icon: Icon, iconColor }: StatCardProps) => (
     <div
       className={`p-6 rounded-2xl shadow-sm flex items-center justify-between border border-gray-100 bg-white`}
     >
@@ -295,9 +318,18 @@ const CategoriesPage = () => {
         <DataTable<Category>
           title="Categories"
           columns={columns}
-          data={filteredCategories}
+          data={categories}
           isLoading={loading}
           searchPlaceholder="Search categories..."
+          searchValue={localSearch}
+          onSearchChange={setLocalSearch}
+          page={currentPage}
+          totalPages={Math.ceil(totalCount / itemsPerPage)}
+          onPageChange={(page) => updateParams({ page: page.toString() })}
+          onSort={handleSort}
+          sortBy={sortBy}
+          sortOrder={sortOrder}
+          total={totalCount}
           actions={
             <button
               onClick={handleCreate}
@@ -320,4 +352,17 @@ const CategoriesPage = () => {
   );
 };
 
-export default CategoriesPage;
+const CategoriesPageWithSuspense = () => {
+  return (
+    <Suspense fallback={
+      <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-4">
+        <div className="w-12 h-12 border-4 border-[#1B4332] border-t-transparent rounded-full animate-spin shadow-md" />
+        <p className="text-gray-500 font-medium">Loading...</p>
+      </div>
+    }>
+      <CategoriesPage />
+    </Suspense>
+  );
+};
+
+export default CategoriesPageWithSuspense;

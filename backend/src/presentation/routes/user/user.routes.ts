@@ -14,43 +14,42 @@ export function createUserRoutes(
 
     router.patch("/mode",
         authMiddleware.verify.bind(authMiddleware),
-        (req, res) => userController.changeRole(req, res)
+        (req, res) => { void userController.changeRole(req, res); }
     );
 
 
-    router.get("/current/:email", (req, res) =>
-        userController.getCurrentUser(req, res)
+    router.get("/current/:email", (req, res) => { void userController.getCurrentUser(req, res); }
     );
 
     router.put(
         "/user/:userId/profile",
         authMiddleware.verify.bind(authMiddleware),
         upload.single("profilePicture"),
-        (req, res) => userProfileController.updateProfile(req, res)
+        (req, res) => { void userProfileController.updateProfile(req, res); }
     );
 
     router.patch(
         "/:userId/skills",
         authMiddleware.verify,
-        userProfileController.updateSkills
+        (req, res) => { void userProfileController.updateSkills(req, res); }
     );
 
     router.post(
         "/:userId/addresses",
         authMiddleware.verify,
-        userProfileController.addAddress
+        (req, res) => { void userProfileController.addAddress(req, res); }
     );
 
     router.put(
         "/:userId/addresses/:addressId",
         authMiddleware.verify,
-        userProfileController.editAddress
+        (req, res) => { void userProfileController.editAddress(req, res); }
     );
 
     router.delete(
         "/:userId/addresses/:addressId",
         authMiddleware.verify,
-        userProfileController.deleteAddress
+        (req, res) => { void userProfileController.deleteAddress(req, res); }
     );
 
     return router;

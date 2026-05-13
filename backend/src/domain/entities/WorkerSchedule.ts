@@ -6,6 +6,7 @@ export interface WorkerSchedule {
   date: Date;
   slotType: SlotType;
   isBooked: boolean;
+  isAvailable: boolean; 
   serviceId?: string;
   createdAt?: Date;
   updatedAt?: Date;

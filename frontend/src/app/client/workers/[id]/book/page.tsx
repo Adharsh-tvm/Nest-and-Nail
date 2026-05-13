@@ -40,22 +40,23 @@ export default async function BookWorkerPage({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-10">
+    <div className="min-h-screen bg-gray-50 py-4">
       <div className="container mx-auto px-4 max-w-3xl">
         {/* Back Link */}
         <Link
           href={`/client/workers/${paramsObj.id}`}
-          className="inline-flex items-center text-gray-500 hover:text-emerald-600 transition-colors mb-6 font-medium"
+          className="inline-flex items-center text-gray-500 hover:text-emerald-600 transition-colors mb-4 font-medium text-sm"
         >
           <ChevronLeft className="w-5 h-5 mr-1" />
           Back to {worker.name}&#39;s profile
         </Link>
         
         {/* Top Info Banner */}
-        <div className="bg-white rounded-[20px] p-6 shadow-sm border border-gray-100 mb-6 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-100 border-2 border-emerald-100">
+        <div className="bg-white rounded-[16px] p-4 shadow-sm border border-gray-100 mb-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100 border-2 border-emerald-100">
                {(worker.profileImageUrl || worker.profilePictureUrl) ? (
+                 // eslint-disable-next-line @next/next/no-img-element
                  <img 
                    src={worker.profileImageUrl || worker.profilePictureUrl || ""}
                    alt={worker.name}
@@ -68,8 +69,8 @@ export default async function BookWorkerPage({
                )}
             </div>
             <div>
-              <h1 className="text-xl font-bold text-gray-900">{worker.name}</h1>
-              <p className="text-sm font-medium text-gray-500">
+              <h1 className="text-lg font-bold text-gray-900">{worker.name}</h1>
+              <p className="text-xs font-medium text-gray-500">
                 {worker.categories && worker.categories.length > 0 
                   ? worker.categories[0] 
                   : (worker.skills && worker.skills.length > 0 ? worker.skills[0] : 'Professional Worker')}

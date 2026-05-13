@@ -1,309 +1,419 @@
 "use client";
 
-import React, { useState } from "react";
-import {
-  Search,
-  MapPin,
-  Hammer,
-  Wrench,
-  Zap,
-  Droplets,
-  PaintBucket,
-  Truck,
-  Star,
-  CheckCircle2,
-  ArrowRight,
-  Menu,
-  X,
-  ShieldCheck,
-  Clock,
-  Wallet,
-  GalleryVerticalEnd,
-  User,
-  Phone,
-  Mail,
-  Instagram,
-  Twitter,
-  Linkedin,
-  Briefcase,
-  TrendingUp,
-  DollarSign
+import React, { useEffect, useState } from "react";
+import { getWorkerDashboardDataAction } from "@/app/actions/worker/dashboard-actions";
+import { 
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  PieChart, Pie, Cell, Legend
+} from 'recharts';
+import { 
+  IndianRupee, Briefcase, Clock, Star, Calendar, MessageSquareQuote, Wallet, MapPin, CalendarDays, XCircle
 } from "lucide-react";
+import toast from "react-hot-toast";
 
-// --- Theme Constants ---
-// Forest Green: #1B4332 (Primary Brand)
-// Red Accent:   #DC2626 (Buttons, Highlights)
-
-// --- Types ---
-interface ServiceCardProps {
-  icon: React.ElementType;
+interface StatCardProps {
   title: string;
-  count: string;
+  value: string;
+  icon: React.ComponentType<{ size?: number; strokeWidth?: number }>;
+  color?: string;
 }
 
-// --- Components ---
+const StatCard = ({ title, value, icon: Icon, color = "indigo" }: StatCardProps) => {
+  const colorMap: Record<string, { iconBg: string, iconColor: string }> = {
+    primary: { iconBg: "bg-emerald-50", iconColor: "text-emerald-600" },
+    secondary: { iconBg: "bg-teal-50", iconColor: "text-teal-600" },
+    info: { iconBg: "bg-sky-50", iconColor: "text-sky-600" },
+    warning: { iconBg: "bg-amber-50", iconColor: "text-amber-600" },
+  };
+  const theme = colorMap[color] || colorMap.primary;
 
-const HeroSection = () => (
-  <div className="relative bg-[#0f291e] overflow-hidden">
-    {/* Pattern Overlay */}
-    <div
-      className="absolute inset-0 opacity-5"
-      style={{
-        backgroundImage: "linear-gradient(45deg, #ffffff 1px, transparent 1px)",
-        backgroundSize: "32px 32px",
-      }}
-    ></div>
-
-    {/* Abstract Shapes */}
-    <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-[#1B4332] opacity-50 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2"></div>
-    <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-[#DC2626] opacity-10 rounded-full blur-[100px] translate-y-1/3 -translate-x-1/4"></div>
-
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32 relative z-10">
-      <div className="text-center max-w-4xl mx-auto">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 backdrop-blur-md text-green-100 text-sm font-medium mb-8 border border-white/10">
-          <span className="w-2 h-2 rounded-full bg-[#4ADE80] animate-pulse"></span>
-          Now recruiting in your area
-        </div>
-
-        <h1 className="text-5xl md:text-7xl font-extrabold text-white mb-8 leading-tight tracking-tight">
-          Work on your terms. <br className="hidden md:block" />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#4ADE80] to-[#22c55e] drop-shadow-sm">
-            Get paid faster.
-          </span>
-        </h1>
-
-        <p className="text-lg md:text-xl text-gray-300 mb-12 max-w-2xl mx-auto font-light leading-relaxed">
-          Stop chasing leads. We connect you with homeowners who are ready to hire. 
-          Set your schedule, pick your price, and build your reputation.
-        </p>
-
-        {/* Enhanced Search Bar for Jobs */}
-        <div className="bg-white p-2.5 rounded-2xl shadow-2xl shadow-black/20 max-w-3xl mx-auto flex flex-col md:flex-row gap-2 transition-transform hover:scale-[1.01] duration-300">
-          <div className="flex-1 flex items-center px-4 h-14 bg-gray-50 rounded-xl md:rounded-r-none md:bg-transparent border-2 border-transparent focus-within:border-[#1B4332]/10 focus-within:bg-white transition-colors">
-            <Briefcase className="text-gray-400 mr-3" size={22} />
-            <select
-              className="w-full bg-transparent outline-none text-gray-800 font-medium text-lg appearance-none cursor-pointer"
-              defaultValue=""
-            >
-              <option value="" disabled>Select your trade...</option>
-              <option value="plumbing">Plumbing</option>
-              <option value="electrical">Electrical</option>
-              <option value="cleaning">Cleaning</option>
-              <option value="carpentry">Carpentry</option>
-            </select>
-          </div>
-          <div className="w-px bg-gray-200 hidden md:block h-8 self-center"></div>
-          <div className="flex-[0.6] flex items-center px-4 h-14 bg-gray-50 rounded-xl md:rounded-none md:bg-transparent border-2 border-transparent focus-within:border-[#1B4332]/10 focus-within:bg-white transition-colors">
-            <MapPin className="text-[#DC2626] mr-3" size={22} />
-            <input
-              type="text"
-              placeholder="Zip Code"
-              className="w-full bg-transparent outline-none text-gray-800 placeholder-gray-400 font-medium text-lg"
-            />
-          </div>
-          <button className="bg-[#1B4332] hover:bg-[#143225] text-white font-bold h-14 px-8 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 group whitespace-nowrap">
-            Find Jobs
-            <ArrowRight
-              size={20}
-              className="group-hover:translate-x-1 transition-transform"
-            />
-          </button>
-        </div>
-
-        {/* Stats Bar */}
-        <div className="mt-16 pt-8 border-t border-white/10 flex flex-wrap justify-center gap-8 md:gap-16">
-          {[
-            { icon: TrendingUp, label: "Jobs Posted Daily", value: "2,500+" },
-            { icon: Wallet, label: "Avg. Pro Earnings", value: "$85/hr" },
-            { icon: CheckCircle2, label: "Payment Guarantee", value: "100%" },
-          ].map((stat, idx) => (
-            <div key={idx} className="flex flex-col items-center gap-1 group">
-              <div className="flex items-center gap-2 text-white font-bold text-2xl group-hover:text-[#4ADE80] transition-colors">
-                <stat.icon
-                  className="text-[#DC2626] group-hover:scale-110 transition-transform"
-                  size={24}
-                />
-                {stat.value}
-              </div>
-              <span className="text-gray-400 text-sm font-medium uppercase tracking-wide">
-                {stat.label}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  </div>
-);
-
-const ServiceCard = ({ icon: Icon, title, count }: ServiceCardProps) => (
-  <div className="bg-white border border-gray-100 p-6 rounded-2xl shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_40px_-15px_rgba(27,67,50,0.1)] hover:border-green-100 transition-all duration-300 group cursor-pointer h-full flex flex-col items-center text-center">
-    <div className="w-16 h-16 bg-[#F3F4F6] rounded-2xl flex items-center justify-center mb-5 group-hover:bg-[#1B4332] group-hover:rotate-3 transition-all duration-300 ease-out">
-      <Icon
-        size={32}
-        className="text-[#DC2626] group-hover:text-white transition-colors duration-300"
-      />
-    </div>
-    <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-[#1B4332] transition-colors">
-      {title}
-    </h3>
-    <p className="text-sm text-gray-500 font-medium bg-gray-50 px-3 py-1 rounded-full group-hover:bg-green-50 group-hover:text-green-700 transition-colors">
-      {count} Active Jobs
-    </p>
-  </div>
-);
-
-const HighDemandJobs = () => (
-  <section className="py-24 bg-[#F9FAFB]">
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="text-center mb-16">
-        <span className="text-[#DC2626] font-bold text-sm uppercase tracking-wider mb-2 block">
-          Market Insights
-        </span>
-        <h2 className="text-3xl md:text-5xl font-extrabold text-[#1B4332] mb-6">
-          High Demand Categories
-        </h2>
-        <p className="text-gray-600 max-w-2xl mx-auto text-lg">
-          We have homeowners looking for these skills right now. Sign up today and start bidding.
-        </p>
-      </div>
-
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-        <ServiceCard icon={Droplets} title="Plumbing" count="120+" />
-        <ServiceCard icon={Zap} title="Electrical" count="85+" />
-        <ServiceCard icon={PaintBucket} title="Painting" count="64+" />
-        <ServiceCard icon={Hammer} title="Carpentry" count="50+" />
-        <ServiceCard icon={Truck} title="Moving" count="42+" />
-        <ServiceCard icon={Wrench} title="HVAC" count="95+" />
-      </div>
-    </div>
-  </section>
-);
-
-const HowItWorksWorker = () => (
-  <section className="py-24 bg-white relative">
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="grid lg:grid-cols-2 gap-20 items-center">
-        
-        <div className="relative">
-          {/* Decorative Background for Card */}
-          <div className="absolute inset-0 bg-[#DC2626] rounded-[2.5rem] -rotate-3 opacity-5 scale-105"></div>
-
-          {/* Main App-like Card */}
-          <div className="bg-white border border-gray-100 shadow-2xl rounded-[2rem] p-8 relative z-10 overflow-hidden">
-            <div className="flex items-center justify-between mb-8">
-              <h3 className="font-bold text-[#1B4332] text-xl">My Dashboard</h3>
-              <span className="text-xs font-bold bg-green-100 text-green-700 px-2 py-1 rounded flex items-center gap-1">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                Live
-              </span>
-            </div>
-
-            {/* Mock Dashboard Earnings */}
-            <div className="bg-[#1B4332] rounded-xl p-6 text-white mb-6">
-                <div className="text-sm opacity-80 mb-1">This Week's Earnings</div>
-                <div className="text-3xl font-bold flex items-center gap-2">
-                    $1,240.50 <TrendingUp size={20} className="text-[#4ADE80]" />
-                </div>
-            </div>
-
-            {/* Mock Job Leads */}
-            <div className="space-y-4">
-              <div className="text-sm font-bold text-gray-400 uppercase">New Leads Near You</div>
-              {[
-                {
-                  title: "Leaky Faucet Repair",
-                  loc: "Downtown • 2.5mi",
-                  budget: "Est. $150",
-                  urgent: true
-                },
-                {
-                  title: "Full Bath Remodel",
-                  loc: "Westside • 5.0mi",
-                  budget: "Est. $4,000",
-                  urgent: false
-                },
-              ].map((job, i) => (
-                <div
-                  key={i}
-                  className="flex items-center gap-4 p-4 rounded-xl border border-gray-100 hover:border-green-200 hover:bg-green-50/30 transition-all cursor-pointer group"
-                >
-                  <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 group-hover:bg-[#1B4332] group-hover:text-white transition-colors">
-                    <Wrench size={18} />
-                  </div>
-                  <div className="flex-1">
-                    <div className="font-bold text-gray-900 group-hover:text-[#1B4332] transition-colors">
-                      {job.title}
-                    </div>
-                    <div className="text-xs text-gray-500">{job.loc}</div>
-                  </div>
-                  <div className="text-right">
-                    <div className="font-bold text-[#DC2626] text-sm">{job.budget}</div>
-                    {job.urgent && <div className="text-[10px] font-bold text-[#DC2626] bg-red-50 inline-block px-1 rounded">URGENT</div>}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="">
-          <h2 className="text-3xl md:text-5xl font-extrabold text-[#1B4332] mb-8 leading-tight">
-            Focus on the work, <br />
-            <span className="text-[#DC2626] decoration-4 underline underline-offset-4 decoration-gray-200">
-              we handle the rest.
-            </span>
-          </h2>
-
-          <div className="space-y-10">
-            {[
-              {
-                title: "Create your Pro Profile",
-                desc: "Showcase your skills, upload photos of past work, and set your service area. It's free to join.",
-                step: "01",
-              },
-              {
-                title: "Get Matched with Leads",
-                desc: "We send you jobs that match your expertise. You choose which ones to accept.",
-                step: "02",
-              },
-              {
-                title: "Get Paid Instantly",
-                desc: "Complete the job and get paid directly to your bank account. No chasing invoices.",
-                step: "03",
-              },
-            ].map((item, idx) => (
-              <div key={idx} className="flex gap-6 group">
-                <div className="flex-shrink-0 w-14 h-14 bg-white border-2 border-[#E5E7EB] text-[#1B4332] rounded-2xl flex items-center justify-center font-black text-xl shadow-sm group-hover:bg-[#1B4332] group-hover:text-white group-hover:border-[#1B4332] transition-all duration-300">
-                  {item.step}
-                </div>
-                <div className="pt-2">
-                  <h4 className="text-xl font-bold text-[#1B4332] mb-2">
-                    {item.title}
-                  </h4>
-                  <p className="text-gray-600 leading-relaxed max-w-sm">
-                    {item.desc}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-);
-
-
-
-const WorkerHomePage = () => {
   return (
-    <div className="min-h-screen font-sans bg-white text-gray-900 selection:bg-[#DC2626] selection:text-white">
-      <HeroSection />
-      <HighDemandJobs />
-      <HowItWorksWorker />
+    <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-col justify-between hover:shadow-md hover:border-gray-300 transition-all duration-200">
+      <div className="flex justify-between items-start mb-4">
+        <div className={`p-3 rounded-xl ${theme.iconBg} ${theme.iconColor}`}>
+          <Icon size={20} strokeWidth={2} />
+        </div>
+      </div>
+      <div>
+        <h3 className="text-sm font-medium text-gray-500 mb-1">{title}</h3>
+        <p className="text-3xl font-semibold text-gray-900 tracking-tight">{value}</p>
+      </div>
     </div>
   );
 };
 
-export default WorkerHomePage;
+import {
+  Review,
+  WorkerDashboardData
+} from "@/sources/api/worker/dashboard.api";
+
+const ReviewRow = ({ review }: { review: Review }) => (
+  <div className="flex items-start gap-4 p-5 bg-white rounded-2xl border border-gray-200 hover:border-gray-300 transition-colors duration-200">
+    <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 bg-gray-100 border border-gray-200">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={review.clientImage || `https://api.dicebear.com/7.x/avataaars/svg?seed=${review.clientName}`}
+        alt={review.clientName}
+        className="w-full h-full object-cover"
+      />
+    </div>
+    <div className="flex-1 min-w-0">
+      <div className="flex justify-between items-start mb-1.5">
+        <h4 className="font-semibold text-gray-900 truncate">{review.clientName}</h4>
+        <div className="flex items-center gap-1">
+          <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+          <span className="text-sm font-medium text-gray-700">{review.rating.toFixed(1)}</span>
+        </div>
+      </div>
+      <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed">&quot;{review.review || "No written review"}&quot;</p>
+      <p className="text-xs text-gray-400 mt-3 font-medium">
+        {new Date(review.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+      </p>
+    </div>
+  </div>
+);
+
+export default function WorkerDashboardPage() {
+  const [data, setData] = useState<WorkerDashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [timeRange, setTimeRange] = useState<number>(6);
+
+  useEffect(() => {
+    fetchData(timeRange);
+  }, [timeRange]);
+
+  const fetchData = async (months: number) => {
+    setLoading(true);
+    const res = await getWorkerDashboardDataAction(months);
+    if (res.success) {
+      setData(res.payload || null);
+    } else {
+      toast.error(res.message || "Failed to load dashboard data");
+    }
+    setLoading(false);
+  };
+
+  if (loading && !data) {
+    return (
+      <div className="flex h-[80vh] items-center justify-center">
+        <div className="relative">
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-gray-200 border-t-gray-800"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!data) {
+    return <div className="p-8 text-center text-gray-500 font-medium">Failed to load dashboard data.</div>;
+  }
+
+  // Pre-process pie chart data for specific colors
+  const STATUS_COLORS: Record<string, string> = {
+    'Completed': '#059669', // emerald-600
+    'In Progress': '#0d9488', // teal-600
+    'Pending': '#0ea5e9', // sky-500
+    'Cancelled': '#f43f5e', // rose-500
+  };
+
+  const enhancedPieData = (data?.charts?.jobsByStatus || []).map((item) => ({
+    ...item,
+    color: STATUS_COLORS[item.name] || item.color
+  }));
+
+  return (
+    <div className="max-w-7xl mx-auto w-full space-y-8 pb-16 px-4 sm:px-6 lg:px-8 pt-8">
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-gray-200">
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <span className="px-2.5 py-1 rounded-md bg-gray-100 text-gray-600 text-xs font-medium tracking-wide uppercase">Portal Overview</span>
+          </div>
+          <h2 className="text-3xl tracking-tight font-semibold text-gray-900">My Workspace</h2>
+        </div>
+        
+        <div className="flex flex-col sm:flex-row items-end sm:items-center gap-4">
+          <div className="flex items-center gap-3 bg-white border border-gray-200 rounded-xl p-3 shadow-sm h-full">
+            <div className="p-2 bg-emerald-50 text-emerald-600 rounded-lg">
+              <Wallet className="w-5 h-5" />
+            </div>
+            <div className="flex flex-col pr-2">
+              <span className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-0.5">Wallet Balance</span>
+              <span className="text-lg font-semibold text-gray-900 leading-none">₹{(data.stats.walletBalance || 0).toLocaleString()}</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-xl p-2 shadow-sm h-full">
+            <div className="p-2 text-gray-400">
+              <Calendar className="w-4 h-4" />
+            </div>
+            <select 
+              value={timeRange} 
+              onChange={(e) => setTimeRange(Number(e.target.value))}
+              className="bg-transparent border-none text-sm font-medium text-gray-700 py-1.5 pr-8 pl-1 focus:ring-0 cursor-pointer outline-none"
+            >
+              <option value={3}>Last 3 Months</option>
+              <option value={6}>Last 6 Months</option>
+              <option value={12}>Last 1 Year</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+        <StatCard
+          title="Total Earnings"
+          value={`₹${data.stats.totalEarnings.toLocaleString()}`}
+          icon={IndianRupee}
+          color="primary"
+        />
+        <StatCard 
+          title="Completed Jobs" 
+          value={data.stats.totalJobs.toString()} 
+          icon={Briefcase}
+          color="secondary" 
+        />
+        <StatCard 
+          title="Pending / Ongoing" 
+          value={(data.stats.ongoingJobs + data.stats.pendingJobs).toString()} 
+          icon={Clock}
+          color="info" 
+        />
+        <StatCard 
+          title="Cancelled Jobs" 
+          value={(data.stats.cancelledJobs || 0).toString()} 
+          icon={XCircle}
+          color="warning" 
+        />
+        <StatCard 
+          title={`Rating (${data.stats.totalRatings})`}
+          value={`${(data.stats.rating || 0).toFixed(1)}`} 
+          icon={Star}
+          color="primary" 
+        />
+      </div>
+
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        {/* Earnings Line Chart */}
+        <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-col xl:col-span-2 h-[400px]">
+          <div className="mb-6 flex justify-between items-start">
+            <div>
+              <h3 className="font-semibold text-lg text-gray-900 flex items-center gap-2">
+                Revenue Trajectory
+              </h3>
+              <p className="text-gray-500 text-sm mt-1">Your income progression over the selected period</p>
+            </div>
+          </div>
+          
+          <div className="flex-1 w-full min-h-0 relative">
+            {loading && (
+              <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-xl">
+                 <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-gray-900"></div>
+              </div>
+            )}
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={data?.charts?.monthlyEarnings || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} tickFormatter={(val) => `₹${val}`} />
+                <Tooltip 
+                  cursor={{stroke: '#e2e8f0', strokeWidth: 1, strokeDasharray: '4 4'}}
+                  contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)' }}
+                  itemStyle={{ color: '#111827', fontWeight: '600', fontSize: '14px' }}
+                  labelStyle={{ color: '#64748b', fontSize: '12px', marginBottom: '4px' }}
+                  formatter={(value: unknown) => [`₹${Number(value).toLocaleString()}`, 'Earnings']}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="earnings" 
+                  stroke="#059669" 
+                  strokeWidth={2} 
+                  dot={{ fill: '#ffffff', stroke: '#059669', strokeWidth: 2, r: 4 }} 
+                  activeDot={{ r: 6, fill: '#059669', stroke: '#ffffff', strokeWidth: 2 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Jobs by Status (Radial Pie) */}
+        <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-col h-[400px]">
+          <div className="w-full mb-6">
+            <h3 className="font-semibold text-lg text-gray-900">
+              Service Status
+            </h3>
+            <p className="text-gray-500 text-sm mt-1">Overview of your job pipeline</p>
+          </div>
+          
+          <div className="flex-1 w-full min-h-0 flex items-center justify-center relative">
+            {loading && (
+              <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-xl">
+                 <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-gray-900"></div>
+              </div>
+            )}
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={enhancedPieData}
+                  cx="50%"
+                  cy="45%"
+                  innerRadius={70}
+                  outerRadius={100}
+                  paddingAngle={2}
+                  cornerRadius={4}
+                  dataKey="value"
+                  stroke="none"
+                >
+                  {enhancedPieData.map((entry, index: number) => (
+                     <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip 
+                  contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                  itemStyle={{ fontWeight: '600', fontSize: '14px', color: '#111827' }}
+                  labelStyle={{ display: 'none' }}
+                  formatter={(value: unknown, name: any) => [Number(value), String(name)]}
+                />
+                <Legend 
+                  verticalAlign="bottom" 
+                  height={36} 
+                  iconType="circle" 
+                  wrapperStyle={{ fontSize: '13px', color: '#475569' }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+            {enhancedPieData.length === 0 && !loading && (
+              <div className="absolute inset-0 flex items-center justify-center text-gray-500 text-sm">
+                No active jobs in this period
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Schedule & Upcoming Service Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        {/* Next Upcoming Service */}
+        <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-col justify-between">
+          <div className="mb-6">
+            <h3 className="font-semibold text-lg text-gray-900 flex items-center gap-2">
+              Next Upcoming Service
+            </h3>
+            <p className="text-gray-500 text-sm mt-1">Details for your next scheduled job</p>
+          </div>
+          
+          <div className="flex-1 flex flex-col justify-center">
+            {data?.upcomingService ? (
+              <div className="bg-gray-50 p-6 rounded-xl border border-gray-200">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-14 h-14 rounded-full overflow-hidden bg-white border border-gray-200 flex-shrink-0">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={data.upcomingService.clientImage || `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.upcomingService.clientName}`} alt="client" className="w-full h-full object-cover" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-lg text-gray-900 leading-tight mb-1">{data.upcomingService.title}</h4>
+                    <p className="text-gray-600 text-sm font-medium">{data.upcomingService.clientName}</p>
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 text-sm text-gray-700">
+                    <CalendarDays className="w-4 h-4 text-gray-400" />
+                    <span>{new Date(data.upcomingService.date).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-gray-700">
+                    <Clock className="w-4 h-4 text-gray-400" />
+                    <span>{new Date(data.upcomingService.date).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-gray-700">
+                    <MapPin className="w-4 h-4 text-gray-400" />
+                    <span className="truncate">{data.upcomingService.location}</span>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-12 bg-gray-50 rounded-xl border border-dashed border-gray-300 text-gray-500">
+                <CalendarDays className="w-8 h-8 text-gray-400 mb-3" />
+                <p className="font-medium text-gray-600">No upcoming services scheduled.</p>
+                <p className="text-sm mt-1">Take a break or find new jobs!</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Schedules / Calendar View */}
+        <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-col h-[400px]">
+          <div className="mb-6">
+            <h3 className="font-semibold text-lg text-gray-900">
+              Service Timeline
+            </h3>
+            <p className="text-gray-500 text-sm mt-1">Your upcoming job schedule</p>
+          </div>
+          
+          <div className="flex-1 overflow-y-auto pr-4 space-y-4 custom-scrollbar pb-2">
+            {(() => {
+              const schedules = data?.schedules || [];
+              return schedules.length > 0 ? (
+                schedules.slice(0, 10).map((schedule, idx: number) => {
+                  const isToday = new Date().toDateString() === new Date(schedule.date).toDateString();
+                  return (
+                    <div key={idx} className="flex gap-4 items-start">
+                      <div className="flex flex-col items-center mt-2">
+                        <div className={`w-3 h-3 rounded-full ${isToday ? 'bg-emerald-500 ring-4 ring-emerald-50' : 'bg-gray-300'}`} />
+                        {idx !== (schedules.length - 1) && <div className="w-px h-12 bg-gray-200 my-1" />}
+                      </div>
+                      <div className={`flex-1 p-4 rounded-xl border ${isToday ? 'bg-emerald-50/50 border-emerald-100' : 'bg-white border-gray-100'}`}>
+                        <h4 className="font-semibold text-sm text-gray-900 mb-1">{schedule.title}</h4>
+                        <div className="flex items-center justify-between">
+                          <p className="text-xs text-gray-500 flex items-center gap-1.5">
+                            {new Date(schedule.date).toLocaleDateString()} at {new Date(schedule.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </p>
+                          <span className={`inline-flex px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide rounded-md ${schedule.status === 'IN_PROGRESS' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-gray-100 text-gray-700 border border-gray-200'}`}>
+                            {schedule.status}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="h-full flex items-center justify-center text-center text-gray-500 text-sm">
+                  No schedules available.
+                </div>
+              );
+            })()}
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom Section: Recent Reviews */}
+      <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+        <div className="mb-6 flex justify-between items-center">
+          <div>
+            <h3 className="font-semibold text-lg text-gray-900">
+              Recent Endorsements
+            </h3>
+            <p className="text-gray-500 text-sm mt-1">What clients are saying about your work</p>
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {(data?.recentReviews || []).map((review) => (
+            <ReviewRow key={review.id} review={review} />
+          ))}
+        </div>
+        
+        {(data?.recentReviews || []).length === 0 && (
+          <div className="text-center py-12 bg-gray-50 rounded-xl border border-dashed border-gray-300 text-gray-500">
+            <MessageSquareQuote className="w-8 h-8 text-gray-400 mx-auto mb-3" />
+            <p className="font-medium text-gray-600">No reviews received yet.</p>
+            <p className="text-sm mt-1">Complete more jobs to earn feedback!</p>
+          </div>
+        )}
+      </div>
+
+    </div>
+  );
+}

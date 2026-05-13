@@ -1,12 +1,9 @@
 "use server"
 
-import axiosInstance from "@/lib/axiosInstance";
-import authApi from "@/sources/api/auth.api";
+import authApi from "@/sources/api/user/auth.api";
 import { JwtPayload } from "@/shared/types/JwtPayload";
 import { jwtVerify } from "jose";
 import { cookies } from "next/headers";
-
-const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL!;
 
 export async function verifyAccessToken(
   token: string
@@ -38,7 +35,7 @@ export async function verifyRefreshToken(token: string) {
     const key = new TextEncoder().encode(process.env.NEXT_PUBLIC_REFRESH_TOKEN_SECRET);
     const verified = await jwtVerify(token, key);
     return verified.payload;
-  } catch (error) {
+  } catch {
     return null;
   }
 }
@@ -76,7 +73,7 @@ export async function refreshTokens(refreshToken: string): Promise<boolean> {
     });
 
     return true;
-  } catch (error) {
+  } catch {
     return false;
   }
 }
@@ -89,4 +86,3 @@ export async function validateUser() {
     return null;
   }
 }
-

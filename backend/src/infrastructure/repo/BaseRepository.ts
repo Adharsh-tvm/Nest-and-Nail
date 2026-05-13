@@ -2,7 +2,7 @@ import { FilterQuery, Model, Document } from "mongoose";
 import { IBaseRepository } from "../../domain/repositories/IBaseRepository";
 import { User } from "../../domain/entities/User";
 
-export abstract class BaseRepository<T extends User, D extends Document = any> implements IBaseRepository<T> {
+export abstract class BaseRepository<T extends User, D extends Document = Document> implements IBaseRepository<T> {
     constructor(protected readonly model: Model<D>) { }
 
     async findByEmail(email: string): Promise<T | null> {
@@ -17,19 +17,29 @@ export abstract class BaseRepository<T extends User, D extends Document = any> i
             return null;
         }
 
-        const { _id, __v, categories, ...cleanResult } = result as any;
-        const mappedCategories = categories?.map((cat: any) => cat._id ? cat._id.toString() : cat.toString()) || [];
+        const leanObj = result as unknown as Record<string, unknown> & { categories?: ({ _id?: { toString(): string } } | string)[] };
+        const mappedCategories = leanObj.categories?.map((cat) => {
+            if (typeof cat === 'object' && '_id' in cat && cat._id) {
+                return (cat._id as { toString(): string }).toString();
+            }
+            return typeof cat === 'string' ? cat : "";
+        }) ?? [];
+        const cleanResult = { ...leanObj };
+        delete (cleanResult as Record<string, unknown>)._id;
+        delete (cleanResult as Record<string, unknown>).__v;
+        delete (cleanResult as Record<string, unknown>).categories;
 
-        return { ...cleanResult, categories: mappedCategories } as T;
+        return { ...cleanResult, categories: mappedCategories } as unknown as T;
     }
 
     async create(user: T): Promise<T> {
-        const created = await this.model.create(user as any);
+        const created = await this.model.create(user as unknown as Partial<D>);
         const obj = created.toObject();
+        const cleanResult = { ...obj as unknown as Record<string, unknown> };
+        delete cleanResult._id;
+        delete cleanResult.__v;
 
-        const { _id, __v, ...cleanResult } = obj as any;
-
-        return cleanResult as T;
+        return cleanResult as unknown as T;
     }
 
     async findById(id: string): Promise<T | null> {
@@ -45,18 +55,31 @@ export abstract class BaseRepository<T extends User, D extends Document = any> i
             return null;
         }
 
-        const { _id, __v, categories, ...cleanResult } = result as any;
-        const mappedCategories = categories?.map((cat: any) => cat._id ? cat._id.toString() : cat.toString()) || [];
+        const leanObj = result as unknown as Record<string, unknown> & { categories?: ({ _id?: { toString(): string } } | string)[] };
+        const mappedCategories = leanObj.categories?.map((cat) => {
+            if (typeof cat === 'object' && '_id' in cat && cat._id) {
+                return (cat._id as { toString(): string }).toString();
+            }
+            return typeof cat === 'string' ? cat : "";
+        }) ?? [];
+        const cleanResult = { ...leanObj };
+        delete (cleanResult as Record<string, unknown>)._id;
+        delete (cleanResult as Record<string, unknown>).__v;
+        delete (cleanResult as Record<string, unknown>).categories;
 
-        return { ...cleanResult, categories: mappedCategories } as T;
+        return { ...cleanResult, categories: mappedCategories } as unknown as T;
     }
 
     async findAll(): Promise<T[]> {
         const clients = await this.model.find().lean().exec();
 
         return clients.map(doc => {
-            const { _id, __v, ...rest } = doc as any;
-            return { id: _id.toString(), ...rest } as T;
+            const leanDoc = doc as Record<string, unknown> & { _id: { toString(): string } };
+            const rest = { ...leanDoc };
+            const id = leanDoc._id.toString();
+            delete (rest as Record<string, unknown>)._id;
+            delete (rest as Record<string, unknown>).__v;
+            return { id, ...rest } as unknown as T;
         });
     }
 
@@ -64,7 +87,7 @@ export abstract class BaseRepository<T extends User, D extends Document = any> i
         const updated = await this.model
             .findOneAndUpdate(
                 { email } as FilterQuery<D>,
-                updateData as any,
+                updateData as unknown as Partial<D>,
                 { new: true }
             )
             .lean()
@@ -72,8 +95,10 @@ export abstract class BaseRepository<T extends User, D extends Document = any> i
 
         if (!updated) return null;
 
-        const { _id, __v, ...clean } = updated as any;
-        return clean as T;
+        const clean = { ...updated as Record<string, unknown> };
+        delete clean._id;
+        delete clean.__v;
+        return clean as unknown as T;
     }
 
     async delete(email: string): Promise<boolean> {
@@ -103,7 +128,7 @@ export abstract class BaseRepository<T extends User, D extends Document = any> i
         const updated = await this.model
             .findOneAndUpdate(
                 { userId } as FilterQuery<D>,
-                updateData as any,
+                updateData as unknown as Partial<D>,
                 { new: true }
             )
             .lean()
@@ -114,16 +139,18 @@ export abstract class BaseRepository<T extends User, D extends Document = any> i
             return null;
         }
 
-        const { _id, __v, ...clean } = updated as any;
-        return clean as T;
+        const clean = { ...updated as Record<string, unknown> };
+        delete clean._id;
+        delete clean.__v;
+        return clean as unknown as T;
     }
 
     async findWithQuery(
         filter: {
             isBlocked?: boolean;
-            isVerified?: any;
+            isVerified?: string | boolean;
             search?: string;
-            role?: any;
+            role?: string | Record<string, unknown>;
         },
         options: {
             sortBy: string;
@@ -133,7 +160,7 @@ export abstract class BaseRepository<T extends User, D extends Document = any> i
         }
     ): Promise<T[]> {
 
-        const mongoFilter: any = {};
+        const mongoFilter: Record<string, unknown> = {};
 
         if (typeof filter.isBlocked === "boolean") {
             mongoFilter.isBlocked = filter.isBlocked;
@@ -161,7 +188,7 @@ export abstract class BaseRepository<T extends User, D extends Document = any> i
         const skip = (options.page - 1) * options.limit;
 
         const results = await this.model
-            .find(mongoFilter)
+            .find(mongoFilter as FilterQuery<D>)
             .sort(sort)
             .skip(skip)
             .limit(options.limit)
@@ -169,17 +196,19 @@ export abstract class BaseRepository<T extends User, D extends Document = any> i
             .exec();
 
         return results.map(doc => {
-            const { _id, __v, ...rest } = doc as any;
-            return rest as T;
+            const rest = { ...doc as Record<string, unknown> };
+            delete rest._id;
+            delete rest.__v;
+            return rest as unknown as T;
         });
     }
 
     async findWithPagination(
         filter: {
             isBlocked?: boolean;
-            isVerified?: any;
+            isVerified?: string | boolean;
             search?: string;
-            role?: any;
+            role?: string | Record<string, unknown>;
         },
         options: {
             sortBy: string;
@@ -188,7 +217,7 @@ export abstract class BaseRepository<T extends User, D extends Document = any> i
             limit: number;
         }
     ): Promise<{ users: T[]; total: number; totalPages: number }> {
-        const mongoFilter: any = {};
+        const mongoFilter: Record<string, unknown> = {};
 
         if (typeof filter.isBlocked === "boolean") {
             mongoFilter.isBlocked = filter.isBlocked;
@@ -217,21 +246,25 @@ export abstract class BaseRepository<T extends User, D extends Document = any> i
 
         const [users, total] = await Promise.all([
             this.model
-                .find(mongoFilter)
+                .find(mongoFilter as FilterQuery<D>)
                 .sort(sort)
                 .skip(skip)
                 .limit(options.limit)
                 .lean()
                 .exec(),
-            this.model.countDocuments(mongoFilter),
+            this.model.countDocuments(mongoFilter as FilterQuery<D>),
         ]);
 
         const totalPages = Math.ceil(total / options.limit);
 
         return {
             users: users.map(doc => {
-                const { _id, __v, ...rest } = doc as any;
-                return { id: _id.toString(), ...rest } as T;
+                const leanDoc = doc as Record<string, unknown> & { _id: { toString(): string } };
+                const rest = { ...leanDoc };
+                const id = leanDoc._id.toString();
+                delete (rest as Record<string, unknown>)._id;
+                delete (rest as Record<string, unknown>).__v;
+                return { id, ...rest } as unknown as T;
             }),
             total,
             totalPages,

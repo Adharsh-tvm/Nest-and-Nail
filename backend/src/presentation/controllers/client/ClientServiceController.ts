@@ -5,14 +5,16 @@ import { IGetClientOngoingServicesUseCase } from "../../../application/interface
 import { IBookWorkerUseCase } from "../../../domain/repositories/IBookWorkerUseCase";
 import { HttpStatusCode } from "../../../shared/enums/httpCodes";
 import { ResponseHandler } from "../../../shared/responses/ApiResponse";
-import { RESPONSE_MESSAGES } from "../../../shared/responses/ResponseMessages";
+import { ICancelServiceUseCase } from "../../../application/interfaces/service/ICancelServiceUseCase";
+import { SlotType } from "../../../shared/enums/slotEnums";
 
 export class ClientServiceController {
     constructor(
-        private readonly getHistoryUseCase: IGetClientServiceHistoryUseCase,
-        private readonly getByIdUseCase: IGetClientServiceByIdUseCase,
-        private readonly getOngoingUseCase: IGetClientOngoingServicesUseCase,
-        private readonly bookWorkerUseCase: IBookWorkerUseCase
+        private readonly _getHistoryUseCase: IGetClientServiceHistoryUseCase,
+        private readonly _getByIdUseCase: IGetClientServiceByIdUseCase,
+        private readonly _getOngoingUseCase: IGetClientOngoingServicesUseCase,
+        private readonly _bookWorkerUseCase: IBookWorkerUseCase,
+        private readonly _cancelServiceUseCase: ICancelServiceUseCase
     ) { }
 
     bookWorker = async (req: Request, res: Response, next: NextFunction) => {
@@ -24,11 +26,35 @@ export class ClientServiceController {
                 selectedSlots,
                 slotType,
                 numberOfDays,
+                numberOfWorkers,
                 title,
                 description,
-            } = req.body;
+                address,
+                pricePerWorker,
+            } = req.body as {
+                workerId: string;
+                category: string;
+                date: string;
+                selectedSlots?: { date: string | Date; slotType: string }[];
+                slotType?: string;
+                numberOfDays: number;
+                numberOfWorkers: number;
+                title: string;
+                description: string;
+                address?: {
+                    street?: string;
+                    city?: string;
+                    state?: string;
+                    country?: string;
+                    zip?: string;
+                    label?: string;
+                    lng?: number;
+                    lat?: number;
+                };
+                pricePerWorker: number;
+            };
 
-            const clientId = (req as any).user?.id || (req as any).user?._id;
+            const clientId = req.user?.id;
 
             if (!clientId) {
                 return res
@@ -39,40 +65,64 @@ export class ClientServiceController {
             const scheduledDate = new Date(date);
 
             const parsedSelectedSlots = selectedSlots
-                ? selectedSlots.map((s: any) => ({
+                ? selectedSlots.map((s: { date: string | Date; slotType: string }) => ({
                     date: new Date(s.date),
-                    slotType: s.slotType,
+                    slotType: s.slotType as SlotType,
                 }))
-                : [{ date: scheduledDate, slotType }];
+                : [{ date: scheduledDate, slotType: (slotType as SlotType | undefined) ?? SlotType.FULL_DAY }];
 
-            const result = await this.bookWorkerUseCase.execute({
+            const bookingAddress = address ? {
+                street: address.street,
+                city: address.city,
+                state: address.state,
+                country: address.country,
+                zip: address.zip,
+                label: address.label
+            } : undefined;
+
+            const bookingLocation = address?.lng && address.lat ? {
+                type: "Point" as const,
+                coordinates: [address.lng, address.lat] as [number, number]
+            } : {
+                type: "Point" as const,
+                coordinates: [0, 0] as [number, number]
+            };
+
+
+            const result = await this._bookWorkerUseCase.execute({
                 clientId,
                 workerId,
                 category,
                 scheduledDate,
                 selectedSlots: parsedSelectedSlots,
                 numberOfDays,
+                numberOfWorkers,
                 title,
                 description,
-                location: {
-                    type: "Point",
-                    coordinates: [0, 0],
-                },
+                location: bookingLocation,
+                address: bookingAddress,
+                pricePerWorker
             });
 
             res.status(HttpStatusCode.OK).json(
                 ResponseHandler.success(result, "Worker booked successfully")
             );
         } catch (error) {
-            next(error); // 🔥 send to your errorHandler
+            next(error);
         }
     };
 
     getServiceHistory = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const clientId = (req as any).user.id;
+            const clientId = req.user?.id;
 
-            const result = await this.getHistoryUseCase.execute(clientId);
+            if (!clientId) {
+                return res
+                    .status(HttpStatusCode.UNAUTHORIZED)
+                    .json(ResponseHandler.error("Unauthorized"));
+            }
+
+            const result = await this._getHistoryUseCase.execute(clientId);
 
             res.status(HttpStatusCode.OK).json(
                 ResponseHandler.success(result, "Service history fetched")
@@ -84,10 +134,16 @@ export class ClientServiceController {
 
     getServiceByClientId = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const clientId = (req as any).user.id;
+            const clientId = req.user?.id;
+
+            if (!clientId) {
+                return res
+                    .status(HttpStatusCode.UNAUTHORIZED)
+                    .json(ResponseHandler.error("Unauthorized"));
+            }
             const { serviceId } = req.params;
 
-            const result = await this.getByIdUseCase.execute(serviceId, clientId);
+            const result = await this._getByIdUseCase.execute(serviceId, clientId);
 
             res.status(HttpStatusCode.OK).json(
                 ResponseHandler.success(result, "Service details fetched")
@@ -99,9 +155,15 @@ export class ClientServiceController {
 
     getOngoingServices = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const clientId = (req as any).user.id;
+            const clientId = req.user?.id;
 
-            const result = await this.getOngoingUseCase.execute(clientId);
+            if (!clientId) {
+                return res
+                    .status(HttpStatusCode.UNAUTHORIZED)
+                    .json(ResponseHandler.error("Unauthorized"));
+            }
+
+            const result = await this._getOngoingUseCase.execute(clientId);
 
             res.status(HttpStatusCode.OK).json(
                 ResponseHandler.success(result, "Ongoing services fetched")
@@ -110,4 +172,25 @@ export class ClientServiceController {
             next(error);
         }
     };
+
+    async cancelService(req: Request, res: Response): Promise<void> {
+        try {
+            const userId = req.user?.id;
+            if (!userId) {
+                res.status(HttpStatusCode.UNAUTHORIZED).json(
+                    ResponseHandler.error("Unauthorized")
+                );
+                return;
+            }
+            const { serviceId } = req.params;
+            const { reason } = req.body as { reason?: string };
+
+            await this._cancelServiceUseCase.execute(serviceId, userId, reason);
+
+            res.status(HttpStatusCode.OK).json(ResponseHandler.success(null, "Service cancelled successfully"));
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : "Failed to cancel service";
+            res.status(HttpStatusCode.BAD_REQUEST).json(ResponseHandler.error(message, error));
+        }
+    }
 }

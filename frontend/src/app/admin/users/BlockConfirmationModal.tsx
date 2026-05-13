@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { AlertTriangle, X, Ban, Unlock } from "lucide-react";
+import { Ban, Unlock } from "lucide-react";
 
 interface BlockConfirmationModalProps {
     isOpen: boolean;

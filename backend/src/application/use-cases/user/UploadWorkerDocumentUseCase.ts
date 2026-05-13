@@ -27,10 +27,10 @@ export class UploadWorkerDocumentUseCase implements IUploadWorkerDocumentUseCase
 
         if (!user) throw new Error("User not found");
 
-        const key = `users/documents/${userId}-${Date.now()}`;
+        const key = `users/documents/${userId}-${String(Date.now())}`;
         await this._s3Service.uploadFile(filePath, key, mimetype);
 
-        user.documents = user.documents || [];
+        user.documents = user.documents ?? [];
         user.documents.push(key);
 
         user.isVerified = VerificationStatus.PENDING;

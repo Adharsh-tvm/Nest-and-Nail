@@ -4,7 +4,7 @@ import {
   getWorkerAvailabilityApi,
   getWorkerAvailabilityBulkApi,
   bookWorkerApi,
-} from "@/sources/api/service.api";
+} from "@/sources/api/service/service.api";
 import {
   BookingPayload,
   BookingResult,
@@ -12,7 +12,7 @@ import {
   ServiceResponseDTO
 } from "@/shared/types/serviceTypes";
 import {
-  getClientOngoingServicesApi, getClientServiceHistoryApi, getClientServiceByIdApi
+  getClientOngoingServicesApi, getClientServiceHistoryApi, getClientServiceByIdApi, cancelServiceApi
 } from "@/sources/api/client/service.api";
 
 export async function getWorkerAvailabilityAction(
@@ -25,9 +25,9 @@ export async function getWorkerAvailabilityAction(
       return { success: false, error: res.message };
     }
     return { success: true, data: res.payload };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("getWorkerAvailabilityAction error:", error);
-    return { success: false, error: error.message || "Failed to fetch availability" };
+    return { success: false, error: (error instanceof Error ? error.message : undefined) || "Failed to fetch availability" };
   }
 }
 
@@ -42,9 +42,9 @@ export async function getWorkerAvailabilityBulkAction(
       return { success: false, error: res.message };
     }
     return { success: true, data: res.payload };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("getWorkerAvailabilityBulkAction error:", error);
-    return { success: false, error: error.message || "Failed to bulk fetch availability" };
+    return { success: false, error: (error instanceof Error ? error.message : undefined) || "Failed to bulk fetch availability" };
   }
 }
 
@@ -57,9 +57,9 @@ export async function bookWorkerAction(
       return { success: false, error: res.message };
     }
     return { success: true, data: res.payload };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("bookWorkerAction error:", error);
-    return { success: false, error: error.message || "Booking failed" };
+    return { success: false, error: (error instanceof Error ? error.message : undefined) || "Booking failed" };
   }
 }
 
@@ -70,9 +70,9 @@ export async function getClientOngoingServicesAction(): Promise<{ success: boole
             return { success: false, error: response.message };
         }
         return { success: true, data: response.payload };
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Failed to fetch ongoing services", error);
-        return { success: false, error: error.message || "Failed to fetch ongoing services" };
+        return { success: false, error: (error instanceof Error ? error.message : undefined) || "Failed to fetch ongoing services" };
     }
 }
 
@@ -83,9 +83,9 @@ export async function getClientServiceHistoryAction(): Promise<{ success: boolea
             return { success: false, error: response.message };
         }
         return { success: true, data: response.payload };
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Failed to fetch service history", error);
-        return { success: false, error: error.message || "Failed to fetch service history" };
+        return { success: false, error: (error instanceof Error ? error.message : undefined) || "Failed to fetch service history" };
     }
 }
 
@@ -96,8 +96,24 @@ export async function getClientServiceByIdAction(serviceId: string): Promise<{ s
             return { success: false, error: response.message };
         }
         return { success: true, data: response.payload };
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error(`Failed to fetch service details for ${serviceId}`, error);
-        return { success: false, error: error.message || "Failed to fetch service details" };
+        return { success: false, error: (error instanceof Error ? error.message : undefined) || "Failed to fetch service details" };
+    }
+}
+
+export async function cancelServiceAction(
+    serviceId: string,
+    reason: string
+): Promise<{ success: boolean; error?: string }> {
+    try {
+        const response = await cancelServiceApi(serviceId, reason);
+        if (!response.success) {
+            return { success: false, error: response.message };
+        }
+        return { success: true };
+    } catch (error: unknown) {
+        console.error(`Failed to cancel service ${serviceId}`, error);
+        return { success: false, error: (error instanceof Error ? error.message : undefined) || "Failed to cancel service" };
     }
 }

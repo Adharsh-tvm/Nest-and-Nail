@@ -1,4 +1,4 @@
-export type SuccessResponse<T = any> = {
+export type SuccessResponse<T = unknown> = {
     success: true,
     message: string,
     payload: T,
@@ -7,7 +7,7 @@ export type SuccessResponse<T = any> = {
 export type FailedResponse = {
     success: false,
     message: string,
-    error: any
+    error: string | null
 }
 
 export type ApiResponse<T> = SuccessResponse<T> | FailedResponse;

@@ -3,6 +3,6 @@ import { IGenerateUserID } from "../../application/contracts/IGenerateUserID";
 
 export class UUIDGenerator implements IGenerateUserID {
     async create(): Promise<string> {
-        return uuidv4();
+        return await Promise.resolve(uuidv4());
     }
 }

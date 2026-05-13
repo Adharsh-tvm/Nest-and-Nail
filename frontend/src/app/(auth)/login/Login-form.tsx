@@ -12,12 +12,15 @@ import {
   MessageSquare,
   Lock,
   ChevronLeft,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { login } from "../../actions/authentication/login-actions";
 import { useActionState } from "react";
-import { GoogleLogin } from "@react-oauth/google";
+import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
 import { handleGoogleSignIn } from "@/app/actions/authentication/google-actions";
 import { redirect, useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 
 import {
   forgotPasswordAction,
@@ -58,6 +61,9 @@ const ForgotPasswordDialog = ({
   const [step, setStep] = useState<Step>("EMAIL");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Form Data State
   const [email, setEmail] = useState("");
@@ -84,8 +90,10 @@ const ForgotPasswordDialog = ({
     const result = await forgotPasswordAction(email);
     setIsLoading(false);
 
-    if (result?.error) {
-      toast.error(result.error);
+    if (result?.error || result?.success === false) {
+      const errMsg = result?.error || "This email is not registered. Please check and try again.";
+      setError(errMsg);
+      toast.error(errMsg);
       return;
     }
 
@@ -220,9 +228,12 @@ const ForgotPasswordDialog = ({
                     type="email"
                     // required
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (error) setError(null);
+                    }}
                     placeholder="you@example.com"
-                    className={dialogInputClass}
+                    className={`${dialogInputClass} ${error ? "border-red-400 focus:ring-red-400" : ""}`}
                   />
                 </div>
               </div>
@@ -262,9 +273,12 @@ const ForgotPasswordDialog = ({
                     type="text"
                     // required
                     value={otp}
-                    onChange={(e) => setOtp(e.target.value)}
+                    onChange={(e) => {
+                      setOtp(e.target.value);
+                      if (error) setError(null);
+                    }}
                     placeholder="123456"
-                    className={`${dialogInputClass} tracking-widest font-mono`}
+                    className={`${dialogInputClass} tracking-widest font-mono ${error ? "border-red-400 focus:ring-red-400" : ""}`}
                   />
                 </div>
               </div>
@@ -316,13 +330,22 @@ const ForgotPasswordDialog = ({
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <input
-                    type="password"
+                    type={showNewPassword ? "text" : "password"}
                     // required
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="••••••••"
-                    className={dialogInputClass}
+                    className={`${dialogInputClass} pr-10`}
                   />
+                  {newPassword && (
+                    <button
+                      type="button"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  )}
                 </div>
               </div>
               <div className="space-y-2">
@@ -332,13 +355,22 @@ const ForgotPasswordDialog = ({
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <input
-                    type="password"
+                    type={showConfirmPassword ? "text" : "password"}
                     // required
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="••••••••"
-                    className={dialogInputClass}
+                    className={`${dialogInputClass} pr-10`}
                   />
+                  {confirmPassword && (
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  )}
                 </div>
               </div>
               {error && (
@@ -394,18 +426,21 @@ export const LoginForm = () => {
   const router = useRouter();
   const [state, formAction, pending] = useActionState(login, initialState);
   const [isForgotOpen, setIsForgotOpen] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [passwordValue, setPasswordValue] = useState("");
 
   const focusRingClass = "focus:ring-[#0f291e]";
   const buttonClass =
     "bg-[#0f291e] text-white hover:bg-[#1B4332] shadow-lg shadow-green-900/20";
   const linkClass = "text-gray-500 hover:text-[#DC2626]";
 
-  async function onGoogleSuccess(credentialResponse: any) {
+  async function onGoogleSuccess(credentialResponse: CredentialResponse) {
     const token = credentialResponse.credential;
+    if (!token) return;
     const result = await handleGoogleSignIn(token, "client");
 
     if (result?.success) {
-      const redirectPath = result.user.user_role;
+      const redirectPath = result.user?.user_role || "client";
       toast.success(result?.message)
       redirect(redirectPath);
     } else {
@@ -418,7 +453,7 @@ export const LoginForm = () => {
     if (state?.error) {
       toast.error(state.error);
     }
-  }, [state?.errorId]);
+  }, [state?.errorId, state?.error]);
 
   useEffect(() => {
     if (state?.success) {
@@ -431,11 +466,16 @@ export const LoginForm = () => {
         else router.replace("/client");
       }, 500);
     }
-  }, [state?.success]);
+  }, [state?.success, state?.userRole, router]);
 
   return (
     <>
-      <div className="px-8 pb-8">
+      <motion.div 
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
+        className="w-full"
+      >
         <form action={formAction} className="space-y-5">
           <div className="space-y-2">
             <label htmlFor="email" className="text-sm font-bold text-gray-700">
@@ -468,12 +508,23 @@ export const LoginForm = () => {
               <input
                 id="password"
                 name="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 // required
+                value={passwordValue}
+                onChange={(e) => setPasswordValue(e.target.value)}
                 disabled={pending}
                 placeholder="••••••••"
-                className={`w-full pl-9 pr-4 py-3 bg-gray-50 border border-gray-200 text-gray-900 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white disabled:opacity-50 disabled:cursor-not-allowed transition-all ${focusRingClass}`}
+                className={`w-full pl-9 pr-10 py-3 bg-gray-50 border border-gray-200 text-gray-900 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white disabled:opacity-50 disabled:cursor-not-allowed transition-all ${focusRingClass}`}
               />
+              {passwordValue && (
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              )}
             </div>
           </div>
 
@@ -514,15 +565,17 @@ export const LoginForm = () => {
           </div>
         </div>
 
-        <GoogleLogin
-          onSuccess={onGoogleSuccess}
-          useOneTap
-          theme="outline"
-          shape="circle"
-          width="330"
-          locale="en"
-        />
-      </div>
+        <div className="flex justify-center w-full mt-6">
+          <GoogleLogin
+            onSuccess={onGoogleSuccess}
+            useOneTap
+            theme="outline"
+            shape="circle"
+            width="330"
+            locale="en"
+          />
+        </div>
+      </motion.div>
 
       <ForgotPasswordDialog
         isOpen={isForgotOpen}

@@ -32,6 +32,10 @@ export interface UserResponseDTO {
     totalRatings?: number;
     weeklyJobCount?: number;
     currentActiveRequestId?: string;
+    isSuspended?: boolean;
+    suspensionStartDate?: string;
+    suspensionEndDate?: string;
+    canAcceptBookings?: boolean;
 }
 
 
