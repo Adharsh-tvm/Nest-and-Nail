@@ -21,6 +21,7 @@ import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
 import { handleGoogleSignIn } from "@/app/actions/authentication/google-actions";
 import { redirect, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import { useUserStore } from "@/store/userStore";
 
 import {
   forgotPasswordAction,
@@ -428,6 +429,11 @@ export const LoginForm = () => {
   const [isForgotOpen, setIsForgotOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [passwordValue, setPasswordValue] = useState("");
+  const setUser = useUserStore((state) => state.setUser);
+
+  useEffect(() => {
+    setUser(null);
+  }, [setUser]);
 
   const focusRingClass = "focus:ring-[#0f291e]";
   const buttonClass =

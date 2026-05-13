@@ -20,8 +20,8 @@ export async function changeRoleAction(role: "client" | "worker") {
 
   const cookieStore = await cookies();
 
-  const ACCESS_MAX_AGE = Number(process.env.MAX_AGE_ACCESS_TOKEN);
-  const REFRESH_MAX_AGE = Number(process.env.MAX_AGE_REFRESH_TOKEN);
+  const ACCESS_MAX_AGE = Number(process.env.MAX_AGE_ACCESS_TOKEN) || 60 * 60 * 24;
+  const REFRESH_MAX_AGE = Number(process.env.MAX_AGE_REFRESH_TOKEN) || 60 * 60 * 24;
 
   if (newAccess) {
     cookieStore.set("accessToken", newAccess, {

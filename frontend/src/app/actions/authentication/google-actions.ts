@@ -49,8 +49,8 @@ export async function handleGoogleSignIn(
 
       const { user, refreshToken, accessToken } = response.data.payload;
 
-      const ACCESS_MAX_AGE = Number(process.env.MAX_AGE_ACCESS_TOKEN);
-      const REFRESH_MAX_AGE = Number(process.env.MAX_AGE_REFRESH_TOKEN);
+      const ACCESS_MAX_AGE = Number(process.env.MAX_AGE_ACCESS_TOKEN) || 60 * 60 * 24;
+      const REFRESH_MAX_AGE = Number(process.env.MAX_AGE_REFRESH_TOKEN) || 60 * 60 * 24;
 
       // create cookies
       const cookieStore = await cookies();

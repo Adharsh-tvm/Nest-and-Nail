@@ -183,10 +183,14 @@ export async function completeSignup(
     // Set cookies
     const cookieStore = await cookies();
 
+    const ACCESS_MAX_AGE = Number(process.env.MAX_AGE_ACCESS_TOKEN) || 60 * 60 * 24;
+    const REFRESH_MAX_AGE = Number(process.env.MAX_AGE_REFRESH_TOKEN) || 60 * 60 * 24;
+
     cookieStore.set("accessToken", accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
+      maxAge: ACCESS_MAX_AGE,
       path: "/",
     });
 
@@ -194,6 +198,7 @@ export async function completeSignup(
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
+      maxAge: REFRESH_MAX_AGE,
       path: "/",
     });
 
@@ -201,6 +206,7 @@ export async function completeSignup(
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
+      maxAge: ACCESS_MAX_AGE,
       path: "/",
     });
 
@@ -208,6 +214,7 @@ export async function completeSignup(
       httpOnly: false,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
+      maxAge: ACCESS_MAX_AGE,
       path: "/",
     });
 
