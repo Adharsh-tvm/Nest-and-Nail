@@ -40,21 +40,21 @@ export default async function BookWorkerPage({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-4">
+    <div className="min-h-screen bg-gray-50 py-2">
       <div className="container mx-auto px-4 max-w-3xl">
         {/* Back Link */}
         <Link
           href={`/client/workers/${paramsObj.id}`}
-          className="inline-flex items-center text-gray-500 hover:text-emerald-600 transition-colors mb-4 font-medium text-sm"
+          className="inline-flex items-center text-gray-500 hover:text-emerald-600 transition-colors mb-2 font-medium text-xs"
         >
-          <ChevronLeft className="w-5 h-5 mr-1" />
+          <ChevronLeft className="w-4 h-4 mr-1" />
           Back to {worker.name}&#39;s profile
         </Link>
         
         {/* Top Info Banner */}
-        <div className="bg-white rounded-[16px] p-4 shadow-sm border border-gray-100 mb-4 flex items-center justify-between">
+        <div className="bg-white rounded-[16px] p-3 shadow-sm border border-gray-100 mb-2 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100 border-2 border-emerald-100">
+            <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100 border-2 border-emerald-100">
                {(worker.profileImageUrl || worker.profilePictureUrl) ? (
                  // eslint-disable-next-line @next/next/no-img-element
                  <img 
@@ -63,14 +63,14 @@ export default async function BookWorkerPage({
                    className="object-cover w-full h-full"
                  />
                ) : (
-                 <span className="w-full h-full flex items-center justify-center text-xl font-bold text-gray-400">
+                 <span className="w-full h-full flex items-center justify-center text-lg font-bold text-gray-400">
                     {worker.name.substring(0, 2).toUpperCase()}
                  </span>
                )}
             </div>
             <div>
-              <h1 className="text-lg font-bold text-gray-900">{worker.name}</h1>
-              <p className="text-xs font-medium text-gray-500">
+              <h1 className="text-base font-bold text-gray-900 leading-tight">{worker.name}</h1>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none mt-1">
                 {worker.categories && worker.categories.length > 0 
                   ? worker.categories[0] 
                   : (worker.skills && worker.skills.length > 0 ? worker.skills[0] : 'Professional Worker')}

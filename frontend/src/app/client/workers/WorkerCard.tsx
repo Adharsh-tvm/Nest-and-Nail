@@ -19,92 +19,85 @@ export default function WorkerCard({ worker, index }: WorkerCardProps) {
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: index * 0.1 }}
-            whileHover={{ y: -5 }}
-            className="bg-white rounded-[24px] border border-gray-200 overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col relative h-full"
+            transition={{ duration: 0.4, delay: index * 0.05 }}
+            whileHover={{ y: -8, scale: 1.01 }}
+            className="group bg-white rounded-[2rem] border border-gray-100 overflow-hidden hover:premium-shadow transition-all duration-500 flex flex-col relative h-full animate-fade-in"
         >
-            {/* Optional Top Rated Badge */}
+            {/* Premium Badge */}
             {!!worker.rating && worker.rating >= 4.5 && (
-                <div className="absolute top-0 right-4 bg-[#FF3366] text-white text-[10px] font-bold px-3 py-1 rounded-b-lg uppercase tracking-wider z-10 w-auto">
-                    Top Rated
+                <div className="absolute top-4 left-4 bg-primary text-white text-[9px] font-bold px-3 py-1.5 rounded-full uppercase tracking-widest z-10 shadow-lg shadow-primary/20 flex items-center gap-1.5">
+                    <Star size={10} className="fill-white" /> Top Professional
                 </div>
             )}
 
             <div className="p-6 flex-grow">
                 {/* Header Row */}
-                <div className="flex items-center gap-4 mb-5">
-                    <div className="relative shrink-0">
-                        <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center border-2 border-white shadow-sm">
+                <div className="flex flex-col items-center text-center mb-6">
+                    <div className="relative mb-4">
+                        <div className="w-24 h-24 rounded-[2rem] overflow-hidden bg-gray-50 flex items-center justify-center border-4 border-white shadow-md group-hover:rotate-3 transition-transform duration-500">
                             {(worker.profileImageUrl || worker.profilePictureUrl) ? (
                                 // eslint-disable-next-line @next/next/no-img-element
                                 <img
                                     src={(() => {
                                         const url = worker.profileImageUrl || worker.profilePictureUrl;
                                         if (!url) return '';
-                                        if (url.startsWith('http') || url.startsWith('blob:') || url.startsWith('data:')) {
-                                            return url;
-                                        }
-                                        // If the backend returns raw S3 keys without presigning (e.g., 'users/profile/123.jpg')
-                                        // Fallback to directly fetching from bucket without signature if public, 
-                                        // Otherwise we must fetch it from our backend / API proxy.
-                                        // Based on the logs, S3 bucket structure is: https://nestnail-storage-2026.s3.ap-south-1.amazonaws.com/
-                                        if (!url.startsWith('/')) {
-                                            return `https://nestnail-storage-2026.s3.ap-south-1.amazonaws.com/${url}`;
-                                        }
-                                        
+                                        if (url.startsWith('http') || url.startsWith('blob:') || url.startsWith('data:')) return url;
+                                        if (!url.startsWith('/')) return `https://nestnail-storage-2026.s3.ap-south-1.amazonaws.com/${url}`;
                                         const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
                                         return `${baseUrl}/${url.replace(/^\//, '')}`;
                                     })()}
                                     alt={worker.name}
                                     className="object-cover w-full h-full"
                                     onError={(e) => {
-                                        // Fallback if image fails to load
                                         (e.target as HTMLImageElement).style.display = 'none';
                                         (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
                                     }}
                                 />
                             ) : (
-                                <span className="text-xl font-bold text-gray-400">
+                                <span className="text-3xl font-bold text-gray-300">
                                     {worker.name.charAt(0).toUpperCase()}
                                 </span>
                             )}
-                            <span className={`w-full h-full flex items-center justify-center text-xl font-bold text-gray-400 bg-gray-100 ${(worker.profileImageUrl || worker.profilePictureUrl) ? 'hidden' : ''}`}>
+                            <span className={`w-full h-full flex items-center justify-center text-3xl font-bold text-gray-300 bg-gray-50 ${(worker.profileImageUrl || worker.profilePictureUrl) ? 'hidden' : ''}`}>
                                 {worker.name.charAt(0).toUpperCase()}
                             </span>
                         </div>
-                        <div className={`absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-white ${worker.isOnline ? 'bg-emerald-500' : 'bg-red-500'}`}></div>
+                        <div className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-full border-4 border-white shadow-sm flex items-center justify-center ${worker.isOnline ? 'bg-emerald-500' : 'bg-gray-300'}`}>
+                           <div className={`w-2 h-2 rounded-full bg-white ${worker.isOnline ? 'animate-pulse' : ''}`} />
+                        </div>
                     </div>
 
                     <div>
-                        <h3 className="text-lg font-bold text-[#111827]">{worker.name}</h3>
-                        <div className="flex flex-col gap-1.5 mt-0.5">
-                            <div className="flex items-center text-sm text-gray-500">
+                        <h3 className="text-xl font-bold text-gray-900 mb-1 group-hover:text-primary transition-colors">{worker.name}</h3>
+                        <div className="flex flex-col items-center gap-2">
+                            <div className="flex items-center text-xs font-bold text-gray-400 uppercase tracking-widest">
                                 <Briefcase className="w-3.5 h-3.5 mr-1.5" />
-                                <span className="truncate max-w-[150px] font-medium text-gray-700">
+                                <span className="truncate max-w-[180px]">
                                     {worker.categories && worker.categories.length > 0 ? worker.categories[0] : (worker.skills && worker.skills.length > 0 ? worker.skills[0] : 'Professional Worker')}
                                 </span>
                             </div>
-                            {worker.distance !== undefined && (
-                                <div className="flex items-center">
-                                    <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-100 flex items-center">
-                                        <MapPin className="w-3 h-3 mr-1" />
-                                        {worker.distance < 1000 
-                                            ? `${Math.round(worker.distance)} m away`
-                                            : `${(worker.distance / 1000).toFixed(1)} km away`}
-                                    </span>
-                                </div>
-                            )}
                         </div>
                     </div>
                 </div>
 
-                {/* Rating & Rate Row */}
-                <div className="flex justify-between items-center mb-4">
-                    <div className="flex items-center gap-1.5">
-                        <Star className="w-4 h-4 fill-emerald-500 text-emerald-500" />
-                        <span className="font-bold text-sm text-gray-900">{worker.rating ? worker.rating.toFixed(1) : 'New'}</span>
-                        <span className="text-xs text-gray-400">({worker.totalRatings || 0}) ratings </span>
+                {/* Info Badges */}
+                <div className="grid grid-cols-2 gap-3 mb-6">
+                    <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-2xl border border-gray-100">
+                        <Star className="w-4 h-4 text-emerald-500 fill-emerald-500" />
+                        <div>
+                            <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-1">Rating</span>
+                            <span className="text-xs font-bold text-gray-900 leading-none">{worker.rating ? worker.rating.toFixed(1) : 'New'} <span className="text-gray-400 font-medium">({worker.totalRatings || 0})</span></span>
+                        </div>
                     </div>
+                    {worker.distance !== undefined && (
+                        <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-2xl border border-gray-100">
+                            <MapPin className="w-4 h-4 text-primary" />
+                            <div>
+                                <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-1">Distance</span>
+                                <span className="text-xs font-bold text-gray-900 leading-none">{worker.distance < 1000 ? `${Math.round(worker.distance)}m` : `${(worker.distance / 1000).toFixed(1)}km`}</span>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Location */}
@@ -155,24 +148,12 @@ export default function WorkerCard({ worker, index }: WorkerCardProps) {
             </div>
 
             {/* Footer */}
-            <div className="px-6 py-4 border-t border-gray-100 bg-[#FCFCFD] flex justify-between items-center rounded-b-[24px]">
-                {worker.isOnline ? (
-                    <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full text-xs font-bold border border-emerald-100">
-                        <CheckCircle2 className="w-3.5 h-3.5" />
-                        Available
-                    </div>
-                ) : (
-                    <div className="flex items-center gap-1.5 px-3 py-1 bg-red-50 text-red-700 rounded-full text-xs font-bold border border-red-100">
-                        <XCircle className="w-3.5 h-3.5" />
-                        Offline
-                    </div>
-                )}
-
+            <div className="px-6 py-5 border-t border-gray-50 bg-gray-50/50 flex justify-between items-center">
                 <Link
                     href={`/client/workers/${worker.userId || worker.id}`}
-                    className="flex items-center justify-center w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-colors"
+                    className="flex-1 flex items-center justify-center gap-2 bg-white border border-gray-100 text-gray-900 py-3 rounded-2xl text-xs font-bold hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 shadow-sm"
                 >
-                    <ChevronRight className="w-4 h-4 hover:translate-x-0.5 transition-transform" />
+                    View Profile <ChevronRight className="w-4 h-4" />
                 </Link>
             </div>
         </motion.div>

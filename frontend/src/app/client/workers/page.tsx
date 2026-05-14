@@ -6,7 +6,7 @@ import WorkerSidebar from './WorkerSidebar';
 import WorkerSearchBar from './WorkerSearchBar';
 import WorkersPagination from './WorkersPagination';
 import WorkerSort from './WorkerSort';
-import { Briefcase } from 'lucide-react';
+import { Briefcase, Star } from 'lucide-react';
 import { User } from '@/shared/types/userTypes';
 import { Category } from '@/shared/types/categoryTypes';
 
@@ -64,12 +64,13 @@ export default async function WorkersPage({
     const activeFiltersCount = [category, lat, isOnline].filter(Boolean).length;
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <div className="max-w-7xl mx-auto px-4 py-6 flex flex-col gap-5">
-
+        <div className="min-h-screen bg-[#f8fafc] animate-fade-in">
+            <div className="max-w-7xl mx-auto px-4 py-10 relative z-20 flex flex-col gap-8">
                 {/* ── Top Search Bar ── */}
-                <Suspense fallback={<div className="h-14 bg-white rounded-2xl animate-pulse border border-gray-100" />}>
-                    <WorkerSearchBar />
+                <Suspense fallback={<div className="h-16 bg-white border border-gray-100 rounded-[2rem] animate-pulse" />}>
+                    <div className="max-w-4xl w-full">
+                        <WorkerSearchBar />
+                    </div>
                 </Suspense>
 
                 {/* ── Main Layout: Sidebar + Content ── */}
@@ -86,27 +87,31 @@ export default async function WorkersPage({
                     <div className="flex-1 flex flex-col gap-4">
 
                         {/* Result count / active filter summary */}
-                        <div className="flex items-center justify-between bg-white px-5 py-3 border border-gray-100 rounded-[16px] shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
-                            <div className="flex items-center gap-3">
-                                <p className="text-sm text-gray-500">
-                                    {success && workers.length > 0 ? (
-                                        <>
-                                            <span className="font-semibold text-gray-800">{workers.length}</span>{' '}
-                                            worker{workers.length !== 1 ? 's' : ''} found
-                                            {totalPages > 1 && (
-                                                <span className="text-gray-400"> · page {safePage} of {totalPages}</span>
-                                            )}
-                                        </>
-                                    ) : success ? 'No workers found' : 'Loading...'}
-                                </p>
+                        <div className="flex items-center justify-between glass px-8 py-5 border border-white/20 rounded-[2.5rem] shadow-sm">
+                            <div className="flex items-center gap-4">
+                                <div className="p-2.5 bg-primary/5 text-primary rounded-xl">
+                                    <Briefcase size={18} />
+                                </div>
+                                <div className="flex flex-col">
+                                    <p className="text-sm font-bold text-gray-900 leading-none mb-1">
+                                        {success && workers.length > 0 ? (
+                                            <>
+                                                {workers.length} {workers.length !== 1 ? 'Pros' : 'Pro'} found
+                                            </>
+                                        ) : success ? 'No matches' : 'Searching...'}
+                                    </p>
+                                    {totalPages > 1 && (
+                                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none">Page {safePage} of {totalPages}</span>
+                                    )}
+                                </div>
                                 {activeFiltersCount > 0 && (
-                                    <span className="hidden sm:inline-flex text-xs bg-emerald-100 text-emerald-700 font-semibold px-2.5 py-1 rounded-full">
-                                        {activeFiltersCount} filter{activeFiltersCount > 1 ? 's' : ''} active
+                                    <span className="hidden sm:inline-flex text-[10px] bg-emerald-100 text-emerald-700 font-bold px-3 py-1 rounded-full uppercase tracking-widest border border-emerald-200">
+                                        {activeFiltersCount} Active Filters
                                     </span>
                                 )}
                             </div>
                             
-                            <Suspense fallback={<div className="h-8 w-32 bg-gray-100 rounded animate-pulse" />}>
+                            <Suspense fallback={<div className="h-10 w-40 bg-gray-100 rounded-2xl animate-pulse" />}>
                                 <WorkerSort />
                             </Suspense>
                         </div>

@@ -147,7 +147,7 @@ export function CalendarSelector({
     if (!date) return '';
 
     const key = toDateKey(date.getFullYear(), date.getMonth(), date.getDate());
-    let classes = 'relative flex flex-col items-center justify-center p-2 rounded-xl transition-all h-14 w-full cursor-pointer ';
+    let classes = 'relative flex flex-col items-center justify-center p-1 rounded-lg transition-all h-10 w-full cursor-pointer ';
 
     if (isPast) {
       return classes + 'text-gray-300 cursor-not-allowed bg-gray-50/50';
@@ -171,14 +171,14 @@ export function CalendarSelector({
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
+    <div className="bg-white rounded-2xl border border-gray-200 p-4 shadow-sm">
       {warningMessage && (
         <div className="mb-5 bg-red-50 text-red-600 p-3 rounded-xl border border-red-100 text-sm font-bold text-center animate-in fade-in duration-300">
           {warningMessage}
         </div>
       )}
       {/* Header */}
-      <div className="flex items-center justify-between mb-5">
+      <div className="flex items-center justify-between mb-3">
         <button
           onClick={goToPrev}
           disabled={isPastMonth}
@@ -206,9 +206,9 @@ export function CalendarSelector({
       </div>
 
       {/* Day Labels */}
-      <div className="grid grid-cols-7 mb-2">
+      <div className="grid grid-cols-7 mb-1">
         {DAY_NAMES.map((d) => (
-          <div key={d} className="text-center text-xs font-semibold text-gray-400 py-1">
+          <div key={d} className="text-center text-[10px] font-bold text-gray-400 py-1 uppercase tracking-wider">
             {d}
           </div>
         ))}
@@ -279,9 +279,9 @@ export function CalendarSelector({
               }}
             >
               <div className={getDayClass(dateObj, isPast, isUnavailable)}>
-                {day}
+                <span className="text-sm">{day}</span>
                 {/* Indicator Dots */}
-                <div className="absolute bottom-1.5 flex gap-1">
+                <div className="absolute bottom-1 flex gap-0.5">
                   {isDateSelected(dateObj) ? (
                      <div className="w-1.5 h-1.5 rounded-full bg-white/80" />
                   ) : isUnavailable ? (
@@ -297,31 +297,31 @@ export function CalendarSelector({
       </div>
 
       {/* Legend */}
-      <div className="flex flex-wrap items-center gap-4 mt-4 pt-4 border-t border-gray-100">
-        <div className="flex items-center gap-1.5 text-xs text-gray-500">
-          <span className="w-3 h-3 rounded-md bg-emerald-500 inline-block" />
-          Selected (Full)
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-3 pt-3 border-t border-gray-100">
+        <div className="flex items-center gap-1.5 text-[10px] font-bold text-gray-400 uppercase">
+          <span className="w-2.5 h-2.5 rounded bg-emerald-500 inline-block" />
+          Full
         </div>
-        <div className="flex items-center gap-1.5 text-xs text-gray-500">
-          <span className="w-3 h-3 rounded-md bg-amber-400 inline-block" />
-          Selected (Half)
+        <div className="flex items-center gap-1.5 text-[10px] font-bold text-gray-400 uppercase">
+          <span className="w-2.5 h-2.5 rounded bg-amber-400 inline-block" />
+          Half
         </div>
-        <div className="flex items-center gap-1.5 text-xs text-gray-500">
-          <span className="w-2.5 h-2.5 rounded-full bg-red-400 inline-block" />
-          Fully booked
+        <div className="flex items-center gap-1.5 text-[10px] font-bold text-gray-400 uppercase">
+          <span className="w-2 h-2 rounded-full bg-red-400 inline-block" />
+          Busy
         </div>
-        <div className="flex items-center gap-1.5 text-xs text-gray-500">
-          <span className="w-2.5 h-2.5 rounded-full bg-gray-200 inline-block" />
-          Available
+        <div className="flex items-center gap-1.5 text-[10px] font-bold text-gray-400 uppercase">
+          <span className="w-2 h-2 rounded-full bg-gray-200 inline-block" />
+          Free
         </div>
       </div>
 
       {/* Secondary Slot Picker Panel */}
       {focusedDate && availabilityData[focusedDate] && (
-        <div className="mt-6 p-5 border-2 border-gray-900 rounded-2xl bg-gray-50 animate-in slide-in-from-top-4 fade-in duration-300">
-           <h4 className="text-sm font-bold text-gray-900 mb-3 flex items-center justify-between">
-             <span>Select Slot for {new Date(focusedDate).toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })}</span>
-             <button onClick={() => setFocusedDate(null)} className="text-gray-400 hover:text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-full w-6 h-6 flex items-center justify-center text-xs">✕</button>
+        <div className="mt-4 p-4 border-2 border-gray-900 rounded-xl bg-gray-50 animate-in slide-in-from-top-4 fade-in duration-300">
+           <h4 className="text-xs font-bold text-gray-900 mb-2 flex items-center justify-between uppercase tracking-wider">
+             <span>Slot for {new Date(focusedDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
+             <button onClick={() => setFocusedDate(null)} className="text-gray-400 hover:text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-full w-5 h-5 flex items-center justify-center text-[10px]">✕</button>
            </h4>
            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
              <button

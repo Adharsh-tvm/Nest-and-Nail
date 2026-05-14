@@ -61,6 +61,20 @@ export function BookingSection({ worker }: BookingSectionProps) {
 
   const { bookingState, book, reset: resetBookingError } = useBookWorker(refetchCurrentDate);
 
+  // Force scroll to top on launch
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    document.documentElement.scrollTop = 0;
+  }, []);
+
+  // Force scroll to top when payment screen appears
+  useEffect(() => {
+    if (bookingState.status === "success") {
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+      document.documentElement.scrollTop = 0;
+    }
+  }, [bookingState.status]);
+
   const [viewYear, setViewYear] = useState(new Date().getFullYear());
   const [viewMonth, setViewMonth] = useState(new Date().getMonth());
 
@@ -249,12 +263,12 @@ export function BookingSection({ worker }: BookingSectionProps) {
   if (bookingState.status === "success" && bookingState.data) {
     if (paymentSuccess) {
       return (
-        <div className="bg-white rounded-xl border border-emerald-200 p-6 shadow-sm text-center animate-in zoom-in-95 duration-500">
-          <div className="w-16 h-16 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
-            <CheckCircle2 className="w-8 h-8" />
+        <div className="bg-white rounded-xl border border-emerald-200 p-5 shadow-sm text-center animate-in zoom-in-95 duration-500">
+          <div className="w-12 h-12 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-3">
+            <CheckCircle2 className="w-6 h-6" />
           </div>
-          <h2 className="text-xl font-black text-gray-900 mb-2">Booking Confirmed!</h2>
-          <p className="text-sm text-gray-500 mb-4">Your service has been successfully scheduled and paid in full.</p>
+          <h2 className="text-lg font-black text-gray-900 mb-1.5">Booking Confirmed!</h2>
+          <p className="text-xs text-gray-500 mb-3">Your service has been successfully scheduled and paid in full.</p>
         </div>
       );
     } else {
@@ -266,8 +280,8 @@ export function BookingSection({ worker }: BookingSectionProps) {
 
       return (
         <>
-          <div className="bg-white rounded-xl border border-emerald-200 p-6 shadow-sm animate-in zoom-in-95 duration-500">
-            <h2 className="text-xl font-black text-gray-900 mb-4 text-center">Complete Payment</h2>
+          <div className="bg-white rounded-xl border border-emerald-200 p-5 shadow-sm animate-in zoom-in-95 duration-500">
+            <h2 className="text-lg font-black text-gray-900 mb-3 text-center">Complete Payment</h2>
 
             {/* Amount Breakdown */}
             <div className="bg-gray-50 rounded-xl p-4 mb-5 space-y-2">
@@ -398,7 +412,7 @@ export function BookingSection({ worker }: BookingSectionProps) {
     <div className="w-full">
       <StepsIndicator currentStep={currentStep} />
 
-      <div className="relative mt-8">
+      <div className="relative mt-4">
         {/* Back Button (Only visible if step > 1 and not loading API) */}
         {currentStep > 1 && bookingState.status !== "loading" && (
           <div className="mb-4">

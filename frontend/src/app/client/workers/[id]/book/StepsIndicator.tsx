@@ -18,7 +18,7 @@ export function StepsIndicator({ currentStep }: { currentStep: number }) {
   }
 
   return (
-    <div className="w-full mb-8 pt-4">
+    <div className="w-full mb-4 pt-1">
       <div className="flex items-center justify-between relative px-2 sm:px-4">
         {/* Background Line */}
         <div className="absolute left-8 right-8 top-1/2 -translate-y-1/2 h-1 bg-gray-200 rounded-full z-0 hidden sm:block" />
@@ -37,7 +37,7 @@ export function StepsIndicator({ currentStep }: { currentStep: number }) {
             <div key={step.num} className="relative z-10 flex flex-col items-center gap-2">
               {/* Circle */}
               <div
-                className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-all duration-300 ${
+                className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-all duration-300 ${
                   isActive
                     ? "bg-emerald-600 border-emerald-600 text-white shadow-md scale-110"
                     : isCompleted
@@ -45,12 +45,12 @@ export function StepsIndicator({ currentStep }: { currentStep: number }) {
                     : "bg-white border-gray-200 text-gray-400"
                 }`}
               >
-                {isCompleted ? <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6" /> : (idx + 1)}
+                {isCompleted ? <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5" /> : (idx + 1)}
               </div>
               
               {/* Label */}
               <span
-                className={`text-xs sm:text-sm font-semibold transition-colors duration-300 hidden sm:block ${
+                className={`text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-colors duration-300 hidden sm:block ${
                   isActive ? "text-emerald-700" : isCompleted ? "text-emerald-600" : "text-gray-400"
                 }`}
               >
@@ -62,7 +62,7 @@ export function StepsIndicator({ currentStep }: { currentStep: number }) {
       </div>
       
       {/* Mobile only active step text */}
-      <div className="mt-4 text-center sm:hidden font-bold text-gray-800">
+      <div className="mt-2 text-center sm:hidden font-bold text-[10px] text-gray-500 uppercase tracking-widest">
          Step {currentIndex + 1} of {steps.length}: {steps[currentIndex]?.label}
       </div>
     </div>

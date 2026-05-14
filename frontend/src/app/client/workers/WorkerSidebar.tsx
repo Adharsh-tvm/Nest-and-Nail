@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { MapPin, Navigation, Map, X, Wifi, SlidersHorizontal, RotateCcw } from 'lucide-react';
+import { MapPin, Navigation, Map, X, Wifi, SlidersHorizontal, RotateCcw, ChevronRight } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { Category } from '@/shared/types/categoryTypes';
 
@@ -137,19 +137,19 @@ export default function WorkerSidebar({ categories, activeCategory }: WorkerSide
     return (
         <>
             {/* Sidebar */}
-            <aside className="w-full bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col gap-6">
+            <aside className="w-full glass rounded-[2.5rem] border border-gray-100 p-8 flex flex-col gap-8 animate-fade-in shadow-sm hover:premium-shadow transition-all duration-500">
                 {/* Header */}
                 <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-gray-800 font-semibold text-sm">
-                        <SlidersHorizontal className="w-4 h-4" />
-                        Filters
+                    <div className="flex items-center gap-3 text-gray-900 font-bold text-base">
+                        <SlidersHorizontal className="w-5 h-5 text-primary" />
+                        Refine Search
                     </div>
                     {hasActiveFilters && (
                         <button
                             onClick={handleClearFilters}
-                            className="flex items-center gap-1 text-xs text-red-500 hover:text-red-700 font-medium"
+                            className="flex items-center gap-1.5 text-xs text-rose-500 hover:text-rose-600 font-bold uppercase tracking-widest transition-colors"
                         >
-                            <RotateCcw className="w-3 h-3" />
+                            <RotateCcw className="w-3.5 h-3.5" />
                             Reset
                         </button>
                     )}
@@ -158,40 +158,43 @@ export default function WorkerSidebar({ categories, activeCategory }: WorkerSide
                 <hr className="border-gray-100" />
 
                 {/* Category Filter */}
-                <div className="flex flex-col gap-2">
-                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Category</label>
-                    <select
-                        value={activeCategory || ''}
-                        onChange={handleCategoryChange}
-                        className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-700 bg-white outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-100 transition-colors cursor-pointer"
-                    >
-                        <option value="">All Categories</option>
-                        {categories.map(cat => (
-                            <option key={cat.id} value={cat.name}>{cat.name}</option>
-                        ))}
-                    </select>
+                <div className="flex flex-col gap-3">
+                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-1">Service Category</label>
+                    <div className="relative group">
+                        <select
+                            value={activeCategory || ''}
+                            onChange={handleCategoryChange}
+                            className="w-full appearance-none border border-gray-100 rounded-2xl px-5 py-3.5 text-sm font-bold text-gray-900 bg-white/50 backdrop-blur-sm outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all cursor-pointer shadow-sm"
+                        >
+                            <option value="">All Expertise</option>
+                            {categories.map(cat => (
+                                <option key={cat.id} value={cat.name}>{cat.name}</option>
+                            ))}
+                        </select>
+                        <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 group-hover:text-primary transition-colors">
+                            <ChevronRight className="w-4 h-4 rotate-90" />
+                        </div>
+                    </div>
                 </div>
-
-                <hr className="border-gray-100" />
 
                 {/* Availability Filter */}
                 <div className="flex flex-col gap-3">
-                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Availability</label>
+                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-1">Real-time Availability</label>
                     <button
                         onClick={handleOnlineToggle}
-                        className={`flex items-center justify-between w-full px-4 py-2.5 rounded-xl border text-sm font-medium transition-all ${
+                        className={`flex items-center justify-between w-full px-5 py-3.5 rounded-2xl border transition-all duration-300 ${
                             isOnline
-                                ? 'bg-emerald-50 border-emerald-300 text-emerald-700'
-                                : 'bg-gray-50 border-gray-200 text-gray-600 hover:border-emerald-300 hover:text-emerald-600'
+                                ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20'
+                                : 'bg-white border-gray-100 text-gray-900 hover:border-primary/30 shadow-sm'
                         }`}
                     >
-                        <div className="flex items-center gap-2">
-                            <Wifi className="w-4 h-4" />
-                            Online Only
+                        <div className="flex items-center gap-3">
+                            <Wifi className={`w-4 h-4 ${isOnline ? 'text-emerald-300' : 'text-primary'}`} />
+                            <span className="text-sm font-bold">Online Only</span>
                         </div>
                         {/* Toggle switch */}
-                        <div className={`w-9 h-5 rounded-full flex items-center px-0.5 transition-colors ${isOnline ? 'bg-emerald-500' : 'bg-gray-300'}`}>
-                            <div className={`w-4 h-4 bg-white rounded-full shadow transition-transform ${isOnline ? 'translate-x-4' : 'translate-x-0'}`} />
+                        <div className={`w-10 h-6 rounded-full flex items-center px-1 transition-colors ${isOnline ? 'bg-white/20' : 'bg-gray-100'}`}>
+                            <div className={`w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-300 ${isOnline ? 'translate-x-4' : 'translate-x-0'} ${isOnline ? '' : 'bg-gray-400'}`} />
                         </div>
                     </button>
                 </div>
@@ -199,36 +202,40 @@ export default function WorkerSidebar({ categories, activeCategory }: WorkerSide
                 <hr className="border-gray-100" />
 
                 {/* Location Filter */}
-                <div className="flex flex-col gap-3">
-                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Location</label>
-                    <p className="text-xs text-gray-400">Set your location to sort workers by distance</p>
+                <div className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-1">
+                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-1">Proximity Search</label>
+                        <p className="text-[10px] text-gray-400 ml-1 leading-relaxed">Find experts nearest to your current location.</p>
+                    </div>
 
                     {locationText ? (
-                        <div className="flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2.5">
-                            <div className="flex items-center gap-2 text-emerald-700 text-xs font-medium">
-                                <MapPin className="w-4 h-4 shrink-0" />
-                                <span className="truncate">{locationText}</span>
+                        <div className="flex items-center justify-between bg-emerald-50/50 border border-emerald-100 rounded-[1.5rem] px-5 py-4 group animate-fade-in">
+                            <div className="flex items-center gap-3 text-emerald-800 text-xs font-bold">
+                                <div className="p-2 bg-emerald-500 text-white rounded-xl shadow-lg shadow-emerald-500/20">
+                                    <MapPin className="w-3.5 h-3.5 shrink-0" />
+                                </div>
+                                <span className="truncate max-w-[120px]">{locationText}</span>
                             </div>
-                            <button onClick={handleClearLocation} className="shrink-0 text-emerald-400 hover:text-red-500 ml-2">
+                            <button onClick={handleClearLocation} className="p-2 text-emerald-300 hover:text-rose-500 transition-colors">
                                 <X className="w-4 h-4" />
                             </button>
                         </div>
                     ) : (
-                        <div className="flex flex-col gap-2">
+                        <div className="grid grid-cols-1 gap-3">
                             <button
                                 onClick={handleGps}
                                 disabled={isLocating}
-                                className="flex items-center justify-center gap-2 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-600 hover:border-emerald-400 hover:text-emerald-600 transition-colors"
+                                className="flex items-center justify-center gap-3 bg-white border border-gray-100 rounded-2xl px-5 py-3.5 text-sm font-bold text-gray-900 hover:premium-shadow hover:border-primary transition-all group"
                             >
-                                {isLocating ? <span className="w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" /> : <Navigation className="w-4 h-4" />}
-                                Use my location
+                                {isLocating ? <span className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" /> : <Navigation className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />}
+                                Use GPS
                             </button>
                             <button
                                 onClick={handleOpenMap}
-                                className="flex items-center justify-center gap-2 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-600 hover:border-emerald-400 hover:text-emerald-600 transition-colors"
+                                className="flex items-center justify-center gap-3 bg-white border border-gray-100 rounded-2xl px-5 py-3.5 text-sm font-bold text-gray-900 hover:premium-shadow hover:border-primary transition-all group"
                             >
-                                <Map className="w-4 h-4" />
-                                Pick on map
+                                <Map className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
+                                Interactive Map
                             </button>
                         </div>
                     )}
