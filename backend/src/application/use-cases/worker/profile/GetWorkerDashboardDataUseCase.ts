@@ -6,6 +6,7 @@ import { WorkerModel } from "../../../../infrastructure/database/models/WorkerMo
 import { ReviewModel } from "../../../../infrastructure/database/models/ReviewModel";
 import { ClientModel } from "../../../../infrastructure/database/models/ClientModel";
 import { WalletModel } from "../../../../infrastructure/database/models/WalletModel";
+import { WorkerScheduleModel } from "../../../../infrastructure/database/models/WorkerScheduleModel";
 import { ServiceStatus } from "../../../../shared/enums/serviceEnums";
 import { transactionType, transactionStatus } from "../../../../shared/enums/transactionEnums";
 
@@ -140,10 +141,28 @@ export class GetWorkerDashboardDataUseCase implements IGetWorkerDashboardDataUse
         }
 
         // Schedules for Calendar
-        const schedules = await ServiceModel.find({
+        const services = await ServiceModel.find({
             workerId,
             status: { $in: [ServiceStatus.PENDING, ServiceStatus.IN_PROGRESS] }
         }).select('title scheduledDate status').lean();
+
+        // Fetch blocked dates (unavailable)
+        const startOfToday = new Date();
+        startOfToday.setHours(0, 0, 0, 0);
+        
+        const blockedDates = await WorkerScheduleModel.find({
+            workerId,
+            isAvailable: false,
+            date: { $gte: startOfToday } // Only show future and current day blocked dates
+        }).select('date').lean();
+
+        const combinedSchedules = [
+            ...services.map(s => ({ title: s.title, date: s.scheduledDate, status: s.status })),
+            ...blockedDates.map(b => ({ title: "Unavailable", date: b.date, status: "BLOCKED" }))
+        ];
+
+        // Sort by date
+        combinedSchedules.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
         return {
             stats: {
@@ -156,7 +175,7 @@ export class GetWorkerDashboardDataUseCase implements IGetWorkerDashboardDataUse
                 rating: worker.rating,
                 totalRatings: worker.totalRatings
             },
-            schedules: schedules.map(s => ({ title: s.title, date: s.scheduledDate, status: s.status })),
+            schedules: combinedSchedules,
             upcomingService: formattedUpcomingService,
             charts: {
                 monthlyEarnings: formattedMonthlyData,

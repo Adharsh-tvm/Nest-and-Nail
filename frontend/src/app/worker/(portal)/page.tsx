@@ -7,8 +7,9 @@ import {
   PieChart, Pie, Cell, Legend
 } from 'recharts';
 import { 
-  IndianRupee, Briefcase, Clock, Star, Calendar, MessageSquareQuote, Wallet, MapPin, CalendarDays, XCircle
+  IndianRupee, Briefcase, Clock, Star, Calendar, MessageSquareQuote, Wallet, MapPin, CalendarDays, XCircle, ChevronLeft, ChevronRight
 } from "lucide-react";
+import { getWorkerBlockedDatesAction } from "@/app/actions/worker/slot-actions";
 import toast from "react-hot-toast";
 
 interface StatCardProps {
@@ -46,6 +47,113 @@ import {
   Review,
   WorkerDashboardData
 } from "@/sources/api/worker/dashboard.api";
+
+const DashboardCalendar = () => {
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [availabilityData, setAvailabilityData] = useState<Record<string, { isBooked: boolean; isAvailable: boolean }>>({});
+  const [loading, setLoading] = useState(true);
+
+  const viewYear = currentMonth.getFullYear();
+  const viewMonth = currentMonth.getMonth();
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const toDateKey = (y: number, m: number, d: number) => {
+    return `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+  };
+
+  useEffect(() => {
+    const load = async () => {
+      setLoading(true);
+      try {
+        const response = await getWorkerBlockedDatesAction();
+        if (response.success && response.payload) {
+          const payloadData = response.payload as Array<{ date: string | Date; isBooked: boolean; isAvailable: boolean }>;
+          const formatted: Record<string, { isBooked: boolean; isAvailable: boolean }> = {};
+          payloadData.forEach(slot => {
+            const d = new Date(slot.date);
+            const key = toDateKey(d.getFullYear(), d.getMonth(), d.getDate());
+            formatted[key] = { isBooked: slot.isBooked, isAvailable: slot.isAvailable };
+          });
+          setAvailabilityData(formatted);
+        }
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, []);
+
+  const firstDayOfMonth = new Date(viewYear, viewMonth, 1).getDay();
+  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+  const cells: (number | null)[] = [];
+  for (let i = 0; i < firstDayOfMonth; i++) cells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+  while (cells.length % 7 !== 0) cells.push(null);
+
+  return (
+    <div className="flex flex-col h-full">
+       <div className="flex justify-between items-center mb-4 bg-gray-50/50 p-3 rounded-xl border border-gray-100">
+          <div className="flex items-center gap-2">
+            <Calendar className="w-4 h-4 text-emerald-600" />
+            <span className="text-sm font-bold text-gray-900">{currentMonth.toLocaleString("default", { month: "long", year: "numeric" })}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <button onClick={() => setCurrentMonth(new Date(viewYear, viewMonth - 1, 1))} className="p-1 hover:bg-white hover:shadow-sm rounded-md transition-all border border-transparent hover:border-gray-200"><ChevronLeft size={16} /></button>
+            <button onClick={() => setCurrentMonth(new Date(viewYear, viewMonth + 1, 1))} className="p-1 hover:bg-white hover:shadow-sm rounded-md transition-all border border-transparent hover:border-gray-200"><ChevronRight size={16} /></button>
+          </div>
+       </div>
+
+       <div className="grid grid-cols-7 gap-1 mb-1">
+          {["S", "M", "T", "W", "T", "F", "S"].map((d, i) => (
+            <div key={`${d}-${i}`} className="text-center text-[10px] font-bold text-gray-400 uppercase tracking-wider py-1">{d}</div>
+          ))}
+       </div>
+       <div className="grid grid-cols-7 gap-1 flex-1">
+          {cells.map((day, idx) => {
+            if (!day) return <div key={`empty-${idx}`} />;
+            const key = toDateKey(viewYear, viewMonth, day);
+            const dateObj = new Date(viewYear, viewMonth, day);
+            const isToday = dateObj.getTime() === today.getTime();
+            const isPast = dateObj < today;
+            const isBooked = availabilityData[key]?.isBooked;
+            const isBlocked = !isBooked && availabilityData[key] && !availabilityData[key].isAvailable;
+
+            return (
+              <div 
+                key={key} 
+                className={`h-12 rounded-xl flex flex-col items-center justify-center text-sm font-medium transition-all relative border
+                  ${isToday ? "ring-2 ring-emerald-500 ring-offset-1 border-emerald-100 z-10" : ""}
+                  ${isPast ? "text-gray-300 bg-gray-50/50 border-transparent" : "text-gray-700 bg-white border-gray-100"}
+                  ${!isPast && isBooked ? "bg-blue-50 text-blue-600 border-blue-100 font-bold" : ""}
+                  ${!isPast && isBlocked ? "bg-gray-50 text-gray-400 border-gray-200 font-bold" : ""}
+                  ${!isPast && !isBooked && !isBlocked ? "hover:bg-emerald-50/50 hover:border-emerald-100 cursor-default" : ""}
+                `}
+              >
+                <span className={isToday ? "text-emerald-700 font-bold" : ""}>{day}</span>
+                {isBooked && !isPast && <span className="absolute bottom-2 w-1.5 h-1.5 rounded-full bg-blue-400"></span>}
+                {isBlocked && !isPast && <span className="absolute bottom-2 w-1.5 h-1.5 rounded-full bg-gray-400"></span>}
+              </div>
+            );
+          })}
+       </div>
+       
+       <div className="mt-6 pt-4 border-t border-gray-100 flex flex-wrap gap-x-5 gap-y-2 text-[11px] font-bold text-gray-500 justify-center">
+          <div className="flex items-center gap-2">
+            <span className="w-3 h-3 rounded-full bg-blue-400"></span> Booked
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="w-3 h-3 rounded-full bg-gray-400"></span> Blocked
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 ring-4 ring-emerald-50"></span> Today
+          </div>
+       </div>
+    </div>
+  );
+};
 
 const ReviewRow = ({ review }: { review: Review }) => (
   <div className="flex items-start gap-4 p-5 bg-white rounded-2xl border border-gray-200 hover:border-gray-300 transition-colors duration-200">
@@ -343,50 +451,21 @@ export default function WorkerDashboardPage() {
           </div>
         </div>
 
-        {/* Schedules / Calendar View */}
-        <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-col h-[400px]">
+        {/* Service Calendar View */}
+        <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-col min-h-[560px]">
           <div className="mb-6">
             <h3 className="font-semibold text-lg text-gray-900">
-              Service Timeline
+              Service Calendar
             </h3>
-            <p className="text-gray-500 text-sm mt-1">Your upcoming job schedule</p>
+            <p className="text-gray-500 text-sm mt-1">Your monthly availability status</p>
           </div>
           
-          <div className="flex-1 overflow-y-auto pr-4 space-y-4 custom-scrollbar pb-2">
-            {(() => {
-              const schedules = data?.schedules || [];
-              return schedules.length > 0 ? (
-                schedules.slice(0, 10).map((schedule, idx: number) => {
-                  const isToday = new Date().toDateString() === new Date(schedule.date).toDateString();
-                  return (
-                    <div key={idx} className="flex gap-4 items-start">
-                      <div className="flex flex-col items-center mt-2">
-                        <div className={`w-3 h-3 rounded-full ${isToday ? 'bg-emerald-500 ring-4 ring-emerald-50' : 'bg-gray-300'}`} />
-                        {idx !== (schedules.length - 1) && <div className="w-px h-12 bg-gray-200 my-1" />}
-                      </div>
-                      <div className={`flex-1 p-4 rounded-xl border ${isToday ? 'bg-emerald-50/50 border-emerald-100' : 'bg-white border-gray-100'}`}>
-                        <h4 className="font-semibold text-sm text-gray-900 mb-1">{schedule.title}</h4>
-                        <div className="flex items-center justify-between">
-                          <p className="text-xs text-gray-500 flex items-center gap-1.5">
-                            {new Date(schedule.date).toLocaleDateString()} at {new Date(schedule.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                          </p>
-                          <span className={`inline-flex px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide rounded-md ${schedule.status === 'IN_PROGRESS' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-gray-100 text-gray-700 border border-gray-200'}`}>
-                            {schedule.status}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })
-              ) : (
-                <div className="h-full flex items-center justify-center text-center text-gray-500 text-sm">
-                  No schedules available.
-                </div>
-              );
-            })()}
+          <div className="flex-1">
+             <DashboardCalendar />
           </div>
         </div>
       </div>
+
 
       {/* Bottom Section: Recent Reviews */}
       <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
