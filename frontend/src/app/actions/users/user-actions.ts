@@ -21,7 +21,17 @@ function normalizeIsVerified(v: unknown): VerificationStatus {
 export async function getCurrentUser(): Promise<User | null> {
   try {
     const cookieStore = await cookies();
-    const email = cookieStore.get("user_email")?.value;
+    let email = cookieStore.get("user_email")?.value;
+
+    if (!email) {
+      const accessToken = cookieStore.get("accessToken")?.value;
+      if (accessToken) {
+        const { verifyAccessToken } = await import("../authentication/session-actions");
+        const payload = await verifyAccessToken(accessToken);
+        email = payload?.email;
+      }
+    }
+
     if (!email) return null;
 
     const data = (await userApi.getCurrentUserByEmail(email)) as ApiResponse<Record<string, unknown>>;

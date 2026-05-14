@@ -56,12 +56,18 @@ export async function refreshTokens(refreshToken: string): Promise<boolean> {
 
     const cookieStore = await cookies();
 
+    // Verify the new token to get user info for other cookies
+    const payload = await verifyAccessToken(accessToken);
+
+    const ACCESS_MAX_AGE = 60 * 15; // 15 minutes
+    const REFRESH_MAX_AGE = 60 * 60 * 24; // 1 day
+
     cookieStore.set("accessToken", accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      maxAge: 60 * 15, // 15 minutes
+      maxAge: ACCESS_MAX_AGE,
     });
 
     cookieStore.set("refreshToken", newRefreshToken, {
@@ -69,11 +75,33 @@ export async function refreshTokens(refreshToken: string): Promise<boolean> {
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      maxAge: 60 * 60 * 24, // 1 day
+      maxAge: REFRESH_MAX_AGE,
     });
 
+    // Refresh user_email and userRole cookies if they exist in the payload
+    if (payload?.email) {
+      cookieStore.set("user_email", payload.email, {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: REFRESH_MAX_AGE, // Match refresh token duration
+        path: "/",
+      });
+    }
+
+    if (payload?.role) {
+      cookieStore.set("userRole", payload.role, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: REFRESH_MAX_AGE, // Match refresh token duration
+        path: "/",
+      });
+    }
+
     return true;
-  } catch {
+  } catch (error) {
+    console.error("Token refresh failed:", error);
     return false;
   }
 }

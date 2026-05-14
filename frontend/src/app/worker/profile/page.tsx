@@ -789,7 +789,17 @@ const ProfileView: React.FC<ViewProps> = ({ user, setUser }) => {
             </div>
             <div className="p-8">
               <div className="flex flex-wrap gap-3 mb-6">
-                {(isEditingExcluded ? formData.excludedServices : user.excludedServices)?.map((service, i) => (
+                {(isEditingExcluded ? formData.excludedServices : user.excludedServices)?.flatMap(service => {
+                  try {
+                    if (typeof service === 'string' && service.startsWith('[') && service.endsWith(']')) {
+                      const parsed = JSON.parse(service);
+                      return Array.isArray(parsed) ? parsed : [service];
+                    }
+                    return [service];
+                  } catch {
+                    return [service];
+                  }
+                }).map((service, i) => (
                   <span
                     key={i}
                     className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium border ${isEditingExcluded ? "bg-white border-red-200 text-red-600" : "bg-red-50 border-red-100 text-red-600"}`}

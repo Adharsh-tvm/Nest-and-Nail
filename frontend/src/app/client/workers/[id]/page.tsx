@@ -450,9 +450,7 @@ export default async function WorkerDetailPage({
                                         )}
                                     </div>
                                 </div>
-
-                                {/* Skills */}
-                                <div>
+                                 <div>
                                     <p style={{
                                         fontSize: '11px', fontWeight: 700, color: '#94a3b8',
                                         textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '12px'
@@ -476,6 +474,7 @@ export default async function WorkerDetailPage({
                                 </div>
 
                                 {/* Excluded Services */}
+                      {/* Excluded Services */}
                                 {worker.excludedServices && worker.excludedServices.length > 0 && (
                                     <div style={{ marginTop: '24px' }}>
                                         <p style={{
@@ -483,7 +482,18 @@ export default async function WorkerDetailPage({
                                             textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '12px'
                                         }}>Services Not Provided</p>
                                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                                            {worker.excludedServices.map((service, idx) => (
+                                            {worker.excludedServices.flatMap(service => {
+                                                try {
+                                                    // Handle case where service string is actually a stringified array
+                                                    if (typeof service === 'string' && service.startsWith('[') && service.endsWith(']')) {
+                                                        const parsed = JSON.parse(service);
+                                                        return Array.isArray(parsed) ? parsed : [service];
+                                                    }
+                                                    return [service];
+                                                } catch {
+                                                    return [service];
+                                                }
+                                            }).map((service, idx) => (
                                                 <span key={idx} style={{
                                                     padding: '7px 16px',
                                                     background: '#fef2f2', color: '#ef4444',

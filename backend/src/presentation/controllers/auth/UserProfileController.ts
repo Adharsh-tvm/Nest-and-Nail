@@ -26,10 +26,22 @@ export class UserProfileController implements IUserProfileController {
             const profilePictureFilePath = req.file?.path;
             const mimetype = req.file?.mimetype;
 
-            const body = req.body as Record<string, unknown> & { isOnline?: unknown };
+            const body = req.body as Record<string, unknown>;
             const updates: Record<string, unknown> = {
                 ...body,
             };
+
+            // Parse JSON fields that might be stringified via FormData
+            const jsonFields = ["address", "documents", "certificates", "excludedServices"];
+            for (const field of jsonFields) {
+                if (typeof body[field] === "string") {
+                    try {
+                        updates[field] = JSON.parse(body[field]);
+                    } catch {
+                        // Not a JSON string, keep as is
+                    }
+                }
+            }
 
             if (body.isOnline !== undefined) {
                 updates.isOnline = body.isOnline === "true";
