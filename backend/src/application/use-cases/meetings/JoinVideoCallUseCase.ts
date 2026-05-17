@@ -55,11 +55,15 @@ export class JoinVideoCallUseCase implements IJoinVideoCallUseCase {
             status = VideoCallStatus.ONGOING;
         }
 
+        // actualStartTime is set once on the very first join and never overwritten
+        const actualStartTime = service.videoCall.actualStartTime ?? startedAt;
+
         await this._serviceRepository.updateVideoCall(serviceId, {
             ...service.videoCall,
             joinedUsers,
             status,
             startedAt,
+            actualStartTime,
         });
 
         // Notify the OTHER participant that this user has joined (ring bell)

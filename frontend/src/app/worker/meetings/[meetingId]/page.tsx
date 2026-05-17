@@ -138,7 +138,7 @@ export default async function WorkerMeetingDetailPage({ params }: { params: Prom
                 <div className="p-4 rounded-2xl bg-blue-50 border border-blue-100">
                   <div className="flex items-center gap-2 mb-1">
                     <Clock className="w-4 h-4 text-blue-500" />
-                    <span className="text-xs font-semibold text-blue-600 uppercase tracking-wide">Start Time</span>
+                    <span className="text-xs font-semibold text-blue-600 uppercase tracking-wide">Booked Start Time</span>
                   </div>
                   <p className="font-bold text-slate-800 text-sm">{formatTime(meeting.videoCall.startTime)}</p>
                 </div>
@@ -148,7 +148,7 @@ export default async function WorkerMeetingDetailPage({ params }: { params: Prom
                 <div className="p-4 rounded-2xl bg-blue-50 border border-blue-100">
                   <div className="flex items-center gap-2 mb-1">
                     <Clock className="w-4 h-4 text-blue-500" />
-                    <span className="text-xs font-semibold text-blue-600 uppercase tracking-wide">End Time</span>
+                    <span className="text-xs font-semibold text-blue-600 uppercase tracking-wide">Booked End Time</span>
                   </div>
                   <p className="font-bold text-slate-800 text-sm">{formatTime(meeting.videoCall.endTime)}</p>
                 </div>
@@ -161,6 +161,37 @@ export default async function WorkerMeetingDetailPage({ params }: { params: Prom
                     <span className="text-xs font-semibold text-emerald-600 uppercase tracking-wide">Duration</span>
                   </div>
                   <p className="font-bold text-slate-800 text-sm">{meeting.videoCall.duration}</p>
+                </div>
+              )}
+
+              {/* Actual Meeting Times — shown only for completed meetings */}
+              {meeting.status === "COMPLETED" && meeting.videoCall?.actualStartTime && (
+                <div className="p-4 rounded-2xl bg-violet-50 border border-violet-100">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Clock className="w-4 h-4 text-violet-500" />
+                    <span className="text-xs font-semibold text-violet-600 uppercase tracking-wide">Actual Start Time</span>
+                  </div>
+                  <p className="font-bold text-slate-800 text-sm">
+                    {new Date(meeting.videoCall.actualStartTime).toLocaleString("en-US", {
+                      month: "short", day: "numeric", year: "numeric",
+                      hour: "2-digit", minute: "2-digit"
+                    })}
+                  </p>
+                </div>
+              )}
+
+              {meeting.status === "COMPLETED" && meeting.videoCall?.endedAt && (
+                <div className="p-4 rounded-2xl bg-violet-50 border border-violet-100">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Clock className="w-4 h-4 text-violet-500" />
+                    <span className="text-xs font-semibold text-violet-600 uppercase tracking-wide">Actual End Time</span>
+                  </div>
+                  <p className="font-bold text-slate-800 text-sm">
+                    {new Date(meeting.videoCall.endedAt).toLocaleString("en-US", {
+                      month: "short", day: "numeric", year: "numeric",
+                      hour: "2-digit", minute: "2-digit"
+                    })}
+                  </p>
                 </div>
               )}
 

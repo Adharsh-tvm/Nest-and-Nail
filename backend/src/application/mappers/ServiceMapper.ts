@@ -96,7 +96,22 @@ export class ServiceMapper {
         coordinates: service.location.coordinates
       },
       address: service.address,
-      videoCall: service.videoCall,
+      videoCall: service.videoCall
+        ? {
+            roomId: service.videoCall.roomId,
+            // Booked times (scheduled at booking creation)
+            startTime: service.videoCall.startTime,
+            endTime: service.videoCall.endTime,
+            meetingLink: service.videoCall.meetingLink,
+            status: service.videoCall.status,
+            // Actual times (recorded during the live session)
+            actualStartTime: service.videoCall.actualStartTime,  // First-join, never cleared
+            startedAt: service.videoCall.startedAt,              // Rolling segment tracker
+            endedAt: service.videoCall.endedAt,
+            duration: service.videoCall.duration,
+            accumulatedDuration: service.videoCall.accumulatedDuration,
+          }
+        : undefined,
     };
   }
 }

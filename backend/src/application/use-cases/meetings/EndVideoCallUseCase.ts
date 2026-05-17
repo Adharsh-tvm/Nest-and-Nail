@@ -50,6 +50,7 @@ export class EndVideoCallUseCase implements IEndVideoCallUseCase {
     const endedAt = new Date();
     let totalSeconds = service.videoCall.accumulatedDuration ?? 0;
 
+    // Use the rolling segment tracker (startedAt) to add the final segment's duration
     if (service.videoCall.startedAt) {
       const segmentMs = endedAt.getTime() - new Date(service.videoCall.startedAt).getTime();
       totalSeconds += Math.floor(segmentMs / 1000);
@@ -60,10 +61,12 @@ export class EndVideoCallUseCase implements IEndVideoCallUseCase {
     const updatedVideoCall = {
       ...service.videoCall,
       status: VideoCallStatus.ENDED,
+      // actualStartTime = permanent first-join time, preserved in history
+      actualStartTime: service.videoCall.actualStartTime,
+      startedAt: null,  // Clear the segment tracker — session is over
       endedAt,
       duration,
       accumulatedDuration: totalSeconds,
-      startedAt: null, // Clear startedAt
     };
 
     const updated = await this.serviceRepository.updateVideoCall(serviceId, updatedVideoCall);

@@ -63,14 +63,15 @@ export interface Service {
 
   videoCall?: {
     roomId: string;
-    startTime: Date;
-    endTime: Date;
+    startTime: Date;       // Booked start time
+    endTime: Date;         // Booked end time
     meetingLink?: string;
 
     status?: VideoCallStatus
     joinedUsers?: string[];
 
-    startedAt?: Date | null;
+    actualStartTime?: Date; // Set on first join, never cleared — used for history
+    startedAt?: Date | null; // Rolling segment tracker, cleared on leave
     endedAt?: Date;
     duration?: string;
     accumulatedDuration?: number

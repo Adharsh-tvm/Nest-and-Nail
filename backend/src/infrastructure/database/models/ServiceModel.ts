@@ -68,6 +68,7 @@ export interface IServiceDocument extends Document {
     meetingLink?: string;
     status?: VideoCallStatus;
     joinedUsers?: string[];
+    actualStartTime?: Date;  // Set on first join, never cleared
     startedAt?: Date;
     endedAt?: Date;
     duration?: string;
@@ -183,6 +184,7 @@ const ServiceSchema = new Schema<IServiceDocument>(
       meetingLink: String,
       status: { type: String, enum: Object.values(VideoCallStatus) },
       joinedUsers: [String],
+      actualStartTime: Date,  // Set on first join, never cleared
       startedAt: Date,
       endedAt: Date,
       duration: String,

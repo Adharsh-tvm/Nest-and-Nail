@@ -159,17 +159,21 @@ export interface ServiceResponseDTO {
   completedAt?: string | Date;
   updatedAt?: string | Date;
 
-    videoCall?: {
-        roomId?: string;
-        startTime?: string | Date;
-        endTime?: string | Date;
-        joinUrl?: string;
-        meetingLink?: string;
-        status: string;
-        startedAt?: string | Date;
-        endedAt?: string | Date;
-        duration?: string;
-    };
+  videoCall?: {
+    roomId?: string;
+    // Booked times (set at booking creation)
+    startTime?: string | Date;
+    endTime?: string | Date;
+    joinUrl?: string;
+    meetingLink?: string;
+    status?: string;
+    // Actual times (recorded during live session)
+    actualStartTime?: string | Date; // First-join time, never cleared
+    startedAt?: string | Date;       // Rolling segment tracker
+    endedAt?: string | Date;
+    duration?: string;
+    accumulatedDuration?: number;
+  };
     review?: {
         rating: number;
         review?: string;
@@ -227,12 +231,16 @@ export interface AdminServiceResponseDTO {
   updatedAt?: string;
   videoCall?: {
     roomId?: string;
+    // Booked times (set at booking creation)
     startTime?: string | Date;
     endTime?: string | Date;
     meetingLink?: string;
-    status: string;
-    startedAt?: string | Date;
+    status?: string;
+    // Actual times (recorded during live session)
+    actualStartTime?: string | Date; // First-join time, never cleared
+    startedAt?: string | Date;       // Rolling segment tracker
     endedAt?: string | Date;
     duration?: string;
+    accumulatedDuration?: number;
   };
 }

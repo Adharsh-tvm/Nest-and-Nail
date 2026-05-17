@@ -8,8 +8,9 @@ export interface UpdateVideoCallDTO {
 
   joinedUsers?: string[];
 
-  startedAt?: Date | null;
+  actualStartTime?: Date;  // Set on first join, never cleared — used for history
+  startedAt?: Date | null; // Rolling segment tracker, cleared on leave
   endedAt?: Date;
   duration?: string;
   accumulatedDuration?: number;
-}
+}
