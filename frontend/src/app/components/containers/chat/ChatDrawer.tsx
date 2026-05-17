@@ -1,10 +1,15 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import { X, Send, MessageCircle } from "lucide-react";
+import { X, Send, MessageCircle, Smile, Paperclip, CheckCheck, User } from "lucide-react";
 import io, { Socket } from "socket.io-client";
 import { getMessagesAction, sendMessageAction } from "@/app/actions/chat-actions";
 import { useUserStore } from "@/store/userStore";
+import dynamic from "next/dynamic";
+import toast from "react-hot-toast";
+
+// Dynamically import EmojiPicker to prevent SSR hydration mismatches
+const EmojiPicker = dynamic(() => import("emoji-picker-react"), { ssr: false });
 
 interface Message {
   messageId?: string;
@@ -27,9 +32,12 @@ export default function ChatDrawer({ chatId, receiverId, receiverName }: ChatDra
   const [newMessage, setNewMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const socketRef = useRef<Socket | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  
   // Ref to track isOpen without stale closures inside socket callbacks
   const isOpenRef = useRef(false);
 
@@ -105,9 +113,8 @@ export default function ChatDrawer({ chatId, receiverId, receiverName }: ChatDra
       createdAt: new Date().toISOString(),
     };
 
-    // Removed optimistic update to prevent double messages.
-    // The message will be added when we receive it back from the socket broadcast.
     setNewMessage("");
+    setShowEmojiPicker(false);
 
     // Emit via socket
     socketRef.current?.emit("send-message", {
@@ -121,6 +128,29 @@ export default function ChatDrawer({ chatId, receiverId, receiverName }: ChatDra
       receiverId,
       message: messageData.message,
     });
+  };
+
+  const onEmojiClick = (emojiData: { emoji: string }) => {
+    const emoji = emojiData.emoji;
+    const input = inputRef.current;
+    
+    if (input) {
+      const start = input.selectionStart ?? 0;
+      const end = input.selectionEnd ?? 0;
+      const text = newMessage;
+      const before = text.substring(0, start);
+      const after = text.substring(end, text.length);
+      
+      setNewMessage(before + emoji + after);
+      
+      // Keep input focused and move cursor directly after the newly inserted emoji
+      setTimeout(() => {
+        input.focus();
+        input.setSelectionRange(start + emoji.length, start + emoji.length);
+      }, 10);
+    } else {
+      setNewMessage((prev) => prev + emoji);
+    }
   };
 
   return (
@@ -142,12 +172,12 @@ export default function ChatDrawer({ chatId, receiverId, receiverName }: ChatDra
 
       {/* Chat Drawer */}
       {isOpen && (
-        <div className="fixed bottom-6 right-6 w-[350px] sm:w-[400px] h-[500px] bg-white rounded-3xl shadow-2xl border border-gray-200 z-[9999] flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 fade-in zoom-in-95 duration-200">
+        <div className="fixed bottom-6 right-6 w-[350px] sm:w-[400px] h-[520px] bg-white rounded-3xl shadow-2xl border border-gray-200 z-[9999] flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 fade-in zoom-in-95 duration-200">
           {/* Header */}
           <div className="bg-[#1B4332] text-white px-5 py-4 flex items-center justify-between shadow-md">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                <MessageCircle size={20} />
+              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center border border-white/10">
+                <User size={20} className="text-emerald-50" />
               </div>
               <div className="flex flex-col">
                 <span className="font-bold text-[15px]">{receiverName || "Chat"}</span>
@@ -173,20 +203,23 @@ export default function ChatDrawer({ chatId, receiverId, receiverName }: ChatDra
               </div>
             ) : messages.length === 0 ? (
               <div className="flex flex-col justify-center items-center h-full text-slate-400 gap-3">
-                <MessageCircle size={40} className="opacity-20" />
-                <p className="text-sm">No messages yet. Say hi!</p>
+                <MessageCircle size={40} className="opacity-20 text-[#1B4332]" />
+                <p className="text-sm font-medium">No messages yet. Say hi!</p>
               </div>
             ) : (
               messages.map((msg, index) => {
                 const isMe = msg.senderId === user?.id;
                 return (
                   <div key={index} className={`flex flex-col max-w-[85%] ${isMe ? "self-end items-end" : "self-start items-start"}`}>
-                    <div className={`px-4 py-2.5 text-[15px] shadow-sm ${isMe ? "bg-[#1B4332] text-white rounded-2xl rounded-br-sm" : "bg-white border border-gray-100 text-slate-800 rounded-2xl rounded-bl-sm"}`}>
+                    <div className={`px-4 py-2.5 text-[15px] shadow-sm ${isMe ? "bg-[#1B4332] text-white rounded-2xl rounded-br-sm animate-in fade-in slide-in-from-right-2 duration-150" : "bg-white border border-gray-100 text-slate-800 rounded-2xl rounded-bl-sm animate-in fade-in slide-in-from-left-2 duration-150"}`}>
                       {msg.message}
                     </div>
-                    <span className="text-[10px] text-slate-400 mt-1 px-1 font-medium">
-                      {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </span>
+                    <div className="flex items-center gap-1 mt-1 px-1 font-medium">
+                      <span className="text-[10px] text-slate-400">
+                        {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                      {isMe && <CheckCheck size={12} className="text-emerald-500" />}
+                    </div>
                   </div>
                 );
               })
@@ -194,22 +227,78 @@ export default function ChatDrawer({ chatId, receiverId, receiverName }: ChatDra
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Input */}
-          <div className="p-4 bg-white border-t border-slate-100">
-            <form onSubmit={handleSend} className="flex items-center gap-3">
-              <input
-                type="text"
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                placeholder="Type a message..."
-                className="flex-1 bg-slate-100 border-transparent focus:bg-white focus:border-[#1B4332] focus:ring-2 focus:ring-[#1B4332]/20 rounded-full px-5 py-3 text-[15px] outline-none transition-all shadow-inner"
-              />
+          {/* Input & Emoji Section */}
+          <div className="p-3 bg-white border-t border-slate-100 relative">
+            {/* Floating Emoji Picker Popover */}
+            {showEmojiPicker && (
+              <div className="absolute bottom-16 left-4 right-4 z-[10000] bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden animate-in slide-in-from-bottom-2 fade-in duration-200">
+                <div className="flex justify-between items-center px-4 py-2 border-b border-slate-100 bg-slate-50">
+                  <span className="text-xs font-bold text-slate-500 flex items-center gap-1.5">
+                    <Smile size={14} className="text-[#1B4332]" /> Express Yourself
+                  </span>
+                  <button 
+                    type="button"
+                    onClick={() => setShowEmojiPicker(false)}
+                    className="text-xs text-slate-400 hover:text-slate-600 font-semibold transition-colors"
+                  >
+                    Close
+                  </button>
+                </div>
+                <div className="h-[250px] overflow-hidden">
+                  <EmojiPicker 
+                    onEmojiClick={onEmojiClick}
+                    width="100%"
+                    height="100%"
+                    skinTonesDisabled
+                    searchDisabled
+                    previewConfig={{ showPreview: false }}
+                  />
+                </div>
+              </div>
+            )}
+
+            <form onSubmit={handleSend} className="flex items-center gap-2">
+              {/* Attachment Option */}
+              <button
+                type="button"
+                onClick={() => toast.success("File attachment option coming soon!", { id: "attach-toast" })}
+                className="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors shrink-0"
+                title="Attach File"
+              >
+                <Paperclip size={18} />
+              </button>
+
+              <div className="flex-1 bg-slate-100 rounded-full flex items-center px-4 py-1 border border-transparent focus-within:border-[#1B4332] focus-within:bg-white focus-within:ring-2 focus-within:ring-[#1B4332]/10 transition-all shadow-inner relative">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={newMessage}
+                  onChange={(e) => {
+                    setNewMessage(e.target.value);
+                    if (showEmojiPicker) setShowEmojiPicker(false);
+                  }}
+                  placeholder="Type a message..."
+                  className="flex-1 bg-transparent py-2.5 text-[15px] outline-none text-slate-800"
+                />
+                
+                {/* Emoji Toggle Option */}
+                <button
+                  type="button"
+                  onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                  className={`w-8 h-8 flex items-center justify-center rounded-full transition-colors shrink-0 ${showEmojiPicker ? "text-[#1B4332] bg-[#1B4332]/10" : "text-slate-400 hover:text-[#1B4332]"}`}
+                  title="Emojis"
+                >
+                  <Smile size={20} />
+                </button>
+              </div>
+
+              {/* Send Button */}
               <button
                 type="submit"
                 disabled={!newMessage.trim()}
-                className="w-12 h-12 flex-shrink-0 bg-[#1B4332] text-white rounded-full flex items-center justify-center hover:bg-[#153426] hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 transition-all shadow-md"
+                className="w-11 h-11 flex-shrink-0 bg-[#1B4332] text-white rounded-full flex items-center justify-center hover:bg-[#153426] hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 transition-all shadow-md shrink-0"
               >
-                <Send size={18} className="ml-1" />
+                <Send size={16} className="ml-0.5" />
               </button>
             </form>
           </div>
@@ -218,3 +307,4 @@ export default function ChatDrawer({ chatId, receiverId, receiverName }: ChatDra
     </>
   );
 }
+
