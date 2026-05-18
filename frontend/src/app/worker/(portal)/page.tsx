@@ -51,7 +51,6 @@ import {
 const DashboardCalendar = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [availabilityData, setAvailabilityData] = useState<Record<string, { isBooked: boolean; isAvailable: boolean }>>({});
-  const [loading, setLoading] = useState(true);
 
   const viewYear = currentMonth.getFullYear();
   const viewMonth = currentMonth.getMonth();
@@ -64,7 +63,6 @@ const DashboardCalendar = () => {
 
   useEffect(() => {
     const load = async () => {
-      setLoading(true);
       try {
         const response = await getWorkerBlockedDatesAction();
         if (response.success && response.payload) {
@@ -79,8 +77,6 @@ const DashboardCalendar = () => {
         }
       } catch (e) {
         console.error(e);
-      } finally {
-        setLoading(false);
       }
     };
     load();

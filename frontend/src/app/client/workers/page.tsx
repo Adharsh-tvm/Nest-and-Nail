@@ -6,7 +6,7 @@ import WorkerSidebar from './WorkerSidebar';
 import WorkerSearchBar from './WorkerSearchBar';
 import WorkersPagination from './WorkersPagination';
 import WorkerSort from './WorkerSort';
-import { Briefcase, Star } from 'lucide-react';
+import { Briefcase } from 'lucide-react';
 import { User } from '@/shared/types/userTypes';
 import { Category } from '@/shared/types/categoryTypes';
 

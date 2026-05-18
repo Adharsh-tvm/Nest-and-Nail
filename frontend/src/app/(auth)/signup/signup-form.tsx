@@ -179,6 +179,7 @@ const SignUpComponent = ({ role }: { role: "client" | "worker" }) => {
       const result = await completeSignup(payload);
 
       if (result.success) {
+        toast.success("Account created successfully!");
         if (signupData.role === "worker") {
           if (result.isVerified === "VERIFIED") {
             router.replace("/worker");

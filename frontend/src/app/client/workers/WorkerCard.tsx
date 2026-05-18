@@ -4,7 +4,7 @@ import React from 'react';
 import { User } from '@/shared/types/userTypes';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Star, MapPin, CheckCircle2, XCircle, ChevronRight, Briefcase } from 'lucide-react';
+import { Star, MapPin, ChevronRight, Briefcase } from 'lucide-react';
 
 interface WorkerCardProps {
     worker: User;

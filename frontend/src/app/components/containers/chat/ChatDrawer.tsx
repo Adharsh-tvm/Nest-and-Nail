@@ -296,7 +296,7 @@ export default function ChatDrawer({ chatId, receiverId, receiverName }: ChatDra
               <button
                 type="submit"
                 disabled={!newMessage.trim()}
-                className="w-11 h-11 flex-shrink-0 bg-[#1B4332] text-white rounded-full flex items-center justify-center hover:bg-[#153426] hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 transition-all shadow-md shrink-0"
+                className="w-11 h-11 flex-shrink-0 bg-[#1B4332] text-white rounded-full flex items-center justify-center hover:bg-[#153426] hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 transition-all shadow-md"
               >
                 <Send size={16} className="ml-0.5" />
               </button>
