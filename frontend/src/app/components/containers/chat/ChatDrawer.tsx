@@ -7,6 +7,8 @@ import { getMessagesAction, sendMessageAction } from "@/app/actions/chat-actions
 import { useUserStore } from "@/store/userStore";
 import dynamic from "next/dynamic";
 import toast from "react-hot-toast";
+import { getMediaUploadUrlAction } from "@/app/actions/media/mediaUpload.actions";
+import { uploadToS3 } from "@/lib/uploadToS3";
 
 // Dynamically import EmojiPicker to prevent SSR hydration mismatches
 const EmojiPicker = dynamic(() => import("emoji-picker-react"), { ssr: false });
@@ -16,6 +18,8 @@ interface Message {
   senderId: string;
   receiverId: string;
   message: string;
+  attachmentUrl?: string;
+  messageType?: string;
   createdAt: string | Date;
 }
 
@@ -33,6 +37,68 @@ export default function ChatDrawer({ chatId, receiverId, receiverName }: ChatDra
   const [isLoading, setIsLoading] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+
+    const isImage = file.type.startsWith("image/");
+    const messageType = isImage ? "image" : "file";
+
+    const toastId = toast.loading("Uploading attachment...");
+    try {
+      // 1. Get presigned upload URL and immediate signed preview Url
+      const response = await getMediaUploadUrlAction(file.name, file.type);
+      if (!response.success || !response.payload) {
+        toast.error(response.message || "Failed to get upload URL", { id: toastId });
+        return;
+      }
+
+      const { uploadUrl, fileUrl, signedUrl } = response.payload;
+
+      // 2. Upload the file to S3
+      const uploadSuccess = await uploadToS3(file, uploadUrl);
+      if (!uploadSuccess) {
+        toast.error("Failed to upload file to S3", { id: toastId });
+        return;
+      }
+
+      // 3. Prepare the message payload
+      const messageData: Message = {
+        senderId: user.id,
+        receiverId,
+        message: messageType === "image" ? "" : file.name,
+        attachmentUrl: signedUrl || fileUrl,
+        messageType,
+        createdAt: new Date().toISOString(),
+      };
+
+      // Emit via socket immediately with the preview Url
+      socketRef.current?.emit("send-message", {
+        chatId,
+        message: messageData,
+      });
+
+      // Save to database using the permanent fileUrl key
+      await sendMessageAction({
+        chatId,
+        receiverId,
+        message: messageType === "image" ? "" : file.name,
+        attachmentUrl: fileUrl,
+        messageType,
+      });
+
+      // Clean up the file input
+      if (fileInputRef.current) fileInputRef.current.value = "";
+
+      toast.success("Attachment sent!", { id: toastId });
+    } catch (err) {
+      console.error("Error sending attachment:", err);
+      toast.error("Failed to send attachment", { id: toastId });
+    }
+  };
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const socketRef = useRef<Socket | null>(null);
@@ -212,7 +278,29 @@ export default function ChatDrawer({ chatId, receiverId, receiverName }: ChatDra
                 return (
                   <div key={index} className={`flex flex-col max-w-[85%] ${isMe ? "self-end items-end" : "self-start items-start"}`}>
                     <div className={`px-4 py-2.5 text-[15px] shadow-sm ${isMe ? "bg-[#1B4332] text-white rounded-2xl rounded-br-sm animate-in fade-in slide-in-from-right-2 duration-150" : "bg-white border border-gray-100 text-slate-800 rounded-2xl rounded-bl-sm animate-in fade-in slide-in-from-left-2 duration-150"}`}>
-                      {msg.message}
+                      {msg.messageType === "image" && msg.attachmentUrl ? (
+                        <div className="max-w-[240px]">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img 
+                            src={msg.attachmentUrl} 
+                            alt="Attachment" 
+                            className="rounded-lg max-h-[180px] object-cover cursor-pointer hover:opacity-90 transition-opacity" 
+                            onClick={() => window.open(msg.attachmentUrl, "_blank")}
+                          />
+                        </div>
+                      ) : msg.messageType === "file" && msg.attachmentUrl ? (
+                        <a 
+                          href={msg.attachmentUrl} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="flex items-center gap-2 hover:underline font-bold"
+                        >
+                          <Paperclip size={16} />
+                          <span className="truncate max-w-[180px]">{msg.message || "View Attachment"}</span>
+                        </a>
+                      ) : (
+                        msg.message
+                      )}
                     </div>
                     <div className="flex items-center gap-1 mt-1 px-1 font-medium">
                       <span className="text-[10px] text-slate-400">
@@ -258,10 +346,19 @@ export default function ChatDrawer({ chatId, receiverId, receiverName }: ChatDra
             )}
 
             <form onSubmit={handleSend} className="flex items-center gap-2">
+              {/* Hidden File Input */}
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                className="hidden"
+                accept="image/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain"
+              />
+
               {/* Attachment Option */}
               <button
                 type="button"
-                onClick={() => toast.success("File attachment option coming soon!", { id: "attach-toast" })}
+                onClick={() => fileInputRef.current?.click()}
                 className="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors shrink-0"
                 title="Attach File"
               >

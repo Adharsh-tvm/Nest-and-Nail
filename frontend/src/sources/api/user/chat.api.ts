@@ -12,7 +12,13 @@ export const getMessagesApi = async (chatId: string) => {
   }
 };
 
-export const sendMessageApi = async (data: { chatId: string; receiverId: string; message: string }) => {
+export const sendMessageApi = async (data: { 
+  chatId: string; 
+  receiverId: string; 
+  message: string;
+  attachmentUrl?: string;
+  messageType?: string;
+}) => {
   try {
     const res = await axiosInstance.post(CHAT_ROUTES.SEND, data);
     return { success: true, data: res.data };

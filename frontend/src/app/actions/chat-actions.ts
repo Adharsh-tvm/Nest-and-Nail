@@ -10,7 +10,13 @@ export async function getMessagesAction(chatId: string) {
   }
 }
 
-export async function sendMessageAction(data: { chatId: string; receiverId: string; message: string }) {
+export async function sendMessageAction(data: { 
+  chatId: string; 
+  receiverId: string; 
+  message: string; 
+  attachmentUrl?: string;
+  messageType?: string;
+}) {
   try {
     return await sendMessageApi(data);
   } catch (error: unknown) {

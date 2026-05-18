@@ -6,6 +6,8 @@ export interface ChatMessage {
     receiverId: string;
 
     message: string;
+    attachmentUrl?: string;
+    messageType?: string; // "text" | "image" | etc.
 
     isRead: boolean;
     createdAt: Date;

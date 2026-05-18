@@ -11,13 +11,19 @@ export class ChatController {
     ) { }
 
     sendMessage = async (req: Request, res: Response) => {
-        const { chatId, receiverId, message } = req.body as { chatId?: string; receiverId?: string; message?: string };
+        const { chatId, receiverId, message, attachmentUrl, messageType } = req.body as { 
+            chatId?: string; 
+            receiverId?: string; 
+            message?: string;
+            attachmentUrl?: string;
+            messageType?: string;
+        };
         const senderId = req.user?.id;
         if (!senderId) {
             return res.status(HttpStatusCode.UNAUTHORIZED).json({ success: false, message: "Unauthorized" });
         }
 
-        if (!chatId || !receiverId || !message) {
+        if (!chatId || !receiverId || (!message && !attachmentUrl)) {
             return res.status(HttpStatusCode.BAD_REQUEST).json({ success: false, message: "Missing required fields" });
         }
 
@@ -25,7 +31,9 @@ export class ChatController {
             chatId,
             senderId,
             receiverId,
-            message
+            message: message || "",
+            attachmentUrl,
+            messageType: messageType || "text"
         });
 
         res.json({ success: true });

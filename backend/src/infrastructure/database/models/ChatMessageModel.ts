@@ -8,6 +8,8 @@ export interface ChatMessageDocument extends Document {
   receiverId: string;
 
   message: string;
+  attachmentUrl?: string;
+  messageType?: string;
 
   isRead: boolean;
 
@@ -22,7 +24,9 @@ const ChatMessageSchema = new Schema<ChatMessageDocument>({
   senderId: { type: String, required: true },
   receiverId: { type: String, required: true },
 
-  message: { type: String, required: true },
+  message: { type: String, default: "" },
+  attachmentUrl: { type: String },
+  messageType: { type: String, default: "text" },
 
   isRead: { type: Boolean, default: false },
 

@@ -4,5 +4,7 @@ export interface ISendMessageUseCase {
         senderId: string;
         receiverId: string;
         message: string;
+        attachmentUrl?: string;
+        messageType?: string;
     }): Promise<void>;
 }

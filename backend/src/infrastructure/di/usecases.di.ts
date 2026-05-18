@@ -807,13 +807,15 @@ export class UseCaseDI {
   get sendMessageUseCase(): ISendMessageUseCase {
     return (this._sendMessageUseCase ??= new SendMessageUseCase(
         this.infra.chatRepository,
-        this.infra.realtimeService
+        this.infra.realtimeService,
+        this.infra.s3Service
       ));
   }
 
   get getMessagesUseCase(): IGetMessagesUseCase {
     return (this._getMessagesUseCase ??= new GetMessagesUseCase(
         this.infra.chatRepository,
+        this.infra.s3Service
       ));
   }
 
