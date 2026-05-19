@@ -28,7 +28,7 @@ export class WorkerController {
 
     if (!dates || !Array.isArray(dates)) {
       res.status(HttpStatusCode.BAD_REQUEST).json(
-        ResponseHandler.error(RESPONSE_MESSAGES.BAD_REQUEST, "Dates are required")
+        ResponseHandler.error(RESPONSE_MESSAGES.DATES_REQUIRED)
       );
       return;
     }
@@ -40,7 +40,7 @@ export class WorkerController {
     });
 
     res.status(HttpStatusCode.OK).json(
-      ResponseHandler.success(null, "Dates blocked successfully")
+      ResponseHandler.success(null, RESPONSE_MESSAGES.DATES_BLOCKED)
     );
   };
 
@@ -57,7 +57,7 @@ export class WorkerController {
     const result = await this._getWorkerBlockedDatesUseCase.execute(workerId);
 
     res.status(HttpStatusCode.OK).json(
-      ResponseHandler.success(result, "Blocked dates fetched successfully")
+      ResponseHandler.success(result, RESPONSE_MESSAGES.BLOCKED_DATES_FETCHED)
     );
   };
 
@@ -74,7 +74,7 @@ export class WorkerController {
       }
       const data = await this._getWorkerDashboardDataUseCase.execute(workerId, months);
       res.status(HttpStatusCode.OK).json(
-        ResponseHandler.success(data, "Dashboard data fetched successfully")
+        ResponseHandler.success(data, RESPONSE_MESSAGES.DASHBOARD_DATA_FETCHED)
       );
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : "Internal Server Error";

@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { HttpStatusCode } from "../../../shared/enums/httpCodes";
 import { ResponseHandler } from "../../../shared/responses/ApiResponse";
+import { RESPONSE_MESSAGES } from "../../../shared/responses/ResponseMessages";
 import { IGetClientScheduledMeetingsUseCase } from "../../../application/interfaces/meetings/client/IGetClientScheduledVideoCallsUseCase";
 import { IGetClientMeetingsHistoryUseCase } from "../../../application/interfaces/meetings/client/IGetClientVideoCallHistoryUseCase";
 import { IGetClientMeetingByIdUseCase } from "../../../application/interfaces/meetings/client/IGetClientMeetingByIdUseCase";
@@ -24,13 +25,13 @@ export class ClientMeetingsController {
             if (!clientId) {
                 return res
                     .status(HttpStatusCode.UNAUTHORIZED)
-                    .json(ResponseHandler.error("Unauthorized"));
+                    .json(ResponseHandler.error(RESPONSE_MESSAGES.UNAUTHORIZED));
             }
 
             const result = await this._getScheduledUseCase.execute(clientId);
 
             res.status(HttpStatusCode.OK).json(
-                ResponseHandler.success(result, "Scheduled video calls fetched")
+                ResponseHandler.success(result, RESPONSE_MESSAGES.SCHEDULED_MEETINGS_FETCHED)
             );
         } catch (error) {
             next(error);
@@ -48,13 +49,13 @@ export class ClientMeetingsController {
             if (!clientId) {
                 return res
                     .status(HttpStatusCode.UNAUTHORIZED)
-                    .json(ResponseHandler.error("Unauthorized"));
+                    .json(ResponseHandler.error(RESPONSE_MESSAGES.UNAUTHORIZED));
             }
 
             const result = await this._getHistoryUseCase.execute(clientId);
 
             res.status(HttpStatusCode.OK).json(
-                ResponseHandler.success(result, "Video call history fetched")
+                ResponseHandler.success(result, RESPONSE_MESSAGES.MEETING_HISTORY_FETCHED)
             );
         } catch (error) {
             next(error);
@@ -68,7 +69,7 @@ export class ClientMeetingsController {
             if (!clientId) {
                 return res
                     .status(HttpStatusCode.UNAUTHORIZED)
-                    .json(ResponseHandler.error("Unauthorized"));
+                    .json(ResponseHandler.error(RESPONSE_MESSAGES.UNAUTHORIZED));
             }
             const { serviceId } = req.params;
 
@@ -78,7 +79,7 @@ export class ClientMeetingsController {
             );
 
             res.status(HttpStatusCode.OK).json(
-                ResponseHandler.success(result, "Meeting fetched")
+                ResponseHandler.success(result, RESPONSE_MESSAGES.MEETING_FETCHED)
             );
         } catch (error) {
             next(error);

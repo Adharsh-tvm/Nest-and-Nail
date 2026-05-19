@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import { HttpStatusCode } from "../../../shared/enums/httpCodes";
 import { ISendMessageUseCase } from "../../../application/interfaces/chat/ISendMessageUseCase";
 import { IGetMessagesUseCase } from "../../../application/interfaces/chat/IGetMessagesUseCase";
+import { ResponseHandler } from "../../../shared/responses/ApiResponse";
+import { RESPONSE_MESSAGES } from "../../../shared/responses/ResponseMessages";
 
 export class ChatController {
 
@@ -20,11 +22,15 @@ export class ChatController {
         };
         const senderId = req.user?.id;
         if (!senderId) {
-            return res.status(HttpStatusCode.UNAUTHORIZED).json({ success: false, message: "Unauthorized" });
+            return res.status(HttpStatusCode.UNAUTHORIZED).json(
+                ResponseHandler.error(RESPONSE_MESSAGES.UNAUTHORIZED)
+            );
         }
 
         if (!chatId || !receiverId || (!message && !attachmentUrl)) {
-            return res.status(HttpStatusCode.BAD_REQUEST).json({ success: false, message: "Missing required fields" });
+            return res.status(HttpStatusCode.BAD_REQUEST).json(
+                ResponseHandler.error(RESPONSE_MESSAGES.MISSING_FIELDS)
+            );
         }
 
         await this._sendMessageUseCase.execute({
@@ -36,7 +42,9 @@ export class ChatController {
             messageType: messageType || "text"
         });
 
-        res.json({ success: true });
+        res.status(HttpStatusCode.OK).json(
+            ResponseHandler.success(null, RESPONSE_MESSAGES.MESSAGE_SENT)
+        );
     };
 
     getMessages = async (req: Request, res: Response) => {
@@ -44,6 +52,8 @@ export class ChatController {
 
         const messages = await this._getMessagesUseCase.execute(chatId);
 
-        res.json(messages);
+        res.status(HttpStatusCode.OK).json(
+            ResponseHandler.success(messages, RESPONSE_MESSAGES.MESSAGES_FETCHED)
+        );
     };
 }

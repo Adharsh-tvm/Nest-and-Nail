@@ -37,7 +37,7 @@ export class AuthController implements IAuthController {
 
       if (!user_role) {
         res.status(HttpStatusCode.BAD_REQUEST).json(
-          ResponseHandler.error(RESPONSE_MESSAGES.BAD_REQUEST, "user_role is required")
+          ResponseHandler.error(RESPONSE_MESSAGES.USER_ROLE_REQUIRED)
         );
       }
 
@@ -115,7 +115,7 @@ export class AuthController implements IAuthController {
 
       if (!email || !role) {
         res.status(HttpStatusCode.BAD_REQUEST).json(
-          ResponseHandler.error(RESPONSE_MESSAGES.BAD_REQUEST, "Email and role are required")
+          ResponseHandler.error(RESPONSE_MESSAGES.EMAIL_ROLE_REQUIRED)
         );
       }
 
@@ -143,7 +143,7 @@ export class AuthController implements IAuthController {
 
       if (!result) {
         res.status(HttpStatusCode.BAD_REQUEST).json(
-          ResponseHandler.error(RESPONSE_MESSAGES.INVALID_OTP, "Invalid or expired OTP")
+          ResponseHandler.error(RESPONSE_MESSAGES.INVALID_OTP_EXP)
         );
         return;
       }
@@ -179,7 +179,7 @@ export class AuthController implements IAuthController {
 
       if (!email) {
         res.status(HttpStatusCode.BAD_REQUEST).json(
-          ResponseHandler.error(RESPONSE_MESSAGES.BAD_REQUEST, "Email is required")
+          ResponseHandler.error(RESPONSE_MESSAGES.EMAIL_REQUIRED)
         );
       }
 
@@ -206,7 +206,7 @@ export class AuthController implements IAuthController {
 
       if (!email || !newPassword || !confirmPassword) {
         res.status(HttpStatusCode.BAD_REQUEST).json(
-          ResponseHandler.error(RESPONSE_MESSAGES.BAD_REQUEST, "Missing required fields")
+          ResponseHandler.error(RESPONSE_MESSAGES.MISSING_FIELDS)
         );
       }
 
@@ -321,7 +321,7 @@ export class AuthController implements IAuthController {
       }
 
       if (newPassword !== confirmPassword) {
-        res.status(HttpStatusCode.BAD_REQUEST).json(ResponseHandler.error("Passwords do not match"));
+        res.status(HttpStatusCode.BAD_REQUEST).json(ResponseHandler.error(RESPONSE_MESSAGES.PASSWORD_MISMATCH));
         return;
       }
 
@@ -332,7 +332,7 @@ export class AuthController implements IAuthController {
       );
 
       res.status(HttpStatusCode.OK).json(
-        ResponseHandler.success(null, "Password changed successfully")
+        ResponseHandler.success(null, RESPONSE_MESSAGES.PASSWORD_CHANGED)
       );
 
     } catch (error: unknown) {

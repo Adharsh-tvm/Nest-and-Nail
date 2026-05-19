@@ -27,7 +27,7 @@ export class VideoCallController {
 
       if (!serviceId) {
         res.status(HttpStatusCode.BAD_REQUEST).json(
-          ResponseHandler.error(RESPONSE_MESSAGES.BAD_REQUEST, "serviceId is required")
+          ResponseHandler.error(RESPONSE_MESSAGES.SERVICE_ID_REQUIRED)
         );
         return;
       }
@@ -35,7 +35,7 @@ export class VideoCallController {
       const result = await this.joinUseCase.execute(serviceId, userId);
 
       res.status(HttpStatusCode.OK).json(
-        ResponseHandler.success(result, "Joined video call successfully")
+        ResponseHandler.success(result, RESPONSE_MESSAGES.JOINED_VIDEO_CALL)
       );
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : "Internal Server Error";
@@ -59,7 +59,7 @@ export class VideoCallController {
 
       if (!serviceId) {
         res.status(HttpStatusCode.BAD_REQUEST).json(
-          ResponseHandler.error(RESPONSE_MESSAGES.BAD_REQUEST, "serviceId is required")
+          ResponseHandler.error(RESPONSE_MESSAGES.SERVICE_ID_REQUIRED)
         );
         return;
       }
@@ -67,7 +67,7 @@ export class VideoCallController {
       const result = await this.endUseCase.execute(serviceId, userId);
 
       res.status(HttpStatusCode.OK).json(
-        ResponseHandler.success(result, "Call ended successfully")
+        ResponseHandler.success(result, RESPONSE_MESSAGES.CALL_ENDED)
       );
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : "Internal Server Error";
@@ -91,7 +91,7 @@ export class VideoCallController {
 
       if (!serviceId) {
         res.status(HttpStatusCode.BAD_REQUEST).json(
-          ResponseHandler.error(RESPONSE_MESSAGES.BAD_REQUEST, "serviceId is required")
+          ResponseHandler.error(RESPONSE_MESSAGES.SERVICE_ID_REQUIRED)
         );
         return;
       }
@@ -99,7 +99,7 @@ export class VideoCallController {
       const result = await this.leaveUseCase.execute(serviceId, userId);
 
       res.status(HttpStatusCode.OK).json(
-        ResponseHandler.success(result, "Left video call successfully")
+        ResponseHandler.success(result, RESPONSE_MESSAGES.LEFT_VIDEO_CALL)
       );
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : "Internal Server Error";

@@ -19,7 +19,7 @@ export class GoogleAuthController implements IGoogleAuthController {
 
       if (!email || !name || !role) {
         res.status(HttpStatusCode.BAD_REQUEST).json(
-          ResponseHandler.error(RESPONSE_MESSAGES.BAD_REQUEST, "email, name, and role are required")
+          ResponseHandler.error(RESPONSE_MESSAGES.GOOGLE_AUTH_MISSING_FIELDS)
         );
         return;
       }

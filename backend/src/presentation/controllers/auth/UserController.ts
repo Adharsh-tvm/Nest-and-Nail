@@ -35,7 +35,7 @@ export class UserController implements IUserController {
 
             if (!role) {
                 return res.status(HttpStatusCode.BAD_REQUEST).json(
-                    ResponseHandler.error(RESPONSE_MESSAGES.BAD_REQUEST, "Role is required")
+                    ResponseHandler.error(RESPONSE_MESSAGES.ROLE_REQUIRED)
                 );
             }
 

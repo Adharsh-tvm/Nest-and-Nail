@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { IAddReviewUseCase } from "../../../application/interfaces/review/IAddReviewUseCase";
 import { HttpStatusCode } from "../../../shared/enums/httpCodes";
 import { ResponseHandler } from "../../../shared/responses/ApiResponse";
+import { RESPONSE_MESSAGES } from "../../../shared/responses/ResponseMessages";
 
 export class ClientReviewController {
 
@@ -17,17 +18,17 @@ export class ClientReviewController {
 
       if (!clientId) {
         return res.status(HttpStatusCode.UNAUTHORIZED)
-          .json(ResponseHandler.error("Unauthorized"));
+          .json(ResponseHandler.error(RESPONSE_MESSAGES.UNAUTHORIZED));
       }
 
       if (!serviceId) {
         return res.status(HttpStatusCode.BAD_REQUEST)
-          .json(ResponseHandler.error("Service ID is required"));
+          .json(ResponseHandler.error(RESPONSE_MESSAGES.SERVICE_ID_REQUIRED));
       }
 
       if (rating === undefined) {
         return res.status(HttpStatusCode.BAD_REQUEST)
-          .json(ResponseHandler.error("Rating is required"));
+          .json(ResponseHandler.error(RESPONSE_MESSAGES.RATING_REQUIRED));
       }
 
       await this._addReviewUseCase.execute(
@@ -38,7 +39,7 @@ export class ClientReviewController {
       );
 
       res.status(HttpStatusCode.OK).json(
-        ResponseHandler.success(null, "Review submitted")
+        ResponseHandler.success(null, RESPONSE_MESSAGES.REVIEW_SUBMITTED)
       );
 
     } catch (error: unknown) {
