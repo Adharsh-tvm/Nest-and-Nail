@@ -143,7 +143,8 @@ export default function CancelMeetingButton({
       <button
         id="cancel-meeting-btn"
         onClick={handleOpen}
-        className="inline-flex items-center gap-2 bg-white hover:bg-red-50 text-red-600 border-2 border-red-100 font-bold text-sm px-5 py-2.5 rounded-xl transition-all duration-200 active:scale-95 shrink-0"
+        disabled={!refund.canCancel}
+        className="inline-flex items-center gap-2 bg-white hover:bg-red-50 text-red-600 border-2 border-red-100 font-bold text-sm px-5 py-2.5 rounded-xl transition-all duration-200 active:scale-95 shrink-0 disabled:bg-slate-100 disabled:text-slate-400 disabled:border-slate-200 disabled:cursor-not-allowed disabled:active:scale-100"
       >
         <XCircle className="w-4 h-4" />
         Cancel Meeting
