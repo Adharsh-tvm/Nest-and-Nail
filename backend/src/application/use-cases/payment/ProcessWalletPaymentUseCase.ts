@@ -1,0 +1,145 @@
+import { IPaymentRepository } from "../../../domain/repositories/IPaymentRepository";
+import { IServiceRepository } from "../../../domain/repositories/IServiceRepository";
+import { IWalletRepository } from "../../../domain/repositories/IWalletRepository";
+import { ITransactionRepository } from "../../../domain/repositories/ITransactionRepository";
+import { IWorkerScheduleRepository } from "../../../domain/repositories/IWorkerScheduleRepository";
+import { IUserRepositoryFactory } from "../../../domain/repositories/IUserRepositoryFactory";
+import { Role } from "../../../shared/enums/authEnums";
+import { PaymentStatus } from "../../../shared/enums/paymentEnums";
+import { ServiceStatus } from "../../../shared/enums/serviceEnums";
+import { v4 as uuidv4 } from "uuid";
+import { IProcessWalletPaymentUseCase } from "../../interfaces/payment/IProcessWalletPaymentUseCase";
+import { transactionSource, transactionStatus, transactionType } from "../../../shared/enums/transactionEnums";
+import { ISendNotificationUseCase } from "../../interfaces/notifications/ISendNotificationUseCase";
+
+export class ProcessWalletPaymentUseCase implements IProcessWalletPaymentUseCase {
+  constructor(
+    private readonly _paymentRepo: IPaymentRepository,
+    private readonly _serviceRepo: IServiceRepository,
+    private readonly _walletRepo: IWalletRepository,
+    private readonly _transactionRepo: ITransactionRepository,
+    private readonly _scheduleRepo: IWorkerScheduleRepository,
+    private readonly _userRepoFactory: IUserRepositoryFactory,
+    private readonly _sendNotificationUseCase: ISendNotificationUseCase
+  ) {}
+
+  async execute(serviceId: string, clientId: string) {
+    const service = await this._serviceRepo.findById(serviceId);
+
+    if (!service) throw new Error("Service not found");
+
+    if (service.clientId !== clientId) {
+      throw new Error("Unauthorized");
+    }
+
+    if (service.paymentStatus === PaymentStatus.SUCCESS) {
+      throw new Error("Service is already paid");
+    }
+
+    const amount = service.totalAmount;
+
+    let wallet = await this._walletRepo.findByUserId(clientId);
+    wallet ??= await this._walletRepo.create({
+      walletId: uuidv4(),
+      userId: clientId,
+      balance: 0,
+      currency: "INR",
+    });
+
+    const updatedWallet = await this._walletRepo.debitBalance(clientId, amount);
+
+    await this._transactionRepo.create({
+      transactionId: uuidv4(),
+      walletId: updatedWallet.walletId,
+      userId: clientId,
+      type: transactionType.DEBIT,
+      amount,
+      source: transactionSource.SERVICE_PAYMENT,
+      serviceId,
+      status: transactionStatus.SUCCESS,
+      createdAt: new Date(),
+    });
+
+    // Credit full amount to Admin wallet initially
+    const adminRepo = this._userRepoFactory.getRepository(Role.ADMIN);
+    const admins = await adminRepo.findAll();
+    const admin = admins[0] as typeof admins[number] | undefined;
+
+    if (admin) {
+        let adminWallet = await this._walletRepo.findByUserId(admin.userId);
+        adminWallet ??= await this._walletRepo.create({
+            walletId: uuidv4(),
+            userId: admin.userId,
+            balance: 0,
+            currency: "INR"
+        });
+
+        const updatedAdminWallet = await this._walletRepo.creditBalance(admin.userId, amount);
+
+        await this._transactionRepo.create({
+            transactionId: uuidv4(),
+            walletId: updatedAdminWallet.walletId,
+            userId: admin.userId,
+            type: transactionType.CREDIT,
+            amount: amount,
+            source: transactionSource.SERVICE_PAYMENT,
+            serviceId,
+            status: transactionStatus.SUCCESS,
+            createdAt: new Date(),
+        });
+    }
+
+    await this._paymentRepo.create({
+      id: uuidv4(),
+      serviceId,
+      clientId,
+      amount,
+      currency: "INR",
+      orderId: `wallet_${uuidv4()}`,
+      status: PaymentStatus.SUCCESS,
+      createdAt: new Date(),
+    });
+
+    await this._serviceRepo.updatePaymentStatus(serviceId, PaymentStatus.SUCCESS);
+
+    await this._serviceRepo.updateStatus(serviceId, {
+      status: ServiceStatus.CONFIRMED,
+    });
+
+    // Mark worker schedule slots as booked now that payment is confirmed
+    for (const slot of service.selectedSlots) {
+      await this._scheduleRepo.markAsBooked(
+        service.workerId,
+        slot.date,
+        slot.slotType,
+        service.serviceId
+      );
+    }
+
+    // Notify worker after wallet payment confirmed
+    await this._sendNotificationUseCase.execute({
+      userId: service.workerId,
+      title: service.category === "VIDEO_CALL"
+        ? "Meeting Confirmed"
+        : "Service Confirmed",
+      message: service.category === "VIDEO_CALL"
+        ? "A client has booked a video call with you"
+        : "A client has paid and confirmed a service booking with you",
+      type: service.category === "VIDEO_CALL"
+        ? "MEETING_BOOKED"
+        : "SERVICE_BOOKED",
+      data: {
+        serviceId: service.serviceId,
+        clientId: service.clientId,
+        category: service.category
+      }
+    });
+
+    return {
+      success: true,
+      message: "Payment successful via Wallet",
+      walletBalance: updatedWallet.balance,
+      serviceId,
+    };
+  }
+}

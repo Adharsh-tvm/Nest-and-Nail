@@ -1,0 +1,87 @@
+import React from "react";
+import { getWorkerDetailAction } from "@/app/actions/client/view-worker-actions";
+import { ChevronLeft, XCircle } from "lucide-react";
+import Link from "next/link";
+import { BookingSection } from "./BookingSection";
+
+export default async function BookWorkerPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const paramsObj = await params;
+  const { success, data: worker, error } = await getWorkerDetailAction(
+    paramsObj.id
+  );
+
+  if (error || !success || !worker) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 max-w-md w-full text-center">
+          <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <XCircle className="w-8 h-8" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            Worker Not Found
+          </h2>
+          <p className="text-gray-500 mb-6">
+            {error ||
+              "The worker profile you're looking for doesn't exist or is unavailable."}
+          </p>
+          <Link
+            href="/client/workers"
+            className="text-emerald-600 font-semibold hover:text-emerald-700 underline"
+          >
+            Back to available workers
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 py-2">
+      <div className="container mx-auto px-4 max-w-3xl">
+        {/* Back Link */}
+        <Link
+          href={`/client/workers/${paramsObj.id}`}
+          className="inline-flex items-center text-gray-500 hover:text-emerald-600 transition-colors mb-2 font-medium text-xs"
+        >
+          <ChevronLeft className="w-4 h-4 mr-1" />
+          Back to {worker.name}&#39;s profile
+        </Link>
+        
+        {/* Top Info Banner */}
+        <div className="bg-white rounded-[16px] p-3 shadow-sm border border-gray-100 mb-2 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100 border-2 border-emerald-100">
+               {(worker.profileImageUrl || worker.profilePictureUrl) ? (
+                 // eslint-disable-next-line @next/next/no-img-element
+                 <img 
+                   src={worker.profileImageUrl || worker.profilePictureUrl || ""}
+                   alt={worker.name}
+                   className="object-cover w-full h-full"
+                 />
+               ) : (
+                 <span className="w-full h-full flex items-center justify-center text-lg font-bold text-gray-400">
+                    {worker.name.substring(0, 2).toUpperCase()}
+                 </span>
+               )}
+            </div>
+            <div>
+              <h1 className="text-base font-bold text-gray-900 leading-tight">{worker.name}</h1>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none mt-1">
+                {worker.categories && worker.categories.length > 0 
+                  ? worker.categories[0] 
+                  : (worker.skills && worker.skills.length > 0 ? worker.skills[0] : 'Professional Worker')}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* The Booking Flow */}
+        <BookingSection worker={worker} />
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,31 @@
+﻿src/app/client/services/ClientServicesView.tsx(54,41): error TS2322: Type 'string | null | undefined' is not assignable to type 'string | Blob | undefined'.
+  Type 'null' is not assignable to type 'string | Blob | undefined'.
+src/app/client/services/ClientServicesView.tsx(160,45): error TS2322: Type 'string | null | undefined' is not assignable to type 'string | Blob | undefined'.
+  Type 'null' is not assignable to type 'string | Blob | undefined'.
+src/app/client/workers/[id]/book/BookingSummaryStep.tsx(3,20): error TS2305: Module '"@/shared/types/serviceTypes"' has no exported member 'SLOT_LABELS'.
+src/app/client/workers/[id]/book/BookingSummaryStep.tsx(3,33): error TS2305: Module '"@/shared/types/serviceTypes"' has no exported member 'SLOT_PRICES'.
+src/app/client/workers/[id]/book/CalendarSelector.tsx(5,10): error TS2305: Module '"@/shared/types/serviceTypes"' has no exported member 'DateAvailabilitySummary'.
+src/app/client/workers/[id]/book/SlotSelector.tsx(5,3): error TS2305: Module '"@/shared/types/serviceTypes"' has no exported member 'SlotAvailability'.
+src/app/client/workers/[id]/book/SlotSelector.tsx(7,3): error TS2305: Module '"@/shared/types/serviceTypes"' has no exported member 'SLOT_LABELS'.
+src/app/client/workers/[id]/book/SlotSelector.tsx(8,3): error TS2305: Module '"@/shared/types/serviceTypes"' has no exported member 'SLOT_PRICES'.
+src/app/client/workers/[id]/book/SlotSelector.tsx(9,3): error TS2305: Module '"@/shared/types/serviceTypes"' has no exported member 'SLOT_DURATION_LABEL'.
+src/hooks/useBookWorker.ts(4,10): error TS2305: Module '"@/app/actions/client/service-actions"' has no exported member 'bookWorkerAction'.
+src/hooks/useBookWorker.ts(5,10): error TS2305: Module '"@/shared/types/serviceTypes"' has no exported member 'BookingPayload'.
+src/hooks/useBookWorker.ts(5,26): error TS2305: Module '"@/shared/types/serviceTypes"' has no exported member 'BookingResult'.
+src/hooks/useBookWorker.ts(5,51): error TS2305: Module '"@/shared/types/serviceTypes"' has no exported member 'SlotAvailability'.
+src/hooks/useWorkerAvailability.ts(4,10): error TS2305: Module '"@/app/actions/client/service-actions"' has no exported member 'getWorkerAvailabilityAction'.
+src/hooks/useWorkerAvailability.ts(4,39): error TS2305: Module '"@/app/actions/client/service-actions"' has no exported member 'getWorkerAvailabilityBulkAction'.
+src/hooks/useWorkerAvailability.ts(6,3): error TS2305: Module '"@/shared/types/serviceTypes"' has no exported member 'DateAvailabilitySummary'.
+src/hooks/useWorkerAvailability.ts(7,3): error TS2305: Module '"@/shared/types/serviceTypes"' has no exported member 'SlotAvailability'.
+src/hooks/useWorkerAvailability.ts(59,41): error TS18046: 'avail' is of type 'unknown'.
+src/hooks/useWorkerAvailability.ts(60,41): error TS18046: 'avail' is of type 'unknown'.
+src/hooks/useWorkerAvailability.ts(61,41): error TS18046: 'avail' is of type 'unknown'.
+src/sources/api/client/service.api.ts(26,13): error TS2322: Type 'ServiceResponseDTO[] | undefined' is not assignable to type 'ServiceResponseDTO[]'.
+  Type 'undefined' is not assignable to type 'ServiceResponseDTO[]'.
+src/sources/api/client/service.api.ts(59,13): error TS2322: Type 'ServiceResponseDTO[] | undefined' is not assignable to type 'ServiceResponseDTO[]'.
+  Type 'undefined' is not assignable to type 'ServiceResponseDTO[]'.
+src/sources/api/client/service.api.ts(92,13): error TS2322: Type 'ServiceResponseDTO | undefined' is not assignable to type 'ServiceResponseDTO'.
+  Type 'undefined' is not assignable to type 'ServiceResponseDTO'.
+src/sources/api/service.api.ts(3,10): error TS2305: Module '"@/shared/types/serviceTypes"' has no exported member 'BookingPayload'.
+src/sources/api/service.api.ts(3,26): error TS2305: Module '"@/shared/types/serviceTypes"' has no exported member 'BookingResult'.
+src/sources/api/service.api.ts(3,41): error TS2305: Module '"@/shared/types/serviceTypes"' has no exported member 'SlotAvailability'.

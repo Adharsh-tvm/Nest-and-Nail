@@ -1,42 +1,91 @@
 import express from "express";
-import dotenv from "dotenv";
+import { env } from "./config/env";
+import cors from "cors";
+import cookieParser from "cookie-parser";
 import { connectDB } from "./infrastructure/database/connection";
-import { CustomerRepository } from "./infrastructure/repo/CustomerRepository";
-import { BcryptPasswordHasher } from "./infrastructure/utils/BcryptPasswordHasher";
-import { UUIDGenerator } from "./infrastructure/utils/UUIDGenerator";
-import { CustomerModel } from "./infrastructure/database/models/CustomerModel";
-import { RegisterCustomerUseCase } from "./application/use-cases/RegisterCustomerUseCase";
-import { LoginCustomerUseCase } from "./application/use-cases/LoginCustomerUseCase";
-import { CustomerController } from "./presentation/controllers/CustomerController";
-import { createCustomerRoutes } from "./presentation/routes/authRoutes";
+import { errorHandler } from "./presentation/middlewares/ErrorHandler";
+import { RequestLogger } from "./presentation/middlewares/RequestLogger";
+import { DIContainer } from "./infrastructure/di/DIContainer";
+import { createRoutes } from "./presentation/routes";
+import http from "http";
+import { Server } from "socket.io";
+import { SocketServer } from "./infrastructure/socket/socketServer";
+import { RealtimeService } from "./infrastructure/socket/socket-services/RealtimeService";
 
-dotenv.config();
+
 
 async function bootstrap() {
   const app = express();
+
+  app.use(
+    cors({
+      origin: ["http://localhost:3000", "https://nominatim.openstreetmap.org/"],
+      credentials: true,
+      methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+      allowedHeaders: ["Content-Type", "Authorization"],
+    })
+  );
+
+
   app.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
+  app.use(cookieParser());
 
   // Connect to MongoDB
-  await connectDB(process.env.MONGO_URI || "mongodb://localhost:27017/clean-arch");
+  await connectDB(env.MONGO_URI);
 
-  // Infrastructure
-  const repo = new CustomerRepository(CustomerModel);
-  const passwordHasher = new BcryptPasswordHasher();
-  const idGenerator = new UUIDGenerator();
+  // Initialize Dependency Injection Container
+  const container = new DIContainer();
+  const server = http.createServer(app);
+  
+  // Use logger middleware after container initialization
+  app.use(RequestLogger(container.infra.logger));
 
-  // Application
-  const registerUseCase = new RegisterCustomerUseCase(repo, passwordHasher, idGenerator);
-  const loginUseCase = new LoginCustomerUseCase(repo, passwordHasher);
+  const io = new Server(server, {
+    cors: {
+      origin: "*",
+      credentials: true,
+    },
+  });
 
-  // Presentation
-  const customerController = new CustomerController(registerUseCase, loginUseCase);
-
+  
+  // Error Handler
+  app.use(errorHandler);
+  
+  
+  const socketServer = new SocketServer(io);
+  socketServer.initialize();
+  
+  const realtimeService = new RealtimeService(socketServer);
+  
+  container.infra.setRealtimeService(realtimeService);
+  
   // Routes
-  app.use("/api/customers", createCustomerRoutes(customerController));
+  app.use("/", createRoutes(container));
 
+  // Start automatic moderation checking background job (runs every 15 minutes)
+  const MODERATION_CHECK_INTERVAL_MS = 15 * 60 * 1000;
+  setInterval(() => {
+    void (async () => {
+      try {
+        container.infra.logger.info("Running automatic moderation detection checks...");
+        const result = await container.useCases.processModerationActionsUseCase.execute();
+        container.infra.logger.info(`Automatic moderation check completed. Case 1: ${String(result.case1ProcessedCount)} physical no-shows, Case 2: ${String(result.case2ProcessedCount)} worker meeting absences, Case 3: ${String(result.case3ProcessedCount)} client meeting absences.`);
+      } catch (err: unknown) {
+        const errMsg = err instanceof Error ? err.message : String(err);
+        container.infra.logger.error(`Error running automatic moderation background check: ${errMsg}`);
+      }
+    })();
+  }, MODERATION_CHECK_INTERVAL_MS);
+  
   // Start server
-  const PORT = process.env.PORT || 3000;
-  app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+  const PORT = env.PORT;
+  server.listen(PORT, () => {
+    container.infra.logger.info(`Server running on http://localhost:${String(PORT)}`);
+  });
 }
 
-bootstrap();
+bootstrap().catch((error: unknown) => {
+  console.error("Failed to start server:", error);
+  process.exit(1);
+});                           
