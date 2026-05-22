@@ -2,6 +2,7 @@
 
 import axios from "axios";
 import { cookies } from "next/headers";
+import { isDynamicServerError } from "./utils";
 
 const axiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000",
@@ -29,6 +30,9 @@ axiosInstance.interceptors.request.use(
           headers["Cookie"] = cookieString;
         }
       } catch (err) {
+        if (isDynamicServerError(err)) {
+          throw err;
+        }
         console.error("Error reading cookies in request interceptor:", err);
       }
     }
@@ -40,6 +44,9 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
+    if (isDynamicServerError(error)) {
+      return Promise.reject(error);
+    }
     const status = error?.response?.status;
     const serverData = error?.response?.data;
     const serverMsg = serverData?.message || serverData?.error || null;
