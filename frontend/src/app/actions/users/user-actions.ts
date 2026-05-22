@@ -7,6 +7,7 @@ import { ApiResponse } from "@/shared/types/responseTypes";
 import { User } from "@/shared/types/userTypes";
 import { Address } from "@/shared/types/addressType";
 import axios from "axios";
+import { isDynamicServerError } from "@/lib/utils";
 
 function normalizeIsVerified(v: unknown): VerificationStatus {
   if (v === true || v === "VERIFIED" || v === "verified") {
@@ -63,6 +64,9 @@ export async function getCurrentUser(): Promise<User | null> {
 
     return user;
   } catch (err: unknown) {
+    if (isDynamicServerError(err)) {
+      throw err;
+    }
     if (axios.isAxiosError(err)) {
       if (err.response?.status === 401 || err.response?.status === 403) {
         return null;
