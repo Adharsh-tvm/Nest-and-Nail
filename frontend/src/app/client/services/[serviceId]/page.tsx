@@ -291,13 +291,20 @@ export default function ClientServiceDetailsPage() {
                   </div>
                 </div>
 
-                {isCancellable && (
-                   <div className="mt-6 pt-6 border-t border-gray-100">
-                       <button onClick={() => setCancelModal({ open: true, reason: "", loading: false })} className="w-full flex justify-center items-center gap-2 py-3.5 bg-red-50 text-red-600 hover:bg-red-100 font-bold rounded-xl transition-colors border border-red-200">
-                           <XCircle className="w-4 h-4"/> Cancel Service
-                       </button>
-                   </div>
-                )}
+                {isCancellable && (() => {
+                  const refund = getRefundInfo(service.createdAt);
+                  return (
+                    <div className="mt-6 pt-6 border-t border-gray-100">
+                        <button
+                          onClick={() => setCancelModal({ open: true, reason: "", loading: false })}
+                          disabled={!refund.canCancel}
+                          className="w-full flex justify-center items-center gap-2 py-3.5 bg-red-50 text-red-600 hover:bg-red-100 font-bold rounded-xl transition-colors border border-red-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:border-slate-200 disabled:cursor-not-allowed"
+                        >
+                            <XCircle className="w-4 h-4"/> Cancel Service
+                        </button>
+                    </div>
+                  );
+                })()}
 
                 {/* Actions after completion */}
                 {service.status === ServiceStatus.COMPLETED && (
