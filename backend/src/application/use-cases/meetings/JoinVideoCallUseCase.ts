@@ -1,5 +1,5 @@
 import { IServiceRepository } from "../../../domain/repositories/IServiceRepository";
-import { VideoCallStatus } from "../../../shared/enums/serviceEnums";
+import { VideoCallStatus, ServiceStatus } from "../../../shared/enums/serviceEnums";
 import { JoinVideoCallResponseDTO } from "../../dtos/common/videocall/JoinVideoCallResponseDTO";
 import { IJoinVideoCallUseCase } from "../../interfaces/meetings/IJoinVideoCallUseCase";
 import { ISendNotificationUseCase } from "../../interfaces/notifications/ISendNotificationUseCase";
@@ -22,6 +22,24 @@ export class JoinVideoCallUseCase implements IJoinVideoCallUseCase {
 
         if (service.clientId !== userId && service.workerId !== userId) {
             throw new Error("Unauthorized");
+        }
+
+        const isEnded = 
+            [
+                ServiceStatus.COMPLETED,
+                ServiceStatus.CANCELLED,
+                ServiceStatus.CANCELLED_BY_CLIENT,
+                ServiceStatus.CANCELLED_BY_WORKER,
+                ServiceStatus.EXPIRED,
+                ServiceStatus.NO_SHOW,
+                ServiceStatus.WORKER_ABSENT,
+                ServiceStatus.CLIENT_ABSENT
+            ].includes(service.status as ServiceStatus) ||
+            service.videoCall.status === VideoCallStatus.ENDED ||
+            service.videoCall.endedAt;
+
+        if (isEnded) {
+            throw new Error("Meeting has already ended");
         }
 
         // const now = new Date();
@@ -74,7 +92,7 @@ export class JoinVideoCallUseCase implements IJoinVideoCallUseCase {
         if (otherUserId) {
             await this._sendNotificationUseCase.execute({
                 userId: otherUserId,
-                title: "🔔 Meeting Room — Someone Joined!",
+                title: "Meeting Room — Someone Joined!",
                 message: `${joinerLabel} has entered the video call room. Join now to connect!`,
                 type: "MEETING_JOINED",
                 data: { serviceId, roomId: service.videoCall.roomId },

@@ -122,7 +122,17 @@ export default function VideoCall({
     socketRef.current = socket;
 
     if (onJoinRef.current) {
-      onJoinRef.current(roomId).catch(err => console.error("Error calling join API:", err));
+      onJoinRef.current(roomId)
+        .then((res: any) => {
+          if (res && res.success === false) {
+            console.error("Failed to join meeting:", res.error);
+            window.location.replace(`/${role.toLowerCase()}/meetings/${roomId}`);
+          }
+        })
+        .catch(err => {
+          console.error("Error calling join API:", err);
+          window.location.replace(`/${role.toLowerCase()}/meetings/${roomId}`);
+        });
     }
 
     const start = async () => {
