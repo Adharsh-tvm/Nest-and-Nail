@@ -1,6 +1,5 @@
 import { getWorkerMeetingByIdAction, joinMeetingAction, leaveMeetingAction } from "@/app/actions/worker/meeting-actions";
 import VideoCall from "@/app/components/containers/video-call/VideoCall";
-import { redirect } from "next/navigation";
 import { ServiceResponseDTO } from "@/shared/types/serviceTypes";
 
 export const dynamic = "force-dynamic";

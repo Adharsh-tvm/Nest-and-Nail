@@ -28,6 +28,7 @@ import {
   uploadDocumentAction,
 } from "@/app/actions/users/user-profile-actions";
 import { VerificationStatus } from "@/shared/enums/authEnums";
+import toast from "react-hot-toast";
 
 type ErrorState = {
   idFront?: string;
@@ -97,6 +98,11 @@ const FileUploader: React.FC<FileUploaderProps> = ({
   };
 
   const processFile = (selectedFile: File) => {
+    if (selectedFile.size > 8 * 1024 * 1024) {
+      toast.error(`${selectedFile.name} is too large. Maximum size allowed is 8MB.`);
+      return;
+    }
+
     if (intervalRef.current) clearInterval(intervalRef.current);
 
     setUploadProgress(0);
@@ -319,8 +325,11 @@ const WorkerVerificationFlow: React.FC<WorkerVerificationFlowProps> = ({
       });
 
       setStep(3);
-    } catch (err) {
+    } catch (err: unknown) {
       console.error("Profile update failed", err);
+      toast.error(
+        err instanceof Error ? err.message : "Document upload or update failed."
+      );
     } finally {
       setIsSubmitting(false);
     }

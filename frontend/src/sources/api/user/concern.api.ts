@@ -51,9 +51,15 @@ export async function raiseConcernApi(
     return { success: true, data: response.data.payload };
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
+      if (error.response?.status === 413) {
+        return {
+          success: false,
+          error: "One or more attachment images are too large for the backend server. Please upload smaller images.",
+        };
+      }
       return {
         success: false,
-        error: error.response?.data?.message || "Failed to raise concern",
+        error: error.response?.data?.message || `Failed to raise concern (Status ${error.response?.status || "Network Error"}).`,
       };
     }
     return { success: false, error: "An unexpected error occurred" };

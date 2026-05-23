@@ -107,12 +107,20 @@ export default function RaiseConcernButton({ serviceId }: RaiseConcernButtonProp
 
     setError(null);
     startTransition(async () => {
-      const res = await raiseConcernAction(formData);
-      if (res.success) {
-        setDone(true);
-        toast.success("Concern raised successfully. Our team will review it.");
-      } else {
-        setError(res.error || "Failed to raise concern. Please try again.");
+      try {
+        const res = await raiseConcernAction(formData);
+        if (res.success) {
+          setDone(true);
+          toast.success("Concern raised successfully. Our team will review it.");
+        } else {
+          setError(res.error || "Failed to raise concern. Please try again.");
+          toast.error(res.error || "Failed to raise concern.");
+        }
+      } catch (err: unknown) {
+        console.error("Raise concern failed", err);
+        const errMsg = err instanceof Error ? err.message : "An unexpected error occurred.";
+        setError(errMsg);
+        toast.error(errMsg);
       }
     });
   };

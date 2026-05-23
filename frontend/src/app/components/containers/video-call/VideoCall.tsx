@@ -123,13 +123,14 @@ export default function VideoCall({
 
     if (onJoinRef.current) {
       onJoinRef.current(roomId)
-        .then((res: any) => {
-          if (res && res.success === false) {
-            console.error("Failed to join meeting:", res.error);
+        .then((res) => {
+          const joinRes = res as { success?: boolean; error?: string } | null;
+          if (joinRes && joinRes.success === false) {
+            console.error("Failed to join meeting:", joinRes.error);
             window.location.replace(`/${role.toLowerCase()}/meetings/${roomId}`);
           }
         })
-        .catch(err => {
+        .catch((err: unknown) => {
           console.error("Error calling join API:", err);
           window.location.replace(`/${role.toLowerCase()}/meetings/${roomId}`);
         });

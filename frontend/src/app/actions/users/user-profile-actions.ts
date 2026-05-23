@@ -112,9 +112,16 @@ export async function updateUserProfileAction(userId: string, updates: ProfileUp
   } catch (err: unknown) {
     if (axios.isAxiosError(err)) {
       console.error("Profile update failed", err.response?.data || err);
+      if (err.response?.status === 413) {
+        return {
+          success: false,
+          message: "Profile image is too large for the backend server to process. Please try a smaller image.",
+        };
+      }
+      const serverMessage = err.response?.data?.message || err.response?.data?.error;
       return {
         success: false,
-        message: err.response?.data?.message || "Profile update failed",
+        message: serverMessage || `Profile update failed (Status ${err.response?.status || "Network Error"}).`,
       };
     }
     console.error("Profile update failed", err);
@@ -127,23 +134,34 @@ export async function updateUserProfileAction(userId: string, updates: ProfileUp
 
 
 export async function uploadDocumentAction(userId: string, file: File) {
-  const token = (await cookies()).get("accessToken")?.value;
+  try {
+    const token = (await cookies()).get("accessToken")?.value;
 
-  const formData = new FormData();
-  formData.append("file", file);
+    const formData = new FormData();
+    formData.append("file", file);
 
-  const res = await axios.post(
-    `${BASE_URL}/api/upload/worker/${userId}/document`,
-    formData,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "multipart/form-data",
-      },
+    const res = await axios.post(
+      `${BASE_URL}/api/upload/worker/${userId}/document`,
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    return res.data.url;
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      if (error.response?.status === 413) {
+        throw new Error("File is too large for the backend server to process. Please try a smaller file.");
+      }
+      const serverMessage = error.response?.data?.message || error.response?.data?.error;
+      throw new Error(serverMessage || `Upload failed with status code ${error.response?.status || "Network Error"}`);
     }
-  );
-
-  return res.data.url;
+    throw new Error(error instanceof Error ? error.message : "Document upload failed");
+  }
 }
 
 

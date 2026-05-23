@@ -1114,6 +1114,19 @@ const UserProfile = () => {
     const file = e.target.files?.[0];
     if (!file || !currentUser) return;
 
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image is too large. Maximum size allowed is 5MB.");
+      return;
+    }
+
+    // Validate file type
+    const allowedTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error("Invalid file format. Please upload JPEG, PNG, or WEBP.");
+      return;
+    }
+
     const preview = URL.createObjectURL(file);
 
     // 1. Optimistic Update
