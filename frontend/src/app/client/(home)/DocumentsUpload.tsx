@@ -294,21 +294,33 @@ const WorkerVerificationFlow: React.FC<WorkerVerificationFlowProps> = ({
       const certUrls: string[] = [];
 
       if (idFront) {
-        const url = await uploadDocumentAction(userId, idFront);
-        docUrls.push(url);
+        const uploadRes = await uploadDocumentAction(userId, idFront);
+        if (!uploadRes.success || !uploadRes.url) {
+          throw new Error(uploadRes.error || "Failed to upload ID Front");
+        }
+        docUrls.push(uploadRes.url);
       }
       if (idBack) {
-        const url = await uploadDocumentAction(userId, idBack);
-        docUrls.push(url);
+        const uploadRes = await uploadDocumentAction(userId, idBack);
+        if (!uploadRes.success || !uploadRes.url) {
+          throw new Error(uploadRes.error || "Failed to upload ID Back");
+        }
+        docUrls.push(uploadRes.url);
       }
 
       if (certFront) {
-        const url = await uploadDocumentAction(userId, certFront);
-        certUrls.push(url);
+        const uploadRes = await uploadDocumentAction(userId, certFront);
+        if (!uploadRes.success || !uploadRes.url) {
+          throw new Error(uploadRes.error || "Failed to upload Certificate Front");
+        }
+        certUrls.push(uploadRes.url);
       }
       if (certBack) {
-        const url = await uploadDocumentAction(userId, certBack);
-        certUrls.push(url);
+        const uploadRes = await uploadDocumentAction(userId, certBack);
+        if (!uploadRes.success || !uploadRes.url) {
+          throw new Error(uploadRes.error || "Failed to upload Certificate Back");
+        }
+        certUrls.push(uploadRes.url);
       }
 
       const updatePayload: { documents?: string[]; certificates?: string[] } = {};
