@@ -8,6 +8,7 @@ export interface IWorkerScheduleDocument extends Document {
   isBooked: boolean;
   isAvailable: boolean;
   serviceId?: string;
+  lockedUntil?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -24,6 +25,7 @@ const WorkerScheduleSchema = new Schema<IWorkerScheduleDocument>(
     isBooked: { type: Boolean, default: false },
     isAvailable: { type: Boolean, required: true },
     serviceId: { type: String },
+    lockedUntil: { type: Date },
   },
   { timestamps: true }
 );

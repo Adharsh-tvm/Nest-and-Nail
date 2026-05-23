@@ -34,7 +34,7 @@ export class JoinVideoCallUseCase implements IJoinVideoCallUseCase {
                 ServiceStatus.NO_SHOW,
                 ServiceStatus.WORKER_ABSENT,
                 ServiceStatus.CLIENT_ABSENT
-            ].includes(service.status as ServiceStatus) ||
+            ].includes(service.status) ||
             service.videoCall.status === VideoCallStatus.ENDED ||
             service.videoCall.endedAt;
 

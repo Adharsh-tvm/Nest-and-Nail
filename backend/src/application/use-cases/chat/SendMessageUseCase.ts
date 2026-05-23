@@ -27,7 +27,7 @@ export class SendMessageUseCase {
             receiverId: data.receiverId,
             message: data.message,
             attachmentUrl: data.attachmentUrl,
-            messageType: data.messageType || "text",
+            messageType: data.messageType ?? "text",
             isRead: false,
             createdAt: new Date(),
         };

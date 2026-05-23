@@ -8,6 +8,7 @@ export interface WorkerSchedule {
   isBooked: boolean;
   isAvailable: boolean; 
   serviceId?: string;
+  lockedUntil?: Date;
   createdAt?: Date;
   updatedAt?: Date;
 }

@@ -37,9 +37,9 @@ export class ChatController {
             chatId,
             senderId,
             receiverId,
-            message: message || "",
+            message: message ?? "",
             attachmentUrl,
-            messageType: messageType || "text"
+            messageType: messageType ?? "text"
         });
 
         res.status(HttpStatusCode.OK).json(

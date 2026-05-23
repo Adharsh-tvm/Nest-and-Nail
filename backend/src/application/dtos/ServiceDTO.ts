@@ -3,6 +3,7 @@ import { ServiceStatus } from "../../shared/enums/serviceEnums";
 import { SlotType } from "../../shared/enums/slotEnums";
 
 export interface CreateServiceDTO {
+  serviceId?: string;
   clientId: string;
   workerId: string;
   category: string;

@@ -7,6 +7,7 @@ import { IWorkerScheduleRepository } from "../../../domain/repositories/IWorkerS
 import { IBaseRepository } from "../../../domain/repositories/IBaseRepository";
 import { User } from "../../../domain/entities/User";
 import { IClientWorkerRestrictionRepository } from "../../../domain/repositories/IClientWorkerRestrictionRepository";
+import { DomainError } from "../../../domain/errors/DomainError";
 
 export class BookWorkerUseCase implements IBookWorkerUseCase {
 
@@ -122,10 +123,17 @@ export class BookWorkerUseCase implements IBookWorkerUseCase {
 
       if (existing) {
         if (!existing.isAvailable) {
-          throw new Error(`Worker is unavailable on ${slot.date.toISOString().split('T')[0]}`);
+          throw new DomainError(
+            `Worker is unavailable on ${slot.date.toISOString().split('T')[0]}`,
+            "WORKER_UNAVAILABLE"
+          );
         }
-        if (existing.isBooked) {
-          throw new Error(`Slot already booked for date: ${slot.date.toISOString().split('T')[0]}`);
+        const isLocked = existing.lockedUntil && new Date() < new Date(existing.lockedUntil);
+        if (existing.isBooked || isLocked) {
+          throw new DomainError(
+            `Slot already booked or temporarily reserved for date: ${slot.date.toISOString().split('T')[0]}`,
+            "SLOT_LOCKED_OR_BOOKED"
+          );
         }
       }
     }
@@ -137,6 +145,32 @@ export class BookWorkerUseCase implements IBookWorkerUseCase {
     }
 
     const serviceEntity = ServiceMapper.toEntity(dto);
+
+    // Temporarily lock the slots for 10 minutes to prevent double booking
+    const tenMinutesFromNow = new Date(Date.now() + 10 * 60 * 1000);
+    const lockedSlots: typeof dto.selectedSlots = [];
+    try {
+      for (const slot of dto.selectedSlots) {
+        await this._scheduleRepo.lockSlot(
+          dto.workerId,
+          slot.date,
+          slot.slotType,
+          tenMinutesFromNow,
+          serviceEntity.serviceId
+        );
+        lockedSlots.push(slot);
+      }
+    } catch (error) {
+      // Rollback locked slots on failure to prevent stale locks
+      for (const slot of lockedSlots) {
+        try {
+          await this._scheduleRepo.unlockSlot(dto.workerId, slot.date, slot.slotType);
+        } catch (unlockError) {
+          console.error("Failed to unlock slot during rollback", unlockError);
+        }
+      }
+      throw error;
+    }
 
     const created = await this._serviceRepo.create(serviceEntity);
 

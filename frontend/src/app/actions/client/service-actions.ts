@@ -4,6 +4,8 @@ import {
   getWorkerAvailabilityApi,
   getWorkerAvailabilityBulkApi,
   bookWorkerApi,
+  lockWorkerSlotsApi,
+  unlockWorkerSlotsApi,
 } from "@/sources/api/service/service.api";
 import {
   BookingPayload,
@@ -116,4 +118,38 @@ export async function cancelServiceAction(
         console.error(`Failed to cancel service ${serviceId}`, error);
         return { success: false, error: (error instanceof Error ? error.message : undefined) || "Failed to cancel service" };
     }
+}
+
+export async function lockWorkerSlotsAction(data: {
+  workerId: string;
+  selectedSlots: { date: string; slotType: string }[];
+  serviceId: string;
+}): Promise<{ success: boolean; error?: string }> {
+  try {
+    const res = await lockWorkerSlotsApi(data);
+    if (!res.success) {
+      return { success: false, error: res.message };
+    }
+    return { success: true };
+  } catch (error: unknown) {
+    console.error("lockWorkerSlotsAction error:", error);
+    return { success: false, error: (error instanceof Error ? error.message : undefined) || "Failed to lock slots" };
+  }
+}
+
+export async function unlockWorkerSlotsAction(data: {
+  workerId: string;
+  selectedSlots: { date: string; slotType: string }[];
+  serviceId: string;
+}): Promise<{ success: boolean; error?: string }> {
+  try {
+    const res = await unlockWorkerSlotsApi(data);
+    if (!res.success) {
+      return { success: false, error: res.message };
+    }
+    return { success: true };
+  } catch (error: unknown) {
+    console.error("unlockWorkerSlotsAction error:", error);
+    return { success: false, error: (error instanceof Error ? error.message : undefined) || "Failed to unlock slots" };
+  }
 }

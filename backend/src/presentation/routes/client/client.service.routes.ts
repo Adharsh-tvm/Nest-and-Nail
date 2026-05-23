@@ -12,6 +12,10 @@ export function createClientServiceRoutes(
 
     router.post("/book", authMiddleware.verify.bind(authMiddleware), (req, res, next) => { void clientServiceController.bookWorker(req, res, next); });
 
+    router.post("/lock-slots", authMiddleware.verify.bind(authMiddleware), (req, res, next) => { void clientServiceController.lockSlots(req, res, next); });
+
+    router.post("/unlock-slots", authMiddleware.verify.bind(authMiddleware), (req, res, next) => { void clientServiceController.unlockSlots(req, res, next); });
+
     router.get("/history", authMiddleware.verify.bind(authMiddleware), (req, res, next) => { void clientServiceController.getServiceHistory(req, res, next); });
 
     router.get("/ongoing", authMiddleware.verify.bind(authMiddleware), (req, res, next) => { void clientServiceController.getOngoingServices(req, res, next); });

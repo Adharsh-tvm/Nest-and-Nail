@@ -18,6 +18,7 @@ export interface SlotAvailability {
 }
 
 export interface BookingPayload {
+  serviceId?: string;
   workerId: string;
   category: string;
   date: string; // ISO date string YYYY-MM-DD

@@ -21,6 +21,7 @@ import { CheckCircle2, ChevronRight, ChevronLeft, CreditCard, Wallet, RotateCcw 
 import { loadRazorpay } from "@/utils/loadRazorpay";
 import { createPaymentOrderAction, verifyPaymentAction, processWalletPaymentAction } from "@/app/actions/client/payment-actions";
 import { getWalletBalanceAction } from "@/app/actions/client/wallet-actions";
+import { lockWorkerSlotsAction, unlockWorkerSlotsAction } from "@/app/actions/client/service-actions";
 
 interface BookingSectionProps {
   worker: User;
@@ -78,6 +79,101 @@ export function BookingSection({ worker }: BookingSectionProps) {
   const [viewYear, setViewYear] = useState(new Date().getFullYear());
   const [viewMonth, setViewMonth] = useState(new Date().getMonth());
 
+  // Generate a unique serviceId for this booking wizard flow session
+  const [serviceId] = useState(() => {
+    if (typeof window !== "undefined" && window.crypto && window.crypto.randomUUID) {
+      return window.crypto.randomUUID();
+    }
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+      const r = (Math.random() * 16) | 0,
+        v = c == "x" ? r : (r & 0x3) | 0x8;
+      return v.toString(16);
+    });
+  });
+
+  const handleSlotChange = async (newSlots: Record<string, SlotType>) => {
+    // 1. Identify which slots were added and which were removed
+    const addedSlots: { date: string; slotType: SlotType }[] = [];
+    const removedSlots: { date: string; slotType: SlotType }[] = [];
+
+    // Check for removed slots
+    for (const [date, oldSlotType] of Object.entries(selectedSlots)) {
+      if (!newSlots[date] || newSlots[date] !== oldSlotType) {
+        removedSlots.push({ date, slotType: oldSlotType });
+      }
+    }
+
+    // Check for added/modified slots
+    for (const [date, newSlotType] of Object.entries(newSlots)) {
+      if (!selectedSlots[date] || selectedSlots[date] !== newSlotType) {
+        addedSlots.push({ date, slotType: newSlotType });
+      }
+    }
+
+    // 2. Handle removals first (always safe to unlock)
+    if (removedSlots.length > 0) {
+      try {
+        await unlockWorkerSlotsAction({
+          workerId: worker.userId || worker.id,
+          selectedSlots: removedSlots,
+          serviceId
+        });
+      } catch (err) {
+        console.error("Failed to unlock slots", err);
+      }
+    }
+
+    // 3. Handle additions (need to lock atomically on backend)
+    if (addedSlots.length > 0) {
+      try {
+        const lockRes = await lockWorkerSlotsAction({
+          workerId: worker.userId || worker.id,
+          selectedSlots: addedSlots,
+          serviceId
+        });
+
+        if (!lockRes.success) {
+          const displayErr = lockRes.error?.toLowerCase().includes("lock") || lockRes.error?.toLowerCase().includes("failed")
+            ? "This slot is already booked or temporarily reserved."
+            : lockRes.error || "This slot is already booked or temporarily reserved.";
+          toast.error(displayErr);
+          // Revert selection by keeping only the ones that didn't change
+          const revertedSlots = { ...newSlots };
+          for (const slot of addedSlots) {
+            delete revertedSlots[slot.date];
+          }
+          setSelectedSlots(revertedSlots);
+          return;
+        }
+      } catch {
+        toast.error("This slot is already booked or temporarily reserved.");
+        const revertedSlots = { ...newSlots };
+        for (const slot of addedSlots) {
+          delete revertedSlots[slot.date];
+        }
+        setSelectedSlots(revertedSlots);
+        return;
+      }
+    }
+
+    // 4. Update the state with new slots if all additions succeeded
+    setSelectedSlots(newSlots);
+  };
+
+  // Unlock slots on unmount to release them immediately if navigating away
+  useEffect(() => {
+    return () => {
+      const slotsArray = Object.entries(selectedSlots).map(([date, slotType]) => ({ date, slotType }));
+      if (slotsArray.length > 0) {
+        unlockWorkerSlotsAction({
+          workerId: worker.userId || worker.id,
+          selectedSlots: slotsArray,
+          serviceId
+        }).catch(err => console.error("Cleanup unlock failed", err));
+      }
+    };
+  }, [selectedSlots, worker.userId, worker.id, serviceId]);
+
   // Auto-clear error when dates change
   useEffect(() => {
     resetBookingError();
@@ -108,6 +204,7 @@ export function BookingSection({ worker }: BookingSectionProps) {
     const finalSlot = slotsArray[0].slotType;
 
     book({
+      serviceId,
       workerId: worker.userId || worker.id,
       category: selectedCategory,
       date: slotsArray[0].date,
@@ -458,9 +555,7 @@ export function BookingSection({ worker }: BookingSectionProps) {
             <h2 className="text-2xl font-black text-gray-900 mb-6 text-center">Select Start Date</h2>
             <CalendarSelector
               selectedSlots={selectedSlots}
-              onSlotChange={(newSlots) => {
-                setSelectedSlots(newSlots);
-              }}
+              onSlotChange={handleSlotChange}
               availabilityData={Object.fromEntries(calendarHighlights.entries()) as Record<string, DateAvailabilitySummary>}
               isLoadingDate={isLoadingDate}
               numberOfDays={numberOfDays || 1}

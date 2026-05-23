@@ -7,6 +7,7 @@ import { HttpStatusCode } from "../../../shared/enums/httpCodes";
 import { ResponseHandler } from "../../../shared/responses/ApiResponse";
 import { ICancelServiceUseCase } from "../../../application/interfaces/service/ICancelServiceUseCase";
 import { SlotType } from "../../../shared/enums/slotEnums";
+import { IWorkerScheduleRepository } from "../../../domain/repositories/IWorkerScheduleRepository";
 
 export class ClientServiceController {
     constructor(
@@ -14,7 +15,8 @@ export class ClientServiceController {
         private readonly _getByIdUseCase: IGetClientServiceByIdUseCase,
         private readonly _getOngoingUseCase: IGetClientOngoingServicesUseCase,
         private readonly _bookWorkerUseCase: IBookWorkerUseCase,
-        private readonly _cancelServiceUseCase: ICancelServiceUseCase
+        private readonly _cancelServiceUseCase: ICancelServiceUseCase,
+        private readonly _scheduleRepo: IWorkerScheduleRepository
     ) { }
 
     bookWorker = async (req: Request, res: Response, next: NextFunction) => {
@@ -193,4 +195,82 @@ export class ClientServiceController {
             res.status(HttpStatusCode.BAD_REQUEST).json(ResponseHandler.error(message, error));
         }
     }
+
+    lockSlots = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const { workerId, selectedSlots, serviceId } = req.body as Partial<{
+                workerId: string;
+                selectedSlots: { date: string | Date; slotType: string }[];
+                serviceId: string;
+            }>;
+
+            if (!workerId || !selectedSlots || !serviceId) {
+                return res
+                    .status(HttpStatusCode.BAD_REQUEST)
+                    .json(ResponseHandler.error("workerId, selectedSlots, and serviceId are required"));
+            }
+
+            const tenMinutesFromNow = new Date(Date.now() + 10 * 60 * 1000);
+            const lockedSlots: typeof selectedSlots = [];
+            try {
+                for (const slot of selectedSlots) {
+                    await this._scheduleRepo.lockSlot(
+                        workerId,
+                        new Date(slot.date),
+                        slot.slotType,
+                        tenMinutesFromNow,
+                        serviceId
+                    );
+                    lockedSlots.push(slot);
+                }
+            } catch (error) {
+                // Rollback locked slots on failure to prevent stale locks
+                for (const slot of lockedSlots) {
+                    try {
+                        await this._scheduleRepo.unlockSlot(workerId, new Date(slot.date), slot.slotType, serviceId);
+                    } catch (unlockError) {
+                        console.error("Failed to unlock slot during rollback", unlockError);
+                    }
+                }
+                throw error;
+            }
+
+            res.status(HttpStatusCode.OK).json(
+                ResponseHandler.success(null, "Slots locked successfully")
+            );
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    unlockSlots = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const { workerId, selectedSlots, serviceId } = req.body as Partial<{
+                workerId: string;
+                selectedSlots: { date: string | Date; slotType: string }[];
+                serviceId: string;
+            }>;
+
+            if (!workerId || !selectedSlots || !serviceId) {
+                return res
+                    .status(HttpStatusCode.BAD_REQUEST)
+                    .json(ResponseHandler.error("workerId, selectedSlots, and serviceId are required"));
+            }
+
+            for (const slot of selectedSlots) {
+                await this._scheduleRepo.unlockSlot(
+                    workerId,
+                    new Date(slot.date),
+                    slot.slotType,
+                    serviceId
+                );
+            }
+
+            res.status(HttpStatusCode.OK).json(
+                ResponseHandler.success(null, "Slots unlocked successfully")
+            );
+        } catch (error) {
+            next(error);
+        }
+    };
 }

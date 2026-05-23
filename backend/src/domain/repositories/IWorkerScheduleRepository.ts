@@ -9,4 +9,6 @@ export interface IWorkerScheduleRepository {
   markAsBooked(workerId: string, date: Date, slotType: string, serviceId: string): Promise<void>;
   unmarkAsBooked(workerId: string, date: Date, slotType: string): Promise<void>;
   findBlockedAndBookedDates(workerId: string): Promise<WorkerSchedule[]>;
+  lockSlot(workerId: string, date: Date, slotType: string, lockedUntil: Date, serviceId: string): Promise<void>;
+  unlockSlot(workerId: string, date: Date, slotType: string, serviceId?: string): Promise<void>;
 }

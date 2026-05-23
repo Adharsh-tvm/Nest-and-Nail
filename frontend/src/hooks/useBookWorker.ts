@@ -17,6 +17,7 @@ export function useBookWorker(refetchAvailability: () => Promise<SlotAvailabilit
 
   const book = useCallback(
     async ({
+      serviceId,
       workerId,
       category,
       date,
@@ -29,6 +30,7 @@ export function useBookWorker(refetchAvailability: () => Promise<SlotAvailabilit
       description,
       address,
     }: {
+      serviceId?: string;
       workerId: string;
       category: string;
       date: string;
@@ -69,7 +71,7 @@ export function useBookWorker(refetchAvailability: () => Promise<SlotAvailabilit
       }
 
       const payload: BookingPayload = { 
-        workerId, category, date, selectedSlots, slotType, numberOfDays, numberOfWorkers, pricePerWorker, title, description, address 
+        serviceId, workerId, category, date, selectedSlots, slotType, numberOfDays, numberOfWorkers, pricePerWorker, title, description, address 
       };
       const res = await bookWorkerAction(payload);
 

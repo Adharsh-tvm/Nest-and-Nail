@@ -31,7 +31,7 @@ export class ServiceMapper {
 
     return {
       id: uuidv4(),
-      serviceId: uuidv4(),
+      serviceId: dto.serviceId ?? uuidv4(),
 
       clientId: dto.clientId,
       workerId: dto.workerId,

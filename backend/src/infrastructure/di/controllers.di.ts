@@ -168,7 +168,8 @@ export class ControllerDI {
                 this._useCases.getClientServiceByIdUseCase,
                 this._useCases.getClientOngoingServicesUseCase,
                 this._useCases.bookWorkerUseCase,
-                this._useCases.cancelServiceUseCase
+                this._useCases.cancelServiceUseCase,
+                this._infra.workerScheduleRepo
             ));
     }
 

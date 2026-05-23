@@ -11,7 +11,7 @@ export class GetWorkerBlockedDatesUseCase implements IGetWorkerBlockedDatesUseCa
     return data.map((slot) => ({
       date: slot.date,
       slotType: slot.slotType,
-      isBooked: slot.isBooked,
+      isBooked: slot.isBooked || (slot.lockedUntil ? new Date() < new Date(slot.lockedUntil) : false),
       isAvailable: slot.isAvailable,
     }));
   }

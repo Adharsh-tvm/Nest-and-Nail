@@ -140,3 +140,89 @@ export async function bookWorkerApi(
     };
   }
 }
+
+/**
+ * Lock selected slots for a worker temporarily.
+ * POST /api/client/services/lock-slots
+ */
+export async function lockWorkerSlotsApi(data: {
+  workerId: string;
+  selectedSlots: { date: string; slotType: string }[];
+  serviceId: string;
+}): Promise<ApiResponse<null>> {
+  try {
+    const response = await axiosInstance.post<ApiResponse<null>>(
+      "/api/client/services/lock-slots",
+      data,
+      { withCredentials: true }
+    );
+    if (!response.data.success) {
+      return {
+        success: false,
+        message: response.data.message || "Failed to lock slots",
+        error: null,
+      };
+    }
+    return {
+      success: true,
+      message: response.data.message || "Slots locked successfully",
+      payload: null,
+    };
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      return {
+        success: false,
+        message: error.response?.data?.message || "Failed to lock slots",
+        error: error.response?.data?.error || null,
+      };
+    }
+    return {
+      success: false,
+      message: "An unexpected error occurred",
+      error: null,
+    };
+  }
+}
+
+/**
+ * Unlock selected slots for a worker.
+ * POST /api/client/services/unlock-slots
+ */
+export async function unlockWorkerSlotsApi(data: {
+  workerId: string;
+  selectedSlots: { date: string; slotType: string }[];
+  serviceId: string;
+}): Promise<ApiResponse<null>> {
+  try {
+    const response = await axiosInstance.post<ApiResponse<null>>(
+      "/api/client/services/unlock-slots",
+      data,
+      { withCredentials: true }
+    );
+    if (!response.data.success) {
+      return {
+        success: false,
+        message: response.data.message || "Failed to unlock slots",
+        error: null,
+      };
+    }
+    return {
+      success: true,
+      message: response.data.message || "Slots unlocked successfully",
+      payload: null,
+    };
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      return {
+        success: false,
+        message: error.response?.data?.message || "Failed to unlock slots",
+        error: error.response?.data?.error || null,
+      };
+    }
+    return {
+      success: false,
+      message: "An unexpected error occurred",
+      error: null,
+    };
+  }
+}
