@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { DateAvailabilitySummary, SlotType } from "@/shared/types/serviceTypes";
+import toast from "react-hot-toast";
 
 interface CalendarSelectorProps {
   selectedSlots: Record<string, SlotType>;
@@ -328,7 +329,7 @@ export function CalendarSelector({
                onClick={() => {
                  const newSlots = { ...selectedSlots };
                  if (Object.keys(newSlots).length >= numberOfDays && !newSlots[focusedDate]) {
-                    alert(`You have already selected ${numberOfDays} day(s). Deselect a date first.`);
+                    toast.error(`You have already selected ${numberOfDays} day(s). Deselect a date first.`);
                     return;
                  }
                  newSlots[focusedDate] = SlotType.MORNING_HALF;
@@ -355,7 +356,7 @@ export function CalendarSelector({
                onClick={() => {
                  const newSlots = { ...selectedSlots };
                  if (Object.keys(newSlots).length >= numberOfDays && !newSlots[focusedDate]) {
-                    alert(`You have already selected ${numberOfDays} day(s). Deselect a date first.`);
+                    toast.error(`You have already selected ${numberOfDays} day(s). Deselect a date first.`);
                     return;
                  }
                  newSlots[focusedDate] = SlotType.EVENING_HALF;
@@ -382,7 +383,7 @@ export function CalendarSelector({
                onClick={() => {
                  const newSlots = { ...selectedSlots };
                  if (Object.keys(newSlots).length >= numberOfDays && !newSlots[focusedDate]) {
-                    alert(`You have already selected ${numberOfDays} day(s). Deselect a date first.`);
+                    toast.error(`You have already selected ${numberOfDays} day(s). Deselect a date first.`);
                     return;
                  }
                  newSlots[focusedDate] = SlotType.FULL_DAY;
