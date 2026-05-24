@@ -21,7 +21,7 @@ export default function WorkerCard({ worker, index }: WorkerCardProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: index * 0.05 }}
             whileHover={{ y: -8, scale: 1.01 }}
-            className="group bg-white rounded-[2rem] border border-gray-100 overflow-hidden hover:premium-shadow transition-all duration-500 flex flex-col relative h-full animate-fade-in"
+            className="group bg-white rounded-[2rem] border border-gray-100 overflow-hidden hover:premium-shadow transition-all duration-500 flex flex-col relative h-full animate-fade-in w-full max-w-md mx-auto sm:max-w-none sm:mx-0"
         >
             {/* Premium Badge */}
             {!!worker.rating && worker.rating >= 4.5 && (

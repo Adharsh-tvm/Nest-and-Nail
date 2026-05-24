@@ -68,13 +68,13 @@ export default async function WorkersPage({
             <div className="max-w-7xl mx-auto px-4 py-10 relative z-20 flex flex-col gap-8">
                 {/* ── Top Search Bar ── */}
                 <Suspense fallback={<div className="h-16 bg-white border border-gray-100 rounded-[2rem] animate-pulse" />}>
-                    <div className="max-w-4xl w-full">
+                    <div className="max-w-4xl w-full mx-auto lg:mx-0">
                         <WorkerSearchBar />
                     </div>
                 </Suspense>
 
                 {/* ── Main Layout: Sidebar + Content ── */}
-                <div className="flex flex-col lg:flex-row gap-5 items-start">
+                <div className="flex flex-col lg:flex-row gap-5 items-center lg:items-start w-full">
 
                     {/* Left Sidebar */}
                     <div className="w-full lg:w-64 shrink-0 sticky top-5">
@@ -84,7 +84,7 @@ export default async function WorkersPage({
                     </div>
 
                     {/* Right Content */}
-                    <div className="flex-1 flex flex-col gap-4">
+                    <div className="flex-1 w-full flex flex-col gap-4">
 
                         {/* Result count / active filter summary */}
                         <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center glass px-8 py-5 border border-white/20 rounded-[2.5rem] shadow-sm">

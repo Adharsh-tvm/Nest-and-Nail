@@ -104,7 +104,7 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
       {/* Sidebar Container */}
       <aside
         className={`fixed top-0 left-0 h-screen z-50 transition-all duration-300 ease-in-out ${isOpen ? "w-72" : "w-0 lg:w-20"
-          } flex flex-col`}
+          } flex flex-col overflow-x-hidden`}
       >
         {/* Glassmorphism Background Layer */}
         <div className="absolute inset-0 bg-white/90 backdrop-blur-xl border-r border-white/20 shadow-2xl" />
