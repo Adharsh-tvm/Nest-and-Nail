@@ -87,7 +87,7 @@ export default async function WorkersPage({
                     <div className="flex-1 flex flex-col gap-4">
 
                         {/* Result count / active filter summary */}
-                        <div className="flex items-center justify-between glass px-8 py-5 border border-white/20 rounded-[2.5rem] shadow-sm">
+                        <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center glass px-8 py-5 border border-white/20 rounded-[2.5rem] shadow-sm">
                             <div className="flex items-center gap-4">
                                 <div className="p-2.5 bg-primary/5 text-primary rounded-xl">
                                     <Briefcase size={18} />

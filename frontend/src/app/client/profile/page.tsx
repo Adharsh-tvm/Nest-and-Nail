@@ -1225,8 +1225,8 @@ const UserProfile = () => {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="border-b border-gray-200 mb-10">
-          <nav className="flex space-x-10" aria-label="Tabs">
+        <div className="border-b border-gray-200 mb-10 overflow-x-auto scrollbar-hide">
+          <nav className="flex space-x-8 sm:space-x-10 min-w-max pb-3" aria-label="Tabs">
             {[
               { id: "profile", label: "Profile", icon: UserIcon },
               { id: "addresses", label: "Addresses", icon: MapPin },
@@ -1240,7 +1240,7 @@ const UserProfile = () => {
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as Tab)}
                   className={`
-                                group inline-flex items-center py-5 px-1 border-b-2 font-medium text-base transition-all
+                                group inline-flex items-center py-3 px-1 border-b-2 font-medium text-base transition-all whitespace-nowrap
                                 ${
                                   isActive
                                     ? "border-[#1B4332] text-[#1B4332]"

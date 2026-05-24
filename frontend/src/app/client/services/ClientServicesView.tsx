@@ -170,7 +170,7 @@ export default function ClientServicesView({ ongoing, history, cancelled, worker
         <div className="space-y-6">
 
             {/* ── Tab Bar ── */}
-            <div className="flex items-center gap-1 bg-gray-100 rounded-2xl p-1.5">
+            <div className="flex items-center gap-1 bg-gray-100 rounded-2xl p-1.5 overflow-x-auto scrollbar-hide">
                 {([
                     { id: 'active' as TabId, label: 'Active', count: localOngoing.length, icon: <Briefcase className="w-4 h-4" /> },
                     { id: 'history' as TabId, label: 'Completed', count: history.length, icon: <CheckCircle2 className="w-4 h-4" /> },
@@ -179,7 +179,7 @@ export default function ClientServicesView({ ongoing, history, cancelled, worker
                     <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-sm font-bold transition-all ${
+                        className={`flex-1 min-w-max flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${
                             activeTab === tab.id
                                 ? tab.id === 'cancelled'
                                     ? 'bg-white text-red-600 shadow-sm'

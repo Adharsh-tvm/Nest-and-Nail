@@ -120,7 +120,7 @@ export default async function WorkerDetailPage({
             <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 24px 64px' }}>
                 <div style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))',
                     gap: '28px',
                     marginTop: '-72px',
                     position: 'relative',

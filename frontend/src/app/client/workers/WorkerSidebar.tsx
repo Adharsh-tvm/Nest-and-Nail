@@ -28,6 +28,7 @@ export default function WorkerSidebar({ categories, activeCategory }: WorkerSide
     const [pendingLat, setPendingLat] = useState<number | null>(null);
     const [pendingLng, setPendingLng] = useState<number | null>(null);
     const [isOnline, setIsOnline] = useState(false);
+    const [isFiltersOpen, setIsFiltersOpen] = useState(false);
     // isMounted prevents createPortal from running on the server
     const [isMounted, setIsMounted] = useState(false);
     useEffect(() => { setIsMounted(true); }, []);
@@ -136,8 +137,26 @@ export default function WorkerSidebar({ categories, activeCategory }: WorkerSide
 
     return (
         <>
+            {/* Mobile Filter Toggle Button */}
+            <button
+                type="button"
+                onClick={() => setIsFiltersOpen(!isFiltersOpen)}
+                className="w-full lg:hidden flex items-center justify-between bg-white border border-gray-200 rounded-[1.5rem] px-5 py-4 shadow-sm hover:border-[#1B4332] transition-all font-bold text-gray-900 mb-4"
+            >
+                <div className="flex items-center gap-2">
+                    <SlidersHorizontal className="w-5 h-5 text-[#1B4332]" />
+                    <span>Filter Workers</span>
+                    {hasActiveFilters && (
+                        <span className="bg-[#1B4332] text-white text-[10px] font-bold rounded-full px-2 py-0.5 ml-2 uppercase tracking-wider">
+                            Active
+                        </span>
+                    )}
+                </div>
+                <ChevronRight className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${isFiltersOpen ? 'rotate-90' : ''}`} />
+            </button>
+
             {/* Sidebar */}
-            <aside className="w-full glass rounded-[2.5rem] border border-gray-100 p-8 flex flex-col gap-8 animate-fade-in shadow-sm hover:premium-shadow transition-all duration-500">
+            <aside className={`w-full glass rounded-[2.5rem] border border-gray-100 p-8 flex flex-col gap-8 animate-fade-in shadow-sm hover:premium-shadow transition-all duration-500 lg:flex ${isFiltersOpen ? 'flex' : 'hidden'}`}>
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3 text-gray-900 font-bold text-base">

@@ -383,20 +383,226 @@ const ClientHeader: React.FC = () => {
 
             {/* Mobile Menu Button */}
             {!_hasHydrated ? null : (
-              <button
-                className="md:hidden text-[#1B4332] p-2 hover:bg-gray-100 rounded-lg transition-colors ml-auto"
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              >
-                {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
-              </button>
+              <div className="flex items-center gap-2 md:hidden ml-auto">
+                <NotificationBell />
+                <button
+                  className="text-[#1B4332] p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                >
+                  {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+                </button>
+              </div>
             )}
           </div>
         </div>
 
-        {/* Mobile menu remains same (you can also wire Become Worker similarly if you want) */}
+        {/* Mobile menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden bg-white border-t border-gray-100 absolute w-full left-0 animate-in slide-in-from-top-5 z-40 shadow-xl max-h-[90vh] overflow-y-auto">
-            {/* ... your existing mobile menu code ... */}
+          <div className="md:hidden bg-white border-t border-gray-100 absolute w-full left-0 z-40 shadow-xl max-h-[90vh] overflow-y-auto divide-y divide-gray-100 animate-in slide-in-from-top-5 duration-200">
+            {/* Navigation Links */}
+            <div className="px-4 py-4 space-y-3">
+              {userMode === "worker" && (
+                <Link
+                  href="/worker/ongoing"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`block px-3 py-2 rounded-lg text-base font-semibold ${
+                    pathname?.startsWith("/worker/ongoing")
+                      ? "bg-emerald-50 text-[#1B4332]"
+                      : "text-gray-600 hover:bg-gray-50"
+                  }`}
+                >
+                  Ongoing
+                </Link>
+              )}
+              {userMode === "worker" && (
+                <Link
+                  href="/worker"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`block px-3 py-2 rounded-lg text-base font-semibold ${
+                    pathname === "/worker"
+                      ? "bg-emerald-50 text-[#1B4332]"
+                      : "text-gray-600 hover:bg-gray-50"
+                  }`}
+                >
+                  Dashboard
+                </Link>
+              )}
+              {userMode !== "worker" && (
+                <Link
+                  href="/client/workers"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`block px-3 py-2 rounded-lg text-base font-semibold ${
+                    pathname?.startsWith("/client/workers")
+                      ? "bg-emerald-50 text-[#1B4332]"
+                      : "text-gray-600 hover:bg-gray-50"
+                  }`}
+                >
+                  Workers
+                </Link>
+              )}
+              {userMode === "worker" ? (
+                <Link
+                  href="/worker/services"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`block px-3 py-2 rounded-lg text-base font-semibold ${
+                    pathname?.startsWith("/worker/services")
+                      ? "bg-emerald-50 text-[#1B4332]"
+                      : "text-gray-600 hover:bg-gray-50"
+                  }`}
+                >
+                  Services
+                </Link>
+              ) : (
+                <Link
+                  href="/client/services"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`block px-3 py-2 rounded-lg text-base font-semibold ${
+                    pathname?.startsWith("/client/services")
+                      ? "bg-[#1B4332]/5 text-[#1B4332]"
+                      : "text-gray-600 hover:bg-gray-50"
+                  }`}
+                >
+                  Services
+                </Link>
+              )}
+              {userMode === "worker" ? (
+                <Link
+                  href="/worker/meetings"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`block px-3 py-2 rounded-lg text-base font-semibold ${
+                    pathname?.startsWith("/worker/meetings")
+                      ? "bg-emerald-50 text-[#1B4332]"
+                      : "text-gray-600 hover:bg-gray-50"
+                  }`}
+                >
+                  Meetings
+                </Link>
+              ) : (
+                <Link
+                  href="/client/meetings"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`block px-3 py-2 rounded-lg text-base font-semibold ${
+                    pathname?.startsWith("/client/meetings")
+                      ? "bg-[#1B4332]/5 text-[#1B4332]"
+                      : "text-gray-600 hover:bg-gray-50"
+                  }`}
+                >
+                  Meetings
+                </Link>
+              )}
+            </div>
+
+            {/* Profile Info, Toggles & Buttons */}
+            <div className="px-6 py-5 space-y-4">
+              {/* User Identity */}
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-[#1B4332] text-white flex items-center justify-center shadow-sm overflow-hidden">
+                  {currentUser?.profileImageUrl && !imageError ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={currentUser.profileImageUrl}
+                      alt={currentUser.name || "User"}
+                      className="w-full h-full object-cover"
+                      onError={() => setImageError(true)}
+                    />
+                  ) : (
+                    <span className="font-bold text-sm">
+                      {currentUser?.name?.charAt(0).toUpperCase()}
+                    </span>
+                  )}
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-gray-800">{currentUser?.name}</p>
+                  <p className="text-xs text-gray-500 capitalize">{currentUser?.role}</p>
+                </div>
+              </div>
+
+              {/* Action: Become Worker / Pending */}
+              {!isVerified && !isPending && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    setIsWorkerFlowOpen(true);
+                  }}
+                  className="w-full flex items-center justify-center gap-2 bg-[#1B4332] text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#153426] transition-colors shadow-sm"
+                >
+                  {buttonPlaceHolder}
+                </button>
+              )}
+              {isPending && (
+                <button
+                  type="button"
+                  disabled
+                  className="w-full flex items-center justify-center gap-2 bg-amber-50 text-amber-700 px-4 py-2.5 rounded-xl text-xs font-semibold border border-amber-200 cursor-not-allowed"
+                >
+                  <Hammer size={14} />
+                  Verification Pending
+                </button>
+              )}
+
+              {/* Role Toggle for Verified Users */}
+              {isVerified && (
+                <div className="flex flex-col gap-2 pt-2">
+                  <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Switch Mode</span>
+                  <div
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      toggleUserMode();
+                    }}
+                    className={`relative flex items-center bg-gray-100 rounded-xl p-1 w-full h-11 border border-gray-200 shadow-inner ${
+                      isTogglingRole
+                        ? "opacity-50 cursor-wait"
+                        : "cursor-pointer"
+                    }`}
+                  >
+                    <div
+                      className={`absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-lg shadow-sm transition-all duration-300 ease-out ${
+                        userMode === "client"
+                          ? "left-1 bg-[#1B4332]"
+                          : "left-[calc(50%)] bg-[#DC2626]"
+                      }`}
+                    />
+                    <div
+                      className={`flex-1 z-10 text-center text-xs font-bold ${
+                        userMode === "client" ? "text-white" : "text-gray-500"
+                      }`}
+                    >
+                      Client
+                    </div>
+                    <div
+                      className={`flex-1 z-10 text-center text-xs font-bold ${
+                        userMode === "worker" ? "text-white" : "text-gray-500"
+                      }`}
+                    >
+                      Worker
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Logout and Profile */}
+            <div className="px-6 py-4 space-y-2">
+              <Link
+                href={profileHref}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center gap-3 px-3 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 rounded-lg"
+              >
+                <User size={16} className="text-gray-400" />
+                View Profile
+              </Link>
+              <button
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  handleLogout();
+                }}
+                className="w-full flex items-center gap-3 px-3 py-2 text-sm font-semibold text-[#DC2626] hover:bg-red-50 hover:text-red-700 rounded-lg text-left"
+              >
+                <LogOut size={16} />
+                Log Out
+              </button>
+            </div>
           </div>
         )}
       </nav>
