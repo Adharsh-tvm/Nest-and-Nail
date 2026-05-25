@@ -96,6 +96,13 @@ export class ServiceMapper {
         coordinates: service.location.coordinates
       },
       address: service.address,
+      title: service.title,
+      description: service.description,
+      numberOfDays: service.numberOfDays,
+      numberOfWorkers: service.numberOfWorkers,
+      startedAt: service.startedAt,
+      completedAt: service.completedAt,
+      updatedAt: service.updatedAt,
       videoCall: service.videoCall
         ? {
             roomId: service.videoCall.roomId,

@@ -81,6 +81,9 @@ export interface ServiceResponseDTO {
   description?: string;
   numberOfDays?: number;
   numberOfWorkers?: number;
+  startedAt?: Date;
+  completedAt?: Date;
+  updatedAt?: Date;
 
   videoCall?: {
     roomId: string;
