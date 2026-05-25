@@ -32,6 +32,13 @@ export class GetWorkerByIdUseCase implements IGetWorkerByIdUseCase {
 
     // Fetch reviews
     const reviews = await this._reviewRepository.findByWorkerId(id);
+    const totalRatings = reviews.length;
+    const totalSum = reviews.reduce((sum, r) => sum + r.rating, 0);
+    const rating = totalRatings > 0 ? totalSum / totalRatings : 0;
+
+    await this._workerRepository.updateById(id, { rating, totalRatings });
+    worker.rating = rating;
+    worker.totalRatings = totalRatings;
 
     // Fetch client names for reviews
     const reviewsWithClientNames = await Promise.all(reviews.map(async (review) => {

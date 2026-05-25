@@ -175,7 +175,7 @@ export const ServiceRouteMap: React.FC<ServiceRouteMapProps> = ({
 
       {/* Floating Driving Route HUD */}
       {drivingInfo && (
-        <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-md p-3 rounded-xl border border-slate-200/80 shadow-md z-[400] max-w-[190px] text-xs font-semibold text-slate-700 animate-in slide-in-from-top-2 duration-300">
+        <div className="absolute top-3 left-3 ml-10 bg-white/95 backdrop-blur-md p-3 rounded-xl border border-slate-200/80 shadow-md z-[400] max-w-[190px] text-xs font-semibold text-slate-700 animate-in slide-in-from-top-2 duration-300">
           <p className="text-[9px] font-extrabold text-indigo-600 uppercase tracking-widest mb-1 flex items-center gap-1">
             {fetchingRoute && <Loader2 className="w-2.5 h-2.5 animate-spin" />}
             🚘 Road Route

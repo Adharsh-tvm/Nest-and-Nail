@@ -490,6 +490,7 @@ export class UseCaseDI {
   get getAvailableWorkersUseCase(): IGetAvailableWorkersUseCase {
     return (this._getAvailableWorkersUseCase ??= new GetAvailableWorkersUseCase(
         this.infra.workerRepository,
+        this.infra.reviewRepository,
         this.infra.s3Service
       ));
   }
