@@ -137,14 +137,15 @@ export class WorkerScheduleRepository implements IWorkerScheduleRepository {
     const end = new Date(date);
     end.setUTCHours(23, 59, 59, 999);
 
-    // 1. Explicitly check if the slot is already booked or locked by another serviceId
-    const existing = await WorkerScheduleModel.findOne({
+    // 1. Explicitly check if any conflicting slot is already booked or locked by another serviceId
+    const conflictingTypes = this.getConflictingSlotTypes(slotType);
+    const initialConflicts = await WorkerScheduleModel.find({
       workerId,
-      slotType,
+      slotType: { $in: conflictingTypes },
       date: { $gte: start, $lte: end }
     }).lean();
 
-    if (existing) {
+    for (const existing of initialConflicts) {
       if (!existing.isAvailable) {
         throw new DomainError(
           `Worker is unavailable on ${date.toISOString().split('T')[0]}`,
@@ -203,6 +204,58 @@ export class WorkerScheduleRepository implements IWorkerScheduleRepository {
       }
       throw error;
     }
+
+    // 3. Post-lock verification to prevent race conditions from concurrent updates
+    const postConflicts = await WorkerScheduleModel.find({
+      workerId,
+      slotType: { $in: conflictingTypes },
+      date: { $gte: start, $lte: end }
+    }).lean();
+
+    let hasConflict = false;
+    let conflictError: DomainError | null = null;
+
+    for (const existing of postConflicts) {
+      if (existing.slotType === slotType && existing.serviceId === serviceId) {
+        continue;
+      }
+      if (!existing.isAvailable) {
+        hasConflict = true;
+        conflictError = new DomainError(
+          `Worker is unavailable on ${date.toISOString().split('T')[0]}`,
+          "WORKER_UNAVAILABLE"
+        );
+        break;
+      }
+      const isLocked = existing.lockedUntil && new Date() < new Date(existing.lockedUntil);
+      if (existing.isBooked || (isLocked && existing.serviceId !== serviceId)) {
+        hasConflict = true;
+        conflictError = new DomainError(
+          `Slot already booked or temporarily reserved for date: ${date.toISOString().split('T')[0]}`,
+          "SLOT_LOCKED_OR_BOOKED"
+        );
+        break;
+      }
+    }
+
+    if (hasConflict) {
+      // Rollback our own lock to prevent a stale/invalid lock state
+      await WorkerScheduleModel.findOneAndUpdate(
+        {
+          workerId,
+          slotType,
+          date: { $gte: start, $lte: end },
+          serviceId: serviceId
+        },
+        {
+          $unset: {
+            lockedUntil: 1,
+            serviceId: 1
+          }
+        }
+      );
+      throw conflictError || new DomainError(`Slot already booked or temporarily reserved for date: ${date.toISOString().split('T')[0]}`, "SLOT_LOCKED_OR_BOOKED");
+    }
   }
 
   async unlockSlot(workerId: string, date: Date, slotType: string, serviceId?: string): Promise<void> {
@@ -231,5 +284,18 @@ export class WorkerScheduleRepository implements IWorkerScheduleRepository {
         }
       }
     );
+  }
+
+  private getConflictingSlotTypes(slotType: string): string[] {
+    if (slotType === "FULL_DAY") {
+      return ["FULL_DAY", "MORNING_HALF", "EVENING_HALF"];
+    }
+    if (slotType === "MORNING_HALF") {
+      return ["FULL_DAY", "MORNING_HALF"];
+    }
+    if (slotType === "EVENING_HALF") {
+      return ["FULL_DAY", "EVENING_HALF"];
+    }
+    return [slotType];
   }
 }

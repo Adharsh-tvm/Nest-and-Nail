@@ -22,6 +22,7 @@ export class ClientServiceController {
     bookWorker = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const {
+                serviceId,
                 workerId,
                 category,
                 date,
@@ -34,6 +35,7 @@ export class ClientServiceController {
                 address,
                 pricePerWorker,
             } = req.body as {
+                serviceId?: string;
                 workerId: string;
                 category: string;
                 date: string;
@@ -92,6 +94,7 @@ export class ClientServiceController {
 
 
             const result = await this._bookWorkerUseCase.execute({
+                serviceId,
                 clientId,
                 workerId,
                 category,

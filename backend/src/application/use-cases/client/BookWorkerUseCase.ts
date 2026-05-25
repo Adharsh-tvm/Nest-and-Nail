@@ -115,13 +115,15 @@ export class BookWorkerUseCase implements IBookWorkerUseCase {
     }
 
     for (const slot of dto.selectedSlots) {
-      const existing = await this._scheduleRepo.findByWorkerDateAndSlot(
+      const schedules = await this._scheduleRepo.findByWorkerAndDate(
         dto.workerId,
-        slot.date,
-        slot.slotType
+        slot.date
       );
 
-      if (existing) {
+      const conflictingTypes = this.getConflictingSlotTypes(slot.slotType);
+      const conflictingSchedules = schedules.filter(s => conflictingTypes.includes(s.slotType));
+
+      for (const existing of conflictingSchedules) {
         if (!existing.isAvailable) {
           throw new DomainError(
             `Worker is unavailable on ${slot.date.toISOString().split('T')[0]}`,
@@ -129,7 +131,7 @@ export class BookWorkerUseCase implements IBookWorkerUseCase {
           );
         }
         const isLocked = existing.lockedUntil && new Date() < new Date(existing.lockedUntil);
-        if (existing.isBooked || isLocked) {
+        if (existing.isBooked || (isLocked && existing.serviceId !== dto.serviceId)) {
           throw new DomainError(
             `Slot already booked or temporarily reserved for date: ${slot.date.toISOString().split('T')[0]}`,
             "SLOT_LOCKED_OR_BOOKED"
@@ -180,5 +182,18 @@ export class BookWorkerUseCase implements IBookWorkerUseCase {
     // Notification to worker is also deferred until payment is confirmed.
 
     return ServiceMapper.toResponse(created);
+  }
+
+  private getConflictingSlotTypes(slotType: string): string[] {
+    if (slotType === "FULL_DAY") {
+      return ["FULL_DAY", "MORNING_HALF", "EVENING_HALF"];
+    }
+    if (slotType === "MORNING_HALF") {
+      return ["FULL_DAY", "MORNING_HALF"];
+    }
+    if (slotType === "EVENING_HALF") {
+      return ["FULL_DAY", "EVENING_HALF"];
+    }
+    return [slotType];
   }
 }
