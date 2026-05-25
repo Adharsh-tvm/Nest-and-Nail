@@ -1,5 +1,6 @@
 import axiosInstance from "@/lib/axiosInstance";
 import { ApiResponse } from "@/shared/types/responseTypes";
+import { AUTH_ROUTES } from "@/sources/constant-api";
 
 /* ---------------- PAYLOADS ---------------- */
 
@@ -34,13 +35,13 @@ export type AuthPayload = {
 export const authApi = {
   login: (payload: LoginPayload) =>
     axiosInstance.post<ApiResponse<AuthPayload>>(
-      "/api/auth/login",
+      AUTH_ROUTES.LOGIN,
       payload
     ),
 
   signup: (payload: Record<string, unknown>) =>
     axiosInstance.post<ApiResponse<AuthPayload>>(
-      "/api/auth/register",
+      AUTH_ROUTES.REGISTER,
       payload
     ),
 
@@ -48,39 +49,39 @@ export const authApi = {
     axiosInstance.post<ApiResponse<{
       accessToken: string;
       refreshToken: string;
-    }>>("/api/auth/refresh", { refreshToken }),
+    }>>(AUTH_ROUTES.REFRESH, { refreshToken }),
 
   logout: () =>
-    axiosInstance.post<ApiResponse<null>>("/api/auth/logout"),
+    axiosInstance.post<ApiResponse<null>>(AUTH_ROUTES.LOGOUT),
 
   validate: () =>
     axiosInstance.get<ApiResponse<{
       id: string;
       role: string;
       isBlocked: boolean;
-    }>>("/api/auth/validate"),
+    }>>(AUTH_ROUTES.VALIDATE),
 
   sendOtp: (payload: { email_address: string; role?: string }) =>
     axiosInstance.post<ApiResponse<null>>(
-      "/api/auth/send-otp",
+      AUTH_ROUTES.SEND_OTP,
       payload
     ),
 
   verifyOtp: (payload: { email_address: string; otp: string }) =>
     axiosInstance.post<ApiResponse<null>>(
-      "/api/auth/verify-otp",
+      AUTH_ROUTES.VERIFY_OTP,
       payload
     ),
 
   googleAuth: (payload: GoogleAuthPayload) =>
     axiosInstance.post<ApiResponse<AuthPayload>>(
-      "/api/auth/google",
+      AUTH_ROUTES.GOOGLE,
       payload
     ),
 
   forgotPassword: (payload: { email_address: string }) =>
     axiosInstance.post<ApiResponse<null>>(
-      "/api/auth/forgot-password",
+      AUTH_ROUTES.FORGOT_PASSWORD,
       payload
     ),
 
@@ -90,7 +91,7 @@ export const authApi = {
     confirmPassword: string;
   }) =>
     axiosInstance.post<ApiResponse<null>>(
-      "/api/auth/reset-password",
+      AUTH_ROUTES.RESET_PASSWORD,
       payload
     ),
 };

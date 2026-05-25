@@ -30,7 +30,7 @@ const userApi = {
     email: string
   ): Promise<ApiResponse<User>> => {
     const response = await axiosInstance.get<ApiResponse<User>>(
-      `/api/auth/current/${encodeURIComponent(email)}`,
+      AUTH_ROUTES.CURRENT_USER(email),
       { withCredentials: true }
     );
 

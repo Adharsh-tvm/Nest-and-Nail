@@ -16,7 +16,7 @@ export async function getAvailableWorkersApi(
 ): Promise<ApiResponse<{ workers: User[]; total: number }>> {
     try {
         const response = await axiosInstance.get<ApiResponse<{ workers: User[]; total: number }>>(
-            "/api/client/workers",
+            CLIENT_ROUTES.WORKERS,
             {
                 params: {
                     category,

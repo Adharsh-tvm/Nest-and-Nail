@@ -5,6 +5,7 @@ import { VerificationStatus } from "@/shared/enums/authEnums";
 import { mapUserFromApi, RawUserApiData } from "@/shared/mappers/user.mapper";
 import { ApiResponse } from "@/shared/types/responseTypes";
 import { User, UserQueryParams } from "@/shared/types/userTypes";
+import { ADMIN_ROUTES } from "@/sources/constant-api";
 
 /* ---------------- TYPES ---------------- */
 
@@ -63,7 +64,7 @@ function normalizeVerification(value: unknown): VerificationStatus {
 export async function fetchAllClients(): Promise<Client[]> {
   try {
     const res = await axiosInstance.get<ApiResponse<RawUserApiData[]>>(
-      "/api/admin/clients"
+      ADMIN_ROUTES.CLIENTS
     );
 
     if (!res.data.success) {
@@ -85,7 +86,7 @@ export async function fetchAllClients(): Promise<Client[]> {
 export async function fetchAllWorkers(): Promise<Worker[]> {
   try {
     const res = await axiosInstance.get<ApiResponse<RawUserApiData[]>>(
-      "/api/admin/workers"
+      ADMIN_ROUTES.WORKERS
     );
 
     if (!res.data.success) {
@@ -137,7 +138,7 @@ export async function fetchAllUsers(
   params: UserQueryParams = {}
 ): Promise<{ users: User[]; total: number; totalPages: number }> {
   const queryString = buildQueryString(params);
-  const url = `/api/admin/users/all${queryString ? `?${queryString}` : ""}`;
+  const url = `${ADMIN_ROUTES.USERS}${queryString ? `?${queryString}` : ""}`;
 
   const res = await axiosInstance.get<ApiResponse<{ users?: RawUserApiData[]; total?: number; totalPages?: number } | RawUserApiData[]>>(url);
 
@@ -164,7 +165,7 @@ export async function fetchAllUsers(
 
 export async function approveVerification(userId: string): Promise<void> {
   const res = await axiosInstance.patch<ApiResponse<null>>(
-    `/api/admin/verify/${userId}`
+    ADMIN_ROUTES.VERIFY(userId)
   );
 
   if (!res.data.success) {
@@ -177,7 +178,7 @@ export async function rejectVerification(
   reason: string
 ): Promise<void> {
   const res = await axiosInstance.patch<ApiResponse<null>>(
-    `/api/admin/reject/${userId}`,
+    ADMIN_ROUTES.REJECT(userId),
     { reason }
   );
 
@@ -188,7 +189,7 @@ export async function rejectVerification(
 
 export async function toggleUserAccess(userId: string): Promise<User> {
   const res = await axiosInstance.patch<ApiResponse<RawUserApiData>>(
-    `/api/admin/access/${userId}`
+    ADMIN_ROUTES.ACCESS(userId)
   );
 
   if (!res.data.success) {

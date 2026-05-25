@@ -138,7 +138,7 @@ export async function fetchAllUsers(
   params: UserQueryParams = {}
 ): Promise<{ users: User[]; total: number; totalPages: number }> {
   const queryString = buildQueryString(params);
-  const url = `/api/admin/users/all${queryString ? `?${queryString}` : ""}`;
+  const url = `${ADMIN_ROUTES.USERS}${queryString ? `?${queryString}` : ""}`;
 
   const res = await axiosInstance.get<ApiResponse<unknown>>(url);
 
@@ -345,7 +345,7 @@ export async function fetchAdminDashboardData(): Promise<unknown> {
 export async function resolveConcern(concernId: string, resolutionMessage: string): Promise<AdminConcern> {
   try {
     const res = await axiosInstance.patch<ApiResponse<AdminConcern>>(
-      `/api/admin/concerns/${concernId}/resolve`,
+      ADMIN_ROUTES.RESOLVE_CONCERN(concernId),
       { resolutionMessage }
     );
     if (!res.data.success) {

@@ -1,10 +1,11 @@
 import axiosInstance from "@/lib/axiosInstance";
 import axios from "axios";
 import { isDynamicServerError } from "@/lib/utils";
+import { TRANSACTION_ROUTES } from "@/sources/constant-api";
 
 export const getClientTransactionsApi = async (page: number = 1, limit: number = 10) => {
     try {
-        const response = await axiosInstance.get(`/api/transactions/client?page=${page}&limit=${limit}`);
+        const response = await axiosInstance.get(`${TRANSACTION_ROUTES.CLIENT}?page=${page}&limit=${limit}`);
         return response.data;
     } catch (error: unknown) {
         if (isDynamicServerError(error)) {
@@ -18,7 +19,7 @@ export const getClientTransactionsApi = async (page: number = 1, limit: number =
 
 export const getWorkerTransactionsApi = async (page: number = 1, limit: number = 10) => {
     try {
-        const response = await axiosInstance.get(`/api/transactions/worker?page=${page}&limit=${limit}`);
+        const response = await axiosInstance.get(`${TRANSACTION_ROUTES.WORKER}?page=${page}&limit=${limit}`);
         return response.data;
     } catch (error: unknown) {
         if (isDynamicServerError(error)) {
@@ -32,7 +33,7 @@ export const getWorkerTransactionsApi = async (page: number = 1, limit: number =
 
 export const getAdminTransactionsApi = async (page: number = 1, limit: number = 10) => {
     try {
-        const response = await axiosInstance.get(`/api/transactions/admin?page=${page}&limit=${limit}`);
+        const response = await axiosInstance.get(`${TRANSACTION_ROUTES.ADMIN}?page=${page}&limit=${limit}`);
         return response.data;
     } catch (error: unknown) {
         if (isDynamicServerError(error)) {

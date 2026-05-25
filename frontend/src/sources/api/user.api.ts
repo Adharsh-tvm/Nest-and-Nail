@@ -4,6 +4,7 @@ import axiosInstance from "@/lib/axiosInstance";
 import { Address } from "@/shared/types/addressType";
 import { ApiResponse } from "@/shared/types/responseTypes";
 import { User } from "@/shared/types/userTypes";
+import { AUTH_ROUTES, USER_ROUTES } from "@/sources/constant-api";
 
 
 export type UpdateRolePayload = {
@@ -18,7 +19,7 @@ const userApi = {
     role: "client" | "worker"
   ): Promise<ApiResponse<UpdateRolePayload>> => {
     const response = await axiosInstance.patch<ApiResponse<UpdateRolePayload>>(
-      "/api/auth/mode",
+      AUTH_ROUTES.MODE,
       { role },
       { withCredentials: true }
     );
@@ -29,7 +30,7 @@ const userApi = {
     email: string
   ): Promise<ApiResponse<User>> => {
     const response = await axiosInstance.get<ApiResponse<User>>(
-      `/api/auth/current/${encodeURIComponent(email)}`,
+      AUTH_ROUTES.CURRENT_USER(email),
       { withCredentials: true }
     );
 
@@ -38,7 +39,7 @@ const userApi = {
 
   getOnlineWorkers: async (): Promise<ApiResponse<User[]>> => {
     const response = await axiosInstance.get<ApiResponse<User[]>>(
-      "/api/users/workers/online",
+      USER_ROUTES.ONLINE_WORKERS,
       { withCredentials: true }
     );
     return response.data;
@@ -51,7 +52,7 @@ const userApi = {
     skills: string[]
   ): Promise<ApiResponse<User>> => {
     const response = await axiosInstance.patch<ApiResponse<User>>(
-      `/api/users/${userId}/skills`,
+      USER_ROUTES.SKILLS(userId),
       { skills },
       { withCredentials: true }
     );
@@ -63,7 +64,7 @@ const userApi = {
     payload: Address
   ): Promise<ApiResponse<User>> => {
     const response = await axiosInstance.post(
-      `/api/users/${userId}/addresses`,
+      USER_ROUTES.ADD_ADDRESS(userId),
       payload
     );
     return response.data
@@ -74,7 +75,7 @@ const userApi = {
     categories: string[]
   ): Promise<ApiResponse<User>> => {
     const response = await axiosInstance.patch<ApiResponse<User>>(
-      `/api/users/categories/${userId}`,
+      USER_ROUTES.UPDATE_CATEGORIES(userId),
       { categoryIds: categories },
       { withCredentials: true }
     );
@@ -89,7 +90,7 @@ const userApi = {
     payload: Address
   ): Promise<ApiResponse<User>> => {
     const response = await axiosInstance.put<ApiResponse<User>>(
-      `/api/users/${userId}/addresses/${addressId}`,
+      USER_ROUTES.UPDATE_ADDRESS(userId, addressId),
       payload,
       { withCredentials: true }
     );
@@ -101,7 +102,7 @@ const userApi = {
     addressId: string
   ): Promise<ApiResponse<User>> => {
     const response = await axiosInstance.delete<ApiResponse<User>>(
-      `/api/users/${userId}/addresses/${addressId}`,
+      USER_ROUTES.DELETE_ADDRESS(userId, addressId),
       { withCredentials: true }
     );
     return response.data;

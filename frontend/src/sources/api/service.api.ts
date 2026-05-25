@@ -2,6 +2,7 @@ import axiosInstance from "@/lib/axiosInstance";
 import { ApiResponse } from "@/shared/types/responseTypes";
 import { BookingPayload, BookingResult, SlotAvailability } from "@/shared/types/serviceTypes";
 import axios from "axios";
+import { CLIENT_ROUTES } from "@/sources/constant-api";
 
 /**
  * Fetch availability for a worker on a specific date.
@@ -13,7 +14,7 @@ export async function getWorkerAvailabilityApi(
 ): Promise<ApiResponse<SlotAvailability>> {
   try {
     const response = await axiosInstance.get<ApiResponse<SlotAvailability>>(
-      `/api/client/workers/${workerId}/availability`,
+      CLIENT_ROUTES.WORKER_AVAILABILITY(workerId),
       {
         params: { date },
         withCredentials: true,
@@ -60,7 +61,7 @@ export async function getWorkerAvailabilityBulkApi(
 ): Promise<ApiResponse<Record<string, SlotAvailability>>> {
   try {
     const response = await axiosInstance.get<ApiResponse<Record<string, SlotAvailability>>>(
-      `/api/client/workers/${workerId}/availability`,
+      CLIENT_ROUTES.WORKER_AVAILABILITY(workerId),
       {
         params: { startDate, endDate },
         withCredentials: true,
@@ -105,7 +106,7 @@ export async function bookWorkerApi(
 ): Promise<ApiResponse<BookingResult>> {
   try {
     const response = await axiosInstance.post<ApiResponse<BookingResult>>(
-      "/api/client/services/book",
+      CLIENT_ROUTES.BOOK_SERVICE,
       payload,
       { withCredentials: true }
     );

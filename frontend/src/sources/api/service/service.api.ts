@@ -152,7 +152,7 @@ export async function lockWorkerSlotsApi(data: {
 }): Promise<ApiResponse<null>> {
   try {
     const response = await axiosInstance.post<ApiResponse<null>>(
-      "/api/client/services/lock-slots",
+      CLIENT_ROUTES.LOCK_SLOTS,
       data,
       { withCredentials: true }
     );
@@ -195,7 +195,7 @@ export async function unlockWorkerSlotsApi(data: {
 }): Promise<ApiResponse<null>> {
   try {
     const response = await axiosInstance.post<ApiResponse<null>>(
-      "/api/client/services/unlock-slots",
+      CLIENT_ROUTES.UNLOCK_SLOTS,
       data,
       { withCredentials: true }
     );

@@ -7,6 +7,8 @@ export const CLIENT_ROUTES = {
         `${BASE}/workers/${id}/availability`,
 
     BOOK_SERVICE: `${BASE}/services/book`,
+    LOCK_SLOTS: `${BASE}/services/lock-slots`,
+    UNLOCK_SLOTS: `${BASE}/services/unlock-slots`,
 
     SERVICES_ONGOING: `${BASE}/services/ongoing`,
     SERVICES_HISTORY: `${BASE}/services/history`,
