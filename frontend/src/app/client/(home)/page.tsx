@@ -1,9 +1,9 @@
 "use client";
 
 import React from "react";
+import { useRouter } from "next/navigation";
 import {
   Search,
-  MapPin,
   Hammer,
   Wrench,
   Zap,
@@ -14,7 +14,6 @@ import {
   ShieldCheck,
   Clock,
   UserCheck,
-  Briefcase,
 } from "lucide-react";
 
 // --- Theme Constants ---
@@ -32,65 +31,55 @@ interface ServiceCardProps {
 
 // --- Components ---
 
-const HeroSection = () => (
-  <div className="relative bg-[#1B4332] overflow-hidden">
-    {/* Pattern Overlay */}
-    <div
-      className="absolute inset-0 opacity-10"
-      style={{
-        backgroundImage: "radial-gradient(#ffffff 1.5px, transparent 1.5px)",
-        backgroundSize: "32px 32px",
-      }}
-    ></div>
+const HeroSection = () => {
+  const router = useRouter();
 
-    <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-[#DC2626] opacity-10 rounded-full blur-3xl translate-y-1/3 -translate-x-1/4"></div>
+  return (
+    <div className="relative bg-[#1B4332] overflow-hidden">
+      {/* Pattern Overlay */}
+      <div
+        className="absolute inset-0 opacity-10"
+        style={{
+          backgroundImage: "radial-gradient(#ffffff 1.5px, transparent 1.5px)",
+          backgroundSize: "32px 32px",
+        }}
+      ></div>
 
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32 relative z-10">
-      <div className="text-center max-w-4xl mx-auto">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md text-white/90 text-sm font-medium mb-8 border border-white/20">
-          <span className="w-2 h-2 rounded-full bg-[#DC2626] animate-pulse"></span>
-          #1 Home Service Platform in 2024
-        </div>
+      <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-[#DC2626] opacity-10 rounded-full blur-3xl translate-y-1/3 -translate-x-1/4"></div>
 
-        <h1 className="text-5xl md:text-7xl font-extrabold text-white mb-8 leading-tight tracking-tight">
-          Home Services, <br className="hidden md:block" />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF6B6B] to-[#FF8787] drop-shadow-sm">
-            Done Right.
-          </span>
-        </h1>
-
-        <p className="text-lg md:text-xl text-gray-200 mb-12 max-w-2xl mx-auto font-light leading-relaxed">
-          From leaky faucets to full renovations, connect with vetted local
-          experts who treat your home like their own.
-        </p>
-
-        {/* Enhanced Search Bar */}
-        <div className="bg-white p-2.5 rounded-2xl shadow-2xl shadow-black/20 max-w-3xl mx-auto flex flex-col md:flex-row gap-2 transition-transform hover:scale-[1.01] duration-300">
-          <div className="flex-1 flex items-center px-4 h-14 bg-gray-50 rounded-xl md:rounded-r-none md:bg-transparent border-2 border-transparent focus-within:border-[#1B4332]/10 focus-within:bg-white transition-colors">
-            <Search className="text-gray-400 mr-3" size={22} />
-            <input
-              type="text"
-              placeholder="What do you need help with?"
-              className="w-full bg-transparent outline-none text-gray-800 placeholder-gray-400 font-medium text-lg"
-            />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32 relative z-10">
+        <div className="text-center max-w-4xl mx-auto">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md text-white/90 text-sm font-medium mb-8 border border-white/20">
+            <span className="w-2 h-2 rounded-full bg-[#DC2626] animate-pulse"></span>
+            #1 Home Service Platform in 2024
           </div>
-          <div className="w-px bg-gray-200 hidden md:block h-8 self-center"></div>
-          <div className="flex-[0.6] flex items-center px-4 h-14 bg-gray-50 rounded-xl md:rounded-none md:bg-transparent border-2 border-transparent focus-within:border-[#1B4332]/10 focus-within:bg-white transition-colors">
-            <MapPin className="text-[#DC2626] mr-3" size={22} />
-            <input
-              type="text"
-              placeholder="Zip Code"
-              className="w-full bg-transparent outline-none text-gray-800 placeholder-gray-400 font-medium text-lg"
-            />
+
+          <h1 className="text-5xl md:text-7xl font-extrabold text-white mb-8 leading-tight tracking-tight">
+            Home Services, <br className="hidden md:block" />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF6B6B] to-[#FF8787] drop-shadow-sm">
+              Done Right.
+            </span>
+          </h1>
+
+          <p className="text-lg md:text-xl text-gray-200 mb-12 max-w-2xl mx-auto font-light leading-relaxed">
+            From leaky faucets to full renovations, connect with vetted local
+            experts who treat your home like their own.
+          </p>
+
+          {/* Search CTA Button */}
+          <div className="flex justify-center">
+            <button
+              onClick={() => router.push("/client/workers")}
+              className="bg-[#DC2626] hover:bg-[#b91c1c] text-white font-extrabold text-lg md:text-xl h-16 px-10 rounded-2xl shadow-xl shadow-red-950/20 transition-all hover:scale-105 hover:-translate-y-0.5 active:translate-y-0 active:scale-100 flex items-center justify-center gap-3 group duration-300"
+            >
+              <Search size={22} />
+              Search Workers
+              <ArrowRight
+                size={22}
+                className="group-hover:translate-x-1.5 transition-transform duration-300"
+              />
+            </button>
           </div>
-          <button className="bg-[#DC2626] hover:bg-[#b91c1c] text-white font-bold h-14 px-8 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 group whitespace-nowrap">
-            Search
-            <ArrowRight
-              size={20}
-              className="group-hover:translate-x-1 transition-transform"
-            />
-          </button>
-        </div>
 
         {/* Stats Bar */}
         <div className="mt-16 pt-8 border-t border-white/10 flex flex-wrap justify-center gap-8 md:gap-16">
@@ -116,10 +105,14 @@ const HeroSection = () => (
       </div>
     </div>
   </div>
-);
+  );
+};
 
-const ServiceCard = ({ icon: Icon, title, count }: ServiceCardProps) => (
-  <div className="bg-white border border-gray-100 p-6 rounded-2xl shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_40px_-15px_rgba(220,38,38,0.1)] hover:border-red-100 transition-all duration-300 group cursor-pointer h-full flex flex-col items-center text-center">
+const ServiceCard = ({ icon: Icon, title, count, onClick }: ServiceCardProps & { onClick?: () => void }) => (
+  <div
+    onClick={onClick}
+    className="bg-white border border-gray-100 p-6 rounded-2xl shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_40px_-15px_rgba(220,38,38,0.1)] hover:border-red-100 transition-all duration-300 group cursor-pointer h-full flex flex-col items-center text-center"
+  >
     <div className="w-16 h-16 bg-[#F3F4F6] rounded-2xl flex items-center justify-center mb-5 group-hover:bg-[#DC2626] group-hover:rotate-3 transition-all duration-300 ease-out">
       <Icon
         size={32}
@@ -135,39 +128,46 @@ const ServiceCard = ({ icon: Icon, title, count }: ServiceCardProps) => (
   </div>
 );
 
-const PopularServices = () => (
-  <section className="py-24 bg-[#F9FAFB]">
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="text-center mb-16">
-        <span className="text-[#DC2626] font-bold text-sm uppercase tracking-wider mb-2 block">
-          Our Expertise
-        </span>
-        <h2 className="text-3xl md:text-5xl font-extrabold text-[#1B4332] mb-6">
-          Popular Services
-        </h2>
-        <p className="text-gray-600 max-w-2xl mx-auto text-lg">
-          From quick fixes to major renovations, find the right expert for every
-          job in your local area.
-        </p>
-      </div>
+const PopularServices = () => {
+  const router = useRouter();
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-        <ServiceCard icon={Droplets} title="Plumbing" count="450+" />
-        <ServiceCard icon={Zap} title="Electrical" count="320+" />
-        <ServiceCard icon={PaintBucket} title="Painting" count="210+" />
-        <ServiceCard icon={Hammer} title="Carpentry" count="180+" />
-        <ServiceCard icon={Truck} title="Moving" count="150+" />
-        <ServiceCard icon={Wrench} title="Repair" count="500+" />
-      </div>
+  return (
+    <section className="py-24 bg-[#F9FAFB]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-16">
+          <span className="text-[#DC2626] font-bold text-sm uppercase tracking-wider mb-2 block">
+            Our Expertise
+          </span>
+          <h2 className="text-3xl md:text-5xl font-extrabold text-[#1B4332] mb-6">
+            Popular Services
+          </h2>
+          <p className="text-gray-600 max-w-2xl mx-auto text-lg">
+            From quick fixes to major renovations, find the right expert for every
+            job in your local area.
+          </p>
+        </div>
 
-      <div className="mt-12 text-center">
-        <button className="text-[#1B4332] font-bold border-b-2 border-[#DC2626] hover:text-[#DC2626] pb-1 transition-colors text-lg flex items-center gap-2 mx-auto">
-          View All 50+ Categories <ArrowRight size={18} />
-        </button>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+          <ServiceCard icon={Droplets} title="Plumbing" count="450+" onClick={() => router.push("/client/workers?category=PLUMBING")} />
+          <ServiceCard icon={Zap} title="Electrical" count="320+" onClick={() => router.push("/client/workers?category=ELECTRICAL")} />
+          <ServiceCard icon={PaintBucket} title="Painting" count="210+" onClick={() => router.push("/client/workers?category=PAINTING")} />
+          <ServiceCard icon={Hammer} title="Carpentry" count="180+" onClick={() => router.push("/client/workers?category=CARPENTRY")} />
+          <ServiceCard icon={Truck} title="Moving" count="150+" onClick={() => router.push("/client/workers?category=MOVING")} />
+          <ServiceCard icon={Wrench} title="Repair" count="500+" onClick={() => router.push("/client/workers?category=REPAIR")} />
+        </div>
+
+        <div className="mt-12 text-center">
+          <button
+            onClick={() => router.push("/client/workers")}
+            className="text-[#1B4332] font-bold border-b-2 border-[#DC2626] hover:text-[#DC2626] pb-1 transition-colors text-lg flex items-center gap-2 mx-auto"
+          >
+            View All 50+ Categories <ArrowRight size={18} />
+          </button>
+        </div>
       </div>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 
 const HowItWorks = () => (
   <section className="py-24 bg-white relative">
@@ -287,32 +287,37 @@ const HowItWorks = () => (
   </section>
 );
 
-const CTASection = () => (
-  <section className="py-24 bg-[#1B4332] relative overflow-hidden isolate">
-    {/* Complex Background Elements */}
-    <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:20px_20px]"></div>
-    <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#DC2626] opacity-10 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/3"></div>
-    <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-[#4ADE80] opacity-5 blur-[100px] rounded-full translate-y-1/2 -translate-x-1/3"></div>
+const CTASection = () => {
+  const router = useRouter();
 
-    <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
-      <h2 className="text-4xl md:text-6xl font-extrabold text-white mb-8 tracking-tight">
-        Ready to <span className="text-[#DC2626]">Fix It?</span>
-      </h2>
-      <p className="text-xl text-gray-300 mb-12 max-w-2xl mx-auto leading-relaxed">
-        Join thousands of homeowners and professionals who are changing the way
-        home services are done.
-      </p>
-      <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-        <button className="w-full sm:w-auto bg-[#DC2626] text-white text-lg font-bold px-10 py-4 rounded-xl hover:bg-[#b91c1c] shadow-xl shadow-red-900/30 transition-all hover:-translate-y-1 active:translate-y-0 flex items-center justify-center gap-2">
-          <Search size={20} /> Find a Pro
-        </button>
-        <button className="w-full sm:w-auto bg-transparent border-2 border-white/20 text-white text-lg font-bold px-10 py-4 rounded-xl hover:bg-white/10 hover:border-white transition-all flex items-center justify-center gap-2">
-          <Briefcase size={20} /> Join as a Worker
-        </button>
+  return (
+    <section className="py-24 bg-[#1B4332] relative overflow-hidden isolate">
+      {/* Complex Background Elements */}
+      <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:20px_20px]"></div>
+      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#DC2626] opacity-10 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/3"></div>
+      <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-[#4ADE80] opacity-5 blur-[100px] rounded-full translate-y-1/2 -translate-x-1/3"></div>
+
+      <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
+        <h2 className="text-4xl md:text-6xl font-extrabold text-white mb-8 tracking-tight">
+          Ready to <span className="text-[#DC2626]">Fix It?</span>
+        </h2>
+        <p className="text-xl text-gray-300 mb-12 max-w-2xl mx-auto leading-relaxed">
+          Join thousands of homeowners and professionals who are changing the way
+          home services are done.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+          <button
+            onClick={() => router.push("/client/workers")}
+            className="w-full sm:w-auto bg-[#DC2626] text-white text-lg font-bold px-10 py-4 rounded-xl hover:bg-[#b91c1c] shadow-xl shadow-red-900/30 transition-all hover:-translate-y-1 active:translate-y-0 flex items-center justify-center gap-2"
+          >
+            <Search size={20} /> Find a Pro
+          </button>
+        
+        </div>
       </div>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 
 const HomePage = () => {
   return (

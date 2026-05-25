@@ -216,7 +216,7 @@ export class WorkerScheduleRepository implements IWorkerScheduleRepository {
     let conflictError: DomainError | null = null;
 
     for (const existing of postConflicts) {
-      if (existing.slotType === slotType && existing.serviceId === serviceId) {
+      if ((existing.slotType as unknown as string) === slotType && existing.serviceId === serviceId) {
         continue;
       }
       if (!existing.isAvailable) {
@@ -254,7 +254,7 @@ export class WorkerScheduleRepository implements IWorkerScheduleRepository {
           }
         }
       );
-      throw conflictError || new DomainError(`Slot already booked or temporarily reserved for date: ${date.toISOString().split('T')[0]}`, "SLOT_LOCKED_OR_BOOKED");
+      throw conflictError ?? new DomainError(`Slot already booked or temporarily reserved for date: ${date.toISOString().split('T')[0]}`, "SLOT_LOCKED_OR_BOOKED");
     }
   }
 
