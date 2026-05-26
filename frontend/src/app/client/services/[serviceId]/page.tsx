@@ -43,6 +43,18 @@ export default function ClientServiceDetailsPage() {
   // Cancellation State
   const [cancelModal, setCancelModal] = useState<{ open: boolean; reason: string; loading: boolean }>({ open: false, reason: "", loading: false });
 
+  const handleReviewSuccess = async () => {
+    if (!serviceId) return;
+    try {
+      const response = await getClientServiceByIdAction(serviceId);
+      if (response.success && response.data) {
+        setService(response.data);
+      }
+    } catch {
+      // Ignored
+    }
+  };
+
   useEffect(() => {
     const fetchDetailedService = async () => {
       if (!serviceId) return;
@@ -310,7 +322,7 @@ export default function ClientServiceDetailsPage() {
                 {service.status === ServiceStatus.COMPLETED && (
                   <div className="mt-6 pt-6 border-t border-gray-100 flex flex-col gap-3">
                     <RaiseConcernButton serviceId={serviceId} />
-                    {!service.review && <AddReviewButton serviceId={serviceId} />}
+                    {!service.review && <AddReviewButton serviceId={serviceId} onSuccess={handleReviewSuccess} />}
                   </div>
                 )}
               </div>

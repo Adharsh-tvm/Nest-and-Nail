@@ -1,15 +1,18 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { Star, X, CheckCircle2, Loader2, Send, MessageSquareHeart } from "lucide-react";
 import toast from "react-hot-toast";
 import { addReviewAction } from "@/app/actions/client/review-actions";
 
 interface AddReviewButtonProps {
   serviceId: string;
+  onSuccess?: () => void;
 }
 
-export default function AddReviewButton({ serviceId }: AddReviewButtonProps) {
+export default function AddReviewButton({ serviceId, onSuccess }: AddReviewButtonProps) {
+  const router = useRouter();
   const [showModal, setShowModal] = useState(false);
   const [rating, setRating] = useState<number>(0);
   const [hoverRating, setHoverRating] = useState<number>(0);
@@ -41,6 +44,10 @@ export default function AddReviewButton({ serviceId }: AddReviewButtonProps) {
       if (res.success) {
         setDone(true);
         toast.success("Review submitted successfully!");
+        router.refresh();
+        if (onSuccess) {
+          onSuccess();
+        }
       } else {
         setError(res.error || "Failed to submit review. Please try again.");
       }

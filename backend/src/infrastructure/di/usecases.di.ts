@@ -628,7 +628,8 @@ export class UseCaseDI {
 
   get getClientMeetingByIdUseCase(): IGetClientMeetingByIdUseCase {
     return (this._getClientMeetingByIdUseCase ??= new GetClientMeetingByIdUseCase(
-        this.infra.serviceRepository
+        this.infra.serviceRepository,
+        this.infra.reviewRepository
       ));
   }
 

@@ -1,4 +1,5 @@
 import { IServiceRepository } from "../../../../domain/repositories/IServiceRepository";
+import { IReviewRepository } from "../../../../domain/repositories/IReviewRepository";
 import { IGetClientMeetingByIdUseCase } from "../../../interfaces/meetings/client/IGetClientMeetingByIdUseCase";
 import { ServiceMapper } from "../../../mappers/ServiceMapper";
 import { ServiceStatus } from "../../../../shared/enums/serviceEnums";
@@ -21,7 +22,10 @@ interface IDetailedService extends Service {
 
 export class GetClientMeetingByIdUseCase implements IGetClientMeetingByIdUseCase {
 
-  constructor(private serviceRepo: IServiceRepository) {}
+  constructor(
+    private readonly serviceRepo: IServiceRepository,
+    private readonly reviewRepo: IReviewRepository
+  ) {}
 
   async execute(serviceId: string, clientId: string) {
 
@@ -46,6 +50,19 @@ export class GetClientMeetingByIdUseCase implements IGetClientMeetingByIdUseCase
       throw new Error("Meeting not found");
     }
 
-    return ServiceMapper.toResponse(service);
+    const response = ServiceMapper.toResponse(service);
+
+    if (service.status === ServiceStatus.COMPLETED) {
+      const reviewObj = await this.reviewRepo.findByServiceId(serviceId);
+      if (reviewObj) {
+        response.review = {
+          rating: reviewObj.rating,
+          review: reviewObj.review,
+          createdAt: reviewObj.createdAt
+        };
+      }
+    }
+
+    return response;
   }
 }

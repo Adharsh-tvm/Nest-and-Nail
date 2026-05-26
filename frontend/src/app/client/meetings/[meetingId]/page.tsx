@@ -5,13 +5,14 @@ import { PaymentStatus, SLOT_LABELS, ServiceResponseDTO } from "@/shared/types/s
 import Link from "next/link";
 import { 
   CalendarDays, Clock, Video, CreditCard, ArrowLeft,
-  CheckCircle2, AlertCircle, Timer, XCircle
+  CheckCircle2, AlertCircle, Timer, XCircle, Star
 } from "lucide-react";
 import EndMeetingButton from "@/app/components/containers/meetings/EndMeetingButton";
 import CancelMeetingButton from "@/app/components/containers/meetings/CancelMeetingButton";
 import { cancelServiceAction } from "@/app/actions/client/service-actions";
 import ChatDrawer from "@/app/components/containers/chat/ChatDrawer";
 import MeetingRingAlert from "@/app/components/containers/meetings/MeetingRingAlert";
+import AddReviewButton from "@/app/components/containers/services/AddReviewButton";
 
 export async function generateMetadata() {
   return { title: `Meeting Details | Client` };
@@ -277,6 +278,66 @@ export default async function ClientMeetingDetailPage({ params }: { params: Prom
                         cancelServiceAction={cancelServiceAction}
                     />
                 </div>
+            )}
+
+            {/* If Completed, show Review section */}
+            {meeting.status === "COMPLETED" && (
+              <div className="mt-6 pt-6 border-t border-slate-100">
+                {meeting.review ? (
+                  <div className="space-y-4">
+                    <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                      <Star className="w-5 h-5 text-amber-500 fill-amber-500" />
+                      Your Rating & Review
+                    </h3>
+                    
+                    <div className="bg-gradient-to-br from-indigo-50/40 via-purple-50/20 to-white rounded-2xl p-6 border border-indigo-50/60 shadow-inner relative overflow-hidden">
+                      {/* Decorative quote mark */}
+                      <div className="absolute right-4 bottom-2 text-indigo-100/40 pointer-events-none select-none font-serif text-8xl">
+                        ”
+                      </div>
+                      
+                      <div className="flex items-center justify-between flex-wrap gap-3 mb-4">
+                        <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-1">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <Star
+                                key={star}
+                                className={`w-4 h-4 ${
+                                  star <= (meeting.review?.rating ?? 0)
+                                    ? "fill-amber-400 text-amber-400"
+                                    : "text-slate-200"
+                                }`}
+                              />
+                            ))}
+                          </div>
+                          <span className="text-xs font-bold text-slate-700 bg-amber-50 border border-amber-100 px-2 py-0.5 rounded-lg">
+                            {meeting.review.rating.toFixed(1)} / 5.0
+                          </span>
+                        </div>
+                        {meeting.review.createdAt && (
+                          <span className="text-xs text-slate-400 font-medium">
+                            Reviewed on {new Date(meeting.review.createdAt).toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                            })}
+                          </span>
+                        )}
+                      </div>
+                      
+                      <p className="text-slate-700 text-sm leading-relaxed italic relative z-10">
+                        &ldquo;{meeting.review.review || "No review description left."}&rdquo;
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-slate-50 border border-slate-100 rounded-2xl p-5 text-center">
+                    <p className="text-sm font-medium text-slate-600 mb-2">How was your video consultation?</p>
+                    <p className="text-xs text-slate-400 mb-4">Share your feedback to help improve the service.</p>
+                    <AddReviewButton serviceId={meeting.serviceId} />
+                  </div>
+                )}
+              </div>
             )}
 
           </div>
