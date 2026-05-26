@@ -93,7 +93,11 @@ export class BookWorkerUseCase implements IBookWorkerUseCase {
     const twelveHoursFromNow = now.getTime() + 12 * 60 * 60 * 1000;
 
     for (const slot of dto.selectedSlots) {
-      const slotDate = new Date(slot.date);
+      const d = new Date(slot.date);
+      const year = d.getUTCFullYear();
+      const month = d.getUTCMonth();
+      const date = d.getUTCDate();
+
       let startHour = 9;
       let startMinute = 0;
       if ((slot.slotType as string) === "EVENING_HALF") {
@@ -105,9 +109,15 @@ export class BookWorkerUseCase implements IBookWorkerUseCase {
           startHour = parseInt(parts[1], 10);
           startMinute = parseInt(parts[2], 10);
         }
+        if (startHour < 12) {
+          startHour += 12; // 8 PM -> 20:00
+        }
       }
 
-      slotDate.setUTCHours(startHour, startMinute, 0, 0);
+      // Create UTC Date representing the slot in IST
+      const slotDate = new Date(Date.UTC(year, month, date, startHour, startMinute, 0, 0));
+      // Subtract 5.5 hours to convert IST to UTC
+      slotDate.setTime(slotDate.getTime() - (5.5 * 60 * 60 * 1000));
 
       if (slotDate.getTime() < twelveHoursFromNow) {
         throw new Error("Services must be booked at least 12 hours in advance.");
