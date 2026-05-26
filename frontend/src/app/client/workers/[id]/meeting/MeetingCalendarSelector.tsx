@@ -27,7 +27,11 @@ const MONTH_NAMES = [
 const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 const isSlotWithin12Hours = (dateKey: string, slotType: SlotType): boolean => {
-  const slotDate = new Date(dateKey);
+  const partsDate = dateKey.split("-");
+  const year = parseInt(partsDate[0], 10);
+  const month = parseInt(partsDate[1], 10) - 1;
+  const day = parseInt(partsDate[2], 10);
+
   let startHour = 9;
   let startMinute = 0;
 
@@ -37,9 +41,16 @@ const isSlotWithin12Hours = (dateKey: string, slotType: SlotType): boolean => {
       startHour = parseInt(parts[1], 10);
       startMinute = parseInt(parts[2], 10);
     }
+    if (startHour < 12) {
+      startHour += 12;
+    }
   }
 
-  slotDate.setUTCHours(startHour, startMinute, 0, 0);
+  // Create UTC Date representing the slot in IST
+  const slotDate = new Date(Date.UTC(year, month, day, startHour, startMinute, 0, 0));
+  // Subtract 5.5 hours to convert IST to UTC
+  slotDate.setTime(slotDate.getTime() - (5.5 * 60 * 60 * 1000));
+
   return slotDate.getTime() < Date.now() + 12 * 60 * 60 * 1000;
 };
 
