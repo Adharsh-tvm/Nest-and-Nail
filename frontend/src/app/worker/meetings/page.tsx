@@ -8,6 +8,7 @@ import { motion, Variants } from "framer-motion";
 import { Calendar as CalendarIcon, Clock, CreditCard, MoreHorizontal, Filter, Loader2, Search, Video } from "lucide-react";
 import toast from "react-hot-toast";
 import Pagination from "@/app/components/ui/Pagination";
+import { formatMeetingDate } from "@/utils/dateTime";
 
 const PAGE_SIZE = 9;
 
@@ -46,11 +47,7 @@ export default function WorkerMeetingsPage() {
   }, [activeTab, searchQuery]);
 
   const formatDate = (dateString: string) => {
-    return new Intl.DateTimeFormat("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    }).format(new Date(dateString));
+    return formatMeetingDate(dateString);
   };
 
   const getStatusColor = (status: ServiceStatus | string) => {

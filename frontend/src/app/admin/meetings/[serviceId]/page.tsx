@@ -16,6 +16,7 @@ import toast from "react-hot-toast";
 
 import { AdminServiceResponseDTO } from "@/shared/types/serviceTypes";
 import { getAdminServiceDetailsAction } from "@/app/actions/admin/service-actions";
+import { formatMeetingDate, formatMeetingDateTime } from "@/utils/dateTime";
 
 const AdminMeetingDetailsPage = () => {
   const router = useRouter();
@@ -75,9 +76,7 @@ const AdminMeetingDetailsPage = () => {
   const slotsByDate: Record<string, string[]> = {};
   if (meeting.selectedSlots) {
       meeting.selectedSlots.forEach(slot => {
-          const dateStr = new Date(slot.date).toLocaleDateString("en-US", {
-              weekday: "short", month: "short", day: "numeric", year: "numeric"
-          });
+          const dateStr = formatMeetingDate(slot.date);
           if (!slotsByDate[dateStr]) slotsByDate[dateStr] = [];
           slotsByDate[dateStr].push(slot.slotType.replace("_", " "));
       });
@@ -256,22 +255,16 @@ const AdminMeetingDetailsPage = () => {
                   </p>
                 </div>
                 <div>
-                  <span className="text-[10px] text-gray-500 uppercase tracking-wider font-bold block mb-0.5">Exact Booking Time</span>
+                  <span className="text-[10px] text-gray-500 uppercase tracking-wider font-bold block mb-0.5">Booked Time</span>
                   <p className="text-gray-800 text-xs font-semibold">
-                    {new Date(meeting.videoCall?.bookingTime || meeting.createdAt).toLocaleString("en-US", {
-                      month: "short", day: "numeric", year: "numeric",
-                      hour: "2-digit", minute: "2-digit", second: "2-digit"
-                    })}
+                    {formatMeetingDateTime(meeting.videoCall?.bookingTime || meeting.createdAt)}
                   </p>
                 </div>
                 {meeting.videoCall?.actualStartTime && (
                   <div>
                     <span className="text-[10px] text-purple-600 uppercase tracking-wider font-bold block mb-0.5">Actual Start Time</span>
                     <p className="text-purple-900 text-xs font-semibold">
-                      {new Date(meeting.videoCall.actualStartTime).toLocaleString("en-US", {
-                        month: "short", day: "numeric", year: "numeric",
-                        hour: "2-digit", minute: "2-digit"
-                      })}
+                      {formatMeetingDateTime(meeting.videoCall.actualStartTime)}
                     </p>
                   </div>
                 )}
@@ -279,10 +272,7 @@ const AdminMeetingDetailsPage = () => {
                   <div>
                     <span className="text-[10px] text-purple-600 uppercase tracking-wider font-bold block mb-0.5">Actual End Time</span>
                     <p className="text-purple-900 text-xs font-semibold">
-                      {new Date(meeting.videoCall.endedAt).toLocaleString("en-US", {
-                        month: "short", day: "numeric", year: "numeric",
-                        hour: "2-digit", minute: "2-digit"
-                      })}
+                      {formatMeetingDateTime(meeting.videoCall.endedAt)}
                     </p>
                   </div>
                 )}

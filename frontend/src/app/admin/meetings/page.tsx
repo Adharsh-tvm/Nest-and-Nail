@@ -24,6 +24,7 @@ import {
   AdminServiceResponseDTO,
 } from "@/shared/types/serviceTypes";
 import { getAdminServicesAction } from "@/app/actions/admin/service-actions";
+import { formatMeetingDate } from "@/utils/dateTime";
 
 const AdminMeetingsPage = () => {
   const router = useRouter();
@@ -162,11 +163,7 @@ const AdminMeetingsPage = () => {
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2 text-sm text-gray-800 font-medium">
             <Calendar size={14} className="text-purple-400" />
-            {new Date(row.scheduledDate).toLocaleDateString("en-US", {
-              day: "numeric",
-              month: "short",
-              year: "numeric",
-            })}
+            {formatMeetingDate(row.scheduledDate)}
           </div>
           <div className="flex gap-1 flex-wrap mt-1">
             {row.selectedSlots?.slice(0, 2).map((slot, idx) => (

@@ -14,6 +14,8 @@ import ChatDrawer from "@/app/components/containers/chat/ChatDrawer";
 import MeetingRingAlert from "@/app/components/containers/meetings/MeetingRingAlert";
 import AddReviewButton from "@/app/components/containers/services/AddReviewButton";
 
+import { formatMeetingDateLong, formatMeetingDateTime } from "@/utils/dateTime";
+
 export async function generateMetadata() {
   return { title: `Meeting Details | Client` };
 }
@@ -29,14 +31,6 @@ export default async function ClientMeetingDetailPage({ params }: { params: Prom
   const meeting = res.data;
   const worker = (meeting as ServiceResponseDTO & { worker?: { name: string; email?: string } }).worker;
   const client = (meeting as ServiceResponseDTO & { client?: { name: string; email?: string } }).client;
-
-  const formatDate = (d: string | Date) =>
-    new Date(d).toLocaleDateString("en-US", {
-      weekday: "long", month: "long", day: "numeric", year: "numeric",
-    });
-
-  const formatTime = (d: string | Date) =>
-    new Date(d).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
 
   const statusConfig: Record<string, { label: string; color: string; bg: string; icon: React.ReactNode }> = {
     CONFIRMED: { label: "Confirmed", color: "text-violet-700", bg: "bg-violet-50 border-violet-200", icon: <CheckCircle2 className="w-4 h-4" /> },
@@ -128,7 +122,7 @@ export default async function ClientMeetingDetailPage({ params }: { params: Prom
                   <CalendarDays className="w-4 h-4 text-emerald-500" />
                   <span className="text-xs font-semibold text-emerald-600 uppercase tracking-wide">Scheduled Date</span>
                 </div>
-                <p className="font-bold text-slate-800 text-sm">{formatDate(meeting.scheduledDate)}</p>
+                <p className="font-bold text-slate-800 text-sm">{formatMeetingDateLong(meeting.scheduledDate)}</p>
               </div>
 
               <div className="p-4 rounded-2xl bg-violet-50 border border-violet-100">
@@ -139,23 +133,15 @@ export default async function ClientMeetingDetailPage({ params }: { params: Prom
                 <p className="font-bold text-slate-800 text-sm">{slotLabel}</p>
               </div>
 
-              {meeting.videoCall?.startTime && (
+              {(meeting.videoCall?.bookingTime || meeting.createdAt) && (
                 <div className="p-4 rounded-2xl bg-blue-50 border border-blue-100">
                   <div className="flex items-center gap-2 mb-1">
                     <Clock className="w-4 h-4 text-blue-500" />
-                    <span className="text-xs font-semibold text-blue-600 uppercase tracking-wide">Booked Start Time</span>
+                    <span className="text-xs font-semibold text-blue-600 uppercase tracking-wide">Booked Time</span>
                   </div>
-                  <p className="font-bold text-slate-800 text-sm">{formatTime(meeting.videoCall.startTime)}</p>
-                </div>
-              )}
-
-              {meeting.videoCall?.endTime && (
-                <div className="p-4 rounded-2xl bg-blue-50 border border-blue-100">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Clock className="w-4 h-4 text-blue-500" />
-                    <span className="text-xs font-semibold text-blue-600 uppercase tracking-wide">Booked End Time</span>
-                  </div>
-                  <p className="font-bold text-slate-800 text-sm">{formatTime(meeting.videoCall.endTime)}</p>
+                  <p className="font-bold text-slate-800 text-sm">
+                    {formatMeetingDateTime(meeting.videoCall?.bookingTime || meeting.createdAt)}
+                  </p>
                 </div>
               )}
               
@@ -169,33 +155,27 @@ export default async function ClientMeetingDetailPage({ params }: { params: Prom
                 </div>
               )}
 
-              {/* Actual Meeting Times — shown only for completed meetings */}
-              {meeting.status === "COMPLETED" && meeting.videoCall?.actualStartTime && (
+              {/* Actual Meeting Times */}
+              {meeting.videoCall?.actualStartTime && (
                 <div className="p-4 rounded-2xl bg-violet-50 border border-violet-100">
                   <div className="flex items-center gap-2 mb-1">
                     <Clock className="w-4 h-4 text-violet-500" />
                     <span className="text-xs font-semibold text-violet-600 uppercase tracking-wide">Actual Start Time</span>
                   </div>
                   <p className="font-bold text-slate-800 text-sm">
-                    {new Date(meeting.videoCall.actualStartTime).toLocaleString("en-US", {
-                      month: "short", day: "numeric", year: "numeric",
-                      hour: "2-digit", minute: "2-digit"
-                    })}
+                    {formatMeetingDateTime(meeting.videoCall.actualStartTime)}
                   </p>
                 </div>
               )}
 
-              {meeting.status === "COMPLETED" && meeting.videoCall?.endedAt && (
+              {meeting.videoCall?.endedAt && (
                 <div className="p-4 rounded-2xl bg-violet-50 border border-violet-100">
                   <div className="flex items-center gap-2 mb-1">
                     <Clock className="w-4 h-4 text-violet-500" />
                     <span className="text-xs font-semibold text-violet-600 uppercase tracking-wide">Actual End Time</span>
                   </div>
                   <p className="font-bold text-slate-800 text-sm">
-                    {new Date(meeting.videoCall.endedAt).toLocaleString("en-US", {
-                      month: "short", day: "numeric", year: "numeric",
-                      hour: "2-digit", minute: "2-digit"
-                    })}
+                    {formatMeetingDateTime(meeting.videoCall.endedAt)}
                   </p>
                 </div>
               )}

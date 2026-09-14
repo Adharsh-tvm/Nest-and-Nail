@@ -7,6 +7,7 @@ import { User } from '@/shared/types/userTypes';
 import Pagination from '@/app/components/ui/Pagination';
 import Link from 'next/link';
 import Image from 'next/image';
+import { formatMeetingDate } from '@/utils/dateTime';
 
 const ACTIVE_PAGE_SIZE = 6;
 const HISTORY_PAGE_SIZE = 6;
@@ -47,9 +48,7 @@ export default function ClientMeetingsView({ scheduled, history, workerMap }: Pr
     };
 
     const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString('en-US', {
-            month: 'short', day: 'numeric', year: 'numeric'
-        });
+        return formatMeetingDate(dateString);
     };
 
     const renderMeetingCard = (meeting: ServiceResponseDTO, isActive: boolean) => {

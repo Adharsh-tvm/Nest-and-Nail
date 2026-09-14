@@ -165,6 +165,10 @@ export class ServiceRepository implements IServiceRepository {
                     title: 1,
                     description: 1,
                     numberOfDays: 1,
+                    numberOfWorkers: 1,
+                    pricePerWorker: 1,
+                    totalAmount: 1,
+                    advanceAmount: 1,
 
                     createdAt: 1,
                     updatedAt: 1,
